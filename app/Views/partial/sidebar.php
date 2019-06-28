@@ -1,0 +1,1 @@
+<h2>This is a sidebar partial view.</h2>
