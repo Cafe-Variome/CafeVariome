@@ -1,6 +1,5 @@
 <?php
 namespace App\Controllers;
-use App\Models\UIData;
 
 /**
  * Class Auth
@@ -11,8 +10,14 @@ use App\Models\UIData;
  * @author   Benoit VRIGNAUD <benoit.vrignaud@zaclys.net>
  * @license  https://opensource.org/licenses/MIT	MIT License
  */
+
+use App\Models\UIData;
+use App\Libraries;
+use App\Models\Settings;
+
 class Auth extends CVUI_Controller
 {
+	public $provider;
 
 	/**
 	 *
@@ -81,6 +86,9 @@ class Auth extends CVUI_Controller
 		{
 			$this->validationListTemplate = $this->configIonAuth->templates['errors']['list'];
 		}
+
+		$this->db = \Config\Database::connect();
+        $this->setting =  Settings::getInstance($this->db);
 	}
 
 	/**
@@ -118,17 +126,72 @@ class Auth extends CVUI_Controller
 		}
 	}
 
+	public function klogin()
+	{
+
+        $key = parse_ini_file($this->setting->settingData["keycloak_ini"], true);
+        try {
+            $this->provider = new \Stevenmaguire\OAuth2\Client\Provider\Keycloak([
+                'authServerUrl'         => $key['base']['authServerUrl'],
+                'realm'                 => $key['base']['realm'],
+                'clientId'              => $key['base']['clientId'],
+                'clientSecret'          => $key['base']['clientSecret'],
+                'redirectUri'           => $key['login']['redirectUri'],
+            ]);
+        }
+        catch (Exception $e) {
+            error_log("failed");
+            header('Location: '.BASE_URL);
+            return;
+        }	    	
+        if (!isset($_GET['code'])) {
+            $authUrl = $this->provider->getAuthorizationUrl();
+            $_SESSION['oauth2state'] = $this->provider->getState();
+            header('Location: '.$authUrl);
+            exit;
+
+        // Check given state against previously stored one to mitigate CSRF attack
+        } elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
+            unset($_SESSION['oauth2state']);
+               redirect('auth_federated/logout', 'refresh');
+
+        } else {
+            // Try to get an access token (using the authorization code grant)
+            try {
+                $token = $this->provider->getAccessToken('authorization_code', [
+                    'code' => $_GET['code']
+                ]);
+            } catch (Exception $e) {
+                exit('Failed to get access token: '.$e->getMessage());
+            }
+            // Optional: Now you have a token you can look up a users profile data
+            try {
+                // We got an access token, let's now get the user's details
+				$user = $this->provider->getResourceOwner($token);
+
+				$details = $user->toArray();
+
+				echo($user->getEmail());
+
+
+            } 
+            catch (Exception $e) {
+                exit('Failed to get resource owner: '.$e->getMessage());
+            }
+            //$this->login_success($token, $user);
+        }
+	}
 	/**
 	 * Log the user in
 	 *
 	 * @return string|\CodeIgniter\HTTP\RedirectResponse
 	 */
 	public function login()
-	{
+	{		
 		$uidata = new UIData();
 		$uidata->title = lang('Auth.login_heading');
 
-		$uidata->javascript = array("cafevariome/authentication.js");
+		//$uidata->javascript = array("cafevariome/authentication.js");
 		
 		// validate form input
 		$this->validation->setRule('identity', str_replace(':', '', lang('Auth.login_identity_label')), 'required');
@@ -139,6 +202,7 @@ class Auth extends CVUI_Controller
 			// check to see if the user is logging in
 			// check for "remember me"
 			$remember = (bool)$this->request->getVar('remember');
+			
 
 			if ($this->ionAuth->login($this->request->getVar('identity'), $this->request->getVar('password'), $remember))
 			{
