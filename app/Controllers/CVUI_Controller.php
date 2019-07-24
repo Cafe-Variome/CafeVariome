@@ -14,7 +14,7 @@ use App\Models\Settings;
 
 class CVUI_Controller extends Controller{
 	
-	protected $db;
+	public $db;
 	protected $session;
 
 	/**
@@ -104,4 +104,8 @@ class CVUI_Controller extends Controller{
 		return $data;
 
 	}	
+
+	//function __destruct() {
+        //session_write_close();
+    //}
 }

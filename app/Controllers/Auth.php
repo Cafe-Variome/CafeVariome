@@ -12,9 +12,9 @@ namespace App\Controllers;
  */
 
 use App\Models\UIData;
-use App\Libraries;
 use App\Models\Settings;
-
+use App\Helpers\AuthHelper;
+use App\Libraries\AuthAdapter;
 class Auth extends CVUI_Controller
 {
 	public $provider;
@@ -88,7 +88,10 @@ class Auth extends CVUI_Controller
 		}
 
 		$this->db = \Config\Database::connect();
-        $this->setting =  Settings::getInstance($this->db);
+		$this->setting =  Settings::getInstance($this->db);
+		
+		$this->authAdapter = new AuthAdapter('KeyCloakFirst');
+
 	}
 
 	/**
@@ -97,18 +100,18 @@ class Auth extends CVUI_Controller
 	 * @return string|\CodeIgniter\HTTP\RedirectResponse
 	 */
 	public function index()
-	{	
-		if (! $this->ionAuth->loggedIn())
+	{
+		if (! $this->authAdapter->loggedIn())
 		{
 			// redirect them to the login page
 			return redirect()->to(base_url("auth/login"));
 		}
-		else if (! $this->ionAuth->isAdmin()) // remove this elseif if you want to enable this for non-admins
-		{
+		//else if (! $this->authAdapter->isAdmin()) // remove this elseif if you want to enable this for non-admins
+		//{
 			// redirect them to the home page because they must be an administrator to view this
 			//show_error('You must be an administrator to view this page.');
-			throw new \Exception('You must be an administrator to view this page.');
-		}
+		//	throw new \Exception('You must be an administrator to view this page.');
+		//}
 		else
 		{
 			$this->data['title'] = lang('Auth.index_heading');
@@ -126,138 +129,103 @@ class Auth extends CVUI_Controller
 		}
 	}
 
-	public function klogin()
-	{
-
-        $key = parse_ini_file($this->setting->settingData["keycloak_ini"], true);
-        try {
-            $this->provider = new \Stevenmaguire\OAuth2\Client\Provider\Keycloak([
-                'authServerUrl'         => $key['base']['authServerUrl'],
-                'realm'                 => $key['base']['realm'],
-                'clientId'              => $key['base']['clientId'],
-                'clientSecret'          => $key['base']['clientSecret'],
-                'redirectUri'           => $key['login']['redirectUri'],
-            ]);
-        }
-        catch (Exception $e) {
-            error_log("failed");
-            header('Location: '.BASE_URL);
-            return;
-        }	    	
-        if (!isset($_GET['code'])) {
-            $authUrl = $this->provider->getAuthorizationUrl();
-            $_SESSION['oauth2state'] = $this->provider->getState();
-            header('Location: '.$authUrl);
-            exit;
-
-        // Check given state against previously stored one to mitigate CSRF attack
-        } elseif (empty($_GET['state']) || ($_GET['state'] !== $_SESSION['oauth2state'])) {
-            unset($_SESSION['oauth2state']);
-               redirect('auth_federated/logout', 'refresh');
-
-        } else {
-            // Try to get an access token (using the authorization code grant)
-            try {
-                $token = $this->provider->getAccessToken('authorization_code', [
-                    'code' => $_GET['code']
-                ]);
-            } catch (Exception $e) {
-                exit('Failed to get access token: '.$e->getMessage());
-            }
-            // Optional: Now you have a token you can look up a users profile data
-            try {
-                // We got an access token, let's now get the user's details
-				$user = $this->provider->getResourceOwner($token);
-
-				$details = $user->toArray();
-
-				echo($user->getEmail());
-
-
-            } 
-            catch (Exception $e) {
-                exit('Failed to get resource owner: '.$e->getMessage());
-            }
-            //$this->login_success($token, $user);
-        }
-	}
 	/**
 	 * Log the user in
 	 *
 	 * @return string|\CodeIgniter\HTTP\RedirectResponse
 	 */
 	public function login()
-	{		
-		$uidata = new UIData();
-		$uidata->title = lang('Auth.login_heading');
-
-		//$uidata->javascript = array("cafevariome/authentication.js");
-		
-		// validate form input
-		$this->validation->setRule('identity', str_replace(':', '', lang('Auth.login_identity_label')), 'required');
-		$this->validation->setRule('password', str_replace(':', '', lang('Auth.login_password_label')), 'required');
-
-		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+	{	
+		if($this->authAdapter->loggedIn())
 		{
-			// check to see if the user is logging in
-			// check for "remember me"
-			$remember = (bool)$this->request->getVar('remember');
-			
+			return redirect()->to(base_url('auth/index'));
+		}
+		else{
+			$this->authAdapter->login('', '', false);
+			$uidata = new UIData();
+			$uidata->data['message'] = "Authentication server is not available. Only local login is possible at the moment.";
 
-			if ($this->ionAuth->login($this->request->getVar('identity'), $this->request->getVar('password'), $remember))
+			$uidata->title = lang('Auth.login_heading');
+	
+			//$uidata->javascript = array("cafevariome/authentication.js");
+			
+			// validate form input
+			$this->validation->setRule('identity', str_replace(':', '', lang('Auth.login_identity_label')), 'required');
+			$this->validation->setRule('password', str_replace(':', '', lang('Auth.login_password_label')), 'required');
+	
+			if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 			{
-				//if the login is successful
-				//redirect them back to the home page
-				$this->session->setFlashdata('message', $this->ionAuth->messages());
-				return redirect()->to(base_url());
+				// check to see if the user is logging in
+				// check for "remember me"
+				$remember = (bool)$this->request->getVar('remember');
+				
+	
+				if ($this->ionAuth->login($this->request->getVar('identity'), $this->request->getVar('password'), $remember))
+				{
+					//if the login is successful
+					//redirect them back to the home page
+					$this->session->setFlashdata('message', $this->ionAuth->messages());
+					return redirect()->to(base_url());
+				}
+				else
+				{
+					// if the login was un-successful
+					// redirect them back to the login page
+					$this->session->setFlashdata('message', $this->ionAuth->errors($this->validationListTemplate));
+					// use redirects instead of loading views for compatibility with MY_Controller libraries
+					return redirect()->back()->withInput();
+	
+				}
+				$data = $this->wrapData($uidata);
+				return view($this->viewsFolder . DIRECTORY_SEPARATOR . 'login', $data);
 			}
 			else
 			{
-				// if the login was un-successful
-				// redirect them back to the login page
-				$this->session->setFlashdata('message', $this->ionAuth->errors($this->validationListTemplate));
-				// use redirects instead of loading views for compatibility with MY_Controller libraries
-				return redirect()->back()->withInput();
-
-			}
-			$data = $this->wrapData($uidata);
-			return view($this->viewsFolder . DIRECTORY_SEPARATOR . 'login', $data);
-		}
-		else
-		{
-			// the user is not logging in so display the login page
-			// set the flash data error message if there is one
-			$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-			
-			$uidata->data['identity'] = [
-				'name'  => 'identity',
-				'id'    => 'identity',
-				'type'  => 'text',
-				'value' => set_value('identity'),
-				'class' => 'form-control'
-
-			];
-
-			$uidata->data['password'] =[
-				'name' => 'password',
-				'id'   => 'password',
-				'type' => 'password',
-				'class' => 'form-control'
-
-			];
-
-			//Check availability of Auth Server
-			if(!$this->checkAuthServer())
-			{
-				//Auth server not available
-				$uidata->data['message'] = "Authentication server is not available. Only local login is possible at the moment.";
-			}
-
-			$data = $this->wrapData($uidata);
-			return view($this->viewsFolder . DIRECTORY_SEPARATOR . 'login', $data);
-		}
+				// the user is not logging in so display the login page
+				// set the flash data error message if there is one
+				$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+				
+				$uidata->data['identity'] = [
+					'name'  => 'identity',
+					'id'    => 'identity',
+					'type'  => 'text',
+					'value' => set_value('identity'),
+					'class' => 'form-control'
+	
+				];
+	
+				$uidata->data['password'] =[
+					'name' => 'password',
+					'id'   => 'password',
+					'type' => 'password',
+					'class' => 'form-control'
+	
+				];
+	
+				$data = $this->wrapData($uidata);
+				return view($this->viewsFolder . DIRECTORY_SEPARATOR . 'login', $data);
+			}			
+		}	
 	}
 
+	public function klogin(){
+		$l = $this->authAdapter->login('', '', false);
+		var_dump($l);
+		var_dump($_SESSION);
+		var_dump($this->authAdapter->loggedIn());
+
+		if($l){
+			header('Location: '.base_url('auth/index'));
+			exit;
+			//var_dump($this->authAdapter->loggedIn());
+			//var_dump($this->authAdapter->authEngine->get_session_status());
+		}
+		else{			
+			header('Location: '.base_url('auth/login'));
+			exit;
+		}
+
+	}
 	/**
 	 * Log the user out
 	 *
@@ -266,7 +234,6 @@ class Auth extends CVUI_Controller
 	public function logout()
 	{
 		$this->data['title'] = 'Logout';
-
 		// log the user out
 		$this->ionAuth->logout();
 
@@ -1016,15 +983,5 @@ class Auth extends CVUI_Controller
 		}
 	}
 
-	private function checkAuthServer(){
 
-		$fp = @fsockopen(AUTH_SERVER, 80, $errno, $errstr, 30);
-
-		if ($fp) {
-			//Auth server is available
-			return true;
-		}
-
-		return false;
-	}
 }

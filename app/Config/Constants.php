@@ -93,4 +93,5 @@ define('CSS','resources/css/');
 define('UPLOAD','resources/upload/');
 define('VENDOR','vendor/');
 
-define('AUTH_SERVER','auth.cafevariome.org');
+define('PRECAN', false); // Set/Unset to enable/disable Precanned Queries feature in Query Builder
+define('PHENOTYPE_CATEGORIES', true); // Set/Unset to enable/disable categories wise split in phenotype attributes

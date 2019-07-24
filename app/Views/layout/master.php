@@ -20,11 +20,12 @@
 	<meta name="description" content="<?php echo $description ?>" />
 	
     <!-- Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh 11/6/2019 -->
-    <link rel="stylesheet" href="<?php echo base_url(CSS."bootstrap.css");?>" />
+    <link rel="stylesheet" href="<?php echo base_url(VENDOR."twbs/bootstrap/dist/css/bootstrap.css");?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/fontawesome.css"); ?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/brands.css"); ?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/solid.css"); ?>" />
     <link rel="stylesheet" href="<?php echo base_url(CSS."/jstree/themes/default/style.css");?>" />
+    <link rel="stylesheet" href="<?php echo base_url(VENDOR."select2/select2/dist/css/select2.css");?>" />
     <style>
     main > .container {
         padding: 80px 15px 0;
@@ -79,13 +80,12 @@
     <!--<link rel="stylesheet" href="<?php echo base_url(CSS."jquery.switchButton.css");?>" />-->
     <!--<link rel="stylesheet" href="<?php echo base_url(CSS."bootstrap-editable.css");?>" type="text/css" />-->
     <!--<link rel="stylesheet" href="<?php echo base_url(CSS."spectrum.css");?>" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."select2.css");?>" />-->
     <!--<link rel="stylesheet" href="<?php echo base_url(CSS."jquery.growl.css");?>" />-->
 
     <!-- extra CSS-->
-    <?php //foreach($css as $c):?>
-    <link rel="stylesheet" href="<?php //echo base_url().CSS.$c?>">
-    <?php //endforeach;?>
+    <?php foreach($css as $c):?>
+    <link rel="stylesheet" href="<?php echo base_url().CSS.$c?>">
+    <?php endforeach;?>
 
     <!-- favicon and touch icons -->
     <?php  if ( $setting->settingData['cafevariome_central'] ): ?>
@@ -103,11 +103,7 @@
     <!-- note: jstree requires the addBack function that wasn't added to jQuery until 1.8, therefore I have changed 1.7.1 to 1.8.1 (tb143) -->
     <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>-->
 
-    <!--Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh 11/6/2019 -->
-    <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
-    <script src="<?php echo base_url(JS."bootstrap.js");?>"></script>
 
-    <script src="<?php echo base_url(JS."jstree/jstree.js");?>"></script>
 
     <!-- TODO: Move from Cafe Variome 2 source code once necessary. Some files may not be necessary. -->
     <!-- TODO: The links to files which are moved are put above this section. -->
@@ -192,6 +188,13 @@
             <span class="text-muted">Powered by CafeVariome</span>             
         </div>
     </footer>
+    
+    <!--Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh 11/6/2019 -->
+    <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
+    <script src="<?php echo base_url(VENDOR."twbs/bootstrap/dist/js/bootstrap.js");?>"></script>
+    <script src="<?php echo base_url(JS."jstree/jstree.js");?>"></script>
+    <script src="<?php echo base_url(VENDOR."select2/select2/dist/js/select2.js");?>"></script>
+
     <!-- extra Java Script-->
     <?php foreach($javascript as $js):?>
     <script src="<?php echo base_url().JS.$js?>"></script>

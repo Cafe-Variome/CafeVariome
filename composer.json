@@ -13,7 +13,13 @@
         "psr/log": "^1.1",
         "zendframework/zend-escaper": "^2.5",
         "stevenmaguire/oauth2-keycloak": "^2.1",
-        "components/font-awesome": "^5.9.0"
+        "components/font-awesome": "^5.9.0",
+        "codeigniter4/framework": "dev-master",
+        "twbs/bootstrap": "^4.3",
+        "benedmunds/codeigniter-ion-auth": "4.x-dev",
+		"elasticsearch/elasticsearch": "^7.0",
+        "select2/select2": "^4.0.7"
+
 	},
     "require-dev": {
         "codeigniter4/codeigniter4-standard": "^1.0",		
@@ -21,8 +27,6 @@
         "phpunit/phpunit": "^7.0",
         "squizlabs/php_codesniffer": "^3.3"
     },
-	"minimum-stability": "dev",
-
     "autoload": {
         "psr-4": {
             "CodeIgniter\\": "system/"
@@ -40,6 +44,7 @@
         "source": "https://github.com/codeigniter4/CodeIgniter4",
         "slack": "https://codeigniterchat.slack.com"
     },
+    "minimum-stability": "dev",
     "repositories": {
         "ionAuth": {
             "type": "vcs",
