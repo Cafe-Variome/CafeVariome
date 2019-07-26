@@ -38,7 +38,7 @@ use CodeIgniter\Database\ConnectionInterface;
         return $sources_options;
     }
 
-    public function createSource($source_data) {
+    public function createSource($data) {
         $this->builder = $this->db->table($this->table);
 		$this->builder->insert($data);
 		$insert_id = $this->db->insertID();
@@ -51,7 +51,7 @@ use CodeIgniter\Database\ConnectionInterface;
     public function updateSource($data) {
         $this->builder = $this->db->table($this->table);
         $this->builder->where('source_id', $data['source_id']);
-        $this->builder->update('sources', $data);
+        $this->builder->update($data);
     }
 
     /**
@@ -71,7 +71,11 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder = $this->db->table($this->table);
         $query = $this->builder->where('source_id', $source_id);
         $query = $this->builder->get()->getResultArray();
-        return $query;
+        if($query)
+        {
+            return $query[0];
+        }
+        return null;
     }
 
     /**

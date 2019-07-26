@@ -18,7 +18,8 @@
         "twbs/bootstrap": "^4.3",
         "benedmunds/codeigniter-ion-auth": "4.x-dev",
 		"elasticsearch/elasticsearch": "^7.0",
-        "select2/select2": "^4.0.7"
+        "select2/select2": "^4.0.7",
+        "datatables/datatables": "^1.10.19"
 
 	},
     "require-dev": {

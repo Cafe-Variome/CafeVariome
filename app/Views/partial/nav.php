@@ -24,7 +24,7 @@ $current_controller = uri_string();
 		</div>
 
 		<ul class="navbar-nav">
-		<?php if (false)://(! $this->ion_auth->logged_in()): ?>	
+		<?php if (! $auth->loggedIn()): ?>	
 			<?php if ( ! preg_match('/login/i', $this->uri->rsegment(2))): ?>
 				<li class="nav-item">
 					<a href="<?php echo base_url() . "auth_federated/login";?>" class="nav-link" id="loginUser">Login</a>
@@ -48,6 +48,9 @@ $current_controller = uri_string();
 		<?php else: ?>
 		<?php $user_id = $session->get( 'user_id' ); ?>
 			<?php if ( (($session->get( 'controller' ) === "auth_federated") && $session->get( 'is_admin' )) /*|| ($this->ion_auth->is_admin())*/): ?>
+			<li class="nav-item">
+				<span class="nav-link text-white">Hello <?= $session->get('first_name') ?>!</span>
+			</li>
 			<li class="nav-item">
 				<a class="nav-link" href="<?php echo base_url(); ?>adminv/chooseAdmin">
 					Admin

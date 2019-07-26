@@ -28,7 +28,7 @@
     <link rel="stylesheet" href="<?php echo base_url(VENDOR."select2/select2/dist/css/select2.css");?>" />
     <style>
     main > .container {
-        padding: 80px 15px 0;
+        padding: 80px 15px 80px;
     }
 
     .footer {
@@ -84,7 +84,7 @@
 
     <!-- extra CSS-->
     <?php foreach($css as $c):?>
-    <link rel="stylesheet" href="<?php echo base_url().CSS.$c?>">
+    <link rel="stylesheet" href="<?php echo base_url().$c?>">
     <?php endforeach;?>
 
     <!-- favicon and touch icons -->
@@ -97,6 +97,7 @@
     <link rel="apple-touch-icon" sizes="114x114" href="<?php echo base_url(IMAGES.'ico/apple-touch-icon-114x114-precompressed.png');?>" />
 
     <script type="text/javascript">
+
         var baseurl = "<?php print base_url(); ?>";
         var authurl = "<?php print rtrim($setting->settingData['auth_server'],"/"); // remove trailing slash from the auth_server config variable ?>";
     </script>
@@ -183,7 +184,7 @@
         </div>
     </div>
 
-    <footer id="footer" class="footer mt-auto py-3">
+    <footer id="footer" class="footer fixed-bottom mt-auto py-3">
         <div class="container">
             <span class="text-muted">Powered by CafeVariome</span>             
         </div>
@@ -191,13 +192,19 @@
     
     <!--Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh 11/6/2019 -->
     <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
-    <script src="<?php echo base_url(VENDOR."twbs/bootstrap/dist/js/bootstrap.js");?>"></script>
+    <script src="<?php echo base_url(VENDOR."twbs/bootstrap/dist/js/bootstrap.bundle.js");?>"></script>
     <script src="<?php echo base_url(JS."jstree/jstree.js");?>"></script>
     <script src="<?php echo base_url(VENDOR."select2/select2/dist/js/select2.js");?>"></script>
 
     <!-- extra Java Script-->
     <?php foreach($javascript as $js):?>
-    <script src="<?php echo base_url().JS.$js?>"></script>
+    <script src="<?php echo base_url().$js?>"></script>
     <?php endforeach;?>    
+
+    <script type="text/javascript">
+        
+             $('[data-toggle="tooltip"]').tooltip();
+    
+    </script>
 </body>
 </html>

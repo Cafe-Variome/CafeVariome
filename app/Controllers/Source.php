@@ -55,6 +55,7 @@ class Source extends CVUI_Controller{
         }
         $uidata = new UIData();
 
+        $uidata->title = "Sources";
 
         $uidata->data['variant_counts'] = $this->sourceModel->countSourceEntries();
         $sources = $this->sourceModel->getSourcesFull();
@@ -89,8 +90,12 @@ class Source extends CVUI_Controller{
             if (!empty($selected_groups)) { // If there's groups assigned to this source then pass to the view
                 $this->data['source_network_groups'][$source_id] = $selected_groups;
             }
-        }
+        }                                                
+        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
+        $uidata->javascript = array(JS.'cafevariome/source.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+
         $data = $this->wrapData($uidata);
+        var_dump(preg_replace("/\s.+/", '', "Cafe Variome"));
         return view('source/sources', $data);
     }
 
@@ -173,74 +178,7 @@ class Source extends CVUI_Controller{
 
         $uidata->data['groups'] = json_decode(json_encode($groups), TRUE);
 
-        if ($this->validation->withRequest($this->request)->run()== false) {
-            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-
-            $uidata->data['name'] = array(
-                'name' => 'name',
-                'id' => 'name',
-                'type' => 'text',
-                'style' => 'width:50%',
-                'value' => set_value('name'),
-            );
-            $uidata->data['owner_name'] = array(
-                'name' => 'owner_name',
-                'id' => 'owner_name',
-                'type' => 'text',
-                'style' => 'width:50%',
-                'value' => set_value('owner_name'),
-            );
-            $uidata->data['email'] = array(
-                'name' => 'email',
-                'id' => 'email',
-                'type' => 'text',
-                'style' => 'width:50%',
-                'value' => set_value('email'),
-            );
-            $uidata->data['uri'] = array(
-                'name' => 'uri',
-                'id' => 'uri',
-                'type' => 'text',
-                'style' => 'width:50%',
-                'value' => set_value('uri'),
-            );
-            $uidata->data['desc'] = array(
-                'name' => 'desc',
-                'id' => 'desc',
-                'type' => 'text',
-                'style' => 'width:50%',
-                'value' => set_value('desc'),
-            );
-
-            $uidata->data['long_description'] = array(
-                'name' => 'long_description',
-                'id' => 'long_description',
-                'type' => 'text',
-                'rows' => '5',
-                'cols' => '3',
-                'style' => 'width:50%',
-                'value' => set_value('long_description'),
-            );
-
-            $uidata->data['status'] = array(
-                'name' => 'status',
-                'id' => 'status',
-                'type' => 'select',
-                'value' => set_value('status'),
-            );
-
-            $uidata->data['type'] = array(
-                'name' => 'type',
-                'id' => 'type',
-                'type' => 'select',
-                'value' => set_value('type'),
-            );
-
-            $uidata->javascript = array('cafevariome/source.js');
-
-            $data = $this->wrapData($uidata);
-            return view('source/add_source', $data);
-        } else {
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             $name = strtolower(str_replace(' ', '_', $this->request->getVar('name'))); // Convert the source name to lowercase and replace whitespace with underscore
             $uri = $this->request->getVar('uri');
             $owner_name = $this->request->getVar('owner_name');
@@ -251,7 +189,7 @@ class Source extends CVUI_Controller{
             $type = $this->request->getVar('type');
 
             $source_data = array("name" => $name, "owner_name" => $owner_name, "email" => $email, "uri" => $uri, "description" => $description, "long_description" => $long_description, "type" => "mysql", "status" => $status);
-            $insert_id = $this->sourcesModel->createSource($source_data);
+            $insert_id = $this->sourceModel->createSource($source_data);
             $this->data['insert_id'] = $insert_id;
 
             if ($this->request->getVar('groups')) {
@@ -269,7 +207,76 @@ class Source extends CVUI_Controller{
                 $groups = $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
             }
 
-			return redirect()->to(base_url('source/index'));
+			return redirect()->to(base_url('source/index'));            
+        } else {
+            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+
+            $uidata->data['name'] = array(
+                'name' => 'name',
+                'id' => 'name',
+                'type' => 'text',
+                'class' => 'form-control',
+                'value' => set_value('name'),
+            );
+            $uidata->data['owner_name'] = array(
+                'name' => 'owner_name',
+                'id' => 'owner_name',
+                'type' => 'text',
+                'class' => 'form-control',
+                'value' => set_value('owner_name'),
+            );
+            $uidata->data['email'] = array(
+                'name' => 'email',
+                'id' => 'email',
+                'type' => 'text',
+                'class' => 'form-control',
+                'value' => set_value('email'),
+            );
+            $uidata->data['uri'] = array(
+                'name' => 'uri',
+                'id' => 'uri',
+                'type' => 'text',
+                'class' => 'form-control',
+                'value' => set_value('uri'),
+            );
+            $uidata->data['desc'] = array(
+                'name' => 'desc',
+                'id' => 'desc',
+                'type' => 'text',
+                'class' => 'form-control',
+                'value' => set_value('desc'),
+            );
+
+            $uidata->data['long_description'] = array(
+                'name' => 'long_description',
+                'id' => 'long_description',
+                'type' => 'text',
+                'rows' => '5',
+                'cols' => '3',
+                'class' => 'form-control',
+                'value' => set_value('long_description'),
+            );
+
+            $uidata->data['status'] = array(
+                'name' => 'status',
+                'id' => 'status',
+                'type' => 'select',
+                'class' => 'form-control',
+                'value' => set_value('status'),
+            );
+
+            $uidata->data['type'] = array(
+                'name' => 'type',
+                'id' => 'type',
+                'type' => 'select',
+                'class' => 'form-control',
+                'value' => set_value('type'),
+            );
+
+            $uidata->javascript = array(JS.'cafevariome/source.js');
+
+            $data = $this->wrapData($uidata);
+            return view('source/add_source', $data);
         }
     }
 
@@ -291,18 +298,10 @@ class Source extends CVUI_Controller{
         $this->validation->setRules([
             'name' => [
                 'label'  => 'Source Name',
-                'rules'  => 'required|alpha_dash|is_unique[sources.name]',
+                'rules'  => 'required|alpha_dash',
                 'errors' => [
-                    'required' => '{field} is required.',
-                    'uniquename_check' => '{field} already exists.'
+                    'required' => '{field} is required.'
                 ]
-            ],
-            'owner_name' => [
-                    'label'  => 'Owner Name',
-                    'rules'  => 'required',
-                    'errors' => [
-                        'required' => '{field} is required.'
-                    ]
             ],
             'email' => [
                 'label'  => 'Owner Email',
@@ -327,11 +326,9 @@ class Source extends CVUI_Controller{
                 ]
             ], 
             'long_description' => [
-                'label'  => 'Long Source Description'
-            ],  
-            'type' => [
-                'label'  => 'Source Type'
-            ],  
+                'label'  => 'Long Source Description',
+                'rules'  => 'string'
+            ],   
             'status' => [
                 'label'  => 'Source Status',
                 'rules'  => 'required',
@@ -343,7 +340,7 @@ class Source extends CVUI_Controller{
         );
 
         
-        if ($this->validation->withRequest($this->request)->run()== true) {
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             //check to see if we are creating the user
             //redirect them back to the admin page
             
@@ -356,7 +353,7 @@ class Source extends CVUI_Controller{
             $update_data['type'] = $this->request->getVar('type');
             $update_data['status'] = $this->request->getVar('status');
 
-            $this->sourcesModel->updateSource($update_data);
+            $this->sourceModel->updateSource($update_data);
 
             // Check if there any groups selected
             if ($this->request->getVar('groups')) {
@@ -398,15 +395,15 @@ class Source extends CVUI_Controller{
             $uidata->data['selected_groups'] = $selected_groups;
 
             // Get all the data for this source
-            $source_data = $this->sourcesModel->getSourceSingleFull($source_id);
+            $source_data = $this->sourceModel->getSourceSingleFull($source_id);
             $uidata->data['source_data'] = $source_data;
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-
+            var_dump($uidata->data['message']);
             $uidata->data['name'] = array(
                 'name' => 'name',
                 'id' => 'name',
                 'type' => 'text',
-                'style' => 'width:70%',
+                'class' => 'form-control',
                 'readonly' => 'true', // Don't allow the user to edit the source name
                 'value' => set_value('name', $source_data['name']),
             );
@@ -414,21 +411,21 @@ class Source extends CVUI_Controller{
                 'name' => 'uri',
                 'id' => 'uri',
                 'type' => 'text',
-                'style' => 'width:70%',
+                'class' => 'form-control',
                 'value' => set_value('uri', $source_data['uri']),
             );
             $uidata->data['desc'] = array(
                 'name' => 'desc',
                 'id' => 'desc',
                 'type' => 'text',
-                'style' => 'width:70%',
+                'class' => 'form-control',
                 'value' => set_value('desc', $source_data['description']),
             );
             $uidata->data['long_description'] = array(
                 'name' => 'long_description',
                 'id' => 'long_description',
                 'type' => 'text',
-                'style' => 'width:70%',
+                'class' => 'form-control',
                 'rows' => '5',
                 'cols' => '3',
                 'value' => set_value('long_description', $source_data['long_description']),
@@ -437,7 +434,7 @@ class Source extends CVUI_Controller{
                 'name' => 'email',
                 'id' => 'email',
                 'type' => 'text',
-                'style' => 'width:70%',
+                'class' => 'form-control',
                 'value' => set_value('email', $source_data['email']),
             );
             $uidata->data['status'] = array(
@@ -455,7 +452,54 @@ class Source extends CVUI_Controller{
 
             $data = $this->wrapData($uidata);
 
-            return view('sources/edit_source', $data);
+            return view('source/edit_source', $data);
+        }
+    }
+
+    function delete_source($source_id = NULL, $source = NULL) {
+        if (!$source) {
+            return redirect()->to(base_url("source/sources"));          
+        }
+        if (!$this->authAdapter->loggedIn() /*|| !$this->ion_auth->is_admin()*/) {
+			return redirect()->to(base_url("auth/login"));
+        }
+
+        
+        $elasticModel = new \App\Models\Elastic();
+        $this->form_validation->set_rules('confirm', 'confirmation', 'required');
+        $this->form_validation->set_rules('source', 'Source Name', 'required|alpha_dash');
+
+        if ($this->form_validation->run() == FALSE) {
+            // insert csrf check
+            $this->data['source_id'] = $source_id;
+            $this->data['source'] = $source;
+            $this->_render('sources/delete_source');
+        } else {
+            // do we really want to delete?
+            if ($this->input->post('confirm') == 'yes') {
+                // do we have a valid request?
+                if ($source != $this->input->post('source')) {
+                    show_error('This form post did not pass our security checks.');
+                }
+
+                // do we have the right userlevel?
+                if ($this->ion_auth->logged_in() && $this->ion_auth->is_admin()) {
+                    error_log("deleting source");
+                    error_log(print_r($_POST,1));
+                    $source_id = $_POST['source_id'];
+                    if ($this->input->post('variants') == 'yes') { // also delete variants for the source
+                        $is_deleted = $this->sources_model->delete_variants_and_phenotypes($source);
+                    }
+                    $this->sources_model->deleteSource($source_id);
+                    $this->elastic_data_model->deleteElasticIndex($source_id);
+                    
+                }
+                if (file_exists("resources/elastic_search_status_complete"))
+                    unlink("resources/elastic_search_status_complete");
+                file_put_contents("resources/elastic_search_status_incomplete", "");
+            }
+            //redirect them back to the auth page
+            redirect('sources', 'refresh');
         }
     }
 }

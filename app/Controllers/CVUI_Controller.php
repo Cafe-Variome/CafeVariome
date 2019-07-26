@@ -11,6 +11,8 @@ use CodeIgniter\Controller;
 use App\Models\UIData;
 use App\Models\cms_model;
 use App\Models\Settings;
+use App\Libraries\AuthAdapter;
+use CodeIgniter\Config\Services;
 
 class CVUI_Controller extends Controller{
 	
@@ -55,6 +57,9 @@ class CVUI_Controller extends Controller{
 
 		$session = \Config\Services::session($config);
 		$setting =  Settings::getInstance($this->db);
+		
+        $authAdapterConfig = config('AuthAdapter');
+        $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
 		$data = Array();
 
 		$data["title"] = $uidata->title;
@@ -72,7 +77,7 @@ class CVUI_Controller extends Controller{
 
 		$data["session"] = &$session;
 		$data["setting"] = &$setting;
-
+		$data["auth"] = &$authAdapter;
 		//Moved to CI4 by Mehdi Mehtarizadeh(mm876) on 18/06/2019 
 
 		//Get dynamic menus from CMS from database and pass to nav template

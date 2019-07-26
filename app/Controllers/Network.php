@@ -163,7 +163,7 @@ class Network extends CVUI_Controller{
             $data = json_decode($networks, true);
 
             $uidata->data['networks'] = $data;
-            $uidata->javascript = array('cafevariome/network.js');
+            $uidata->javascript = array(JS.'cafevariome/network.js');
 
             $data = $this->wrapData($uidata);
 

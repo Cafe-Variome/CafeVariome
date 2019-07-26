@@ -76,7 +76,7 @@ class Discover extends CVUI_Controller{
         }
 
         $uidata->title = "Discover - Query Builder";
-        $uidata->css = array('jquery.querybuilder.css');  
+        $uidata->css = array(CSS.'jquery.querybuilder.css');  
 
         $basic = $this->session->get('query_builder_basic') == "yes" ? 1 : 0;
         $advanced = $this->session->get('query_builder_advanced') == "yes" ? 1 : 0;
@@ -85,11 +85,11 @@ class Discover extends CVUI_Controller{
         
         if($basic && !$advanced && !$precan)  {
             if(PHENOTYPE_CATEGORIES) {
-                $uidata->javascript = array('bootstrap-notify.js', 'mustache.min.js', 'query_builder_config.js', 'query_builder_category.js');
+                $uidata->javascript = array(JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
                 $data = $this->wrapData($uidata);
                 return view("discover/query_builder/main", $data);
             } else {
-                $this->javascript = array('bootstrap-notify.js','mustache.min.js', 'query_builder_config.js', 'query_builder.js');
+                $this->javascript = array(JS.'bootstrap-notify.js',JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder.js');
                 $data = $this->wrapData($uidata);
                 return view("discover/query_builder/main", $data);
             }
@@ -118,10 +118,10 @@ class Discover extends CVUI_Controller{
                 }
 
                 if(PHENOTYPE_CATEGORIES) {
-                    $uidata->javascript = array('mustache.min.js', 'query_builder_config.js', 'query_builder_precan_v2_category.js', 'query_builder_advanced_v2_category.js');
+                    $uidata->javascript = array(JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_precan_v2_category.js', JS.'query_builder_advanced_v2_category.js');
                 } else {
                     $uidata->data['precanned_queries'] = json_decode(file_get_contents(base_url() . "resources/precanned.json"), 1);
-                 $uidata->javascript = array('mustache.min.js', 'query_builder_config.js', 'query_builder_precan.js', 'query_builder_advanced.js');
+                 $uidata->javascript = array(JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_precan.js', JS.'query_builder_advanced.js');
                 }
 
                 $uidata->data['qb_basic'] = $basic ? 1 : 0;

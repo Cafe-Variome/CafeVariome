@@ -124,6 +124,10 @@ class Network extends Model{
 		$num_results = $this->builder->countAllResults();
 		return $num_results;
 	}
+
+	/**
+	 * Deprecated
+	 */
 	function get_network_groups_for_installation() {
 
 		$network_groups_for_installation = array();

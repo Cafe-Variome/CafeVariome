@@ -147,7 +147,7 @@ class Auth extends CVUI_Controller
 
 			$uidata->title = lang('Auth.login_heading');
 	
-			//$uidata->javascript = array("cafevariome/authentication.js");
+			//$uidata->javascript = array(JS."cafevariome/authentication.js");
 			
 			// validate form input
 			$this->validation->setRule('identity', str_replace(':', '', lang('Auth.login_identity_label')), 'required');
