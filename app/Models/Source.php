@@ -92,4 +92,41 @@ use CodeIgniter\Database\ConnectionInterface;
         }
         return $source_counts;
     }
+
+    /**
+     * 
+     */
+    public function deleteVariantsPhenotypes($source_id) {
+        $this->builder = $this->db->table('eavs');
+        $this->builder->delete(['source' => $source_id]);
+    }
+
+    /**
+     * 
+     */
+    public function deleteSource($source_id) {
+        $this->builder = $this->db->table($this->table);
+        $this->builder->delete(['source_id' => $source_id]);
+    }
+
+    /**
+     * Get Status For Source - Get all rows from UploadDataStatus for given source
+     *
+     * @param int $source_id  - The source id we are wanting rows from
+     * @return array $query   - Our Results
+     */
+    public function getSourceStatus($source_id) {
+        // SELECT UploadDataStatus.FileName, UploadDataStatus.uploadStart, UploadDataStatus.uploadStart, UploadDataStatus.Status, UploadDataStatus.elasticStatus, users.email FROM UploadDataStatus INNER JOIN users ON UploadDataStatus.user_id=users.id;
+        
+        $this->builder = $this->db->table('UploadDataStatus');
+        $this->builder->select('UploadDataStatus.ID,UploadDataStatus.FileName,UploadDataStatus.uploadEnd,UploadDataStatus.uploadStart,UploadDataStatus.Status,UploadDataStatus.elasticStatus,UploadDataStatus.patient,UploadDataStatus.tissue,users.email,sources.name');
+        $this->builder->join('users', 'UploadDataStatus.user_id=users.id', 'inner');
+        $this->builder->join('sources', 'UploadDataStatus.source_id=sources.source_id', 'inner');
+        if ($source_id != 'all') {
+            $this->builder->where('UploadDataStatus.source_id', $source_id);
+        }
+        $query = $this->builder->get()->getResultArray();
+        return $query;
+    }
+
  }

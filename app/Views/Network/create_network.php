@@ -1,46 +1,47 @@
 <?= $this->extend('layout\master') ?>
 <?= $this->section('content') ?>
-<div class="container">
-	<div class="row">  
-		<div class="span6">  
-			<ul class="breadcrumb">  
-				<li>  
-					<a href="<?php echo base_url() . "admin";?>">Dashboard Home</a> <span class="divider">></span>  
-				</li>
-				<li>
-					<a href="<?php echo base_url() . "networks";?>">Networks</a> <span class="divider">></span>
-				</li>
-				<li class="active">Create Network</li>
-			</ul>  
-		</div>  
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin";?>">Dashboard Home</a></li>
+  <li class="breadcrumb-item"><a href="<?php echo base_url() . "networks";?>">Networks</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
+  </ol>
+</nav>
+<div class="row">
+	<div class="col">
+		<h2><?= $title ?></h2>	
+	</div>	
+</div>
+<hr>
+<div class="row">
+	<div class="col">
+		<p>Please enter the network information below.</p>
 	</div>
-	<div class="row-fluid">
-		<div class="span9 offset2 pagination-centered">
-			<div class="well">
-				<h2>Create Network</h2>
-				<p>Please enter the network information below.</p>
-				<b><strong><?= $validation->listErrors() ?></strong></b>
-				
-				<?php echo form_open("network/create_network", array('name' => 'createNetwork')); ?>
-				<p>
-					Network Name:<br />
-					<?php echo form_input($name); ?>
-					<br />
-					<small>(no spaces allowed but underscores and dashes are accepted, <br />uppercase characters will be converted to lowercase)</small>
-				</p>
-				<p><button type="submit" name="submit" class="btn btn-primary"><i class="icon-file icon-white"></i>  Create Network</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="<?php echo base_url() . "networks"; ?>" class="btn" ><i class="icon-step-backward"></i> Go back</a></p>
-				<br />
-				<?php if($message): ?>
-				<div class="row">
-				<div class="col">
-					<div class="alert alert-info">
-					<?php echo $message ?>
-					</div>
-				</div>
-				</div>
-				<?php endif; ?>
+</div>	
+<?php if($message): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-info">
+			<?php echo $message ?>
 			</div>
 		</div>
+	</div>
+<?php endif; ?>
+<?php echo form_open("network/create_network", array('name' => 'createNetwork')); ?>
+<div class="form-group">
+<?php echo form_label('Network Name', 'name'); ?>
+
+<?php echo form_input($name); ?>
+	<small class="form-text text-muted">
+	(no spaces allowed but underscores and dashes are accepted, <br />uppercase characters will be converted to lowercase)
+	</small>
+</div>
+<div class="form-group row">
+	<div class="col">
+	<button type="submit" name="submit" class="btn btn-primary">
+		<i class="fa fa-file"></i>  Create Network
+	</button>
+	<a href="<?php echo base_url() . "network"; ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a></p>
 	</div>
 </div>
 <?php echo form_close(); ?>

@@ -13,7 +13,11 @@
 	</div>	
 </div>
 <hr>
-<p>Please enter the source information below.</p>
+<div class="row">
+	<div class="col">
+		<p>Please enter the source information below.</p>
+	</div>
+</div>	
 <?php if($message): ?>
 	<div class="row">
 		<div class="col">
@@ -23,7 +27,7 @@
 		</div>
 	</div>
 <?php endif; ?>
-<?php echo form_open("source/add_source"); ?>
+<?php echo form_open("source/create_source"); ?>
 
 <div class="form-group">
 <?php echo form_label('Source Name', 'name'); ?>
@@ -154,7 +158,7 @@
 <div class="form-group row">
 	<div class="col">
 		<button type="submit" onclick="select_groups()" name="submit" class="btn btn-primary">
-			<i class="fa fa-file"></i>  Add Source
+			<i class="fa fa-file"></i>  Create Source
 		</button>
 		<a href="<?php echo base_url() . "admin"; ?>" class="btn btn-secondary" >
 			<i class="fa fa-backward"></i> Go back

@@ -16,8 +16,15 @@ use CodeIgniter\Config\Services;
 
 class CVUI_Controller extends Controller{
 	
-	public $db;
+	private $isProtected;
+	private $isAdmin;
+	protected $db;
+
 	protected $session;
+	protected $authAdapter;
+	protected $setting;
+
+	private $authAdapterConfig;
 
 	/**
 	 * Constructor.
@@ -34,6 +41,16 @@ class CVUI_Controller extends Controller{
 		// $this->session = \Config\Services::session();
 		$this->session = \Config\Services::session();
 		$this->db = \Config\Database::connect();
+        $this->setting =  Settings::getInstance($this->db);
+
+        // If the controller needs authorisation, initiate AuthAdapater object accordingly.
+		if ($this->isProtected) {
+			$this->authAdapterConfig = config('AuthAdapter');
+			$this->authAdapter = new AuthAdapter($this->authAdapterConfig->authRoutine);
+
+			$this->checkAuthentication($this->isAdmin);
+		}
+
 
 		//Load form helper
 		//Might be moved to a more suitable location
@@ -110,7 +127,37 @@ class CVUI_Controller extends Controller{
 
 	}	
 
-	//function __destruct() {
-        //session_write_close();
-    //}
+	protected function setProtected(bool $protected){
+		$this->isProtected = $protected;
+	}
+
+	public function getProtected(){
+		return $this->isProtected;
+	}
+
+	protected function setIsAdmin(bool $isAdmin){
+		$this->isAdmin = $isAdmin;
+	}
+
+	public function getAdmin(){
+		return $this->isAdmin;
+	}
+
+	private function checkAuthentication(bool $checkIsAdmin) {
+		if ($checkIsAdmin) {
+			if (!$this->authAdapter->loggedIn() || !$this->authAdapter->isAdmin()) {
+				header('Location: '.base_url("auth/login"));
+				exit;
+			}
+		} else {
+			if (!$this->authAdapter->loggedIn()) {
+				header('Location: '.base_url("auth/login"));
+				exit;
+			}
+		}
+		
+
+
+	}
+
 }

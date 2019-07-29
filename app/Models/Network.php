@@ -126,6 +126,21 @@ class Network extends Model{
 	}
 
 	/**
+     * Get Users For Network Group - Get a basic list of all users Within a Specific Network Group
+     *
+     * @param int $group_id - The ID of the Group
+	 * @return array $query - List of Users
+     */
+	function getNetworkGroupUsers($group_id) {
+		$this->builder = $this->db->table('users');
+		$this->builder->select("users.id, users.username, users.remote");
+		$this->builder->join('users_groups_networks', 'users_groups_networks.user_id=users.id');
+		$this->builder->where(array('users_groups_networks.group_id' => $group_id));	
+		$query = $this->db->builder()->getResultArray();
+		return $query;
+	}
+
+	/**
 	 * Deprecated
 	 */
 	function get_network_groups_for_installation() {

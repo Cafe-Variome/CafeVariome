@@ -100,7 +100,7 @@ class KeyCloak{
 	 */
 	public function isAdmin(int $id=0): bool
 	{
-        return $this->keyCloakSession->get('user_id');
+        return $this->keyCloakSession->get('is_admin');
 	}
 
     public function getAuthorizationUrl(){
@@ -291,6 +291,7 @@ class KeyCloak{
         return($this->get_session_status() == 'not expired');
 
     }
+
 
     /**
      * Get Session Status - Check whether the user still has a valid session on 

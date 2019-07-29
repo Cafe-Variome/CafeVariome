@@ -26,35 +26,24 @@ class Network extends CVUI_Controller{
 	 */
     protected $validationListTemplate = 'list';
     
-    private $authAdapter;
-
-    private $validation;
-
     private $networkModel;
+
+    private $userModel;
     /**
 	 * Constructor
 	 *
-	 * @return void
 	 */
-	public function __construct()
-	{
-		$this->session = Services::session();
-		$this->db = \Config\Database::connect();
-        $this->setting =  Settings::getInstance($this->db);
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+        parent::setProtected(true);
+        parent::setIsAdmin(true);
+        parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-
-        $this->authAdapterConfig = config('AuthAdapter');
-        $this->authAdapter = new AuthAdapter($this->authAdapterConfig->authRoutine);
-        
         $this->networkModel = new \App\Models\Network($this->db);
-
-        if (!$this->authAdapter->loggedIn() /*|| !$this->ion_auth->is_admin()*/) {
-            redirect('auth');
-        }
+        $this->userModel = new \App\Models\User($this->db);
     }
 
-    function index(){
+    public function index(){
         return redirect()->to(base_url("network/networks"));
     }
 
@@ -62,7 +51,7 @@ class Network extends CVUI_Controller{
      * 
      */
 
-    function networks()
+    public function networks()
     {
 
         $uidata = new UIData();
@@ -73,6 +62,9 @@ class Network extends CVUI_Controller{
 
         $uidata->data['groups'] = $master_groups;
         $uidata->data['networks'] = $installations_for_networks;
+            
+        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
+        $uidata->javascript = array(JS.'cafevariome/network.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
         $data = $this->wrapData($uidata);
         return view("network/networks", $data);
@@ -100,28 +92,11 @@ class Network extends CVUI_Controller{
         ]
         );
 
-        if ($this->validation->withRequest($this->request)->run()== false) {
-            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
 
-            $uidata->data['name'] = array(
-                'name' => 'name',
-                'id' => 'name',
-                'type' => 'text',
-                'style' => 'width:50%',
-                'value' =>set_value('name'),
-            );
-            $uidata->data['validation'] = $this->validation;
-            $data = $this->wrapData($uidata);
-
-            return view('Network/create_network', $data);
-        } else {
             $name = strtolower($this->request->getVar('name')); // Convert the network name to lowercase
 
-            $base_url = base_url();
-            error_log($base_url);
-            $network = json_decode(AuthHelper::authPostRequest(array('installation_base_url' => $base_url, 'network_name' => $name, 'installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/create_network"),1);
-            error_log(print_r($network,1));
-
+            $network = json_decode(AuthHelper::authPostRequest(array('installation_base_url' => $base_url(), 'network_name' => $name, 'installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/create_network"),1);
 
 			$this->networkModel->createNetwork(array ('network_name' => $network['network_name'],'network_key' => $network['network_key'],'network_type' => 'federated'));
             $network_master_group_data = array (    'name' => $network['network_name'],
@@ -135,8 +110,114 @@ class Network extends CVUI_Controller{
             $this->session->setFlashdata('message', "Successfully created network $name");
 
 
-            redirect("networks", 'refresh');
+			return redirect()->to(base_url('network/index'));            
+        } else {
+
+            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+
+            $uidata->data['name'] = array(
+                'name' => 'name',
+                'id' => 'name',
+                'type' => 'text',
+                'class' => 'form-control',
+                'value' =>set_value('name'),
+            );
+            $uidata->data['validation'] = $this->validation;
+
+            $data = $this->wrapData($uidata);
+
+            return view('network/create_network', $data);
         }
+    }
+
+    function edit_user_network_groups($id, $isMaster = false) {
+
+        $uidata = new UIData();
+        $uidata->title = "Edit User Network Groups";
+
+
+        $uidata->data['user_id'] = $id;
+        //display the edit user form
+        $uidata->data['csrf'] = $this->_get_csrf_nonce();
+
+        //set the flash data error message if there is one
+        $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+        $users = json_decode(json_encode($this->userModel()),1);
+        $group_users = json_decode(json_encode($this->networkModel->getNetworkGroupUsers($id)),1);
+        $group_details = json_decode(json_encode($this->network_model->get_network_name_and_type_for_id($id)),1);
+        $uidata->data['name'] = $group_details[0]['name'];   
+        $uidata->data['group_type'] = $group_details[0]['group_type']; 
+        if(!$isMaster) {
+            $this->load->model('federated_model');
+            $sources = $this->federated_model->get_sources();
+            $group_sources = json_decode(json_encode($this->network_model->get_sources_for_group($id)), TRUE);
+            // error_log(print_r($sources, 1));
+            // error_log(print_r($group_sources, 1));
+
+            $ids = [];
+            foreach ($group_sources as $key => $value)
+                $ids[] = $value['source_id'];
+
+            if($ids)
+                $group_sources = $this->federated_model->add_source_name_to_ids($ids);
+
+            // error_log(print_r($group_sources, 1));
+
+            $sources_left = []; 
+            $sources_right = [];
+
+            foreach ($sources as $key => $value)
+                $sources_left[$value['source_id']] = $value['name'];
+
+            foreach ($group_sources as $key => $value)
+                $sources_right[$value['source_id']] = $value['name'];
+
+            foreach ($sources_right as $key => $value) {
+                if(array_key_exists($key, $sources_left))
+                    unset($sources_left[$key]);
+            }
+
+            // error_log(print_r($sources_left, 1));
+            // error_log(print_r($sources_right, 1));
+
+            $uidata->data['sources_left'] = $sources_left;
+            $uidata->data['sources_right'] = $sources_right;
+        }
+
+        if($isMaster) {
+            for($i = 0; $i < count($users); $i++) {
+                if($users[$i]['username'] == "admin@cafevariome") {
+                    unset($users[$i]);
+                    $users = array_values($users);
+                }
+            }
+        }
+
+        if (!array_key_exists('error', $group_users)) {
+            foreach ($group_users as $group_user) {
+                for($i = 0; $i < count($users); $i++) {
+                    if($group_user == $users[$i]) {
+                        unset($users[$i]);
+                        $users = array_values($users);
+                    }
+                }
+            }
+            $uidata->data['group_users'] = $group_users;   
+        }
+
+        if($isMaster)
+            $uidata->data['users'] = $users;
+        else {
+            if(!array_key_exists('error', $users))  $uidata->data['users'] = $users;
+        }
+        
+        $uidata->data['isMaster'] = $isMaster;
+        $uidata->data['user_id'] = $id;
+        $uidata->data['installation_key'] = $this->setting->settingData['installation_key'];
+
+        $data = $this->wrapData($uidata);
+        return view('federated/auth/edit_network_groups_users', $data);
+
     }
 
     /**
@@ -163,6 +244,7 @@ class Network extends CVUI_Controller{
             $data = json_decode($networks, true);
 
             $uidata->data['networks'] = $data;
+            
             $uidata->javascript = array(JS.'cafevariome/network.js');
 
             $data = $this->wrapData($uidata);
@@ -198,4 +280,17 @@ class Network extends CVUI_Controller{
             echo json_encode(array('error' => 'Sorry, unable to process request. Retry!'));
         }
     }
+
+
+
+    function _get_csrf_nonce()
+	{
+		$this->load->helper('string');
+		$key   = random_string('alnum', 8);
+		$value = random_string('alnum', 20);
+		$this->session->set_flashdata('csrfkey', $key);
+		$this->session->set_flashdata('csrfvalue', $value);
+
+		return array($key => $value);
+	}
 }

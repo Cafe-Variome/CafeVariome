@@ -3,7 +3,7 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
     <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin";?>">Dashboard Home</a></li>
-    <li class="breadcrumb-item active" aria-current="page">Sources</li>
+    <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
 
@@ -13,7 +13,7 @@
 	</div>	
 </div>
 <hr>
-	
+
 <table class="table table-bordered table-striped table-hover" id="sourcestable">
 	<thead>
 		<tr>
@@ -78,7 +78,7 @@
 			<?php endif; ?>
 				<a href="<?php echo base_url('source/delete_source'). "/" . $source['source_id'] . "/" . $source['name']; ?>" rel="popover" data-content="Delete the source entry. N.B. records related to this source will not be deleted from the database." data-original-title="Delete Source">
 					<i class="fa fa-trash"></i></a>
-				<a href="<?php echo base_url('source/status'). "/" . $source['name']; ?>" rel="popover" data-content="View the the status of uploaded files to this source." data-original-title="Source File Status">
+				<a href="<?php echo base_url('source/status'). "/" . $source['source_id']; ?>" rel="popover" data-content="View the the status of uploaded files to this source." data-original-title="Source File Status">
 					<i class="fa fa-info-circle"></i>
 				</a>
 			</td>
@@ -107,7 +107,7 @@
 <div class="row">
 	<div class="col">
 		<a href="#" class="btn btn-primary btn-medium" data-target="#addSourceModal" data-toggle="modal" data-backdrop="false" rel="popover" data-content="Fill in a form to add a new source to your installation." data-original-title="Add Source">
-			<i class="fa fa-file"></i>  Add source
+			<i class="fa fa-file"></i>  Create source
 		</a>
 		<a class="btn btn-primary btn-medium" href="<?php echo base_url('admin/variants') ?>" data-content="Switches to the records admin interface to allow you to modify records." data-original-title="Edit Records">
 			<i class="fa fa-edit"></i>  Edit records
@@ -132,8 +132,8 @@
 			<div class="modal-body">
 				<div class="row">
 					<div class="col">
-						<a class="btn btn-primary btn-medium" href="<?php echo base_url('source/add_source') ?>" >
-							<i class="fa fa-file"></i>  Add local source
+						<a class="btn btn-primary btn-medium" href="<?php echo base_url('source/create_source') ?>" >
+							<i class="fa fa-file"></i>  Create local source
 						</a>
 					</div>
 				</div>
@@ -146,7 +146,7 @@
 				<hr/>
 				<div class="row">
 					<div class="col">
-					<a class="btn btn-primary btn-medium" href="<?php echo base_url('sources/add_federated_source') ?>" >
+					<a class="btn btn-primary btn-medium" href="<?php echo base_url('sources/create_federated_source') ?>" >
 						<i class="fa fa-file"></i>  Add federated source</a>
 					</div>
 				</div>

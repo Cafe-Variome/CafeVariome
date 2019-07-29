@@ -1,3 +1,8 @@
+$(document).ready(function() {
+    $('#networkstable').DataTable();
+} );
+
+
 function join_network() {
     $callAjax = true;
     $('form[name="joinNetwork"]').submit(function (e) {

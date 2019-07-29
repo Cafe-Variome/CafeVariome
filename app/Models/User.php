@@ -68,4 +68,15 @@ class User extends Model{
 
         return ($query) ? $query : null;
     }
+
+    /**
+     * Gets all users in the installation.
+     * @return array
+     */
+
+     public function getUsers(){
+        $this->builder = $this->db->table($this->table);
+        $query = $this->builder->get()->getResultArray();
+        return ($query) ? $query : null;
+     }
 }

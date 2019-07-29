@@ -74,4 +74,8 @@ class AuthAdapter{
         return $this->authEngine->loggedIn();
     }
 
+    public function isAdmin(int $id=0):bool{
+        return $this->authEngine->isAdmin($id);
+    }
+
 }

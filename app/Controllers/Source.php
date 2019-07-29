@@ -11,9 +11,6 @@
  */
 
 use App\Models\UIData;
-use App\Models\Settings;
-use App\Libraries\AuthAdapter;
-//use App\Models\Source;
 use CodeIgniter\Config\Services;
 
 class Source extends CVUI_Controller{
@@ -25,36 +22,31 @@ class Source extends CVUI_Controller{
 	 */
     protected $validationListTemplate = 'list';
 
-    private $authAdapter;
 
     private $sourceModel;
-
 
     /**
 	 * Constructor
 	 *
-	 * @return void
 	 */
-    public function __construct(){
-        $this->session = Services::session();
-		$this->db = \Config\Database::connect();
-        $this->setting =  Settings::getInstance($this->db);
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+        parent::setProtected(true);
+        parent::setIsAdmin(true);
+        parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-
-        $this->authAdapterConfig = config('AuthAdapter');
-        $this->authAdapter = new AuthAdapter($this->authAdapterConfig->authRoutine);
-
         $this->sourceModel = new \App\Models\Source($this->db);
 
     }
 
-    public function index() {
-        if (!$this->authAdapter->loggedIn() /*|| !$this->ion_auth->is_admin()*/) {
-			return redirect()->to(base_url("auth/login"));
-        }
-        $uidata = new UIData();
+    public function index(){
+        return redirect()->to(base_url("source/sources"));
 
+    }
+
+    public function sources() {
+
+        $uidata = new UIData();
         $uidata->title = "Sources";
 
         $uidata->data['variant_counts'] = $this->sourceModel->countSourceEntries();
@@ -95,17 +87,14 @@ class Source extends CVUI_Controller{
         $uidata->javascript = array(JS.'cafevariome/source.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
         $data = $this->wrapData($uidata);
-        var_dump(preg_replace("/\s.+/", '', "Cafe Variome"));
         return view('source/sources', $data);
     }
 
-    function add_source() {
-        if (!$this->authAdapter->loggedIn() /*|| !$this->ion_auth->is_admin()*/) {
-			return redirect()->to(base_url("auth/login"));
-        }
+    public function create_source() {
+
         $uidata = new UIData();
 
-        $uidata->data['title'] = "Add Source";
+        $uidata->data['title'] = "Create Source";
 
         $this->validation->setRules([
             'name' => [
@@ -276,15 +265,11 @@ class Source extends CVUI_Controller{
             $uidata->javascript = array(JS.'cafevariome/source.js');
 
             $data = $this->wrapData($uidata);
-            return view('source/add_source', $data);
+            return view('source/create_source', $data);
         }
     }
 
     public function edit_source($source_id = NULL) {
-
-        if (!$this->authAdapter->loggedIn() /*|| !$this->ion_auth->is_admin()*/) {
-			return redirect()->to(base_url("auth/login"));
-        }
 
         $uidata = new UIData();
 
@@ -398,7 +383,6 @@ class Source extends CVUI_Controller{
             $source_data = $this->sourceModel->getSourceSingleFull($source_id);
             $uidata->data['source_data'] = $source_data;
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-            var_dump($uidata->data['message']);
             $uidata->data['name'] = array(
                 'name' => 'name',
                 'id' => 'name',
@@ -456,50 +440,113 @@ class Source extends CVUI_Controller{
         }
     }
 
-    function delete_source($source_id = NULL, $source = NULL) {
+    public function delete_source($source_id = NULL, $source = NULL) {
         if (!$source) {
             return redirect()->to(base_url("source/sources"));          
         }
-        if (!$this->authAdapter->loggedIn() /*|| !$this->ion_auth->is_admin()*/) {
-			return redirect()->to(base_url("auth/login"));
-        }
 
-        
+        $uidata = new UIData();
+        $uidata->title = "Delete Source";
+
         $elasticModel = new \App\Models\Elastic();
-        $this->form_validation->set_rules('confirm', 'confirmation', 'required');
-        $this->form_validation->set_rules('source', 'Source Name', 'required|alpha_dash');
 
-        if ($this->form_validation->run() == FALSE) {
-            // insert csrf check
-            $this->data['source_id'] = $source_id;
-            $this->data['source'] = $source;
-            $this->_render('sources/delete_source');
-        } else {
-            // do we really want to delete?
-            if ($this->input->post('confirm') == 'yes') {
+        $this->validation->setRules([
+            'confirm' => [
+                'label'  => 'confirmation',
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => '{field} is required.'
+                ]
+            ],
+            
+                'source' => [
+                    'label'  => 'Source Name',
+                    'rules'  => 'required|alpha_dash',
+                    'errors' => [
+                        'required' => '{field} is required.',
+                        'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
+                    ]
+                ]            
+            ]);
+
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+           // do we really want to delete?
+            if ($this->request->getVar('confirm') == 'yes') {
                 // do we have a valid request?
-                if ($source != $this->input->post('source')) {
-                    show_error('This form post did not pass our security checks.');
+                if ($source != $this->request->getVar('source')) {
+                        show_error('This form post did not pass our security checks.');
                 }
 
                 // do we have the right userlevel?
-                if ($this->ion_auth->logged_in() && $this->ion_auth->is_admin()) {
-                    error_log("deleting source");
-                    error_log(print_r($_POST,1));
+                if ($this->authAdapter->loggedIn() /*&& $this->ion_auth->is_admin()*/) {
                     $source_id = $_POST['source_id'];
-                    if ($this->input->post('variants') == 'yes') { // also delete variants for the source
-                        $is_deleted = $this->sources_model->delete_variants_and_phenotypes($source);
+                    if ($this->request->getVar('variants') == 'yes') { // also delete variants for the source
+                        $is_deleted = $this->sourceModel->deleteVariantsPhenotypes($source);
                     }
-                    $this->sources_model->deleteSource($source_id);
-                    $this->elastic_data_model->deleteElasticIndex($source_id);
+                    $this->sourceModel->deleteSource($source_id);
+                    $elasticModel->deleteElasticIndex($source_id);
                     
                 }
                 if (file_exists("resources/elastic_search_status_complete"))
                     unlink("resources/elastic_search_status_complete");
                 file_put_contents("resources/elastic_search_status_incomplete", "");
+
+            }
+        }   
+        else
+        {
+            // insert csrf check
+            $uidata->data['source_id'] = $source_id;
+            $uidata->data['source'] = $source;
+            $data = [
+                'name'    => 'newsletter',
+                'id'      => 'newsletter',
+                'value'   => 'accept',
+                'checked' => TRUE,
+                'style'   => 'margin:10px'
+            ];
+            $uidata->data['confirm'] = array(
+                'name' => 'confirm',
+                'type' => 'radio',
+                'class' => 'form-control',
+            );
+
+            $data = $this->wrapData($uidata);
+            return view('source/delete_source', $data);
             }
             //redirect them back to the auth page
-            redirect('sources', 'refresh');
+            return redirect()->to(base_url("source/sources"));
         }
+
+    public function status($source_id = null) {  
+        if (!$source_id) {
+            return redirect()->to(base_url("source/sources"));
+        }
+        $uidata = new UIData();
+        $uidata->title = "Status";
+        $uidata->data['source_id'] = $source_id;
+        $uidata->javascript = array(JS.'cafevariome/status.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
+
+        $data = $this->wrapData($uidata);
+
+        return view('source/status', $data);
     }
+
+    public function getSourceStatus($source_id){
+
+        $output = ['Files' => [], 'Error' => []];
+        if ($source_id== 'all') {
+            $output['Files'] = $this->sourceModel->getSourceStatus('all');
+            //$output['Error'] = $this->upload_data_model->getErrorForSource('all');
+        }
+        else {
+          //source_id = $this->upload_data_model->getSourceId($_POST['source']);  
+          $output['Files'] = $this->sourceModel->getSourceStatus($source_id);
+         // $output['Error'] = $this->upload_data_model->getErrorForSource($source_id);
+        }       
+        
+        return json_encode($output);   
+    }
+
 }
