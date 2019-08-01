@@ -2,6 +2,8 @@
 
 /**
  * Name Users.php
+ * @author Owen Lancaster
+ * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
  * 
  * User model class that handles operations on User entity.
@@ -74,9 +76,42 @@ class User extends Model{
      * @return array
      */
 
-     public function getUsers(){
+    public function getUsers(){
+    $this->builder = $this->db->table($this->table);
+    $query = $this->builder->get()->getResultArray();
+    return ($query) ? $query : null;
+    }
+
+    /**
+     * userExists
+     * returns true if user exists in the local database.
+     * 
+     * @author Mehdi Mehtarizadeh
+     * @param string $username  
+     * @return bool true if user exists false otherwise
+     */
+    function userExists(string $username):bool{
+        if ($this->getUserByUsername($username)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Add Remote User - Add a  minimal new user as remote 
+     *
+     * @param string $email   - The email of the new user
+	 * @return int $insert_id ID of inserted user
+     */
+	function createRemoteUser($email) {
+		$data = array(
+            'email'  	=> $email,
+            'username'  => $email,
+            'remote'  	=> 1,
+            'active'    => 0);
         $this->builder = $this->db->table($this->table);
-        $query = $this->builder->get()->getResultArray();
-        return ($query) ? $query : null;
-     }
+        $this->builder->insert($data);
+		$insert_id = $this->db->insertID();
+		return $insert_id;
+	}
 }

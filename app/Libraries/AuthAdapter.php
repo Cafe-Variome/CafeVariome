@@ -66,8 +66,8 @@ class AuthAdapter{
         return $this->authEngine->logout();
     }
 
-    public function getUser(){
-        return $this->authEngine->getUser();
+    public function getUserId(){
+        return $this->authEngine->getUserId();
     }
 
     public function loggedIn():bool{

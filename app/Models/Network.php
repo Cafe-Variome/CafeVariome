@@ -136,8 +136,68 @@ class Network extends Model{
 		$this->builder->select("users.id, users.username, users.remote");
 		$this->builder->join('users_groups_networks', 'users_groups_networks.user_id=users.id');
 		$this->builder->where(array('users_groups_networks.group_id' => $group_id));	
-		$query = $this->db->builder()->getResultArray();
+		$query = $this->builder->get()->getResultArray();
 		return $query;
+	}
+
+	function getNetworkGroup($group_id){
+		$this->builder = $this->db->table('network_groups');
+		$this->builder->where(array('id' => $group_id));
+		$query = $this->builder->get()->getResultArray();
+		return  $query ? $query[0] : null;
+	}
+
+	
+	function addUserToNetworkGroup($user_id, $group_id, $installation_key) {
+
+		$this->builder = $this->db->table('network_groups');
+		$this->builder->select("network_key");
+		$this->builder->where('id', $group_id);
+		$query = $this->builder->get()->getResultArray();
+		$network_key = $query[0]['network_key'];
+		$data = array ( 'group_id' => $group_id,
+						'user_id' => $user_id,
+						'installation_key' => $installation_key,
+						'network_key' => $network_key,
+		);
+
+		$this->builder = $this->db->table('users_groups_networks');				
+		$this->builder->insert( $data);
+		//$insert_id = $this->db->insertID();
+		return $network_key;
+	}
+
+	function deleteAllUsersFromNetworkGroup($group_id, $isMaster = false) {
+		if($isMaster) {
+			$this->builder = $this->db->table('network_groups');
+			$this->builder->select("network_key");
+			$this->builder->where('id', $group_id);
+			$result = $this->builder->get()->getResultArray();
+			$network_key = $result[0]['network_key'];
+
+			//delete
+			$this->builder = $this->db->table('users_groups_networks');
+			$this->builder->where('network_key', $network_key);
+			$this->builder->delete();
+		} else {
+			$this->builder = $this->db->table('users_groups_networks');
+			$this->builder->where('group_id', $group_id);	
+			$this->builder->delete();
+		}
+	}
+
+	function deleteUserFromAllOtherNetworkGroups($network_key, $users) {
+		$this->builder = $this->db->table('users_groups_networks');
+		$this->builder->where('network_key', $network_key);	
+		$this->builder->whereNotIn('user_id', $users);
+		$this->builder->delete();
+	}
+
+	function deleteAllSourcesFromNetworkGroup($group_id, $installation_key) {
+		$this->builder = $this->db->table('network_groups_sources');
+		$this->builder->where('group_id', $group_id);	
+		$this->builder->where('installation_key', $installation_key);	
+		$this->builder->delete();
 	}
 
 	/**

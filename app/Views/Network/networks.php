@@ -14,7 +14,11 @@
 </div>
 <hr>
 <?php if ( ! $networks ): ?>
-<p>You are currently not a member of any networks.</p>
+<div class="row">
+	<div class="col">
+		<p>You are currently not a member of any networks.</p>
+	</div>
+</div>
 <?php else: ?>
 <table class="table table-bordered table-striped table-hover" id="networkstable">
 	<thead>
@@ -42,7 +46,7 @@
 				<i class="fa fa-lock"></i>
 			</a>
 			<?php if (isset($groups[$network['network_name']])): ?>
-			<a rel="popover" data-content="Add/Remove users for this network" data-original-title="Edit Network Users" href="<?php echo base_url('auth_federated/edit_user_network_groups') . '/' . $groups[$network['network_name']] . '/1'?>" >
+			<a rel="popover" data-content="Add/Remove users for this network" data-original-title="Edit Network Users" href="<?php echo base_url('network/edit_user_network_groups') . '/' . $groups[$network['network_name']] . '/1'?>" >
 				<i class="fa fa-edit"></i>
 			</a>
 			<?php else: ?>

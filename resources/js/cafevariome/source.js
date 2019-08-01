@@ -1,7 +1,8 @@
 $(document).ready(function() {
-    $('#sourcestable').DataTable();
+    if ($('#sourcestable').length) {
+        $('#sourcestable').DataTable();
+    }
 } );
-
 function select_groups() {
     $(".groupsSelected").find('option').each(function () {
         $(this).attr('selected', 'selected');

@@ -111,6 +111,6 @@ $current_controller = uri_string();
 
 <?php if(file_exists("resources/elastic_search_status_incomplete")) { ?>
     <script>
-        show_growl_elastic_search();
+        //show_growl_elastic_search();
     </script>
 <?php } ?>

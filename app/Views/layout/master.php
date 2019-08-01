@@ -167,7 +167,9 @@
 			});
 		</script>-->
 		<?php endif; ?>
-		
+        <!--Initial step to upgrade to boostrap 4.3.1, jquery 4 by Mehdi Mehtarizadeh 11/6/2019 -->
+        <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
+
 
 
 </head>
@@ -190,8 +192,7 @@
         </div>
     </footer>
     
-    <!--Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh 11/6/2019 -->
-    <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
+    <!--Initial step to upgrade to boostrap 4.3.1, jquery 4 by Mehdi Mehtarizadeh 11/6/2019 -->
     <script src="<?php echo base_url(VENDOR."twbs/bootstrap/dist/js/bootstrap.bundle.js");?>"></script>
     <script src="<?php echo base_url(JS."jstree/jstree.js");?>"></script>
     <script src="<?php echo base_url(VENDOR."select2/select2/dist/js/select2.js");?>"></script>

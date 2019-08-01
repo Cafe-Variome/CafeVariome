@@ -175,7 +175,7 @@ class Discover extends CVUI_Controller{
         
         $sourceModel =  new Source($this->db);
         $sources = array();
-        $sources = $sourceModel-> getSources();
+        $sources = $sourceModel->getOnlineSources();
 
 
         // Check if Base url is set from precan query else

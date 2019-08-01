@@ -50,7 +50,7 @@ class Source extends CVUI_Controller{
         $uidata->title = "Sources";
 
         $uidata->data['variant_counts'] = $this->sourceModel->countSourceEntries();
-        $sources = $this->sourceModel->getSourcesFull();
+        $sources = $this->sourceModel->getSources();
         $uidata->data['sources'] = $sources;
         $source_groups = array();
 
@@ -380,7 +380,8 @@ class Source extends CVUI_Controller{
             $uidata->data['selected_groups'] = $selected_groups;
 
             // Get all the data for this source
-            $source_data = $this->sourceModel->getSourceSingleFull($source_id);
+            $source_data = $this->sourceModel->getSource($source_id);
+
             $uidata->data['source_data'] = $source_data;
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
             $uidata->data['name'] = array(
