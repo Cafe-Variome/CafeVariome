@@ -544,7 +544,7 @@ class Source extends CVUI_Controller{
         else {
           //source_id = $this->upload_data_model->getSourceId($_POST['source']);  
           $output['Files'] = $this->sourceModel->getSourceStatus($source_id);
-         // $output['Error'] = $this->upload_data_model->getErrorForSource($source_id);
+          $output['Error'] = $this->sourceModel->getErrorForSource($source_id);
         }       
         
         return json_encode($output);   

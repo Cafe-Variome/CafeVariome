@@ -12,8 +12,9 @@ class Home extends CVUI_Controller
 		$udata = new UIData();
 		$udata->title = "Home";
 		$data = $this->wrapData($udata);
-		$kc = new \App\Libraries\KeyCloak();
-		var_dump($kc->checkKeyCloakServer());
+
+		var_dump(shell_exec("php " . getcwd() . "/index.php Task phenoPacketInsert 7"));
+		exit;
 		echo view('home/index', $data);
 	}
 

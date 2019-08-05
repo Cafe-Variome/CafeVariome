@@ -1,3 +1,5 @@
+var fileIntervalActive = false;
+
 $(document).ready(function() { 
    $('.norm').on('click', function(){
    	// console.log($(this).prev('input').prop('checked'));
@@ -104,17 +106,17 @@ $(document).ready(function() {
 								}
 								$.ajax({
 									type: "POST",  
-									url: baseurl+'Upload/jsonBatch',
+									url: baseurl+'upload/jsonBatch',
 									contentType: 'multipart/form-data',
 									data: formData,
 									cache: false,
 									contentType: false,
 									processData: false,
 									success: function(response)  {
-										param = "source="+id;
+										param = "source_id="+id;
 										$.ajax({
 											type: "POST",   
-								      		url: baseurl+'Upload/jsonStart',
+								      		url: baseurl+'upload/jsonStart',
 								      		data: param,
 								      		dataType: "json", 
 											success: function(response)  {
@@ -398,6 +400,7 @@ $(document).ready(function() {
     });
 })
 
+
 function confirmvcf(data) {
 	counter = 0;
 	done = [];
@@ -627,3 +630,38 @@ $('#confirmVcf').on('hidden', function () {
       	});
     $('#vcfTable').DataTable().fnDestroy();
 })
+
+
+
+function fileUploadInterval() {
+    if (!fileIntervalActive) {
+        fileIntervalActive = true;
+        fileInterval = setInterval(function() {
+            $.ajax({url: baseurl + 'upload/checkUploadJobs',
+                type: 'POST',
+                success: function (data) {
+					param = $('#source_id').val();
+
+					reloadTable(param,false);
+                    data = $.parseJSON(data);
+                    // console.log(data);
+                    if (!data.Status) {
+                        fileIntervalActive = false;  
+                        clearInterval(fileInterval);  
+                        return; 
+                    }
+                    if (data.Message.length > 0) {
+                        for (var i = 0; i < data.Message.length; i++) {
+                            $.notify({
+                                message: 'The Source: '+data.Message[i]+' has finished with its database operation (Upload Or Regenerate). Please refer to the status page for that source to see more details.'
+                              },{
+                                // settings
+                                timer: 2000000
+                            });
+                        }
+                    }                
+                }
+            });
+        }, 5000)
+    }
+}

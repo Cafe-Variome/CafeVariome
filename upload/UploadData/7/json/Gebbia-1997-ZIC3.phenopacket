@@ -1,10 +1,10 @@
 {
-  "id": "1",
+  "id": "",
   "subject": {
-    "id": "IV-5/family A",
+    "id": "III-1",
     "datasetId": "",
     "ageAtCollection": {
-      "age": "26Y"
+      "age": "7W"
     },
     "sex": {
       "id": "PATO:0000384",
@@ -13,8 +13,8 @@
     "phenotypes": [{
       "description": "",
       "type": {
-        "id": "HP:0007843",
-        "label": "Attenuation of retinal blood vessels"
+        "id": "HP:0002139",
+        "label": "Arrhinencephaly"
       },
       "negated": false,
       "modifiers": [],
@@ -24,15 +24,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9354794",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0001513",
-        "label": "Obesity"
+        "id": "HP:0001750",
+        "label": "Single ventricle"
       },
       "negated": false,
       "modifiers": [],
@@ -42,15 +42,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9354794",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0000608",
-        "label": "Macular degeneration"
+        "id": "HP:0001643",
+        "label": "Patent ductus arteriosus"
       },
       "negated": false,
       "modifiers": [],
@@ -60,15 +60,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9354794",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0000486",
-        "label": "Strabismus"
+        "id": "HP:0001746",
+        "label": "Asplenia"
       },
       "negated": false,
       "modifiers": [],
@@ -78,15 +78,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9354794",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0001328",
-        "label": "Specific learning disability"
+        "id": "HP:0004971",
+        "label": "Pulmonary artery hypoplasia"
       },
       "negated": false,
       "modifiers": [],
@@ -96,15 +96,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9354794",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0000510",
-        "label": "Rod-cone dystrophy"
+        "id": "HP:0001674",
+        "label": "Complete atrioventricular canal defect"
       },
       "negated": false,
       "modifiers": [],
@@ -114,15 +114,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9354794",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0001263",
-        "label": "Global developmental delay"
+        "id": "HP:0001669",
+        "label": "Transposition of the great arteries"
       },
       "negated": false,
       "modifiers": [],
@@ -132,8 +132,98 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9354794",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0012890",
+        "label": "Posteriorly placed anus"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:9354794",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0001629",
+        "label": "Ventricular septal defect"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:9354794",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0012262",
+        "label": "Abnormal ciliary motility"
+      },
+      "negated": true,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:9354794",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0004935",
+        "label": "Pulmonary artery atresia"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:9354794",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0003363",
+        "label": "Abdominal situs inversus"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:9354794",
+          "description": ""
         }
       }]
     }],
@@ -146,27 +236,27 @@
   "individuals": [],
   "biosamples": [],
   "genes": [{
-    "id": "ENTREZ:582",
-    "symbol": "BBS1"
+    "id": "ENTREZ:7547",
+    "symbol": "ZIC3"
   }],
   "variants": [{
     "genomeAssembly": "GRCH_37",
-    "sequence": "11",
+    "sequence": "X",
     "coordinateSystem": "ONE_BASED",
-    "position": 66278178,
-    "deletion": "G",
+    "position": 136649818,
+    "deletion": "C",
     "insertion": "T",
     "hgvs": "",
     "sampleGenotypes": {
-      "IV-5/family A": {
-        "id": "GENO:0000136",
-        "label": "homozygous"
+      "III-1": {
+        "id": "GENO:0000134",
+        "label": "hemizygous"
       }
     }
   }],
   "diseases": [{
-    "id": "OMIM:209900",
-    "label": "BARDET-BIEDL SYNDROME 1; BBS1"
+    "id": "OMIM:306955",
+    "label": "HETEROTAXY, VISCERAL, 1, X-LINKED; HTX1"
   }],
   "htsFiles": [],
   "metaData": {

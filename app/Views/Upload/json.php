@@ -38,7 +38,7 @@
     <span class="btn btn-default btn-file" style="padding-top: 10px; line-height: normal;">
         <input type="file" name="userfile[]" id="jsonFile" multiple required/>
     </span>
-    <input type="hidden" id="source_id" value="<?php echo $source ?>" name="source_id">
+    <input type="hidden" id="source_id" value="<?php echo $source ?>" />
     <br/><br/>
     <div class="pagination-centered">
         <button class="span3 btn btn-large btn-primary " type="submit">Upload File</button>

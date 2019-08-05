@@ -1,10 +1,10 @@
 {
-  "id": "1",
+  "id": "",
   "subject": {
-    "id": "IV-5/family A",
+    "id": "0548",
     "datasetId": "",
     "ageAtCollection": {
-      "age": "26Y"
+      "age": "2y"
     },
     "sex": {
       "id": "PATO:0000384",
@@ -13,8 +13,8 @@
     "phenotypes": [{
       "description": "",
       "type": {
-        "id": "HP:0007843",
-        "label": "Attenuation of retinal blood vessels"
+        "id": "HP:0009732",
+        "label": "Plexiform neurofibroma"
       },
       "negated": false,
       "modifiers": [],
@@ -24,15 +24,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9101303",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0001513",
-        "label": "Obesity"
+        "id": "HP:0001480",
+        "label": "Freckling"
       },
       "negated": false,
       "modifiers": [],
@@ -42,15 +42,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9101303",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0000608",
-        "label": "Macular degeneration"
+        "id": "HP:0007565",
+        "label": "Multiple cafe-au-lait spots"
       },
       "negated": false,
       "modifiers": [],
@@ -60,15 +60,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9101303",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0000486",
-        "label": "Strabismus"
+        "id": "HP:0000767",
+        "label": "Pectus excavatum"
       },
       "negated": false,
       "modifiers": [],
@@ -78,15 +78,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9101303",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0001328",
-        "label": "Specific learning disability"
+        "id": "HP:0002751",
+        "label": "Kyphoscoliosis"
       },
       "negated": false,
       "modifiers": [],
@@ -96,15 +96,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9101303",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0000510",
-        "label": "Rod-cone dystrophy"
+        "id": "HP:0001010",
+        "label": "Hypopigmentation of the skin"
       },
       "negated": false,
       "modifiers": [],
@@ -114,15 +114,15 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9101303",
+          "description": ""
         }
       }]
     }, {
       "description": "",
       "type": {
-        "id": "HP:0001263",
-        "label": "Global developmental delay"
+        "id": "HP:0001067",
+        "label": "Neurofibromas"
       },
       "negated": false,
       "modifiers": [],
@@ -132,8 +132,26 @@
           "label": "author statement supported by traceable reference"
         },
         "reference": {
-          "id": "PMID:23559858",
-          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+          "id": "PMID:9101303",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0000957",
+        "label": "Cafe-au-lait spot"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:9101303",
+          "description": ""
         }
       }]
     }],
@@ -146,27 +164,27 @@
   "individuals": [],
   "biosamples": [],
   "genes": [{
-    "id": "ENTREZ:582",
-    "symbol": "BBS1"
+    "id": "ENTREZ:4763",
+    "symbol": "NF1"
   }],
   "variants": [{
     "genomeAssembly": "GRCH_37",
-    "sequence": "11",
+    "sequence": "17",
     "coordinateSystem": "ONE_BASED",
-    "position": 66278178,
-    "deletion": "G",
-    "insertion": "T",
+    "position": 29665753,
+    "deletion": "C",
+    "insertion": "CTT",
     "hgvs": "",
     "sampleGenotypes": {
-      "IV-5/family A": {
-        "id": "GENO:0000136",
-        "label": "homozygous"
+      "0548": {
+        "id": "GENO:0000135",
+        "label": "heterozygous"
       }
     }
   }],
   "diseases": [{
-    "id": "OMIM:209900",
-    "label": "BARDET-BIEDL SYNDROME 1; BBS1"
+    "id": "OMIM:162200",
+    "label": "NEUROFIBROMATOSIS, TYPE I; NF1"
   }],
   "htsFiles": [],
   "metaData": {

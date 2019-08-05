@@ -59,10 +59,35 @@ use CodeIgniter\Config\Services;
         $uidata->data['source'] = $source;
         // preparing webpage
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js',];
+        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js',];
 
         $data = $this->wrapData($uidata);
         return view('upload/json', $data);
+    }
+
+    /**
+     * VCF - Render the Stand-Alone view to upload VCF's
+     * NOT BEING USED / DEPRECATED
+     *
+     * @return N/A
+     */
+    public function vcf($source_id) {
+
+        $uidata = new UIData();
+        //if ($this->ion_auth->in_group("curator")) // Since this is a shared function for curators and admin check that the curator is a curator for this source
+        $user_id = $this->authAdapter->getUserId();
+        $can_curate_source = $this->sourceModel->canCurateSource($source_id, $user_id);
+        if (!$can_curate_source) {
+                //show_error("Sorry, you are not listed as a curator for that particular source.");
+            }
+        $uidata->data['source'] = $source_id;
+        //$uidata->css = array(CSS.'datatables/datatables/media/css/jquery.dataTables.min.css');
+
+        $uidata->css = ['upload_data.css'];
+        $uidata->javascript = [JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
+
+        $data = $this->wrapData($uidata);
+        return view('upload/vcf', $data);
     }
 
     /**
@@ -166,6 +191,7 @@ use CodeIgniter\Config\Services;
         // Check the number of files we are uploading
         $filesCount = count($_FILES['userfile']['name']);
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $userFile = $this->request->getFiles();
 
         for($i = 0; $i < $filesCount; $i++){     
 
@@ -181,26 +207,72 @@ use CodeIgniter\Config\Services;
                 error_log("failure");
             }   
             
-            
-            $userFile = $this->request->getFiles();
-            //$userFile  = $this->request->getFile('userfile');
-            
-            //var_dump(move_uploaded_file($_FILES["userfile"]["tmp_name"], $source_path));
-            var_dump($userFile['userfile'][0]);
-            if($userFile['userfile'][0]->move($source_path. "/" . $_FILES['userfile']['name'][$i])){     
+            if($userFile['userfile'][$i]->move($source_path. "/", $_FILES['userfile']['name'][$i]))
+            {     
                 // if file upload was successful
-                // Update UploadDataStatus table with the new file          
-                
-                //$this->upload_data_model->sqlInsert($_FILES['file']['name'],$source_id);
+                // Update UploadDataStatus table with the new file    
+                $this->uploadModel->createUpload($_FILES['userfile']['name'],$source_id);
+      
+                return true;
             }
-            else {
+            //else
+            {
                 // if it failed to upload report error
                 // TODO: Make it return failure and reflect in JS for this eventuality
 
             }
         }
-        return var_dump($userFile);
+        return false;
         
     }
+
     
+    /**
+     * Json Start - At this point all files have been uploaded. Lock the source and begin 
+     * Insert into MySQL
+     *
+     * @param string $_POST['source'] - The source we must upload into
+     * @return string Green for success
+     */
+    public function jsonStart() {
+        // Assign posted source to easier variable
+        $source_id = $_POST['source_id'];
+        // Get ID for source and lock it so further updates and uploads cannot occur
+        // Until update is finished
+        $this->sourceModel->toggleSourceLock($source_id);
+        $uid = md5(uniqid(rand(),true));
+        $this->uploadModel->addUploadJobRecord($source_id,$uid,$_SESSION['user_id']);
+        // Create thread to begin SQL insert in the background
+
+        shell_exec("php " . getcwd() . "/index.php Task phenoPacketInsert ".$source_id);
+
+        // Report to front end that the process has now begun
+        echo json_encode("Green");
+    }
+
+    
+    public function checkUploadJobs() {
+
+        $user_id = $_SESSION['user_id'];
+        $return = ['Status' => '', 'Message' => []];
+        if ($this->uploadModel->countUploadJobRecord($user_id)) {
+            $return['Status'] = true;
+            $values = $this->uploadModel->checkUploadJobRecord($user_id);
+            for ($i=0; $i < count($values); $i++) { 
+                if ($values[$i]['elastic_lock'] == 0) {
+                    $source_name = $this->uploadModel->getSourceNameByID($values[$i]['source_id']);
+                    array_push($return['Message'], $source_name);
+                    $this->uploadModel->removeUploadJobRecord($user_id,$values[$i]['source_id']);
+                }
+            }
+        }
+        else {
+            $return['Status'] = false;
+        }
+        echo json_encode($return);
+    }
+    
+
+    
+
  }

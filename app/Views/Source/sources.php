@@ -42,7 +42,7 @@
 					if ( isset($variant_counts[$source['source_id']]) ):
 						echo $variant_counts[$source['source_id']];
 					else:?>
-						<button data-toggle="modal" data-target="#addVariantsModal" data-name="<?= $source['name'] ?>" data-description="<?= $source['description'] ?>" data-content="Add records to this source" data-toggle="tooltip" data-placement="top" title="Import Records">
+						<button data-toggle="modal" data-target="#addVariantsModal" data-id="<?= $source['source_id'] ?>" data-description="<?= $source['description'] ?>" data-content="Add records to this source" data-toggle="tooltip" data-placement="top" title="Import Records">
 							<i class="fa fa-plus"></i>
 						</button>
 					<?php endif; ?>

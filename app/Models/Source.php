@@ -112,6 +112,23 @@ use CodeIgniter\Database\ConnectionInterface;
         $query = $this->builder->get()->getResultArray();
         return $query? $query[0]['source_id'] : null;
     }
+    
+    /**
+     * Get Source Name - Get the source name for given ID
+     *
+     * @param int $source_id - The source ID we are trying to find name for
+     * @return string the Source Name
+     * 
+     * Moved to source model by Mehdi Mehtarizadeh(02/08/2019)
+     */
+    public function getSourceNameByID($source_id) {
+        $this->builder = $this->db->table($this->table);
+
+        $this->builder->select('name');
+        $this->builder->where('source_id', $source_id);
+        $query = $this->builder->get()->getResultArray();
+        return ($query) ? $query[0]['name'] : null;
+    }
 
     /**
      * Is Source Locked - Is the given Source Locked?
@@ -137,7 +154,7 @@ use CodeIgniter\Database\ConnectionInterface;
         $query = $this->builder->get()->getResultArray();
         $source_counts = array();
         foreach ($query as $r) {
-            $source_counts[$r->source] = $r->total;
+            $source_counts[$r["source"]] = $r["total"];
         }
         return $source_counts;
     }
@@ -178,6 +195,23 @@ use CodeIgniter\Database\ConnectionInterface;
         return $query;
     }
 
+    /**
+     * Get Error For Source - Get all rows from upload_error for given source
+     *
+     * @param int $source_id  - The source id we are wanting rows from
+     * @return array $query   - Our Results
+     */
+    public function getErrorForSource($source_id) {
+        $this->builder = $this->db->table('upload_error');
+
+        $this->builder->select('*');
+        if ($source_id != 'all') {
+            $this->builder->where('source_id', $source_id);
+        }
+        $query = $this->builder->get()->getResultArray();
+        return $query;
+    }
+        
     public function canCurateSource($source_id, $user_id) {
         $this->builder = $this->db->table('curators');
 
@@ -186,6 +220,25 @@ use CodeIgniter\Database\ConnectionInterface;
         $query = $this->builder->get()->getResultArray();
         $count = $this->builder->countAllResults();
         return $count;
+    }
+    
+    /**
+     * Toggle Source Lock -  Lock the source which is currently being regenerated or
+     * uploaded to
+     * 
+     * Moved to source model by Mehdi Mehtarizadeh (02/08/2019)
+     * 
+     * @param int $source_id - The source we are locking
+     * @return N/A
+     */
+    public function toggleSourceLock($source_id) {
+        $this->builder = $this->db->table($this->table);
+
+        $data = array(
+            "elastic_lock" => "!elastic_lock"
+        );
+        $this->builder->where('source_id', $source_id);
+        $this->builder->update($data);
     }
 
  }
