@@ -11,10 +11,13 @@
 
  use App\Models\Settings;
 
-class Elastic{
+class Elastic extends Model{
 
-    public function  __construct(){
-		$this->db = \Config\Database::connect();
+    protected $db;
+    protected $builder;
+
+    public function  __construct(ConnectionInterface &$db){
+        $this->db =& $db;
         $this->setting =  Settings::getInstance($this->db);
     }
 
@@ -50,5 +53,44 @@ class Elastic{
             echo 'Error:' . curl_error($ch);
         }
         curl_close ($ch);
+    }
+
+    /**
+     * Get VCF Pending - Get a list of all pending VCF files to add to MySQL for a given source
+     *
+     * @param int $source_id - The id of the source
+     * @return array $vcf    - Full details needed for all VCF Files
+     */
+    function getvcfPending($source_id) {
+
+        $this->builder = $this->db->table('UploadDataStatus');
+
+        $this->builder->select('FileName,tissue,patient');
+        $this->builder->like('FileName', '.vcf', 'before'); 
+        $this->builder->where('Status', 'Pending');
+        $this->builder->where('source_id', $source_id);
+        $vcf = $this->builder->get()->getResultArray();
+        return $vcf;
+    }
+
+    
+    /**
+     * VCF Wrap - We have finished inserting data for a VCF file and it is time to update the status table. 
+     *
+     * @param string $file   - The name of the file
+     * @param int $source_id - The id of the source
+     * @return N/A 
+     */
+    function vcfWrap($file, $source_id) {
+        $this->builder = $this->db->table('UploadDataStatus');
+
+        $now = date('Y-m-d H:i:s');
+        $Status = "Success";
+        $data = array(
+            'uploadEnd' => $now,
+            'Status' => $Status);
+        $this->builder->where('FileName', $file);
+        $this->builder->where('source_id', $source_id);
+        $this->builder->update($data);
     }
 }

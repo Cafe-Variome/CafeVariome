@@ -1,0 +1,154 @@
+<?= $this->extend('layout\master') ?>
+<?= $this->section('content') ?>
+
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin";?>">Dashboard Home</a></li>
+  <li class="breadcrumb-item"><a href="<?php echo base_url() . "source";?>">Sources</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
+  </ol>
+</nav>
+<div class="row">
+	<div class="col">
+		<h2><?= $title ?></h2>	
+	</div>	
+</div>
+<hr>
+<div id="load"></div>
+<div class="row">
+    <div class="col">
+        <h4>Import records for <?php echo $source_name; ?></h3>
+        <p>Accepted file formats are tab delimited, csv & xlsx. </p>
+        <p><a id="headerInfo">Click me for a description of header rules to implement into your files.</a></p>
+
+    </div>
+</div>
+<?php
+if (!is_writable(FCPATH . 'upload/')) {
+    echo '<div class="alert alert-danger">';
+     echo 'WARNING: Your upload directory is currently not writable by the webserver. In order to import records you must make this directory writable. Please change the permissions of the following directory:';
+     echo '<br /><br />' . FCPATH . 'upload/' . "<br /><br />Please contact admin@cafevariome.org if you require help.";
+     echo "</div><hr>";
+}
+?>
+
+
+<form enctype="multipart/form-data" method="post" id="fileinfo">
+<input type="hidden" id="source_id" name="source_id" value="<?php echo $source_id ?>">
+
+<div class="form-group">
+  <div class="custom-control custom-radio">
+    <input type="radio" id="fActionAppend" name="fAction[]" value="append" class="custom-control-input">
+    <label class="custom-control-label" for="fActionAppend" data-toggle="tooltip" data-placement="right" title="By selecting this option you will not impact any prior data already within the source.">Append</label>
+  </div>
+  <div class="custom-control custom-radio">
+    <input type="radio" id="fActionOverwrite" name="fAction[]" value="overwrite" class="custom-control-input">
+    <label class="custom-control-label" for="fActionOverwrite" data-toggle="tooltip" data-placement="right" title="By selecting this option you will delete all data currently in this source.">Overwrite</label>
+  </div>
+</div>
+<div class="form-group">
+  <div class="custom-file">
+    <input type="file" class="custom-file-input" name='userfile' id="dataFile" required>
+    <label class="custom-file-label" for="customFile">Choose file</label>
+  </div>
+</div>
+<div class="row">
+  <div class="col">
+    <button class="btn btn-large btn-primary" type="submit">Upload File</button>
+  </div>
+</div>
+</form>
+
+<hr>
+
+<div class="row">
+  <div class="col">
+    <p>The Status table will refresh every 5 seconds. However as long as the search box is highlighted the refresh will not occur.</p>
+  </div>
+</div>
+
+<table class="table table-bordered table-striped table-hover" id="file_table" width="100%" cellspacing="0">
+  <thead>
+    <tr>
+        <th>File-name</th>
+        <th>User</th>
+        <th>Upload Start</th>
+        <th>Upload End</th>
+        <th>Errors</th>
+        <th>Status</th>
+    </tr>
+  </thead>
+  <tbody id="file_grid">
+  </tbody>
+</table>
+<hr>
+
+<a href="<?php
+if ($session->get('admin_or_curate') == "curate") {
+    echo base_url() . "curate/variants";
+} else {
+    echo base_url() . "admin/variants";
+}
+?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
+
+
+<div id="uploadInfoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Header rules for CSV/XLSX File Upload</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>      
+      </div>
+      <div class="modal-body">
+        <p>The first column must be "subject_id". The file will not be processed otherwise.</p>
+        <p>Subsequent data columns will be considered a group and when inserted into the database will be linked together.</p>
+        <p>When you want to make a new group please insert an empty column with the header "&lt;group_end&gt;"</p>
+        <p>The final group does not require a closing &lt;group_end&gt; tag.</p>
+        <img src="<?php echo base_url('resources/images/upload_info.png'); ?>" title="Visual Graphic Explaining Header Rules" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- added Dec 2018 -->
+<div class="modal fade" id="duplicateResponse" tabindex="-1" role="dialog" aria-labelledby="duplicateResponseLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Duplicate subject IDs</h5>
+      </div>
+      <div class="modal-body">
+        <p>Duplicate subject IDs have been detected for this source. Please select from the options below. "Cancel Upload" - will abort the upload of this file,leaving the current data intact.  "Append data" - will add the data from this file to current data, existing data is not altered. "Overwrite Source" - will delete all data for this source and replace with current upload</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#" id="cancel" class="btn btn-warning" data-dismiss="modal" aria-hidden="true">Cancel Upload</a>
+        <a href="#" id="append" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Append data</a>
+        <a href="#" id="overwrite" class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Overwrite Source</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="confirmOverwrite" tabindex="-1" role="dialog" aria-labelledby="confirmOverwriteLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Confirm Overwrite</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>          
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>This will delete all existing data in this source, continue?</p>
+      </div>
+      <div class="modal-footer">
+        <a href="#" id ="cancel" class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</a>
+        <a href="#" id ="overwrite" class="btn btn-primary" data-dismiss="modal" aria-hidden="true">OK</a>
+      </div>
+    </div>
+  </div>
+</div>
+<?= $this->endSection() ?>

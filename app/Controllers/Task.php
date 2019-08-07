@@ -17,12 +17,15 @@ use CodeIgniter\Controller;
 use CodeIgniter\CLI\CLI;
 use App\Models\Upload;
 use App\Models\Source;
+use App\Models\Elastic;
+use App\Models\Settings;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
  class Task extends Controller{
 
     function __construct(){
         $this->db = \Config\Database::connect();
-
+		$this->setting =  Settings::getInstance($this->db);
     }
 
     /**
@@ -47,7 +50,7 @@ use App\Models\Source;
             $file_id = $files[$t]['ID'];
             error_log("Now doing: ".$file);
             // create array of the given json file
-            $data = json_decode(file_get_contents(FCPATH . "upload/UploadData/$source_id/json/$file"), true);
+            $data = json_decode(file_get_contents(FCPATH . "upload/UploadData/".$source_id."/json/".$file), true);
             $uploadModel->phenoPacketClear($source_id,$file_id);
             $uploadModel->clearErrorForFile($file_id);
             $meta = null;
@@ -98,7 +101,7 @@ use App\Models\Source;
                 error_log($this->db->transStatus());
                 $message = "Data Failed to insert. Please double check file for sanity.";
                 $error_code = 4;
-                $this->errorInsert($file,$source,$message,$error_code,true);
+                $uploadModel->errorInsert($file,$source,$message,$error_code,true);
             }
             // update status table to class current file as inserted to database
             $uploadModel->insertStatistics($file_id, $source_id);
@@ -106,6 +109,305 @@ use App\Models\Source;
         }
         // we have finished updating the source and unlock it so further uploads and updates can be performed
         $sourceModel->toggleSourceLock($source_id);	
+    }
+
+    /**
+     * VCF Elastic - Insert into ElasticSearch VCF Files
+     *
+     * Imported from elastic controller by Mehdi Mehtarizadeh (06/08/2019)
+     * 
+     * @param int $source_id - The source we are inserting into
+     * @return N/A
+     */
+    public function vcfElastic($source_id) {
+
+        $hosts = $this->setting->settingData['elastic_url'];
+        $elasticClient =  Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+
+        error_log("vcfElastic");
+
+        $uploadModel = new Upload($this->db);
+        $elasticModel = new Elastic($this->db);
+        $sourceModel = new Source($this->db);
+
+        // Get Pending VCF Files
+        $vcf = $elasticModel->getvcfPending($source_id);
+
+        $title = $this->setting->settingData['site_title'];
+        $title = preg_replace("/\s.+/", '', $title);
+        $title = strtolower($title); 
+
+        for ($t=0; $t < count($vcf); $t++) { 
+            error_log("now doing ".$vcf[$t]['FileName']);
+            $index_name = $title."_".$source_id."_".strtolower($vcf[$t]['patient'])."";
+            if ($vcf[$t]['tissue']) {
+                $index_name = $index_name."_".strtolower($vcf[$t]['tissue']);
+            }
+            // error_log($index_name);
+            $params['index'] = $index_name;
+            // return;
+            if ($elasticClient->indices()->exists($params)){
+                $params = ['index' => $index_name];
+                $response = $elasticClient->indices()->delete($params);
+            }
+            $params = [];
+            $params['index'] = $index_name;
+            $map = '{
+                "settings":{ "index.mapping.single_type":"true"},
+                "mappings":{
+                    "subject":{
+                        "properties":{
+                            "eav_rel":{"type": "join", "relations": {"sub":"eav"}},
+                            "type": {"type": "keyword"},
+                            "subject_id": {"type": "keyword"},
+                            "patient_id": {"type": "keyword"},
+                            "file_name": {"type": "keyword"},
+                            "source": {"type":"keyword"},
+                            "attribute":{"type":"keyword"},
+                            "value":{"type":"text", "fields": {"raw":{"type": "keyword"}, "d":{"type": "long", "ignore_malformed": "true"}, "dt":{"type": "date", "ignore_malformed": "true"}}}                              
+                        }
+                    }
+                }
+            }'; 
+            $map2 = json_decode($map,1);
+            $params['body'] = $map2;		    
+            $response = $elasticClient->indices()->create($params);
+            $source_name = $sourceModel->getSourceNameByID($source_id);
+            
+            // Open file for reading
+            $handle = fopen(FCPATH."upload/UploadData/".$source_id."/".$vcf[$t]['FileName'], "r");
+            // The list of extra parameters we want to include in our insert
+            $config = ["AF"];
+            $headers = [];
+            $counter = 0;
+            if ($handle) {
+                // Read file line by line
+                while (($line = fgets($handle)) !== false) {
+                    // Ignore all lines which start with ##
+                    if (preg_match("/^##/", $line)) {
+                        continue;
+                    }
+                    // This line has all the headers listed on it
+                    else if (preg_match("/^#/", $line)) {
+                        $line = substr($line, 1);
+                        $headers = explode("\t", $line);
+                    }
+                    // We have reached the data
+                    else {
+                        // Each row is its own group so we need to create a link id 
+                        // Explode our lines by tabs
+                        $values = explode("\t", $line);
+                        $link = md5(uniqid());
+                        // create parent document
+                        $bulk['body'][] = ["index"=>["_index"=>$index_name, "_type"=>"subject","_id"=>$link]];
+                        $bulk['body'][] = ["record_id"=>$patient, "patient_id"=>$patient, "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_vcf"];
+                        $counter++;
+                        // Every thousand documents perform a bulk operation to ElasticSearch
+                        if ($counter%1000 == 0) {      
+                            $responses = $elasticClient->bulk($bulk);			  
+                            $bulk=[];
+                            unset ($responses);
+                        }
+                        for ($i=0; $i < 8; $i++) { 
+                            if ($i == 7) {
+                                // go through format column and multidimensional array with each index
+                                // having two elements: [0] for alias and [1] for the value
+                                $string = $values[$i];
+                                $val = array_map(function($string) { return explode('=', $string); }, explode(';', $string));
+                                foreach ($val as $v) {
+                                    if (in_array($v[0], $config)) {
+                                        $id = md5(uniqid());
+                                        $bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "_routing"=>$link,"_id"=>$id]];
+                                        $bulk['body'][] = ["record_id"=>$values[2], "patient_id"=> $patient,"attribute"=>$v[0],"value"=>$v[1], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                        $counter++;	
+                                        if ($counter%1000 == 0) {      
+                                            error_log($counter);          	
+                                            $responses = $elasticClient->bulk($bulk);
+                                            
+                                            $bulk=[];
+                                            unset ($responses);
+                                        }
+                                    }
+                                }
+                            } 
+                            else if ($i == 6) {
+                                continue;
+                            }		              
+                            else {
+                                $id = md5(uniqid());
+                                $bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "_routing"=>$link,"_id"=>$id]];
+                                $bulk['body'][] = ["record_id"=>$patient, "patient_id"=> $patient,"attribute"=>$headers[$i],"value"=>$values[$i], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                $counter++;		
+                                if ($counter%1000 == 0) {      
+                                    error_log($counter);          	
+                                    $responses = $elasticClient->bulk($bulk);
+                                    
+                                    $bulk=[];
+                                    unset ($responses);
+                                }
+                            }
+                        }	                    
+                    }
+                }
+                fclose($handle);
+                    // Finished all files. Send the last records through
+                $responses = $elasticClient->bulk($bulk);
+                // error_log($counter);
+                unset ($responses);
+                unset($params);
+                $bulk=[];  	
+                $elasticModel->vcfWrap($vcf[$t]['FileName'],$source_id);
+            } else {
+                // error opening the file.
+            } 
+
+        }	
+        error_log("toggling source lock on: ".$source_id);
+        $sourceModel->toggleSourceLock($source_id); 		      
+    }
+
+    /**
+     * bulkUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
+     *
+     * @param string $file        - The File We are uploading
+     * @param int $delete         - 0: We do not need to delete data from eavs | 1: We do need to 
+     * @param string $source      - The name of the source we are uploading to
+     * @return array $return_data - Basic information on the status of the upload
+     */
+    public function bulkUploadInsert($file, $delete, $source_id) {
+
+        $uploadModel = new Upload($this->db);
+        $sourceModel = new Source($this->db);
+
+        $error = array('subject_id' => 'No subject_id column.',
+        'wrong_type' => 'File did not conform to allowed types.',
+         'insert_fail' => 'Data Failed to insert. Please double check file for sanity.',
+         'variant_invalid' => 'Variant is not valid, as according to VariantValidator. https://variantvalidator.org/',
+        );
+        $fileId = $uploadModel->getFileId($source_id, $file);
+        $uploadModel->clearErrorForFile($fileId);
+        if ($delete == 1) {		
+            $sourceModel->deleteSourceFromEAVs($source_id);
+        }
+        list( $true, $linerow, $counter, $groupnumber, $filePath ) = array( true, 1, 0, 0, FCPATH."upload/UploadData/".$source_id."/".$file);
+        
+        
+        $return_data = array('result_flag' => 1);   
+        $attgroups = [];
+        if (preg_match("/\.csv$|\.tsv$/", $file)) {
+            $line = fgets(fopen($filePath, 'r'));
+            if (!preg_match("/^subject_id(.)/", $line, $matches)) {
+                $return_data['result_flag'] = 0;
+                $return_data['error'] = $error['subject_id'];
+                $message = $error['subject_id'];
+                $error_code = 1;
+                $uploadModel->errorInsert($fileId,$source_id,$message,$error_code,true);
+                return $return_data;
+            }
+            else {
+                $delimiter = $matches[1];
+            }
+            $reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::CSV);
+            $reader->setFieldDelimiter($delimiter);
+        }     
+        elseif (preg_match("/\.xlsx$/", $file)) {
+
+            $reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::XLSX);
+        } 
+        elseif (preg_match("/\.ods$/", $file)) {
+            $reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::ODS);
+        }
+        else {
+            $return_data['result_flag'] = 0;
+            $return_data['error'] = "File did not conform to allowed types";   
+            $message = "File did not conform to allowed types.";
+            $error_code = 2;
+            $uploadModel->errorInsert($fileId,$message,$error_code,true);         
+            return $return_data;
+        }
+
+        $sourceModel->toggleSourceLock($source_id);	
+        $reader->open($filePath);
+        foreach ($reader->getSheetIterator() as $sheet) {
+            foreach ($sheet->getRowIterator() as $row) {
+                if ($true) {			 
+                    for ($i=0; $i < count($row); $i++) { 	
+                        if ($i === 0) {
+                            if ($row[$i] != "subject_id"){
+                                $return_data['result_flag'] = 0;
+                                $return_data['error'] = "No subject_id column.";
+                                $message = "No subject_id column.";
+                                $error_code = 1;
+                                $uploadModel->errorInsert($fileId,$source_id,$message,$error_code,true);
+                                $sourceModel->toggleSourceLock($source_id);
+                                return $return_data;
+                            }
+                            continue;
+                        }                    
+                        if ($row[$i] == "<group_end>"){
+                            if (!empty($temphash)){
+                                $attgroups[$groupnumber] = $temphash;
+                                $temphash = [];
+                                $groupnumber++;
+                            }
+                        } 
+                        else {
+                            $temphash[$row[$i]] = $i;
+                        }                      
+                        if (!empty($temphash)){
+                            $attgroups[$groupnumber] = $temphash;
+                        }	
+                    }
+                    $true = false;
+                    $this->db->transStart();			
+                }
+                else {
+                    $subject_id = $row[0];
+                    if ($subject_id == ""){
+                        $point = $row;
+                        $return_data['result_flag'] = 0;
+                        $return_data['status'] = "error";
+                        $return_data['error'] = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
+                        $message = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
+                        $error_code = 3;
+                        $uploadModel->errorInsert($fileId,$source_id,$message,$error_code,true);
+                        $sourceModel->toggleSourceLock($source_id);
+                        return $return_data;
+                    }
+                    foreach ($attgroups as $group){
+                        $uid = md5(uniqid(rand(),true));                           
+                        foreach ($group as $att => $val){                          
+                            $value = $row[$val];
+                            if ($value == "") continue;     
+                            if (is_a($value, 'DateTime')) $value = $value->format('Y-m-d H:i:s');
+                            $uploadModel->jsonInsert($uid,$source_id,$fileId,$subject_id,$att,$value);
+                            $counter++;                            
+                            if ($counter % 800 == 0) {
+                                $error = $this->sendBatch();   
+                                error_log($counter);                          
+                                if ($error) {                             
+                                    error_log("failed on insert");
+                                    $return_data['result_flag'] = 0;
+                                    $return_data['error'] = "MySQL insert was unsuccessful";
+
+                                    $sourceModel->toggleSourceLock($source_id);
+                                    return $return_data;
+                                }
+                            }                         
+                        }
+                    }
+                }
+            }
+            $linerow++;
+        }
+        $reader->close();
+
+        $this->db->transComplete();
+        $uploadModel->insertStatistics($fileId, $source_id);
+        $uploadModel->bigInsertWrap($fileId, $source_id);
+        $uploadModel->clearErrorForFile($fileId);
+        $sourceModel->toggleSourceLock($source_id);	
+        return $return_data;
     }
 
     /**
@@ -447,20 +749,12 @@ use App\Models\Source;
         $posLength = strlen($ref);
         $posEnd = $pos + $posLength -1;
         $possibleRef = $ref;
-        // error_log($possibleRef);
-        // $possibleRef = json_decode($this->sequenceCurl($chrom,$pos,$posEnd,$assembly),1);
 
-        // if (!empty($possibleRef['response'][0]['result'])) {
-        // 	$possibleRef = $possibleRef['response'][0]['result'][0]['sequence'];
-        // 	error_log($possibleRef);
-        // }
-        // error_log(print_r($possibleRef,1));
-        // error_log($possibleRef);
         if (!is_null($this->variantValidatorCurl($chrom,$pos,$assembly,$possibleRef,$alt))) {
             error_log("failed petes api");
             $message = "Variant is not valid, as according to VariantValidator. https://variantvalidator.org/";
             $error_code = 3;
-            $this->errorInsert($file,$source,$message,$error_code,true,true);
+            $uploadModel->errorInsert($file,$source,$message,$error_code,true,true);
             return;
         }
         else {
@@ -599,6 +893,24 @@ use App\Models\Source;
             else {
                 $uploadModel->jsonInsert($uid,$source,$file,$id,$key,$value);  
             }
+        }
+    }
+
+    /**
+     * Send Batch - Fill in the status table on the success of the upload
+     *
+     * @param N/A
+     * @return boolean $error - True if the transaction failed 
+     */
+    public function sendBatch() {
+        $dbRet = $this->db->transComplete();
+        // select has had some problem.
+        if ($this->db->transStatus() === FALSE) {
+            $error = true;
+            return $error;
+        }
+        else {
+            $this->db->transStart();
         }
     }
 

@@ -59,7 +59,7 @@ use CodeIgniter\Config\Services;
         $uidata->data['source'] = $source;
         // preparing webpage
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js',];
+        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
 
         $data = $this->wrapData($uidata);
         return view('upload/json', $data);
@@ -74,20 +74,44 @@ use CodeIgniter\Config\Services;
     public function vcf($source_id) {
 
         $uidata = new UIData();
+        $uidata->title = "Upload VCF";
         //if ($this->ion_auth->in_group("curator")) // Since this is a shared function for curators and admin check that the curator is a curator for this source
         $user_id = $this->authAdapter->getUserId();
         $can_curate_source = $this->sourceModel->canCurateSource($source_id, $user_id);
         if (!$can_curate_source) {
                 //show_error("Sorry, you are not listed as a curator for that particular source.");
             }
-        $uidata->data['source'] = $source_id;
-        //$uidata->css = array(CSS.'datatables/datatables/media/css/jquery.dataTables.min.css');
+        $uidata->data['source_id'] = $source_id;
+        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css', CSS.'upload_data.css');
 
-        $uidata->css = ['upload_data.css'];
-        $uidata->javascript = [JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
+        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js'];
 
         $data = $this->wrapData($uidata);
         return view('upload/vcf', $data);
+    }
+
+    function bulk_import($source_id = null) {
+        // Check whether the user is either an admin or a curator that has the required permissions to do this action
+
+        $uidata = new UIData();
+        $uidata->title = "Bulk Import";
+
+        //if ($this->ion_auth->in_group("curator")) { // Since this is a shared function for curators and admin check that the curator is a curator for this source
+            $user_id = $this->authAdapter->getUserID();
+            $can_curate_source = $this->sourceModel->canCurateSource($source_id, $user_id);
+            if (!$can_curate_source) {
+                //show_error("Sorry, you are not listed as a curator for that particular source.");
+            }
+        
+        $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
+
+        $uidata->data['source_id'] = $source_id;
+
+        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css', CSS.'sourcesv.css');
+        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
+
+        $data = $this->wrapData($uidata);
+        return view('upload/bulk_import', $data);
     }
 
     /**
@@ -211,7 +235,7 @@ use CodeIgniter\Config\Services;
             {     
                 // if file upload was successful
                 // Update UploadDataStatus table with the new file    
-                $this->uploadModel->createUpload($_FILES['userfile']['name'],$source_id);
+                $this->uploadModel->createUpload($_FILES['userfile']['name'][$i],$source_id);
       
                 return true;
             }
@@ -273,6 +297,304 @@ use CodeIgniter\Config\Services;
     }
     
 
-    
+    public function vcf_upload() {
 
+        $spreadsheet =  \PhpOffice\PhpSpreadsheet\IOFactory::load($_FILES['config']['tmp_name']);
+        $worksheet = $spreadsheet->getActiveSheet();
+        $highestRow = $worksheet->getHighestRow(); 
+        $highestColumn = $worksheet->getHighestColumn(); 
+        $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
+
+        $_POST['files'] = explode(",", $_POST['files']);
+        $headers = [];
+        $dup_files = [];
+        $dup_elastic = [];
+        $pairings = [];
+        $types = [];
+        $source_id = $_POST['source_id'];
+
+        array_push($headers, "");
+        $response_array = array('status' => "",
+                                       'message' => []);
+        $file_parts = pathinfo($_FILES['config']['name']);
+        $count = count($_POST['files']);
+        if ($count > 200) {
+            error_log("overload");
+            $response_array['status'] = "Overload";
+            $response_array['message'] = "You are trying to upload more than 200 files. Please limit your upload to 200 files or less.";
+            echo json_encode($response_array);
+            return;
+        }
+        if ($file_parts['extension'] == "csv" || $file_parts['extension'] == "xls") {
+            for ($row = 1; $row <= $highestRow; ++$row) {
+                for ($col = 1; $col <= $highestColumnIndex; ++$col) {
+                    if ($row == 1) {
+                        $value = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                        if (!preg_match("/filename|patient|tissue/", strtolower($value))) {
+                            error_log("failure on ".$value);
+                            $message = "Headers in ".$_FILES['config']['name']." not in FileName,Patient,Tissue format.";
+                            array_push($response_array['message'], $message);
+                            echo json_encode($response_array);
+                            return;
+                        }
+                        else {	    					
+                            array_push($headers, strtolower($value));
+                        }
+                    }
+                    else {
+                        $value = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+                        $key = $headers[$col];
+                        switch ($key) {
+                            case 'filename' :
+                                $flag = 0;						      
+                                if (is_array($_POST['files'])) {
+                                    if (in_array($value, $_POST['files'])) $flag = 1;
+                                }
+                                else {
+                                    if ($value == $_POST['files']) $flag = 1;
+                                }	
+                                if (!$flag) {
+                                    $message = "File: ".$value." not found in list of Uploaded Files from config file: ". $_FILES['config']['name'];
+                                    array_push($response_array['message'], $message);			
+                                }
+                                if (!preg_match("/\.vcf$|\.vcf\.gz$/", $value)) {
+                                    $message = "File: ".$value." is not a vcf file.";
+                                    array_push($response_array['message'], $message);
+                                }
+                                $file_path = FCPATH."upload/UploadData/$source_id/$value";
+                                if (file_exists($file_path)) {
+                                    array_push($dup_files, $value);
+                                }
+                                $file = $value;
+                                break ;	
+                            case 'tissue' :
+                                $tissue = $value;
+                                break;
+                            case 'patient' :
+                                $patient = $value;
+                                break;
+                        }				    					
+                    }
+                }
+                if ($row == 1) {
+                    continue;
+                }
+                if ($this->uploadModel->patientSubjectSourceCombo($source_id,$patient,$tissue)) {
+                    // if the file already exists and we get true from prior if
+                    // the file is duplicated and the patient/source/tissue exists
+                    array_push($dup_elastic, $file);
+                }	
+                $pairings[$file][] = $tissue;
+                $pairings[$file][] = $patient;
+            }
+             if (!empty($response_array['message'])) {
+                 $response_array['status'] = "Cancel";
+                 if (!empty($dup_files)) {
+                     $response_array['files'] = $dup_files;
+                 }
+                 if (!empty($dup_elastic)) {
+                     $response_array['elastic'] = $dup_elastic;
+                 }
+             }	
+             else if (empty($dup_files) && empty($dup_elastic)) {
+                 $response_array['status'] = "Green";
+                 $response_array['message'] = "no errors";
+             }
+             else if (!empty($dup_files) && !empty($dup_elastic)) {
+                 $response_array['status'] = "Duplicate";
+                 $both = array_intersect($dup_files, $dup_elastic);
+                 if ($both) {
+                     $dup_files = array_diff($dup_files, $both);
+                     $dup_elastic = array_diff($dup_elastic, $both);
+                     $response_array['both'] = $both;
+                     array_push($types, "both");
+                     if ($dup_files) {
+                         $dup_files = array_values($dup_files);
+                         $response_array['files'] = $dup_files;
+                         array_push($types, "files");
+                     }
+                     if ($dup_elastic) {
+                         $dup_elastic = array_values($dup_elastic);
+                         $response_array['elastic'] = $dup_elastic;
+                         array_push($types, "elastic");
+                     }		         		
+                 } 
+                 else {
+                     $response_array['elastic'] = $dup_elastic;
+                     $response_array['files'] = $dup_files;
+                     array_push($types, "elastic");
+                     array_push($types, "files");
+                 }		
+             }
+             else {
+                 $response_array['status'] = "Duplicate";
+                 if (!empty($dup_files)) {
+                     $response_array['files'] = $dup_files;
+                     array_push($types, "files");
+                 }
+                 if (!empty($dup_elastic)) {
+                     $response_array['elastic'] = $dup_elastic;
+                     array_push($types, "elastic");
+                 }
+             }        	
+        }
+        else {
+            $response_array['status'] = "Cancel";
+            array_push($response_array['message'], "Config file is not in correct format. Cannot be read.");
+            echo json_encode($response_array);
+            return;		
+        }
+        $source_path = FCPATH."upload/UploadData/$source_id";
+        if (!file_exists($source_path)) mkdir($source_path);
+        $source_path = FCPATH."upload/pairings/";
+        if (!file_exists($source_path)) mkdir($source_path); 
+        $uid = md5(uniqid(rand(),true));  
+        file_put_contents($source_path.$uid.".json", json_encode($pairings));
+        $response_array['uid'] = $uid;
+        $response_array['types'] = $types;
+        echo json_encode($response_array);
+        return;
+    }
+
+    public function vcfBatch() {
+
+        $source_id = $_POST['source_id']; 
+        $uid = $_POST['uid'];
+        $pairings = json_decode(file_get_contents(FCPATH."upload/pairings/$uid.json"), true);
+        $source_path = FCPATH."upload/UploadData/".$source_id."/";	
+
+        // Params for the upload type		
+        $config = array(
+            'upload_path' => $source_path,
+            'allowed_types' => "*",
+            'overwrite' => TRUE,
+            'max_size' => "2048000" // Can be set to particular file size , here it is 2 MB(2048 Kb)
+        );
+
+        // Check the number of files we are uploading
+        $filesCount = count($_FILES['userfile']['name']);
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+
+        $userFile = $this->request->getFiles();
+
+        for($i = 0; $i < $filesCount; $i++){     
+            // Check the mime and extension for the file we are currently uploading
+            $mime = finfo_file($finfo, $_FILES['userfile']['tmp_name'][$i]);
+            $file_parts = pathinfo($_FILES['userfile']['name'][$i]);
+            if ($mime != "text/plain" && $file_parts['extension'] == "json") {
+                error_log("failure");
+            }   
+
+            if($userFile['userfile'][$i]->move($source_path. "/", $_FILES['userfile']['name'][$i]))
+            {     
+                $this->uploadModel->createUpload($_FILES['userfile']['name'][$i],$source_id);
+                 $this->uploadModel->vcfStart($_FILES['userfile']['name'][$i], $source_id,$pairings[$_FILES['userfile']['name'][$i]][0],$pairings[$_FILES['userfile']['name'][$i]][1]);
+
+            }
+            else {
+                // if it failed to upload report error
+                // TODO: Make it return failure and reflect in JS for this eventuality
+                error_log($mime);
+                //error_log($this->upload->display_errors());
+            }
+        }
+        echo json_encode("Green");
+    }
+
+    public function vcfStart() {
+        $source_id = $_POST['source_id'];
+        $uid = $_POST['uid'];
+
+        // Get ID for source and lock it so further updates and uploads cannot occur
+        // Until update is finished
+
+        $this->sourceModel->toggleSourceLock($source_id);
+        $uid = md5(uniqid(rand(),true));
+        $this->uploadModel->addUploadJobRecord($source_id,$uid,$this->session->get('user_id'));
+        $path = FCPATH."upload/pairings/".$uid.".json";
+        try {
+            if( $this->delete_file($path) === true ) {
+                error_log(" delete success");	    	
+            }
+        }
+        catch (Exception $e) {
+           error_log($e->getMessage()); // will print Exception message defined above.
+        }
+        // Create thread to begin SQL insert in the background
+        error_log("calling vcfElastic");
+        echo json_encode("Green");
+        shell_exec("php " . getcwd() . "/index.php Task vcfElastic ". $source_id);
+        
+        // Report to front end that the process has now begun
+        
+    }
+
+    /**
+     * bulk_upload - Perform Upload for CSV/XLS/XLSX files
+     * TODO: Create a link to page from sources admin. Replace with stand alone vcf page
+     *
+     * @param string $_POST['source'] - The source name we will be uploading to
+     * @param array $_FILES           - The file we are uploading
+     * @return json_encoded array Success|Headers are not as expected|File is Duplicated
+     */
+    public function bulk_upload($force=false){   
+        error_log(print_r($_POST,1));
+        $tmp = $_FILES["userfile"]["tmp_name"];
+        $file_name = $_FILES["userfile"]["name"];
+        $source_id = $_POST['source_id'];
+        if (!$force) {
+            if ($this->uploadModel->isDuplicatePhysicalFile($source_id,$file_name, $tmp)) {
+                $response_array = array('status' => "Duplicate");
+                echo json_encode($response_array);
+                return;
+            }
+        }
+        
+        $source_path = FCPATH."upload/UploadData/".$source_id;
+
+        
+        $userFile = $this->request->getFiles();
+
+        if ($userFile['userfile']->move($source_path. "/", $_FILES['userfile']['name'])){	
+            // File was uploaded successfully	
+            // Populate status table with initial details on uploaded file
+            $file_id = $this->uploadModel->createUpload($file_name, $source_id);
+            // Begin background insert to MySQL
+            if ($_POST['fAction'][0] == "overwrite") {
+                error_log("overwriting");
+                shell_exec("php " . getcwd() . "/index.php Task bulkUploadInsert ".$file_name." 1 ".$source_id);
+            }
+            elseif ($_POST['fAction'][0] == "append") {
+                error_log("appending");
+                shell_exec("php " . getcwd() . "/index.php Task bulkUploadInsert ".$file_name." 0 ".$source_id);
+            }
+            else {
+                error_log("entered else");
+                return;
+            }	
+            $uid = md5(uniqid(rand(),true));
+            $this->uploadModel->addUploadJobRecord($source_id,$uid,$this->session->get('user_id'));
+            $response_array = array('status'  => "Green",
+                                    'message' => "",
+                                    'uid'     => $uid);
+            echo json_encode($response_array);
+        }
+        else{
+            #shouldnt ever happen
+            error_log("entered else");
+        }
+    }
+
+
+    function delete_file($pFilename) {
+        if ( file_exists($pFilename) ) {
+            //    Added by muhammad.begawala
+            //    '@' will stop displaying "Resource Unavailable" error because of file is open some where.
+            //    'unlink($pFilename) !== true' will check if file is deleted successfully.
+            //  Throwing exception so that we can handle error easily instead of displaying to users.
+            if( @unlink($pFilename) !== true )
+                throw new Exception('Could not delete file: ' . $pFilename . ' Please close all applications that are using it.');
+        }   
+        return true;
+    }
  }

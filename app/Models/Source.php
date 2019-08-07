@@ -162,7 +162,7 @@ use CodeIgniter\Database\ConnectionInterface;
     /**
      * 
      */
-    public function deleteVariantsPhenotypes($source_id) {
+    public function deleteSourceFromEAVs($source_id) {
         $this->builder = $this->db->table('eavs');
         $this->builder->delete(['source' => $source_id]);
     }

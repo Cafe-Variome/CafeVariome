@@ -157,11 +157,11 @@ $(document).ready(function() {
 		  size = size + $('#vcfFile')[0].files[i].size;
 		  file_names.push($('#vcfFile')[0].files[i].name);
 		} 
-		id = $('#source').val();
-		param = "source="+id+"&size="+size;
+		id = $('#source_id').val();
+		param = "source_id="+id+"&size="+size;
 		$.ajax({
       		type: "post",  
-      		url: baseurl+'UploadData/checkIfValid',
+      		url: baseurl+'upload/validateUpload',
       		data: param,
       		dataType: "json", 
       		success: function(response)  {
@@ -178,13 +178,13 @@ $(document).ready(function() {
 					// var ajaxData = new FormData(this);
 					$("#load").append('<div class="loading">Loading&#8230;</div>');
 					var formData = new FormData();
-					formData.append("source", id);
+					formData.append("source_id", id);
 					formData.append("files", file_names);
 					formData.append("config", $("#config")[0].files[0])					
 					$.ajax({
 						//Send the form through to do_upload
 			      		type: "POST",  
-			      		url: baseurl+'UploadData/vcf_upload',
+			      		url: baseurl+'upload/vcf_upload',
 			      		contentType: 'multipart/form-data',
 			      		data: formData,
 			      		cache: false,
@@ -222,7 +222,7 @@ $(document).ready(function() {
 									// console.log("Success");
 									if (flag) {
 										var formData = new FormData();
-										formData.append("source", id);
+										formData.append("source_id", id);
 										formData.append("uid", data.uid);
 										flag = false;
 									}
@@ -232,7 +232,7 @@ $(document).ready(function() {
 										flag = true;
 										$.ajax({
 											type: "POST",  
-											url: baseurl+'UploadData/vcfBatch',
+											url: baseurl+'upload/vcfBatch',
 											contentType: 'multipart/form-data',
 											data: formData,
 											cache: false,
@@ -247,17 +247,17 @@ $(document).ready(function() {
 								}
 								$.ajax({
 									type: "POST",  
-									url: baseurl+'UploadData/vcfBatch',
+									url: baseurl+'upload/vcfBatch',
 									contentType: 'multipart/form-data',
 									data: formData,
 									cache: false,
 									contentType: false,
 									processData: false,
 									success: function(response)  {
-										param = "source="+id+"&uid="+data.uid;
+										param = "source_id="+id+"&uid="+data.uid;
 										$.ajax({
 											type: "POST",   
-								      		url: baseurl+'UploadData/vcfStart',
+								      		url: baseurl+'upload/vcfStart',
 								      		data: param,
 								      		dataType: "json", 
 											success: function(response)  {
@@ -289,18 +289,20 @@ $(document).ready(function() {
     //allow the user to upload files to the server to be inserted into MySQL
     //first perform checks to ensure sanity of file
     $("form#fileinfo").submit(function(e){
-        e.preventDefault();
-        if ($('div.checkbox-group.required :checkbox:checked').length == 0) {
-        	alert("You need to select whether to append or replace.");
-        	return;
-        }
-        selected = $('input[name="fAction[]"]:checked').val(); 
+		e.preventDefault();
+		selected = $('input[name="fAction[]"]:checked').val(); 
+		var appendRadioBtn = $("#fActionAppend").prop('checked');
+		var overwriteRadioBtn = $("#fActionOverwrite").prop('checked');
+		if (!appendRadioBtn && !overwriteRadioBtn){
+			alert("You need to select whether to append or replace.");
+			return;
+		}
         if (selected == 'append') {
         	if(!confirm("You have selected to append new data into this source without changing any other data. Continue?")) {
         		return;
         	}
         }
-        else if (selected == 'replace') {
+        else if (selected == 'overwrite') {
         	if(!confirm("WARNING! By selecting this option you will delete all data from the source. Are you sure you want to continue?")) {
         		return;
         	}
@@ -310,12 +312,12 @@ $(document).ready(function() {
         for (i = 0; i < $('#dataFile')[0].files.length; i++) {
           size = size + $('#dataFile')[0].files[i].size;
         } 
-        id = ajaxData.get('source');
+        id = ajaxData.get('source_id');
         name = $('#dataFile')[0].files[0].name;
-        param = "source="+id+"&size="+size;
+        param = "source_id="+id+"&size="+size;
         $.ajax({
             type: "post",  
-            url: baseurl+'UploadData/checkIfValid',
+            url: baseurl+'upload/validateUpload',
             data: param,
             dataType: "json", 
             success: function(response)  {
@@ -335,7 +337,7 @@ $(document).ready(function() {
                     $.ajax({
                         //Send the form through to do_upload
                         type: "POST",  
-                        url: baseurl+'UploadData/do_upload',
+                        url: baseurl+'upload/bulk_upload',
                         contentType: 'multipart/form-data',
                         data: ajaxData,
                         cache: false,
@@ -354,7 +356,7 @@ $(document).ready(function() {
                                 if (confirm("This file has been uploaded before. Do you want to replace the file and all associated data?")) {
                                     $.ajax({
                                         type: "POST",  
-                                        url: baseurl+'UploadData/do_upload/true',
+                                        url: baseurl+'upload/bulk_upload/true',
                                         contentType: 'multipart/form-data',
                                         data: ajaxData,
                                         cache: false,
@@ -442,17 +444,17 @@ function proceedVcf() {
 	sessionStorage.removeItem("done");
 	sessionStorage.setItem('done', JSON.stringify(done));
 	if (sessionStorage.getItem('both') !== null) {
-		$('#vcfTable').DataTable().fnDestroy();
+		$('#vcfTable').dataTable().fnDestroy();
 	   	remakeModal("both");
 	  	return;
 	}
 	if (sessionStorage.getItem('elastic') !== null) {
-		$('#vcfTable').DataTable().fnDestroy();
+		$('#vcfTable').dataTable().fnDestroy();
 	  	remakeModal("elastic");
 	  	return;
 	}
 	if (sessionStorage.getItem('files') !== null) {
-		$('#vcfTable').DataTable().fnDestroy();
+		$('#vcfTable').dataTable().fnDestroy();
 	  	remakeModal("files");
 	  return;
 	}
@@ -462,7 +464,7 @@ function proceedVcf() {
 	}
 	else {
 		$('#confirmVcf').modal('hide');
-		$('#vcfTable').DataTable().fnDestroy();
+		$('#vcfTable').dataTable().fnDestroy();
 		$.notify({
             // options
             message: 'No Files were selected. This upload was cancelled.'
@@ -510,7 +512,7 @@ function remakeModal(target) {
 		$("#row_0").append('<td><label id="child"><input type="checkbox" class="select-checkbox" value="'+sessionStorage.both+'" name="chk[]" id="file_'+0+'"> Tick to upload and replace.</label></td>');
 	}
 	$('#vcfTable').css('width', '');
-	$('#vcfTable').DataTable( {
+	$('#vcfTable').dataTable( {
 	    columnDefs: [ {
 	        orderable: false,
 	        className: 'select-checkbox',
@@ -527,8 +529,8 @@ function remakeModal(target) {
 
 function batchVcf() {
 	$('#confirmVcf').modal('hide');
-	$('#vcfTable').DataTable().fnDestroy();
-	id = $('#source').val();
+	$('#vcfTable').dataTable().fnDestroy();
+	id = $('#source_id').val();
 	$("#load").append('<div class="loading">Loading&#8230;</div>');
 	flag = true;
 	uid = sessionStorage.getItem('uid');
@@ -539,7 +541,7 @@ function batchVcf() {
 		file = $('#vcfFile')[0].files[i];
 		if (flag) {
 			var formData = new FormData();
-			formData.append("source", id);
+			formData.append("source_id", id);
 			formData.append("uid", uid);
 			flag = false;
 		}
@@ -628,7 +630,7 @@ $('#confirmVcf').on('hidden', function () {
             // settings
             timer: 200
       	});
-    $('#vcfTable').DataTable().fnDestroy();
+    $('#vcfTable').dataTable().fnDestroy();
 })
 
 

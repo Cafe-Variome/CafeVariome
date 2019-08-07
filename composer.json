@@ -19,8 +19,9 @@
         "benedmunds/codeigniter-ion-auth": "4.x-dev",
 		"elasticsearch/elasticsearch": "^7.0",
         "select2/select2": "^4.0.7",
-        "datatables/datatables": "^1.10.19"
-
+        "datatables/datatables": "^1.10.19",
+        "phpoffice/phpspreadsheet": "^1.8.2",
+        "box/spout": "2.7.3"
 	},
     "require-dev": {
         "codeigniter4/codeigniter4-standard": "^1.0",		

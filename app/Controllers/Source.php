@@ -449,7 +449,7 @@ class Source extends CVUI_Controller{
         $uidata = new UIData();
         $uidata->title = "Delete Source";
 
-        $elasticModel = new \App\Models\Elastic();
+        $elasticModel = new \App\Models\Elastic($this->db);
 
         $this->validation->setRules([
             'confirm' => [
@@ -482,7 +482,7 @@ class Source extends CVUI_Controller{
                 if ($this->authAdapter->loggedIn() /*&& $this->ion_auth->is_admin()*/) {
                     $source_id = $_POST['source_id'];
                     if ($this->request->getVar('variants') == 'yes') { // also delete variants for the source
-                        $is_deleted = $this->sourceModel->deleteVariantsPhenotypes($source);
+                        $is_deleted = $this->sourceModel->deleteSourceFromEAVs($source);
                     }
                     $this->sourceModel->deleteSource($source_id);
                     $elasticModel->deleteElasticIndex($source_id);

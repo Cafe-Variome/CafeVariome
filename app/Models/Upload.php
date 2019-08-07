@@ -35,7 +35,6 @@ use CodeIgniter\Database\ConnectionInterface;
     /**
      * createUpload - Perform Initial insert into UploadDataStatus table
      * to keep track of uploaded file
-     * @author Mehdi
      * @param string $file    - The name of the file being uploaded
      * @param string $source  - The source the file was added to
      * @return int $insert_id - The ID of updated/inserted row
@@ -116,6 +115,22 @@ use CodeIgniter\Database\ConnectionInterface;
         return $count;
     }
 
+    /**
+     * Get File ID - Get the File ID for given source ID and file name
+     *
+     * @param int $source_id  - The source ID we are checking inside of
+     * @param string $file - The File name we are searching for
+     * @return int File_ID|null
+     */
+    public function getFileId($source_id, $file) {
+        $this->builder = $this->db->table($this->table);
+
+        $this->builder->select('ID');
+        $this->builder->where('FileName', $file);
+        $this->builder->where('source_id', $source_id);
+        $query = $this->builder->get()->getResultArray();;
+        return ($query) ? $query[0] : null;
+    }
     /**
      * Check Upload Job Record - Check if any jobs have been completed
      *
@@ -447,5 +462,115 @@ use CodeIgniter\Database\ConnectionInterface;
 
     }
 
+    /**
+     * Patient Subject Source Combo - Does this combo of Source/Patient/Tissue already exist?
+     *
+     * @param int $source_id  - The source_id we are checking
+     * @param string $patient - The Patient we are checking
+     * @param string $tissue  - The tissue we are checking  
+     * @return int 0 if doesnt exist| 1 if it does
+     */
+    public function patientSubjectSourceCombo($source_id,$patient,$tissue) {
+        $this->builder = $this->db->table($this->table);
+
+        $this->builder->where('source_id', $source_id);
+        $this->builder->where('patient', $patient);
+        $this->builder->where('tissue', $tissue);
+        $query = $this->builder->countAllResults(); 
+        return $query;
+    }
+
+    /**
+     * VCF Start -  Perform Initial insert into vcf_elastic table
+     * to keep track of uploaded file
+     *
+     * @param string $file    - The File name we have uploaded
+     * @param string $source  - The source name we are adding to
+     * @param string $tissue  - The Tissue this VCF data is sampled from
+     * @param string $patient - The Subject ID this VCF data is sample from
+     * @return N/A
+     */
+    public function vcfStart($file, $source_id, $tissue, $patient) {
+
+        error_log("file: ".$file." source: ".$source_id. " tissue: ".$tissue." patient: ".$patient);
+
+        $this->builder = $this->db->table($this->table);
+
+        // Set current time
+        $now = date('Y-m-d H:i:s');
+
+        // Check if this VCF is duplicated
+        if ($this->isDuplicateVcf($file,$source_id)) {
+            // If it has all we need to do is to update a current row with some of the 
+            // information which is current
+            $data = array(
+                'user_id' => $this->session->get('user_id'),
+                'upload_start' => $now,
+                'upload_end' => null,
+                'Status' => 'Pending');
+            $this->builder->where('source_id', $source_id);
+            $this->builder->where('file_name', $file);
+            $this->builder->update($data);
+        }
+        else {
+            // We havent seen this file/source combination before. Add whole row
+            $data = array(
+                'source_id' => $source_id,
+                'user_id' => $this->session->get('user_id'),
+                'file_name' => $file,
+                'upload_start' => $now,
+                'upload_end' => null,
+                'status' => 'Pending',
+                'patient' => $patient,
+                'tissue' => $tissue);				
+            $this->builder->insert($data);
+        }		
+    }
+
+    /**
+     * Is Duplicate VCF - Has a VCF with same name and source been uploaded before?
+     *
+     * @param string $file   - The file name we are checking
+     * @param int $source_id - The source_id we are checking
+     * @return int 0 if doesnt exist| 1 if it does
+     */
+    public function isDuplicateVcf($file,$source_id) {
+
+        $this->builder = $this->db->table('vcf_elastic');
+
+        $this->builder->select('*');
+        $this->builder->where('source_id', $source_id);
+        $this->builder->where('file_name', $file);
+        $query = $this->builder->countAllResults(); 
+        return $query;
+    }
+
+    /**
+     * isDuplicatePhysicalFile - Perform checks on the file from do_upload to see if the file can be uploaded
+     * Checks if the directory to upload to exists
+     *
+     * Moved by Mehdi Mehtarizadeh 07/08/2019
+     * 
+     * @param string $source_id    - The source id we will be uploading to
+     * @param string $file_name - The file we are uploading
+     * @param string $tmp       - The file path for where the file is stored in /tmp
+     *							  prior to being uploaded
+     * @return bool 
+    */
+    public function isDuplicatePhysicalFile($source_id,$file_name, $tmp): bool{
+        $source_path = FCPATH."upload/UploadData/".$source_id;
+        if (!file_exists($source_path)) {
+            mkdir($source_path);
+        }
+        $file_path = FCPATH."upload/UploadData/".$source_id."/".$file_name;
+        if (file_exists($file_path)){
+           return true;
+        }
+        else {
+            return false;
+        }    	
+    }
+
+    
  }
  

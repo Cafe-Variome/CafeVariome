@@ -100,7 +100,8 @@ class KeyCloak{
 	 */
 	public function isAdmin(int $id=0): bool
 	{
-        return $this->keyCloakSession->get('is_admin');
+        $is_admin = $this->keyCloakSession->get('is_admin');
+        return ($is_admin) ? $is_admin : false;
 	}
 
     public function getAuthorizationUrl(){
@@ -267,7 +268,7 @@ class KeyCloak{
     function error_logout($error) {
         if($this->keyCloakSession->get('email'))
                 error_log("User: " . $this->keyCloakSession->userdata('email') . " has logged out || " . date("Y-m-d H:i:s"));
-            $this->keyCloakSession->destroy();
+            //$this->keyCloakSession->destroy();
             $this->provider = new \Stevenmaguire\OAuth2\Client\Provider\Keycloak([
                 'authServerUrl'         => $this->serverURI,
                 'realm'                 => $this->realm,
