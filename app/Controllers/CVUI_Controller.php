@@ -149,7 +149,7 @@ class CVUI_Controller extends Controller{
 				if (!$this->authAdapter->isAdmin()) {
 					header('Location: '.base_url("daeisadeghhhhhh"));
 				}
-				header('Location: '.base_url("daeisadeghhhhhh222"));
+				header('Location: '.base_url("auth/login"));
 				exit;
 			}
 		} else {

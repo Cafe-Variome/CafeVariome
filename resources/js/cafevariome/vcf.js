@@ -568,17 +568,17 @@ function batchVcf() {
 	}
 	$.ajax({
 		type: "POST",  
-		url: baseurl+'Upload/vcfBatch',
+		url: baseurl+'upload/vcfBatch',
 		contentType: 'multipart/form-data',
 		data: formData,
 		cache: false,
 		contentType: false,
 		processData: false,
 		success: function(response)  {
-			param = "source="+id+"&uid="+uid;
+			param = "source_id="+id+"&uid="+uid;
 			$.ajax({
 				type: "POST",   
-	      		url: baseurl+'Upload/vcfStart',
+	      		url: baseurl+'upload/vcfStart',
 	      		data: param,
 	      		dataType: "json", 
 				success: function(response)  {

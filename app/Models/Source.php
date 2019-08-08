@@ -81,6 +81,14 @@ use CodeIgniter\Database\ConnectionInterface;
         return null;
     }
 
+    function getSourceElasticStatus() {
+        $this->builder = $this->db->table($this->table);
+
+        $this->builder->select('source_id, name, elastic_status');
+        $query = $this->builder->get()->getResultArray();
+
+        return $query;
+    }
 
     function getSpecificSources($source_ids){
 

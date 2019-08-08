@@ -10,6 +10,9 @@
  */
 
  use App\Models\Settings;
+ 
+ use CodeIgniter\Model;
+ use CodeIgniter\Database\ConnectionInterface;
 
 class Elastic extends Model{
 

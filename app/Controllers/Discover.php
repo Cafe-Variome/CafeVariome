@@ -265,7 +265,7 @@ class Discover extends CVUI_Controller{
         try {
             $indices = $client->cat()->indices(array('index' => '*'));
             return true;
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return false;
         }
     }

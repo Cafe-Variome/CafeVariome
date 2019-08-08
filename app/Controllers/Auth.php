@@ -138,6 +138,7 @@ class Auth extends CVUI_Controller
 	{	
 		if($this->authAdapter->loggedIn())
 		{
+			error_log("redirecting to auth index...");
 			return redirect()->to(base_url('auth/index'));
 		}
 		else{

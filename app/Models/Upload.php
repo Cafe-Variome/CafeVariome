@@ -505,11 +505,11 @@ use CodeIgniter\Database\ConnectionInterface;
             // information which is current
             $data = array(
                 'user_id' => $this->session->get('user_id'),
-                'upload_start' => $now,
-                'upload_end' => null,
+                'uploadstart' => $now,
+                'uploadend' => null,
                 'Status' => 'Pending');
             $this->builder->where('source_id', $source_id);
-            $this->builder->where('file_name', $file);
+            $this->builder->where('filename', $file);
             $this->builder->update($data);
         }
         else {
@@ -517,9 +517,9 @@ use CodeIgniter\Database\ConnectionInterface;
             $data = array(
                 'source_id' => $source_id,
                 'user_id' => $this->session->get('user_id'),
-                'file_name' => $file,
-                'upload_start' => $now,
-                'upload_end' => null,
+                'filename' => $file,
+                'uploadstart' => $now,
+                'uploadend' => null,
                 'status' => 'Pending',
                 'patient' => $patient,
                 'tissue' => $tissue);				
@@ -536,11 +536,11 @@ use CodeIgniter\Database\ConnectionInterface;
      */
     public function isDuplicateVcf($file,$source_id) {
 
-        $this->builder = $this->db->table('vcf_elastic');
+        $this->builder = $this->db->table($this->table);
 
         $this->builder->select('*');
         $this->builder->where('source_id', $source_id);
-        $this->builder->where('file_name', $file);
+        $this->builder->where('filename', $file);
         $query = $this->builder->countAllResults(); 
         return $query;
     }

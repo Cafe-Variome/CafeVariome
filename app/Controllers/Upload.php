@@ -108,7 +108,7 @@ use CodeIgniter\Config\Services;
         $uidata->data['source_id'] = $source_id;
 
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css', CSS.'sourcesv.css');
-        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
+        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
 
         $data = $this->wrapData($uidata);
         return view('upload/bulk_import', $data);
@@ -204,13 +204,6 @@ use CodeIgniter\Config\Services;
         if (!file_exists($source_path)) {
             mkdir($source_path);
         }		
-        // Params for the upload type		
-        $config = array(
-            'upload_path' => $source_path,
-            'allowed_types' => "*",
-            'overwrite' => TRUE,
-            'max_size' => "2048000" // Can be set to particular file size , here it is 2 MB(2048 Kb)
-        );
 
         // Check the number of files we are uploading
         $filesCount = count($_FILES['userfile']['name']);
@@ -566,7 +559,7 @@ use CodeIgniter\Config\Services;
             }
             elseif ($_POST['fAction'][0] == "append") {
                 error_log("appending");
-                shell_exec("php " . getcwd() . "/index.php Task bulkUploadInsert ".$file_name." 0 ".$source_id);
+                shell_exec("php " . getcwd() . "/index.php Task bulkUploadInsert ".$file_name." 00 ".$source_id);
             }
             else {
                 error_log("entered else");

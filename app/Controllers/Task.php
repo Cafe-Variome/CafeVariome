@@ -121,8 +121,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      */
     public function vcfElastic($source_id) {
 
-        $hosts = $this->setting->settingData['elastic_url'];
-        $elasticClient =  Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+        $hosts = array($this->setting->settingData['elastic_url']);
+        $elasticClient =  \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
 
         error_log("vcfElastic");
 
@@ -143,7 +143,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             if ($vcf[$t]['tissue']) {
                 $index_name = $index_name."_".strtolower($vcf[$t]['tissue']);
             }
-            // error_log($index_name);
+             error_log("Index name: ".$index_name);
             $params['index'] = $index_name;
             // return;
             if ($elasticClient->indices()->exists($params)){
@@ -170,7 +170,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                 }
             }'; 
             $map2 = json_decode($map,1);
-            $params['body'] = $map2;		    
+            $params['body'] = $map2;		  
+            error_log("params: ".var_dump($params));
             $response = $elasticClient->indices()->create($params);
             $source_name = $sourceModel->getSourceNameByID($source_id);
             
@@ -955,4 +956,5 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         }     
         return true;
     }
+
  }
