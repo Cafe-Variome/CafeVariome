@@ -22,6 +22,7 @@ class Elastic extends Model{
     public function  __construct(ConnectionInterface &$db){
         $this->db =& $db;
         $this->setting =  Settings::getInstance($this->db);
+        helper('filesystem');
     }
 
     /**
@@ -31,14 +32,18 @@ class Elastic extends Model{
      * @return N/A
      */
     function deleteElasticIndex($source_id) {
+
         $params = [];
-        $title = $this->setting->settingData['site_title'];
+
+        $title = $this->getTitlePrefix();
+
         $index_name = $title."_".$source_id."*";	    
         $uri = $this->setting->settingData['elastic_url']."/".$index_name;
+
         try {
             $this->buildCurlCommand($uri);
         }	  
-        catch (exception $e) {
+        catch (\Exception $e) {
             error_log("No Indices exist for source: ". $source_id);
         }      	 
     }
@@ -76,7 +81,6 @@ class Elastic extends Model{
         return $vcf;
     }
 
-    
     /**
      * VCF Wrap - We have finished inserting data for a VCF file and it is time to update the status table. 
      *
@@ -95,5 +99,157 @@ class Elastic extends Model{
         $this->builder->where('FileName', $file);
         $this->builder->where('source_id', $source_id);
         $this->builder->update($data);
+    }
+
+    /**
+     * getUnprocessedFilesForSource
+     * For a given source get the number of files whose data has not been added to ElasticSearch
+     *
+     * @param int $source_id - The name of the source
+     * @return int      - Count of how many Files there are which arent in ElasticSearch
+     */
+    function getUnprocessedFilesForSource(int $source_id): int {
+
+        $this->builder = $this->db->table('UploadDataStatus');
+
+        $this->builder->where('source_id', $source_id);
+        $count = $this->builder->countAllResults(); 
+        return $count;
+    }
+
+    /**
+     * getUnaddedEAVs 
+     * For a given source check whether there is any data in MySQL which isnt in ElasticSearch
+     *
+     * @param string $source_id  - The name of the source
+     * @return int $noOfRecords    - Count of how many records there are which arent in ElasticSearch
+     */
+    function getUnaddedEAVs($source_id) {
+
+        $this->builder = $this->db->table('eavs');
+
+        $this->builder->where('elastic', 0);
+        $this->builder->where('source', $source_id);
+
+        $count = $this->builder->countAllResults();
+        return $count;
+    }
+
+    /**
+     * setElasticFlagForSource
+     * Make all files for source be fresh by setting the elastic status flag
+     *
+     * @param int $source_id - The name of the source
+     * @return N/A
+     */
+    function setElasticFlagForSource(int $source_id) {
+        $this->builder = $this->db->table('sources');
+
+        $data = array('elastic_status' => 1);
+        $this->builder->where('source_id', $source_id);
+        $this->builder->update($data);
+    }
+
+    /**
+     * getElasticFlagForSource
+     * get elastic_status for a source from sources table
+     *
+     * @param int $source_id - The name of the source
+     * @return array $query       - All columns for all files which are fresh
+     */
+    function getElasticFlagForSource(int $source_id):int {
+        $this->builder = $this->db->table('sources');
+
+        $this->builder->select('elastic_status');
+        $this->builder->where('source_id', $source_id);
+        $query = $this->builder->get()->getResult();
+        return ($query) ? $query[0]->elastic_status : -1;
+    }
+
+    /**
+     * Get Eavs Count - Count number of records for given source where elastic boolean is false
+     *
+     * @param int $source_id  - The id of the source
+     * @return long $count  - The count of the records 
+     */
+    function getEAVsCountForSource(int $source_id): int{
+        $this->builder = $this->db->table('eavs');
+
+        $this->builder->where('source',$source_id);
+        $this->builder->where('elastic',0);
+
+        $count = $this->builder->countAllResults();
+        return $count;
+    }
+
+    /**
+     * resetElasticFlagForSourceEAVs
+     * Set Elastic boolean to false for all data in a given source
+     *
+     * @param int $source_id  - The id of the source
+     * @return N/A
+     */
+    function resetElasticFlagForSourceEAVs(int $source_id) {
+        $this->builder = $this->db->table('eavs');
+
+        $data = array(
+                'elastic' => 0
+        );
+        $this->builder->where('source', $source_id);
+        $this->builder->update($data);
+    }
+
+    /**
+     * Regenerate Federated Phenotype Attributes And Values List - Update Attributes and Values lists for given source
+     *
+     * @param string $source_name - The source we performing this operation for
+     * @return N/A
+     */
+    public function regenerateFederatedPhenotypeAttributeValueList($source_id) {
+        // Load Models
+        $sourceModel = new Source($this->db);
+        $networkModel = new Network($this->db);
+        $phenotypeModel = new Phenotype($this->db);
+        
+        $sourceModel->toggleSourceLock($source_id);	
+        //$result = $networkModel->getNetworkAndTheirSourcesForThisInstallation();
+        $result = $networkModel->getNetworkSourcesForCurrentInstallation();
+
+        $phenotypeModel->deleteAllLocalPhenotypesLookup();
+        delete_files("resources/phenotype_lookup_data/");
+
+        if(isset($result['error'])) return;
+
+        foreach ($result as $row) {
+            $data = $phenotypeModel->localPhenotypesLookupValues($row['source_id'], $row['network_key']);
+            $json_data = array();
+            foreach ($data as $d) {
+                $json_data[] = array("attribute" => $d['phenotype_attribute'], "value" => rtrim($d['phenotype_values'], "|"));
+            }
+            $json_data = json_encode($json_data);
+            if (!file_exists('resources/phenotype_lookup_data/')) {
+                mkdir('resources/phenotype_lookup_data/', 777, true);
+            }
+            file_put_contents("resources/phenotype_lookup_data/" . $row['network_key'] . ".json", $json_data);
+        }
+
+        return;
+    }
+
+
+    /**
+     * getTitlePrefix()
+     * This funcion returns the first part of site_title variable in settings table in the database.
+     * 
+     * @author Mehdi Mehtarizadeh
+     * 
+     * @param void 
+     * @return string
+     */
+    public function getTitlePrefix(): string{
+        $title = $this->setting->settingData['site_title'];
+        $title = preg_replace("/\s.+/", '', $title);
+        $title = strtolower($title); 
+        return $title;
     }
 }

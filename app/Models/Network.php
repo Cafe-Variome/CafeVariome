@@ -32,6 +32,31 @@ class Network extends Model{
 	}
 
 	/**
+	 * Retrieve all networks
+	 */
+	function getNetworks(){
+		$this->builder = $this->db->table('networks');
+		$query = $this->builder->get()->getResultArray();
+
+		return $query;
+	}
+
+	/**
+	 * Retrieve all network keys
+	 */
+	function getNetworkKeys(){
+		$this->builder = $this->db->table('networks');
+		$this->builder->select('network_key');
+
+		$query = $this->builder->get()->getResultArray();
+		$network_keys = [];
+		foreach ($query as $network_key ){
+			array_push($network_keys, $network_key["network_key"]);
+		}
+
+		return $network_keys;
+	}
+	/**
 	 * 
 	 */
 	function getMasterGroups() {
@@ -108,6 +133,17 @@ class Network extends Model{
 		return $query;
 	}
 
+	function getNetworkSourcesForCurrentInstallation() {
+		$net_keys = $this->getNetworkKeys();
+		$this->builder = $this->db->table('network_groups_sources');
+
+		$this->builder->select("network_key, source_id");
+		$this->builder->distinct();
+		$this->builder->whereIn("network_key", $net_keys);
+		$query = $this->builder->get()->getResultArray();
+	   	return $query;
+	}
+	
 	function getNetworkGroupsForInstallation() {
 		$this->builder = $this->db->table('network_groups');
 		$this->builder->join('networks', 'network_groups.network_key = networks.network_key');

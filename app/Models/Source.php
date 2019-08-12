@@ -49,9 +49,11 @@ use CodeIgniter\Database\ConnectionInterface;
     /**
      * 
      */
-    public function updateSource($data) {
+    public function updateSource(array $data, array $conds) {
         $this->builder = $this->db->table($this->table);
-        $this->builder->where('source_id', $data['source_id']);
+        if ($conds) {
+            $this->builder->where($conds);
+        }
         $this->builder->update($data);
     }
 

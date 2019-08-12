@@ -19,6 +19,9 @@ use App\Models\Upload;
 use App\Models\Source;
 use App\Models\Elastic;
 use App\Models\Settings;
+use App\Models\EAV;
+use App\Models\Neo4j;
+
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
  class Task extends Controller{
@@ -410,6 +413,164 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         $sourceModel->toggleSourceLock($source_id);	
         return $return_data;
     }
+
+    
+    /**
+     * Regenerate ElasticSearch Index - Loop through the MySQL eavs table to add to ElasticSearch
+     *
+     * @param int $source_id - The source we are updating ElasticSearch for
+     * @param int $add            - Whether we are adding data without fully remaking the index 
+     * @return N/A
+     */
+    public function regenerateElasticsearchIndex($source_id, $add) {
+        // Begin timer and load models
+        $first  = new \DateTime();
+        $hosts = (array)$this->setting->settingData['elastic_url'];
+        $elasticClient = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+        $sourceModel = new Source($this->db);
+        $elasticModel = new Elastic($this->db);
+        $uploadModel = new Upload($this->db);
+        $eavModel = new EAV($this->db);
+        $neo4jModel = new Neo4j($this->db);
+        $source_name = $sourceModel->getSourceNameByID($source_id);
+
+        // Get the source id of the source we are working with
+
+        $params = [];
+        // Generate ElasticSearch index name
+
+        $title = $elasticModel->getTitlePrefix();
+        
+        $index_name = $title."_".$source_id;
+        $params['index'] = $index_name;
+        // Check whether an Index already exists
+        $flag = false;
+        if ($elasticClient->indices()->exists($params)){
+            // If we are not adding to the index then we need to delete the current index
+            if (!$add) {
+                $response = $elasticClient->indices()->delete($params);
+                error_log("deleted ES5 index\n");
+                $flag = true;
+            }      
+        }
+        else{
+                $flag = true;
+        }
+        // If we need to - create a new index
+        if ($flag) {
+            $map = '{  
+                "settings":{},
+                "mappings":{
+                    "subject":{
+                        "properties":{
+                            "eav_rel":{"type": "join", "relations": {"sub":"eav"}},
+                            "type": {"type": "keyword"},
+                            "subject_id": {"type": "keyword"},
+                            "source": {"type":"keyword"}, 
+                            "attribute":{"type":"keyword"},
+                            "value":{
+                                "type":"text",
+                                "fields": 
+                                    {"raw":{"type": "keyword"},
+                                    "d":{"type": "double", "ignore_malformed": "true"},
+                                    "dt":{"type": "date", "ignore_malformed": "true"}}}           
+                        }
+                    }
+                }
+            }';
+
+            $map2 = json_decode($map,1);
+            $params['body'] = $map2;
+
+            $response = $elasticClient->index($params);
+            error_log(print_r($response,1));
+            error_log("created index mapping\n"); 
+        }       
+        // Set the elastic state of data to stale  
+        $sourceModel->updateSource(["elastic_status"=>0], ["source_id" => $source_id]);
+
+        // Get all the unique subject ids for this source
+        $unique_ids = $eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>0], true);
+
+        $bulk = [];
+        $counta = 0;
+        $countparents = 0;
+        // start making all the parent documents in ElasticSearch
+        foreach($unique_ids as $index_data){
+            $bulk['body'][] = ["index"=>["_index"=>$index_name, "_type"=>"subject","_id"=>$index_data['uid']]];
+            $bulk['body'][] = ["subject_id"=>$index_data['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_eav"];    
+            $countparents++;
+            if ($countparents%500 == 0){
+                // error_log($countparents);
+                $responses = $elasticClient->bulk($bulk);
+                $bulk=[];
+                unset ($responses);
+            }                    
+        }
+        // Send the last parents through who didnt get finished in loop
+        if (!empty($bulk['body'])){
+            error_log("final");
+            $responses = $elasticClient->bulk($bulk);
+            $bulk=[];
+            unset ($responses);
+        }
+        error_log("parents indexed");
+        // Figure out how many documents we need to index
+        $eavsize = count($eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>0]));
+        $bulk=[];
+        // We are looping through with the use of limit to increase speed of writing
+        $offset = 0;
+        while ($offset < $eavsize){
+            // Get our current limit chunk of data
+            $eavdata = $eavModel->getEAVs(null, ["source"=>$source_id, "elastic"=>0], false, 1000, $offset);
+            // Loop through our limit chunk
+            foreach ($eavdata as $attribute_array){
+                $attribute_array['attribute'] = preg_replace('/\s+/', '_', $attribute_array['attribute']);
+                $bulk['body'][] = ["index"=>["_index"=>$index_name,
+                                            "_type"=>"subject",
+                                            "routing"=>$attribute_array['uid']]];
+                $bulk['body'][] = ["subject_id"=>$attribute_array['subject_id'],
+                                   "attribute"=>$attribute_array['attribute'],
+                                   "value"=>strtolower($attribute_array['value']),
+                                    "eav_rel"=>["name"=>"eav",
+                                    "parent"=>$attribute_array['uid']],
+                                     "type"=>"eav",
+                                     "source"=>$source_name."_eav"];
+                $counta++;
+                // Every 500 documents bulk insert to ElasticSearch
+                if ($counta%500 == 0){
+                    // error_log($counta);
+                    $responses = $elasticClient->bulk($bulk);
+                    $bulk=[];
+                    unset ($responses);
+                    // error_log("inserted");
+                }   
+            }
+            // Update our offset 
+            //error_log(print_r($eavdata,1));
+            $offset += 1000;
+        }
+        // Send the last of our documents through
+        if (!empty($bulk['body'])){
+            error_log("final");
+            $responses = $elasticClient->bulk($bulk);
+        }        
+        // The update is now complete. Perform post processing reporting  
+        $eavModel->retrieveUpdateNeo4j($source_id); 
+        $eavModel->updateEAVs(["elastic"=>1], ['source'=> $source_id]) ;     
+
+        $sourceModel->toggleSourceLock($source_id);	
+
+        if(file_exists("resources/elastic_search_status_incomplete"))
+                rename("resources/elastic_search_status_incomplete", "resources/elastic_search_status_complete");
+        echo "Completed";
+        error_log("Completed ES5 $index_name");   
+        // Determine how long it took
+        $second = new \DateTime();	
+        $diff = $first->diff( $second );
+        error_log("For " .$eavsize. "MySQL rows it took: ". $diff->format( '%H:%I:%S' )); // -> 00:25:25     	   
+    }
+
 
     /**
      * Recursive Packet 2 - Up to Date Recursive Loop to iterate through a multi nested 

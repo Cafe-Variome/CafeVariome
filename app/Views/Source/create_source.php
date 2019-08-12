@@ -122,6 +122,7 @@
         </select>
 	</div>
 </div>
+
 <?php foreach ($groups as $group ):
 		if ($group['group_type'] === "source_display"):
 			if(isset($selected_groups) && array_key_exists($group['id'], $selected_groups)): ?>

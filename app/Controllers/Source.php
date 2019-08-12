@@ -11,6 +11,7 @@
  */
 
 use App\Models\UIData;
+use App\Models\Neo4j;
 use CodeIgniter\Config\Services;
 
 class Source extends CVUI_Controller{
@@ -36,6 +37,7 @@ class Source extends CVUI_Controller{
 
 		$this->validation = Services::validation();
         $this->sourceModel = new \App\Models\Source($this->db);
+        helper('filesystem');
 
     }
 
@@ -155,17 +157,17 @@ class Source extends CVUI_Controller{
         // Temporary section from network model
         $network_groups_for_installation = array();
 		$installation_key = $this->setting->settingData['installation_key'];
-		$url = base_url();
+        $url = base_url();
+
 		foreach ( $networkModel->getNetworkGroupsForInstallation() as $network_group ) {
 			$number_sources = $networkModel->countSourcesForNetworkGroup($network_group['id']);
 			$network_group['number_of_sources'] = $number_sources;
 			$network_groups_for_installation[] = $network_group;
-		}
-        //$groups = $networkModel->get_network_groups_for_installation();
-        $groups = $network_groups_for_installation;
+        }
+        
         //End temporary section
 
-        $uidata->data['groups'] = json_decode(json_encode($groups), TRUE);
+        $uidata->data['groups'] = json_decode(json_encode($network_groups_for_installation), TRUE);
 
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             $name = strtolower(str_replace(' ', '_', $this->request->getVar('name'))); // Convert the source name to lowercase and replace whitespace with underscore
@@ -329,7 +331,7 @@ class Source extends CVUI_Controller{
             //check to see if we are creating the user
             //redirect them back to the admin page
             
-            $update_data['source_id'] = $this->request->getVar('source_id');
+            //$update_data['source_id'] = $this->request->getVar('source_id');
             $update_data['name'] = $this->request->getVar('name');
             $update_data['email'] = $this->request->getVar('email');
             $update_data['uri'] = $this->request->getVar('uri');
@@ -338,7 +340,7 @@ class Source extends CVUI_Controller{
             $update_data['type'] = $this->request->getVar('type');
             $update_data['status'] = $this->request->getVar('status');
 
-            $this->sourceModel->updateSource($update_data);
+            $this->sourceModel->updateSource($update_data, ["source_id"=>$this->request->getVar('source_id')]);
 
             // Check if there any groups selected
             if ($this->request->getVar('groups')) {
@@ -471,6 +473,8 @@ class Source extends CVUI_Controller{
             ]);
 
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+
+            $neo4jModel = new Neo4j($this->db);
            // do we really want to delete?
             if ($this->request->getVar('confirm') == 'yes') {
                 // do we have a valid request?
@@ -478,16 +482,25 @@ class Source extends CVUI_Controller{
                         show_error('This form post did not pass our security checks.');
                 }
 
-                // do we have the right userlevel?
-                if ($this->authAdapter->loggedIn() /*&& $this->ion_auth->is_admin()*/) {
-                    $source_id = $_POST['source_id'];
-                    if ($this->request->getVar('variants') == 'yes') { // also delete variants for the source
-                        $is_deleted = $this->sourceModel->deleteSourceFromEAVs($source);
-                    }
-                    $this->sourceModel->deleteSource($source_id);
-                    $elasticModel->deleteElasticIndex($source_id);
-                    
+                $source_id = $_POST['source_id'];
+
+                //delete associated records from EAV table
+                $this->sourceModel->deleteSourceFromEAVs($source);
+                
+
+                $this->sourceModel->deleteSource($source_id);
+                $dirPath = FCPATH."upload/UploadData/".$source_id;
+                if (file_exists($dirPath)) {
+                    delete_files($dirPath, true);
                 }
+
+                //delete Elasticsearch index associated with the source
+                $elasticModel->deleteElasticIndex($source_id);
+                
+                //delete the associated node from neo4j database
+                $neo4jModel->deleteSource($source_id);
+
+                
                 if (file_exists("resources/elastic_search_status_complete"))
                     unlink("resources/elastic_search_status_complete");
                 file_put_contents("resources/elastic_search_status_incomplete", "");

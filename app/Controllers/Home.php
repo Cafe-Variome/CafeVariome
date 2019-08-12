@@ -9,11 +9,13 @@ class Home extends CVUI_Controller
 
 	public function index()
 	{
+		$this->db = \Config\Database::connect();
+
 		$udata = new UIData();
 		$udata->title = "Home";
 		$data = $this->wrapData($udata);
-
-		var_dump(shell_exec("php " . getcwd() . "/index.php Task phenoPacketInsert 7"));
+		$eavModel = new \App\Models\EAV($this->db);
+		var_dump($eavModel->retrieveUpdateNeo4j(7));
 		exit;
 		echo view('home/index', $data);
 	}

@@ -1,0 +1,211 @@
+{
+  "id": "1",
+  "subject": {
+    "id": "IV-5/family A",
+    "datasetId": "",
+    "ageAtCollection": {
+      "age": "26Y"
+    },
+    "sex": {
+      "id": "PATO:0000384",
+      "label": "male"
+    },
+    "phenotypes": [{
+      "description": "",
+      "type": {
+        "id": "HP:0007843",
+        "label": "Attenuation of retinal blood vessels"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:23559858",
+          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0001513",
+        "label": "Obesity"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:23559858",
+          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0000608",
+        "label": "Macular degeneration"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:23559858",
+          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0000486",
+        "label": "Strabismus"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:23559858",
+          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0001328",
+        "label": "Specific learning disability"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:23559858",
+          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0000510",
+        "label": "Rod-cone dystrophy"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:23559858",
+          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0001263",
+        "label": "Global developmental delay"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:23559858",
+          "description": "A family was reported in which two affected members had a splicing variant in BBS1, c.47+1G>T."
+        }
+      }]
+    }],
+    "taxonomy": {
+      "id": "NCBITaxon:9606",
+      "label": "Homo sapiens"
+    },
+    "externalIdentifiers": []
+  },
+  "individuals": [],
+  "biosamples": [],
+  "genes": [{
+    "id": "ENTREZ:582",
+    "symbol": "BBS1"
+  }],
+  "variants": [{
+    "genomeAssembly": "GRCH_37",
+    "sequence": "11",
+    "coordinateSystem": "ONE_BASED",
+    "position": 66278178,
+    "deletion": "G",
+    "insertion": "T",
+    "hgvs": "",
+    "sampleGenotypes": {
+      "IV-5/family A": {
+        "id": "GENO:0000136",
+        "label": "homozygous"
+      }
+    }
+  }],
+  "diseases": [{
+    "id": "OMIM:209900",
+    "label": "BARDET-BIEDL SYNDROME 1; BBS1"
+  }],
+  "htsFiles": [],
+  "metaData": {
+    "createdBy": "HPO:probinson",
+    "resources": [{
+      "id": "hp",
+      "name": "human phenotype ontology",
+      "namespacePrefix": "HP",
+      "url": "http://purl.obolibrary.org/obo/hp.owl",
+      "version": "2018-03-08",
+      "iriPrefix": "http://purl.obolibrary.org/obo/HP_"
+    }, {
+      "id": "pato",
+      "name": "Phenotype And Trait Ontology",
+      "namespacePrefix": "PATO",
+      "url": "http://purl.obolibrary.org/obo/pato.owl",
+      "version": "2018-03-28",
+      "iriPrefix": "http://purl.obolibrary.org/obo/PATO_"
+    }, {
+      "id": "geno",
+      "name": "Genotype Ontology",
+      "namespacePrefix": "GENO",
+      "url": "http://purl.obolibrary.org/obo/geno.owl",
+      "version": "19-03-2018",
+      "iriPrefix": "http://purl.obolibrary.org/obo/GENO_"
+    }, {
+      "id": "ncbitaxon",
+      "name": "NCBI organismal classification",
+      "namespacePrefix": "NCBITaxon",
+      "url": "http://purl.obolibrary.org/obo/ncbitaxon.owl",
+      "version": "2018-03-02",
+      "iriPrefix": ""
+    }, {
+      "id": "eco",
+      "name": "Evidence and Conclusion Ontology",
+      "namespacePrefix": "ECO",
+      "url": "http://purl.obolibrary.org/obo/eco.owl",
+      "version": "2018-11-10",
+      "iriPrefix": "http://purl.obolibrary.org/obo/ECO_"
+    }]
+  }
+}

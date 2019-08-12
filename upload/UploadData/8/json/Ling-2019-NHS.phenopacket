@@ -1,0 +1,247 @@
+{
+  "id": "",
+  "subject": {
+    "id": "III:1",
+    "datasetId": "",
+    "ageAtCollection": {
+      "age": "15y"
+    },
+    "sex": {
+      "id": "PATO:0000384",
+      "label": "male"
+    },
+    "phenotypes": [{
+      "description": "",
+      "type": {
+        "id": "HP:0040080",
+        "label": "Anteverted ears"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:30642278",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0006346",
+        "label": "Screwdriver-shaped incisors"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:30642278",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0011092",
+        "label": "Mulberry molar"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:30642278",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0001249",
+        "label": "Intellectual disability"
+      },
+      "negated": true,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:30642278",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0000689",
+        "label": "Dental malocclusion"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:30642278",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0000708",
+        "label": "Behavioral abnormality"
+      },
+      "negated": true,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:30642278",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0100018",
+        "label": "Nuclear cataract"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:30642278",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0000275",
+        "label": "Narrow face"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:30642278",
+          "description": ""
+        }
+      }]
+    }, {
+      "description": "",
+      "type": {
+        "id": "HP:0000448",
+        "label": "Prominent nose"
+      },
+      "negated": false,
+      "modifiers": [],
+      "evidence": [{
+        "evidenceCode": {
+          "id": "ECO:0000033",
+          "label": "author statement supported by traceable reference"
+        },
+        "reference": {
+          "id": "PMID:30642278",
+          "description": ""
+        }
+      }]
+    }],
+    "taxonomy": {
+      "id": "NCBITaxon:9606",
+      "label": "Homo sapiens"
+    },
+    "externalIdentifiers": []
+  },
+  "individuals": [],
+  "biosamples": [],
+  "genes": [{
+    "id": "ENTREZ:4810",
+    "symbol": "NHS"
+  }],
+  "variants": [{
+    "genomeAssembly": "GRCH_37",
+    "sequence": "X",
+    "coordinateSystem": "ONE_BASED",
+    "position": 17750140,
+    "deletion": "C",
+    "insertion": "G",
+    "hgvs": "",
+    "sampleGenotypes": {
+      "III:1": {
+        "id": "GENO:0000134",
+        "label": "hemizygous"
+      }
+    }
+  }],
+  "diseases": [{
+    "id": "OMIM:302350",
+    "label": "NANCE-HORAN SYNDROME; NHS"
+  }],
+  "htsFiles": [],
+  "metaData": {
+    "createdBy": "HPO:probinson",
+    "resources": [{
+      "id": "hp",
+      "name": "human phenotype ontology",
+      "namespacePrefix": "HP",
+      "url": "http://purl.obolibrary.org/obo/hp.owl",
+      "version": "2018-03-08",
+      "iriPrefix": "http://purl.obolibrary.org/obo/HP_"
+    }, {
+      "id": "pato",
+      "name": "Phenotype And Trait Ontology",
+      "namespacePrefix": "PATO",
+      "url": "http://purl.obolibrary.org/obo/pato.owl",
+      "version": "2018-03-28",
+      "iriPrefix": "http://purl.obolibrary.org/obo/PATO_"
+    }, {
+      "id": "geno",
+      "name": "Genotype Ontology",
+      "namespacePrefix": "GENO",
+      "url": "http://purl.obolibrary.org/obo/geno.owl",
+      "version": "19-03-2018",
+      "iriPrefix": "http://purl.obolibrary.org/obo/GENO_"
+    }, {
+      "id": "ncbitaxon",
+      "name": "NCBI organismal classification",
+      "namespacePrefix": "NCBITaxon",
+      "url": "http://purl.obolibrary.org/obo/ncbitaxon.owl",
+      "version": "2018-03-02",
+      "iriPrefix": ""
+    }, {
+      "id": "eco",
+      "name": "Evidence and Conclusion Ontology",
+      "namespacePrefix": "ECO",
+      "url": "http://purl.obolibrary.org/obo/eco.owl",
+      "version": "2018-11-10",
+      "iriPrefix": "http://purl.obolibrary.org/obo/ECO_"
+    }]
+  }
+}

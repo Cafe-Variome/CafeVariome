@@ -1,0 +1,78 @@
+<?php namespace App\Models;
+
+/**
+ * Neo4j.php
+ * 
+ * Created 09/08/2019
+ * 
+ * @author Gregory Warren
+ * @author Mehdi Mehtarizadeh
+ * @author Owen Lancaster
+ * 
+ * This class handles operations for Neo4j database.
+ * 
+ */
+
+use CodeIgniter\Model;
+use CodeIgniter\Database\ConnectionInterface;
+use GraphAware\Neo4j\Client\ClientBuilder;
+
+
+class Neo4j extends Model{
+
+    public function __construct(ConnectionInterface &$db){
+
+        $this->db =& $db;
+    }
+
+    public function toUpdate($data,$source_name) {
+        $client = ClientBuilder::create()
+        ->addConnection('default', 'http://neo4j:password@localhost:7474')
+        ->setDefaultTimeout(60)
+        ->build();	    
+        $keys = array_keys($data);
+        $batch = md5(uniqid(rand(),true));	
+        $tx = $client->transaction();
+        error_log(print_r($data,1));
+        foreach ($keys as $key) {
+
+            $out = preg_replace("/(-|_)*?icm-brice(-|_)*/", "", $key);
+            $query = 'MATCH (n:Subject{subjectid:"'.$out.'"}) RETURN n.subjectid as id';
+            $result = $client->run($query);
+            $exists = false;
+            foreach ($result->records() as $record) {
+                $exists = true;
+            }
+            // return;
+            if (!$exists) {
+                error_log("it doesnt");
+                $tx->push("CREATE (n:Subject{ subjectid: '".$out."', source: '".$source_name."', batch: '".$batch."' })");
+                for ($i=0; $i < count($data[$key]); $i++) { 
+                    if ($data[$key][$i]['negated']) {
+                        $tx->push("MATCH (a:Subject),(b:HPOterm) WHERE a.subjectid = '".$out."' AND b.hpoid = '".$data[$key][$i]['hpo']."' CREATE (a)<-[r:NOT_PHENOTYPE_OF]-(b)");
+                    }
+                    else {
+                        $tx->push("MATCH (a:Subject),(b:HPOterm) WHERE a.subjectid = '".$out."' AND b.hpoid = '".$data[$key][$i]['hpo']."' CREATE (a)<-[r:PHENOTYPE_OF]-(b)");
+                    }
+                }
+            }
+            else {
+                error_log("it exists");
+            }
+        }
+        $results = $tx->commit();
+    }
+
+    
+    function deleteSource($source_id) {
+        $sourceModel = new Source($this->db);
+        $client = ClientBuilder::create()
+        ->addConnection('default', 'http://neo4j:password@localhost:7474')
+        ->setDefaultTimeout(60)
+        ->build();
+        $source_name = $sourceModel->getSourceNameByID($source_id);
+        $query = 'MATCH (n:Subject { source: "'.$source_name.'" }) DETACH DELETE n';
+        $result = $client->run($query);
+    }
+
+}
