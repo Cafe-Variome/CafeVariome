@@ -92,7 +92,7 @@ use CodeIgniter\Database\ConnectionInterface;
         return $query;
     }
 
-    function updateLocalPhenoTypes(string $updateData,array $conds = null){
+    function updateLocalPhenoTypes(array $updateData,array $conds = null){
         $this->builder = $this->db->table('local_phenotypes_lookup');
         if($updateData) {
             if($conds){
@@ -107,6 +107,20 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->insert($data);
     }
 
+    function getHPOTerms($source_ids) { //edited may13 2019 to remove match for phenotypes_id
+        $this->builder = $this->db->table('eavs');
+        $this->builder->select('value');
+        $this->builder->distinct();
+        $this->builder->whereIn('source', $source_ids);
+        $this->builder->like('value', 'HP:', 'after');
 
+        $terms = $this->builder->get()->getResultArray();
+
+        $hpo_terms = [];
+		foreach ($terms as $term) {
+			$hpo_terms[] = $term['value'];
+		}
+		return $hpo_terms;
+	}
 
  }

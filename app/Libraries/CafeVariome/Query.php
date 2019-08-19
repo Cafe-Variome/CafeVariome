@@ -1,12 +1,21 @@
 <?php namespace App\Libraries\CafeVariome;
 
+
+use App\Helpers\AuthHelper;
+use App\Models\Settings;
+use App\Models\Source;
+
 class Query extends CafeVariome{
-    function __construct($parameters) {
+    function __construct($parameters = []) {
         if (array_key_exists('syntax', $parameters)) {
             $this->syntax = $parameters['syntax'];
         } else {
             $this->syntax = 'elasticsearch';
         }
+        $this->db = \Config\Database::connect();
+
+        $this->setting =  Settings::getInstance($this->db);
+
     }
 
     function parse($query) {
@@ -182,7 +191,7 @@ class Query extends CafeVariome{
         }
 
         $query_statement = $query['queryStatement'];
-//        Add hashes to make sure that numbers on their own don't get replace (e.g. BRCA2 would get replaced if there's a statement ID of 2 after first initial)
+        //Add hashes to make sure that numbers on their own don't get replace (e.g. BRCA2 would get replaced if there's a statement ID of 2 after first initial)
         $query_statement = preg_replace('/\b(\d+)\b/', "##$1##", $query_statement);
         foreach ($query_array as $statement_id => $query_element) {
             $statement_id = "##" . $statement_id . "##";
@@ -192,7 +201,7 @@ class Query extends CafeVariome{
         $query_statement = str_replace('##', '', $query_statement);
 
         $query_stmt = $query['queryStatement'];
-//        Add hashes to make sure that numbers on their own don't get replace (e.g. BRCA2 would get replaced if there's a statement ID of 2 after first initial)
+        //Add hashes to make sure that numbers on their own don't get replace (e.g. BRCA2 would get replaced if there's a statement ID of 2 after first initial)
         $query_stmt = preg_replace('/\b(\d+)\b/', "##$1##", $query_stmt);
         foreach ($query_array as $statement_id => $query_element) {
             // only for epad
@@ -232,5 +241,99 @@ class Query extends CafeVariome{
         $query_statement_for_display = str_replace('\]', ']', $query_statement_for_display);
         print "<h4 id='query_for_disp'>$query_statement_for_display</h4>";
         return array($query_statement, $query_statement_for_display);
+    }
+
+    public function search($json_string, string $network_key) {
+        $session = \Config\Services::session();
+        $sourceModel = new Source($this->db);
+
+		error_log("Function: Search");
+    	//$jsonAPI = file_get_contents('php://input');
+    	// error_log("search: JSONAPI: $jsonAPI");
+    	$api = json_decode($json_string, 1);
+    	
+    	if(json_last_error() !== JSON_ERROR_NONE) {
+    		header('Content-Type: application/json');
+	        echo $this->error_codes['400'];
+	        return;
+		}
+		
+		$this->api = $api;
+		// error_log(print_r($this->api,1));
+		//temp data until api updated
+		//$user_id = 145; 
+		//$network_key = "5339d2fff671474501fb36a2ede8c450";
+        $installation_key = $this->setting->settingData['installation_key'];
+
+    	$user_id = $session->get('user_id');
+
+
+		$bool = json_decode(AuthHelper::authPostRequest(array('installation_key' => $installation_key, 'network_key' => $network_key), $this->setting->settingData['auth_server'] . "network/checkInstallationIsAMemberOfANetwork"),1);
+        var_dump($sourceModel->getSourcesForInstallationThatUserIdHasCountDisplayGroupAccessTo($user_id, $installation_key));
+
+        exit;
+		// fetch sources for which the user has source display access
+		$sdg_arr = json_decode(AuthHelper::authPostRequest(array('user_id' => $user_id, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_installation_that_user_id_has_source_display_group_access_to"), 1);
+
+        $sdg_ids = [];
+		if(!array_key_exists('error', $sdg_arr)) {
+			foreach ($sdg_arr as $s) {
+				$sdg_ids[$s['source_id']] = $s['source_id'];
+			}
+			// error_log("sdg IDs -> " . print_r($sdg_ids, 1));
+		}
+		// fetch sources for which the user has data display access (count display group)
+		$cdg_arr = json_decode(AuthHelper::authPostRequest(array('user_id' => $user_id, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_installation_that_user_id_has_count_display_group_access_to"), 1);
+		$cdg_ids = [];
+		if(!array_key_exists('error', $cdg_arr)) {
+			foreach ($cdg_arr as $s) {
+				$cdg_ids[$s['source_id']] = $s['source_id'];
+			}
+			// error_log("cdg IDs: -> " . print_r($cdg_ids, 1));
+		}		
+
+		// Fetch all source id part of the network for this installation
+		$network_sources = json_decode(AuthHelper::authPostRequest(array('network_key' => $network_key, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_network_part_of_group"), 1)['sources'];
+		// error_log("network_sources -> " . print_r($network_sources, 1));		
+
+    	$this->load->model('sources_model');
+		$sources = $this->sources_model->getSourcesForFederatedQuery(); // this and the above needs replacing with a sources model function to get all the data from local databases (need greg's new code)
+		//end fetching sources
+
+		if(!isset($api['logic']) || empty($api['logic'])) {
+			$this->makeLogic($api); // no logic section provided
+		}
+		
+		$result = $this->decouple($api['logic']); // convert to ORs(AND, AND)
+		error_log($result);
+
+		$pointer_query = $this->generate_pointer_query($result, $api);
+		error_log("Pointer query: " . $pointer_query . "\n");
+
+		// $es5_query = $this->generate_es5_query($result, $api);
+		// error_log("search: ES query: " . str_replace('@@@', ' ', $es5_query) . "\n");
+
+		// $sources = ['test_pheno_upload', 'ga4gh_search', 'icm-brice', 'semmelweis-balicza', 'test_spout', 'pseudosubject', 'omim'];
+		// $sources = [['source_id' => "1", 'name' => "test_pheno_upload"]];
+		$sources = [['source_id' => "1", 'name' => "pseudosubject"]];
+		foreach ($sources as $source_array) {
+			$source_id = $source_array['source_id'];
+			if(!in_array($source_id, $network_sources)) continue; //as above
+			$es5_counts[$source_array['name']] = "Access denied"; // not sure if this correct, yes if they are not in sg then access denied, but if in should get counts
+
+			if (array_key_exists($source_id, $sdg_ids)) {
+				$es5_counts[$source_array['name']] = $this->process_query($source_array['name'], $pointer_query);
+				// $es5_counts[$source_array['name']] = count($this->es5v2_records($source_array['name'], $pointer_query));
+				// $es5_counts[$source_array['name']] = count($this->es5v2_records($source_array['name'], $pointer_query));
+			}
+			if (array_key_exists($source_id, $cdg_ids)) {  //don't need to be in cdg to just get counts
+				// add code to return data or link for sources where user has access
+			}			
+		}
+		error_log("Source result: " . print_r($es5_counts, 1));
+
+		header('Content-Type: application/json');
+		// error_log(json_encode($es5_counts));
+		echo json_encode($es5_counts);
     }
 }

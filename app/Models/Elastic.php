@@ -13,6 +13,7 @@
  
  use CodeIgniter\Model;
  use CodeIgniter\Database\ConnectionInterface;
+ use GraphAware\Neo4j\Client\ClientBuilder;
 
 class Elastic extends Model{
 
@@ -233,9 +234,87 @@ class Elastic extends Model{
             file_put_contents("resources/phenotype_lookup_data/" . $row['network_key'] . ".json", $json_data);
         }
 
+        //HPO Ancestry JSON FILE
+        $neo4jClient =  ClientBuilder::create()
+        ->addConnection('default', 'http://neo4j:password@localhost:7474')
+        ->setDefaultTimeout(60)
+        ->build();	    
+        
+        $result = $networkModel->getAllNetworksSourcesBySourceId($source_id);
+        $sourceslist = []; // NEED to DO THIS per NETWORK!!!!
+
+        foreach ($result as $nkey => $row) {
+            $network = $nkey;
+            if (!isset($sourceslist[$network])) $sourceslist[$network] = [];
+            array_push($sourceslist[$network], $row[0]);
+        }
+
+        foreach ($sourceslist as $network => $sourcelist) {
+            $hpo_terms = $phenotypeModel->getHPOTerms($sourcelist);
+            foreach ($hpo_terms as $term){
+                $query = "MATCH (c:HPOterm{hpoid:\"".$term."\"})-[:IS_A]->(p:HPOterm) RETURN c.termname as termname, p.hpoid as ph";
+                error_log($query);
+                $result = $neo4jClient->run($query);
+                $pars = [];
+                $termname = '';
+                foreach ($result->getRecords() as $record) {
+                    error_log($record->value('ph'));
+                    error_log($record->value('termname'));
+                    array_push($pars, $record->value('ph'));
+                    $termname = $record->value('termname');
+
+                }  
+                $term .= ' (' . $termname . ')';
+                $ancestors = $this->collect_ids_neo4j('', $pars);
+                $hpo[$term] = $ancestors;
+                // error_log(print_r($hpo,1));
+
+                $flag = false;
+                while(!$flag) {
+                    $flag = true;
+                    $parents = [];
+                    foreach ($hpo[$term] as $key => $ancestor) {
+                        $temp = explode('|', $ancestor);
+                        $t = end($temp);
+
+                        if($t !== 'HP:0000001') {
+                            $query = "MATCH (c:HPOterm{hpoid:\"".$t."\"})-[:IS_A]->(p:HPOterm) RETURN c.termname as termname, p.hpoid as ph";
+                            error_log($query);
+                            $result = $neo4jClient->run($query);
+
+                            $pars = [];
+                            $termname = '';
+                            foreach ($result->getRecords() as $record) {
+                                error_log($record->value('ph'));
+                                array_push($pars, $record->value('ph'));
+                            } 
+                            $parents = array_merge($parents, $this->collect_ids_neo4j($ancestor, $pars));
+                            $flag = false;
+                        } else {
+                            $parents[] = $ancestor;
+                        }
+                    }
+                    $hpo[$term] = $parents;
+                }
+            }
+
+            foreach($hpo as $term => $ancestory) {
+                $hpo[$term] = implode('||', $ancestory);
+            }
+            // print_r($hpo);
+            file_put_contents("resources/phenotype_lookup_data/" . $network . "_hpo_ancestry.json", json_encode($hpo));
+        }
+
         return;
     }
 
+    function collect_ids_neo4j($ancestor, $data) {
+        $arr = [];
+        foreach ($data as $d) {
+            $arr[] = $ancestor === '' ? $d : $ancestor . '|'. $d;
+        }
+        return $arr;
+    }
 
     /**
      * getTitlePrefix()

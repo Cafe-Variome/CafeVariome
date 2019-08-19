@@ -23,8 +23,8 @@ class Admin extends CVUI_Controller{
 	 *
 	 */
     public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
-        parent::setProtected(true);
-        parent::setIsAdmin(true);
+        parent::setProtected(false);
+        parent::setIsAdmin(false);
         parent::initController($request, $response, $logger);
 
 		$this->session = Services::session();
@@ -171,7 +171,7 @@ class Admin extends CVUI_Controller{
         $postdata = http_build_query(
                 array(
                     'network_key' => $network_key,
-                    'modification_time' => @filemtime("resources/phenotype_lookup_data/" . "local_" . $network_key . ".json")
+                    'modification_time' => @filemtime("resources/phenotype_lookup_data/local_" . $network_key . ".json")
                 )
         );
 
@@ -186,12 +186,18 @@ class Admin extends CVUI_Controller{
         $context = stream_context_create($opts);
 
         $data = array();
-        foreach ($installation_urls as $url) {
-            $url = rtrim($url['installation_base_url'], "/") . "/admin/get_json_for_phenotype_lookup/";
-            $result = @file_get_contents($url, 1, $context);
 
+        foreach ($installation_urls as $url) {
+            $url = rtrim($url['installation_base_url'], "/") . "/admin/get_json_for_phenotype_lookup";
+            try{
+                $result = @file_get_contents($url, 1, $context);
+            }
+            catch (\Exception $ex) {
+                return json_encode(var_dump($ex));
+            }
             if ($result) {
                 foreach (json_decode($result, 1) as $res) {
+
                     if (array_key_exists($res['attribute'], $data)) {
                         foreach (explode("|", strtolower($res['value'])) as $val) {
                             if (!in_array($val, $data[$res['attribute']]))
@@ -210,9 +216,62 @@ class Admin extends CVUI_Controller{
         ksort($data);
 
         if ($data) {
-            file_put_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . ".json", json_encode($data));
+            file_put_contents("resources/phenotype_lookup_data/local_" . $network_key . ".json", json_encode($data));
         }
-        echo file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . ".json");
+
+        // HPO ancestry
+        $postdata = http_build_query(
+            ['network_key' => $network_key,
+                'modification_time' => @filemtime("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json")]
+        );
+
+        $opts = ['http' =>
+            [
+                'method' => 'POST',
+                'header' => 'Content-type: application/x-www-form-urlencoded',
+                'content' => $postdata,
+                'timeout' => 1
+            ]
+        ];
+        $context = stream_context_create($opts);
+        $data = '';
+        foreach ($installation_urls as $url) {
+            $url = rtrim($url['installation_base_url'], "/") . "/admin/get_json_for_hpo_ancestry";
+            $data = @file_get_contents($url, 1, $context);
+        }
+
+        if($data) {
+            file_put_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json", json_encode($data));
+        }
+
+        $phen_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . ".json"), 1);
+        $hpo_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json"), 1);
+        echo json_encode([$phen_data, $hpo_data]);
     }
+
+    function get_json_for_phenotype_lookup() {
+        $modification_time = $this->request->getVar('modification_time');
+        $network_key = $this->request->getVar('network_key');
+
+        if (file_exists('resources/phenotype_lookup_data/' . $network_key . ".json")) {
+            error_log(file_get_contents("resources/phenotype_lookup_data/" . $network_key . ".json"));
+            return (file_get_contents("resources/phenotype_lookup_data/" . $network_key . ".json"));
+        } else {
+            error_log("resources/phenotype_lookup_data/" . $network_key . ".json");
+        }              
+    }
+
+    
+    function get_json_for_hpo_ancestry() {
+        $modification_time = $this->request->getVar('modification_time');
+        $network_key = $this->request->getVar('network_key');
+
+        if (file_exists('resources/phenotype_lookup_data/' . $network_key . "_hpo_ancestry.json")) {
+            echo (file_get_contents("resources/phenotype_lookup_data/" . $network_key . "_hpo_ancestry.json"));
+        } else {
+            echo false;
+        }              
+    }
+
 
 }

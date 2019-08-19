@@ -19,9 +19,9 @@
 <div id="load"></div>
 <div class="row">
     <div class="col">
-        <h4>Import VCF's into <?php echo $source_id; ?></h3>
-        <p>Config file can be either a csv/xls/xlsx file with three columns with headers. FileName, Patient ID, Tissue.</p>
-        <p> This will allow us to correctly map and classify your vcf files for reference and query purposes.</p>
+      <h4>Import VCF's into <?php echo $source_id; ?></h3>
+      <p>Config file can be either a csv/xls/xlsx file with three columns with headers. FileName, Patient ID, Tissue.</p>
+      <p> This will allow us to correctly map and classify your vcf files for reference and query purposes.</p>
     </div>
 </div>
 

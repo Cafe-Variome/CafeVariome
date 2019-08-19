@@ -159,6 +159,7 @@ $(document).ready(function() {
 		} 
 		id = $('#source_id').val();
 		param = "source_id="+id+"&size="+size;
+		$cfile = $("#config")[0].files[0];
 		$.ajax({
       		type: "post",  
       		url: baseurl+'upload/validateUpload',
@@ -195,7 +196,6 @@ $(document).ready(function() {
 			      			$("#load").empty();
 			      			if (data.status == "Overload") {
 			      				alert(data.message);
-
 			      			}
 			      			else if (data.status == "Cancel") {
 			      				// alert(data.message);

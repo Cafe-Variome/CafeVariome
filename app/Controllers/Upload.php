@@ -299,6 +299,7 @@ use CodeIgniter\Config\Services;
         $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
 
         $_POST['files'] = explode(",", $_POST['files']);
+
         $headers = [];
         $dup_files = [];
         $dup_elastic = [];
@@ -309,7 +310,9 @@ use CodeIgniter\Config\Services;
         array_push($headers, "");
         $response_array = array('status' => "",
                                        'message' => []);
+
         $file_parts = pathinfo($_FILES['config']['name']);
+
         $count = count($_POST['files']);
         if ($count > 200) {
             error_log("overload");
@@ -354,7 +357,7 @@ use CodeIgniter\Config\Services;
                                     $message = "File: ".$value." is not a vcf file.";
                                     array_push($response_array['message'], $message);
                                 }
-                                $file_path = FCPATH."upload/UploadData/$source_id/$value";
+                                $file_path = FCPATH."upload/UploadData/".$source_id."/".$value;
                                 if (file_exists($file_path)) {
                                     array_push($dup_files, $value);
                                 }
@@ -479,10 +482,10 @@ use CodeIgniter\Config\Services;
             }   
 
             if($userFile['userfile'][$i]->move($source_path. "/", $_FILES['userfile']['name'][$i]))
-            {     
-                $this->uploadModel->createUpload($_FILES['userfile']['name'][$i],$source_id);
-                 $this->uploadModel->vcfStart($_FILES['userfile']['name'][$i], $source_id,$pairings[$_FILES['userfile']['name'][$i]][0],$pairings[$_FILES['userfile']['name'][$i]][1]);
-
+            {   
+                // 13/08/2019 POTENTIAL BUG 
+                // The value for patient must be specified as it is always set to 0 (false)
+                $this->uploadModel->createUpload($_FILES['userfile']['name'][$i], $source_id,$pairings[$_FILES['userfile']['name'][$i]][0],$pairings[$_FILES['userfile']['name'][$i]][1]);
             }
             else {
                 // if it failed to upload report error

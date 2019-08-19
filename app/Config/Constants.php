@@ -76,15 +76,15 @@ defined('EXIT_DATABASE')       || define('EXIT_DATABASE', 8); // database error
 defined('EXIT__AUTO_MIN')      || define('EXIT__AUTO_MIN', 9); // lowest automatically-assigned error code
 defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
-/*
-|--------------------------------------------------------------------------
-| Cafe Variome Path Constants
-|--------------------------------------------------------------------------
-| @author Mehdi Mehtarizadeh
-| @date 11/06/2019
-| This section contains base folder paths for running Cafe Variome user interface. 
-| The code is extracted from the Cafe Variome 2.
-| 
+/**
+*--------------------------------------------------------------------------
+* Cafe Variome Path Constants
+*--------------------------------------------------------------------------
+* @author Mehdi Mehtarizadeh
+* date 11/06/2019
+* This section contains base folder paths for running Cafe Variome user interface. 
+* The code is extracted from the Cafe Variome 2.
+* 
 */
 
 define('IMAGES','resources/images/');

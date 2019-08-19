@@ -136,9 +136,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         // Get Pending VCF Files
         $vcf = $elasticModel->getvcfPending($source_id);
 
-        $title = $this->setting->settingData['site_title'];
-        $title = preg_replace("/\s.+/", '', $title);
-        $title = strtolower($title); 
+        $title = $elasticModel->getTitlePrefix();
 
         for ($t=0; $t < count($vcf); $t++) { 
             error_log("now doing ".$vcf[$t]['FileName']);
@@ -156,7 +154,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             $params = [];
             $params['index'] = $index_name;
             $map = '{
-                "settings":{ "index.mapping.single_type":"true"},
+                "settings":{ },
                 "mappings":{
                     "subject":{
                         "properties":{
@@ -175,7 +173,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             $map2 = json_decode($map,1);
             $params['body'] = $map2;		  
             error_log("params: ".var_dump($params));
-            $response = $elasticClient->indices()->create($params);
+            $response = $elasticClient->index($params);
             $source_name = $sourceModel->getSourceNameByID($source_id);
             
             // Open file for reading
@@ -198,6 +196,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                     }
                     // We have reached the data
                     else {
+                        $patient = $vcf[$t]['patient'];
                         // Each row is its own group so we need to create a link id 
                         // Explode our lines by tabs
                         $values = explode("\t", $line);
@@ -221,7 +220,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                                 foreach ($val as $v) {
                                     if (in_array($v[0], $config)) {
                                         $id = md5(uniqid());
-                                        $bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "_routing"=>$link,"_id"=>$id]];
+                                        $bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "routing"=>$link,"_id"=>$id]];
                                         $bulk['body'][] = ["record_id"=>$values[2], "patient_id"=> $patient,"attribute"=>$v[0],"value"=>$v[1], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
                                         $counter++;	
                                         if ($counter%1000 == 0) {      
@@ -239,7 +238,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                             }		              
                             else {
                                 $id = md5(uniqid());
-                                $bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "_routing"=>$link,"_id"=>$id]];
+                                $bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "routing"=>$link,"_id"=>$id]];
                                 $bulk['body'][] = ["record_id"=>$patient, "patient_id"=> $patient,"attribute"=>$headers[$i],"value"=>$values[$i], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
                                 $counter++;		
                                 if ($counter%1000 == 0) {      
@@ -270,6 +269,13 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         $sourceModel->toggleSourceLock($source_id); 		      
     }
 
+    public function regEl($id){
+
+        $elasticModel = new Elastic($this->db);
+
+        $elasticModel->regenerateFederatedPhenotypeAttributeValueList($id);
+
+    }
     /**
      * bulkUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
      *

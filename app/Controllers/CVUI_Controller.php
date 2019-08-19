@@ -127,6 +127,10 @@ class CVUI_Controller extends Controller{
 
 	}	
 
+	protected function setAuthLevel(bool $protected, bool $isAdmin){
+		$this->isProtected = $protected;
+		$this->isAdmin = $isAdmin;
+	}
 	protected function setProtected(bool $protected){
 		$this->isProtected = $protected;
 	}
@@ -147,7 +151,7 @@ class CVUI_Controller extends Controller{
 		if ($checkIsAdmin) {
 			if (!$this->authAdapter->loggedIn()) {
 				if (!$this->authAdapter->isAdmin()) {
-					header('Location: '.base_url("daeisadeghhhhhh"));
+					header('Location: '.base_url("auth/login"));
 				}
 				header('Location: '.base_url("auth/login"));
 				exit;

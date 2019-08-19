@@ -18,6 +18,15 @@ use CodeIgniter\Config\Services;
 
 class NetworkGroup extends CVUI_Controller{
 
+	/**
+	 * Validation list template.
+	 *
+	 * @var string
+	 * @see https://bcit-ci.github.io/CodeIgniter4/libraries/validation.html#configuration
+	 */
+	protected $validationListTemplate = 'list';
+	
+
     /**
 	 * Constructor
 	 *
@@ -42,7 +51,7 @@ class NetworkGroup extends CVUI_Controller{
         $this->validation->setRules([
             'group_name' => [
                 'label'  => 'Group name',
-                'rules'  => 'required|alpha_dash|callback_unique_network_group_name_check['.$this->request->getVar('network').']',
+                'rules'  => 'required|alpha_dash|unique_network_group_name_check['.$this->request->getVar('name').','. $this->request->getVar('network') . ']',
                 'errors' => [
                     'required' => '{field} is required.',
                     'callback_unique_network_group_name_check' => '{field} already exists.'
@@ -56,10 +65,13 @@ class NetworkGroup extends CVUI_Controller{
                 ]
             ],
             'network' => [
-                'label'  => 'Network'
+				'label'  => 'Network',
+				'rules' => 'string'
             ],
             'group_type' => [
-                'label' => 'Group Type'
+				'label' => 'Group Type',
+				'rules' => 'string'
+
             ]
         ]
         );
@@ -69,11 +81,11 @@ class NetworkGroup extends CVUI_Controller{
 		//$this->form_validation->set_rules('group_type', 'Group type', 'xss_clean');
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
 			// Create the new group
-			$data = array ( 'name' => $this->request->getVar['group_name'],
-							'description' =>$this->request->getVar['desc'],
-							'group_type' => $this->request->getVar['group_type'],
-							'network_key' => $this->request->getVar['network'],
-							'url'		=> BASE_URL
+			$data = array ( 'name' => $this->request->getVar('group_name'),
+							'description' =>$this->request->getVar('desc'),
+							'group_type' => $this->request->getVar('group_type'),
+							'network_key' => $this->request->getVar('network'),
+							'url'		=> base_url()
 			);
 			
 			$network_group_id = $this->networkModel->createNetworkGroup($data);
@@ -91,23 +103,25 @@ class NetworkGroup extends CVUI_Controller{
 			}
 		}
 		else {
-			$networks_installation_member_of = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData('installation_key')), $this->setting->settingData('auth_server') . "network/get_networks_installation_member_of_with_other_installation_details");
+			$networks_installation_member_of = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/get_networks_installation_member_of_with_other_installation_details");
 			//$networks_installation_member_of = json_decode($networks_installation_member_of, 1);
-			var_dump($networks_installation_member_of);
             if ( ! empty($networks_installation_member_of) ) {
-					$uidata->data['networks'] = json_decode(json_encode($networks_installation_member_of), TRUE);
+					$uidata->data['networks'] = json_decode($networks_installation_member_of, TRUE);
 			}
+
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 			$uidata->data['group_name'] = array(
 				'name'  => 'group_name',
 				'id'    => 'group_name',
 				'type'  => 'text',
+				'class' => 'form-control',
 				'value' => set_value('group_name'),
 			);
 			$uidata->data['desc'] = array(
 				'name'  => 'desc',
 				'id'    => 'desc',
 				'type'  => 'text',
+				'class' => 'form-control',
 				'value' => set_value('description'),
 			);
 			$uidata->data['network'] = array(
@@ -120,6 +134,7 @@ class NetworkGroup extends CVUI_Controller{
 				'name'  => 'group_type',
 				'id'    => 'group_type',
 				'type'  => 'group_type',
+				'class' => 'form-control',
 				'value' => set_value('group_type'),
             );
             
@@ -130,21 +145,7 @@ class NetworkGroup extends CVUI_Controller{
 
     }
 
-    public function unique_network_group_name_check($group_name, $network_key) {
-		$token = $this->session->userdata('Token');
 
-
-        $group_exists_bool = $this->network_model->checkIfGroupExistsInNetwork($network_key, $group_name);
-		if( ! $group_exists_bool) {
-
-            return TRUE;
-		}
-		else {
-			$this->form_validation->set_message('unique_network_group_name_check', 'The %s field must be unique (there is already a group with that name in the network)');
-
-            return FALSE;
-		}
-	}
 
     function delete_networkgroup($id = NULL){}
 

@@ -1,64 +1,78 @@
 <?= $this->extend('layout\master') ?>
 <?= $this->section('content') ?>
-<div class="container">
-	<div class="row">  
-		<div class="span6">  
-			<ul class="breadcrumb">  
-				<li>  
-					<a href="<?php echo base_url() . "admin";?>">Dashboard Home</a> <span class="divider">></span>  
-				</li>
-				<li>
-					<a href="<?php echo base_url() . "groups";?>">Groups</a> <span class="divider">></span>
-				</li>
-				<li class="active">Create Network Group</li>
-			</ul>  
-		</div>  
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin";?>">Dashboard Home</a></li>
+  <li class="breadcrumb-item"><a href="<?php echo base_url() . "networkgroup";?>">Network Groups</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
+  </ol>
+</nav>
+<div class="row">
+	<div class="col">
+		<h2><?= $title ?></h2>	
+	</div>	
+</div>
+<hr>
+<div class="row">
+	<div class="col">
+		<p>Please enter the network group information below.</p>
 	</div>
-	<div class="row-fluid">
-		<div class="span8 offset3">
-			<h1>Create Network Group</h1>
-			
-			<div id="infoMessage"><b><?php echo $message; ?></b></div>
-			<?php if ( ! isset($networks)): ?>
-			<hr>
-			<p>You do not appear to be part of any networks so cannot create network groups. You should <a href="<?php echo base_url() . "networks";?>" >create or join a network</a>.</p>
-			<?php else: ?>
-			<p>Please enter the network group information below.</p>
-			<?php echo form_open("groups/create_network_group"); ?>
-			<p>
-				Network: <br />
-				<?php
-					$options = array();
-					foreach ($networks as $network) {
-//						print_r($network);
-						$options[$network['network_key']] = $network['network_name'];
-					}
-					echo form_dropdown('network', $options);
-				?>
-				<?php // echo form_input($network); ?>
-			</p>
-			<p>
-				Group Name: <br />
-				<?php echo form_input($group_name); ?>
-			</p>
-
-			<p>
-				Description: <br />
-				<?php echo form_input($desc); ?>
-			</p>
-			<p>
-				Group Type: <br />
-				<?php
-					$options = array('source_display' => 'Source Display', 'count_display' => 'Count Display');
-					echo form_dropdown('group_type', $options);
-				?>
-				<?php // echo form_input($network); ?>
-			</p>
-
-			<p><button type="submit" name="submit" class="btn btn-primary"><i class="icon-th icon-white"></i>  Create Group</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="<?php echo base_url() . "groups";?>" class="btn" ><i class="icon-step-backward"></i> Go back</a></p>
-			<?php endif; ?>
+</div>	
+<?php if($message): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-info">
+			<?php echo $message ?>
+			</div>
 		</div>
 	</div>
+<?php endif; ?>
+<?php if ( ! isset($networks)): ?>
+<div class="alert alert-info">
+	<p>You do not appear to be part of any networks so cannot create network groups. You should <a href="<?php echo base_url() . "network";?>" >create or join a network</a>.</p>
 </div>
+<?php else: ?>
+<?php echo form_open("networkgroup/create_networkgroup"); ?>
+
+<div class="form-group">
+<?php echo form_label('Network Name', 'network'); ?>
+<?php
+	$style = [
+        'class' => 'form-control'
+	];
+	$options = array();
+	foreach ($networks as $network) {
+		$options[$network['network_key']] = $network['network_name'];
+	}
+	echo form_dropdown('network', $options, 'mysql', $style);
+?>
+</div>
+<div class="form-group">
+	<?php echo form_label('Group Name', 'group_name'); ?>
+
+	<?php echo form_input($group_name); ?>
+</div>
+<div class="form-group">
+	<?php echo form_label('Description', 'desc'); ?>
+	<?php echo form_input($desc); ?>
+</div>
+
+<div class="form-group">
+	<?php echo form_label('Group Type', 'group_type'); ?>
+	<?php
+		$options = array('source_display' => 'Source Display', 'count_display' => 'Count Display');
+		echo form_dropdown('group_type', $options, 'mysql', $style);
+	?>
+</div>
+
+<div class="form-group row">
+	<div class="col">
+	<button type="submit" name="submit" class="btn btn-primary"> Create Group</button>
+	<a href="<?php echo base_url() . "networkgroup";?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>	
+	</div>
+</div>
+
 <?php echo form_close(); ?>
+<?php endif; ?>
+
 <?= $this->endSection() ?>

@@ -183,6 +183,34 @@ class Network extends Model{
 		return  $query ? $query[0] : null;
 	}
 
+	/**
+	 * @author Mehdi Mehtarizadeh
+	 * 
+	 * General function to get fetch data from network_groups table.
+	 */
+	function getNetworkGroups(string $cols, array $conds = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
+		$this->builder = $this->db->table('network_groups');
+		
+		if ($cols) {
+            $this->builder->select($cols);
+        }
+        if ($conds) {
+            $this->builder->where($conds);
+        }
+        if ($isDistinct) {
+            $this->builder->distinct();
+        }
+        if ($limit > 0) {
+            if ($offset > 0) {
+                $this->builder->limit($limit, $offset);
+            }
+            $this->builder->limit($limit);
+        }
+
+        $query = $this->builder->get()->getResultArray();
+        return $query; 
+	}
+
 	
 	function addUserToNetworkGroup($user_id, $group_id, $installation_key) {
 
@@ -237,7 +265,7 @@ class Network extends Model{
 	}
 
 	/**
-	 * Deprecated
+	 * @deprecated
 	 */
 	function get_network_groups_for_installation() {
 
@@ -316,5 +344,43 @@ class Network extends Model{
 					$id = $this->addSourceFromInstallationToNetworkGroup($data);
 			}
 		} 
+	}
+
+	function getAllNetworksSourcesBySourceId(int $source_id) {
+		$this->builder = $this->db->table('network_groups_sources');
+
+		$this->builder->select('network_key');
+		$this->builder->distinct();
+		$this->builder->where('source_id', $source_id);
+		$data = $this->builder->get()->getResultArray();
+		$output = [];
+		foreach ($data as $datum) {
+			$this->builder = $this->db->table('network_groups_sources');
+
+			$output[$datum['network_key']] = [];
+			$this->builder->select('source_id');
+			$this->builder->where('network_key', $datum['network_key']);
+			$sources = $this->builder->get()->getResultArray();
+			foreach ($sources as $source_id) {
+				array_push($output[$datum['network_key']], $source_id['source_id']);
+			}
+		}
+		return $output;
+		// select distinct network_key from network_groups_sources  where source_id=9;
+
+		// select source_id from network_groups_sources where network_key="a846f6d38152843bee11a38a82ebafbe";
+	}
+
+	/**
+	 * @deprecated
+	 */
+    function checkIfGroupExistsInNetwork(string $network_key, string $group_name) {
+        $query = $this->db->get_where('network_groups',array('network_key' => $network_key, 'name' => $group_name));
+		if ($query->num_rows() > 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 }

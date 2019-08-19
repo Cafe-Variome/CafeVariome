@@ -1,211 +1,499 @@
-String.prototype.format = function (arguments) {
-    var s = this, i = arguments.length;
-    if (i === 0)
-        return s;
-    while (i--)
-        s = s.replace(new RegExp('\\{' + i + '\\}', 'gm'), arguments[i]);
-    return s;
-};
-
-function add_options(option, arguments) {
-    $select = $.parseHTML(option);
-    for (var arg in arguments) {
-        if(arguments[arg] == "----------------------" || arguments[arg] == "not all values displayed")
-            $($select).children('select').append("<option value='" + arguments[arg] + "' disabled>" + arguments[arg] + "</option>");
-        else
-            $("<option />", {value: arguments[arg], text: arguments[arg]}).appendTo($($select).children('select'));
-    }
-    return $select;
-}
-
-function add_options_group(option, arguments) {
-    var $select = $.parseHTML(option);
-    for (var key in arguments) {
-        var group = $('<optgroup label="' + key + '" />');
-        for (var value in arguments[key])
-            $("<option />", {value: arguments[key][value], text: arguments[key][value]}).appendTo(group);
-        group.appendTo($($select).children('select'));
+$(function() {
+    // console.log alias
+    const log = console.log.bind(console)
+    // urls object
+    const urls = {'qb_config': baseurl + 'resources/js/config.json', 'qb_json': baseurl + 'resources/js/querybuilder.json', 'phen_json': baseurl + 'admin/get_phenotype_attributes_for_network/' + $('#network_key').val() }
+    // error object
+    const error = {
+        'load_config': 'Error: Unable to load query builder config file.',
+        'load_json': 'Error: Unable to load query builder json file.',
+        'load_phen_json': 'Error: Unable to load phenotype.json',
+        'NaN': 'A numeric comparison operator was specified but the entered value is not numeric, unable to proceed with the query.',
+        'null' : 'NULL queries are only possible with "IS" or "IS NOT" operators, unable to proceed with the query.',
+        'str_cmp': 'You have specified a string comparison operator but supplied a numeric value. Query may not return proper results.'
     }
 
-    return $select;
-}
+    String.prototype.isNumber = function(){ return !isNaN(parseFloat(this)) && isFinite(this) }
+    String.prototype.isEmpty = function(){ return !this.trim().length > 0 }
+    // Split the string by the delimiter specified, capitalized first character of each word & then joins each word by a space.
+    String.prototype.titleCase = function(delimiter) {
+        if(this === 'NULL') return this
+        str = this.toLowerCase().split(delimiter).map((word)=> word.charAt(0).toUpperCase() + word.slice(1))
+        return str.join(' ')
+    }
 
-function isNumber(n) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-}
+    var hpo = {
+        'HP:0008066': "Abnormal Blistering of the Skin",
+        'HP:0008071': "Abnormality of Cardiovascular System Morphology",
+        'HP:0008773': "Aplasia/Hypoplasia of the middle ear",
+        'HP:0000413': "Atresia of the external auditory canal",
+        'HP:0000453': "Choanal atresia",
+        'HP:0000405': "Conductive hearing impairment",
+        'HP:0011451': "Congenital microcephaly",
+        'HP:0011471': "Gastrostomy tube feeding in infancy",
+        'HP:0010880': "Increased nuchal translucency",
+        'HP:0000272': "Malar flattening",
+        'HP:0000347': "Micrognathia",
+        'HP:0008551': "Microtia",
+        'HP:0011342': "Mild global developmental delay",
+        'HP:0000545': "Myopia",
+        'HP:0000384': "Preauricular skin tag",
+        'HP:0001622': "Premature birth",
+        'HP:0009623': "Proximal placement of thumb",
+        'HP:0100026': "Arteriovenous malformation",
+        'HP:0003561': "Birth length less than 3rd percentile",
+        'HP:0009879': "Cortical gyral simplification",
+        'HP:0011097': "Epileptic spasms",
+        'HP:0001263': "Global developmental delay",
+        'HP:0012469': "Infantile spasms",
+        'HP:0001336': "Myoclonus",
+        'HP:0000648': "Optic atrophy"
+    }
 
-$and_or_logic = '<div class="btn-group btn-toggle logic_phenotype" id="" style="margin-bottom:20px">\n\
-                        <a class="btn btn-medium {0}">AND</a>\n\
-                        <a class="btn btn-medium {1}">OR</a>\n\
-                     </div>';
+    var attributes = {
+                        'Affected Gene Symbol' : "genes_symbol",
+                        'Disease Label': "diseases_label",
+                        'Sex': "sex_label"
+                    };
 
-$or_logic = '<div class="row"><div class="btn-group span3 offset5 pagination-centered logic" style="padding-bottom:10px">\n\
-                        <a class="btn btn-medium btn-primary disabled">OR</a>\n\
-                 </div></div>';
+    // Entry point of script: Load config file and then load phenotype json if successful
 
-$option = '<div class="pagination-centered {0}">\n\
-                <select class="{1}" data-type="operator" {2}></select>\n\
-               {3}\n\
-                </div>';
 
-$option_select2 = '<div class="pagination-centered {0}">\n\
-                            <select class="input-xlarge {1}" style="margin-bottom:10px">\n\
-                            <option></option>\n\
-                            </select>\n\
-                        </div>';
+    //load_qb_config()
+    load_phen_json();
+    var template = {}
+    var phen_data = {};
+    // Load phenotype json and then load JSON API template if successful
+    function load_phen_json(/*qb_config*/) {
+        var phen_attrib = []
+        $.ajax({ url: urls['phen_json'], dataType: 'json'})
+        .done((jsonData)=> { 
+            log(jsonData)
+            phen_data = jsonData[0];
 
-$textbox = '<div class="{0} pagination-centered">\n\
-                    <div class="input-append">\n\
-                        <input class="input_field textValidate {1}" data-type="{2}" type="text" placeholder="{3}">\n\
-                        <span class="add-on"><i class="icon-remove-circle"></i></span>\n\
-                    </div>\n\
-                </div>';
-
-$options_container = '<div class="span7 pagination-centered"></div>';
-
-$textbox_with_label = '<div class="input-prepend input-append text_with_label {0}" style="margin-bottom:10px">\n\
-                            <span class="add-on">{1}</span>\n\
-                                <input class="input_field query_term {2}" type="text" placeholder="{3}">\n\
-                            <span class="add-on"><i class="icon-remove-circle"></i></span>\n\
-                          </div>';
-
-$add_remove_btn = '<div class="span2 {0} add_remove_btn" style="padding-top: 3px;">\n\
-                        <button class="btn btn-mini btn-success add">\n\
-                            <i class="icon-plus"></i>\n\
-                        </button>\n\
-                        <button class="btn btn-mini btn-danger remove hidden">\n\
-                            <i class="icon-minus icon-white"></i>\n\
-                        </button>\n\
-                       </div>';
-
-$type_sample = '<div id="{0}" class="row-fluid type_sample {1}">\n\
-                    </div>';
-
-$row = '<div class="row-fluid pagination-centered"></div>';
-
-$phenotype_count = 1;
-$phenotype_option_1 = ["IS", "IS LIKE", "IS NOT", "IS NOT LIKE", "---------------", "=", "≠", "<", ">", "<=", ">="];
-$phenotype_option_2 = ["--Select a value--", "NULL", "[Input your own value]"];
-
-add_symbol("phenotypeContainer");
-
-function add_symbol($symbol) {
-    switch ($symbol) {
-        case "phenotypeContainer":
-
-            if ($("#phenotypeContainer").children('.type_sample').length == 1)
-                $("#phenotypeContainer").append($and_or_logic.format(["btn-primary active", "btn-default"]));
-            else if ($("#phenotypeContainer").children('.type_sample').length > 1) {
-                if ($("#phenotypeContainer").find('.logic_phenotype .active').html() === "AND")
-                    $("#phenotypeContainer").append($and_or_logic.format(["btn-primary active", "btn-default"]));
-                else
-                    $("#phenotypeContainer").append($and_or_logic.format(["btn-default", "btn-primary active"]));
-            }
-
-            $("#phenotypeContainer").append($type_sample.format(["phenotype" + $phenotype_count, ""]));
-
-            if ($phenotype_count == 1)
-                $("#phenotype" + $phenotype_count).append($option_select2.format(["span4 offset1", "keys phenotype_keys" + $phenotype_count]));
-            else {
-                $options = add_options($option_select2.format(["span4 offset1", "keys phenotype_keys" + $phenotype_count]), phenotype_keys);
-                $("#phenotype" + $phenotype_count).append($options);
-            }
-
-            $("." + ["phenotype_keys" + $phenotype_count]).select2({
-                placeholder: "--Select an attribute--",
-//                    allowClear: true
+            $.each( jsonData[0].chr, function( key, value ) {
+                console.log(key + ":" + value);
+                $('#values_chr').append($('<option></option>').attr('value', value.toLowerCase()).text('Chr:' + value));
             });
 
-            $options_1 = add_options($option.format(["span2", "input-small conditions", "", ""]), $phenotype_option_1);
-            $("#phenotype" + $phenotype_count).append($options_1);
+            $.each( jsonData[0].alternatebases,function( key, value ){
+                console.log(key + ":" + value);
 
-            $options_2 = add_options($option.format(["span2", "input-large phenotype_values\" disabled ", "", ""]), $phenotype_option_2);
-            $("#phenotype" + $phenotype_count).append($options_2);
+                $('select.values_altall').append($('<option></option>').attr('value', value.toLowerCase()).text(value))
+            });
 
-            $("#phenotype" + $phenotype_count).append($add_remove_btn.format(["offset1"]));
+            $.each(jsonData[0].referencebases,function( key, value ) {
+                console.log(key + ":" + value);
 
-            $phenotype_count += 1;
-            break;
+                $('select.values_refall').append($('<option></option>').attr('value', key.toLowerCase()).text(value))
+            });
+
+            $.each(JSON.parse(jsonData[1]), (hpo, ancestry) => {
+                console.log(hpo + ":" + ancestry);
+
+                $('select#values_phen_left').append($('<option></option>').attr('value', ancestry).text(hpo))
+            })
+
+            $.each(attributes, function(k, v) {
+                console.log(k + ":" + v);
+
+                $('select.keys_pat').append($('<option></option>').attr('value', v.toLowerCase()).text(k))
+            })
+            
+            template['patient'] = $('.rules .rule')[0].outerHTML
+            template['genotype'] = $('.rules .rule')[1].outerHTML
+
+            $('select#values_phen_left').filterByText($('input#search_filter'));
+            $('select#values_phen_right').filterByText($('input#search_filter2'));
+
+            initSelect2();
+        })
+        .fail(()=> alert(error['load_phen_json']))
     }
-}
 
-var phenotype_keys = new Array();
-var phenotype_values = new Array();
+    var hpo_json = {};
 
-$(document).ready(function () {
-    // $("#loader").addClass('hide');
-    $network_key = $("#network_key").val();
-   $.ajax({url: baseurl + 'admin/get_phenotype_attributes_for_network/' + $network_key,
-//        $.ajax({url: baseurl + 'admin/get_phenotype_attributes_for_network/5b7a1ae7ac7fa0a4a4c7cedac1982dba',
-        // $.ajax({url: baseurl + 'admin/get_phenotype_attributes_for_network/f75ef233eb89ba76a4187912cd6f909d',
-        dataType: 'json',
-        delay: 200,
-        type: 'POST',
-        success: function (json) {
-            console.log("1 "+json);
-            $.each(json, function (attribute, value) {
-                $('select.phenotype_keys1').append($('<option>').text(attribute).attr('value', attribute));
-                phenotype_keys.push(attribute);
-                var index = value.indexOf("not all values displayed");
-                if(index != -1) {
-                    value.splice(index, 1);
-                    value.push("----------------------", "not all values might be displayed");
+
+    $.getJSON(baseurl + "discovery/hpo_query/", (data, st) => {
+        // log(JSON.stringify(data))
+        hpo_json = data;
+        init_hpotree();
+    });
+
+
+    // var jstree_hpo;
+    var jstree_hpo;
+    function init_hpotree() {
+        jstree_hpo = $('#jstree_hpo')
+        .jstree({
+            'core' : {
+                'data' : function (node, cb) {
+                    if(node.id == '#'){
+                        cb.call(this, hpo_json);
+                    } else {
+                        $.ajax({
+                            url: baseurl + "discovery/hpo_query/"+node.id,
+                            type: 'POST',
+                            dataType: 'JSON'
+                        }).done(function(data) {
+                            cb.call(this, data);
+                            hpo_json = jstree_hpo.jstree().get_json('#')[0]
+                            // log(JSON.stringify(hpo_json))
+                        });
+                    }
                 }
-                
-                phenotype_values[attribute] = value;
-                
+            },
+            'checkbox': {
+                three_state: false,
+                cascade: 'up+undetermined'
+            },
+            "plugins" : [ "wholerow", "checkbox"]
+        }).on("loaded.jstree.jstree", function (e, data) {
+            $(this).jstree().open_node("HP:0000001.HP:0000118_anchor",function(){;},false);
+        }).on("changed.jstree", function (e, data) {
+            $('select#values_phen_right').empty();
+            $("#jstree_hpo").jstree("get_selected", true).forEach(function(term) {
+                txt = '(' + term.text.split(' (')[1] + ' ' + term.text.split(' (')[0];
+                if($('select#values_phen_right option[value="' + txt + '"]').length == 0) {
+                    $('select#values_phen_right').append($("<option></option>").attr("value", txt).text(txt))    
+                } else {
+                    var f = $('select#values_phen_right option[value="' + txt + '"]').text()
+                    if(!f.includes("*"))
+                        $('select#values_phen_right option[value="' + txt + '"]').text('*' + f)
+                }
+            })
+            sortSelect('values_phen_right')
+        }).on("ready.jstree", function (e, data) {
+            $('select#values_phen_right').empty();
+            $("#jstree_hpo").jstree("get_selected", true).forEach(function(term) {
+                txt = '(' + term.text.split(' (')[1] + ' ' + term.text.split(' (')[0];
+                if($('select#values_phen_right option[value="' + txt + '"]').length == 0) {
+                    $('select#values_phen_right').append($("<option></option>").attr("value", txt).text(txt))    
+                } else {
+                    var f = $('select#values_phen_right option[value="' + txt + '"]').text()
+                    if(!f.includes("*"))
+                        $('select#values_phen_right option[value="' + txt + '"]').text('*' + f)
+                }
+            })
+            sortSelect('values_phen_right')
+        });
+    }
+
+    function destroy_hpotree() {
+        $("#jstree_hpo").jstree("destroy");    
+    }
+
+    const removeEmpty = (obj) => {
+      Object.keys(obj).forEach(key => {
+        if(Object.entries(obj[key]).length === 0 && obj[key].constructor === Object) { delete obj[key]; }
+        else if (obj[key] && typeof obj[key] === 'object' && obj[key].length === 0) { delete obj[key];}
+        else if (obj[key] && typeof obj[key] === 'object') { removeEmpty(obj[key]);}
+      });
+    };
+
+    $('button.btnRemove').click(() => {
+        $('select#values_phen_right :selected').each((key, el) => {
+            var txt = $(el).val().split(') ')[1] + ' ' + $(el).val().split(') ')[0] + ')';
+            $('#jstree_hpo a:contains("' + txt + '")').each(function(e) {
+                $("#jstree_hpo").jstree("deselect_node", $(this).attr('id'))
+            })
+
+        });
+    });
+    
+    $('button.btnAdd').click(() => {
+
+        hpo_json = jstree_hpo.jstree().get_json('#')[0]
+        removeEmpty(hpo_json)
+        destroy_hpotree();
+
+        $.ajax({
+            url: baseurl + 'discovery/build_tree',
+            type: 'POST',
+            dataType: 'JSON',
+            data: {'hpo_json' : JSON.stringify(hpo_json), 'ancestry': $('select#values_phen_left').val(), 'hp_term': $('select#values_phen_left :selected').text()},
+        })
+        .done(function(data) {
+
+            hpo_json = data;
+            init_hpotree();
+        }).always(function() {
+        });
+    })
+
+    var jstreeArea;
+    $('#full_screen').click(function(e) {
+        e.preventDefault();
+        hpo_json = jstree_hpo.jstree().get_json('#')[0]
+        log(JSON.stringify(hpo_json))
+        jstreeArea = $('#jstreeArea')
+        .jstree({
+            'core' : {
+                'data' : function (node, cb) {
+                    if(node.id == '#') {
+                        cb.call(this, hpo_json);
+                    } else {
+                        $.ajax({
+                            url: baseurl + "discovery/hpo_query/"+node.id,
+                            type: 'POST',
+                            dataType: 'JSON'
+                        }).done(function(data) {
+                            cb.call(this, data);
+                            hpo_json = jstreeArea.jstree(true).get_json('#')[0]
+                            // log(JSON.stringify(hpo_json))
+                        });
+                    }
+                }
+            },
+            'checkbox': {
+                three_state: false,
+                cascade: 'up+undetermined'
+            },
+            "plugins" : [ "wholerow", "checkbox"]
+        });
+        $('.modal-content').resizable({
+            alsoResize: ".modal",
+            minHeight: 300,
+            minWidth: 300
+        });
+
+        $('.modal').draggable();
+        $('#myModal').modal('show');
+    })
+
+    $('#myModal').on('hidden', function () {
+        hpo_json = jstreeArea.jstree().get_json('#')[0]
+        $("#jstreeArea").jstree("destroy");
+        $("#jstree_hpo").jstree("destroy");
+        init_hpotree();
+    })
+
+    $('#jstreeArea').on("changed.jstree", function (e, data) {
+        // hpo_json = jstreeArea.jstree(true).get_json('#')[0]
+        // log(JSON.stringify(hpo_json));
+    });
+
+
+
+    // Load JSON API template and initialise query builder if successful
+    function load_json_api_template(qb_config, phen_attrib) {
+        $.ajax({ url: urls['qb_json'], dataType: 'json', })
+        .done()
+        .fail(()=> alert(error['load_json']))
+    }
+
+    function initSelect2() {
+        $('select.keys').select2({ allowClear: true, theme: 'classic', placeholder: 'Select an attribute', dropdownAutoWidth: 'true' });
+        $('select.conditions').select2({ allowClear: true, theme: 'classic', placeholder: 'Select operator', dropdownAutoWidth: 'true' });
+        $('select.keys_altaf').select2({theme: 'classic', placeholder: 'Select an attribute', dropdownAutoWidth: 'true' });
+        $('select.keys_pat').select2({theme: 'classic', placeholder: 'Select an attribute', dropdownAutoWidth: 'true' });
+        $('select.values_altall').select2({allowClear: true, theme: 'classic', placeholder: 'ALT', dropdownAutoWidth: 'true' });
+        $('select.values_refall').select2({allowClear: true, theme: 'classic', placeholder: 'REF', dropdownAutoWidth: 'true' });
+
+        $('select.values').select2({ allowClear: true, theme: 'classic', placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
+        $('select.values_pat').select2({ allowClear: true, theme: 'classic', placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
+        $('select.values_pos').select2({ allowClear: true, theme: 'classic', placeholder: 'Select/Input position', dropdownAutoWidth: 'true' });
+        $('select.values_altaf').select2({ allowClear: true, theme: 'classic', placeholder: 'Select/Input value'});
+    }
+
+    $(document).on('change', "select.keys_pat", function () {
+        $(this).closest('.rule').find('select.values_pat').select2('destroy')
+        $val = $(this).closest('.rule').find('select.values_pat');
+        $val.empty()
+        // log($(this).val())
+        // log(phen_data[$(this).val()])
+
+        $val.append('<option></option>');
+
+        phen_data[$(this).val()].forEach(function(val) {
+            console.log(val);
+            $val.append($('<option>', {
+                value: val,
+                text: val.toUpperCase()
+            }));    
+        })
+        
+
+        $val.select2({ allowClear: true, theme: 'classic', placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
+    })
+
+
+    function logic_eav(rule, eav, logic) {
+        if(typeof rule[1] !== 'undefined' && typeof rule[2] !== 'undefined' && rule[1] !== '' && rule[2] !== '') {
+            eav.push({'attribute' : rule[0], 'operator': rule[1], 'value': rule[2]})
+            logic['-AND'].push("/query/components/eav/" + (eav.length-1))
+        }
+    }
+
+    var modal_data = {};
+
+    $('#build_query').click(() => {
+        $('#waiting').removeClass('hide')
+        $('#build_query').attr('disabled', 'disabled');
+        $('#query_result tbody').html('')
+        $.ajax({ url: urls['qb_json'], dataType: 'json', })
+        .done((jsonAPI) => {
+
+            var logic = {"-AND": []}
+            var eav = []
+            var phe = []
+            var gen = []
+
+            $('#pat_container .rule').each(function() {
+                var attr = $('select.keys_pat', this).val()
+                var opr = $('select.conditions', this).val()
+                var val = $('select.values_pat', this).val()
+                if(val != '') {
+                    logic_eav([attr, opr, val], eav, logic);
+                }
+            })
+
+            // logic_eav(['sex', 'is', $('#values_sex').val()], eav, logic);
+            // logic_eav(['age', $('select.oprAge').val(), $('select.values_age').val()], eav, logic);
+            // logic_eav(['tissue', 'is', $('#values_tissue').val()], eav, logic);
+
+            // logic_haplo = [];
+            // $("#values_haplo_right > option").each(function() {
+            //     eav.push({'attribute' : "haplogroup", 'operator': "is", 'value': this.value})
+            //     logic_haplo.push("/query/components/eav/" + (eav.length-1))
+            // });
+            // if(logic_haplo.length > 1) {logic['-AND'].push({'-OR': logic_haplo})}
+
+            var phenLogic = $('#phen_logic a.active').html();
+            logic_phen = [];
+
+            sim = [];
+            if(phenLogic === 'SIM' && $("#values_phen_right option").length > 0) {
+                terms = [];
+                $("#values_phen_right option").each(function() { terms.push($(this).val().split(' ')[0].replace(/[()]/g, ''))})
+
+                    if($('#rel').is(':checked')) {
+                        sim[0] = {
+                            'r': $('#r').val(),
+                            's': $('#s').val(),
+                            'ids': terms
+                        }
+                    }
+
+                    if($('#jc').is(':checked')) {
+                        sim[0] = {
+                            'j': $('#j').val(),
+                            'ids': terms
+                        }
+                    }
+                    logic['-AND'].push('/query/components/sim/0')
+            } else {
+                // $("#jstree_hpo").jstree("get_selected").forEach(function(term) {
+                $("#values_phen_right option").each(function() { 
+                    var term = $(this).val().split(' ')[0].replace(/[()]/g, '')
+
+                    if(phenLogic === 'AND') {
+                        phe.push({'attribute' : "phenotypes_id", 'operator': "is", 'value': term})
+                        logic['-AND'].push("/query/components/phenotype/" + (phe.length-1))
+                    } else {
+                        phe.push({'attribute' : "phenotypes_id", 'operator': "is", 'value': term})
+                        logic_phen.push("/query/components/phenotype/" + (phe.length-1))
+                    }
+                });
+                if(logic_phen.length > 1 && phenLogic === 'OR') {logic['-AND'].push({'-OR': logic_phen})}    
+            }
+
+            
+            var genLogic = 'AND'; //$('#gen_logic a.active').html();
+            var logic_gen = [];
+            $('#gen_container .rule').each(function() {
+                v = {
+                        'chr' : $('#values_chr', this).val(),
+                        'start' : $('input.values_start', this).val(),
+                        'end' : $('input.values_end', this).val(),
+                        'referencebases' : $('select.values_refall', this).val(),
+                        'alternatebases' : $('select.values_altall', this).val()
+                    };
+                    log(v)
+                if(v['chr'] !== '' && v['referencebases'] !== '' && v['alternatebases'] !== '') {
+                    gen.push(v);
+                    if(genLogic === 'AND') {
+                        logic['-AND'].push("/query/components/subjectVariant/" + (gen.length-1))
+                    } else {
+                        logic_gen.push("/query/components/subjectVariant/" + (gen.length-1))    
+                    }
+                }
             });
-            console.log(phenotype_values);
-            $("#loader").addClass('hide');
-        }
+            if(logic_gen.length > 1 && genLogic === 'OR') {logic['-AND'].push({'-OR': logic_gen})}
+
+            jsonAPI['query']['components']['eav'] = eav;
+            jsonAPI['query']['components']['subjectVariant'] = gen;
+            jsonAPI['query']['components']['phenotype'] = phe;
+            jsonAPI['query']['components']['sim'] = sim;
+            jsonAPI['logic'] = logic;
+            log(jsonAPI);
+            // log(JSON.stringify(jsonAPI));
+
+            $.ajax({url: baseurl + 'AjaxApi/query/' + $('#network_key').val(),
+                dataType: 'html',
+                delay: 200,
+                type: 'POST',
+                data: {'jsonAPI': jsonAPI},
+                dataType: 'json',
+                success: function (data) {
+                    $.each(data, function(key, val) {
+                        if(val != null) {
+                            resp = $.parseJSON(val)
+                            $.each(resp, function(key, val1) {
+                                if(key !== 'site_title') {
+                                    if($('#query_result tbody tr' + '#' + val.id + '_' + key).length == 0) {
+                                        $('#query_result tbody').append("<tr id = " + val.id + '_' + key + ">" +
+                                            "<td>" + key.titleCase() + "</a></td>" +
+                                            "<td>" + (val1.length > 0 ? "<a href='' class='hover_test'>" + val1.length + "</a>" : "0")  + "</td>" +
+                                        "</tr>")
+                                    }
+                                }
+                            })    
+                        }
+                    })
+                },
+                'complete': function(data) {
+                    $('#query_result').removeClass('hide');
+                    $('#build_query').removeClass('disabled');
+                    $('#waiting').addClass('hide')
+                },
+            })
+        }).fail(()=> alert(error['load_json']));
+    })
+
+    setTimeout(() => {$('#isPhenotype').trigger('click')}, 200)
+    setTimeout(() => {$('#isGenotype').trigger('click')}, 200)
+    setTimeout(() => {$('#isDemographic').trigger('click')}, 200)
+    setTimeout(() => {$('#ishaplogroup').trigger('click')}, 200)
+    setTimeout(() => {$('#istissue').trigger('click')}, 200)
+    setTimeout(() => {$('#isPatient').trigger('click')}, 200)
+
+    $(document).on('click', ".hover_test", function (e) {
+        e.preventDefault()
+        
     });
 
-    // Phenotype
-    $(document).on('change', '.keys', function () {
-        $current_phenotype_values = $(this).parent().parent().find('.phenotype_values').prop('disabled', '').parent();
-        $new_phenotype_values = add_options($option.format(["span2", "input-large phenotype_values", "", ""]), $phenotype_option_2.concat(phenotype_values[$(this).val()]));
-        $current_phenotype_values.replaceWith($new_phenotype_values);
-    });
+    // Bootstrap notify plugin
+    function notify(title, msg, type) { 
+        $.notify({
+            title: '<strong>' + title + ' </strong>', 
+            message: msg, 
+            icon: 'glyphicon glyphicon-' + (type === 'danger' ? 'remove' : 'info') + '-sign'
+        }, 
+        {type: type, delay: 5000}) 
+    }
 
-    $(document).on('change', "select.phenotype_values", function () {
-        if ($(this).val() === "[Input your own value]") {
-            $(this).parent().append('<div class="input-append phenotype_custom_value">\n\
-                                <input class="input-medium phenotype_values" data-type="phenotype" type="text" placeholder="Enter a value">\n\
-                                <span class="add-on"><i class="icon-share-alt"></i></span>\n\
-                            </div>');
-            $phenotype_values = $(this).remove();
-        }
-    });
-
-    $(document).on('click', '.phenotype_custom_value .icon-share-alt', function () {
-        $(this).parent().parent().parent().append($phenotype_values)
-                .find('option:contains("--Select a value--")').attr('selected', 'selected')
-                .parent().prev().remove();
-    });
-
-    // Rest
     $(document).on('click', ".btn-collapse", function () {
-
-        if ($(this).attr('id') === "isPhenotype")
-            $parent = $(this).parent().parent().parent();
-        else
-            $parent = $(this).parent().parent();
-
+        $parent = $(this).parent().parent().parent();
         if ($(this).attr("data-collapseStatus") === "false") {
             $(this).removeClass("btn-info").addClass("btn-success");
             $(this).find('i').removeClass("icon-chevron-left").addClass("icon-chevron-down");
-            $($(this).parent().parent().next().collapse('show')).addClass('container_border');
+            $(this).parent().parent().next().collapse('show').addClass('container_border');
             $(this).attr("data-collapseStatus", "true");
             $parent.prev().children('a').removeClass('disabled');
-
         } else {
             $collapse = true;
-
-            switch ($(this).parent().parent().next().attr('id')) {
-                case "phenotypeContainer":
-                    $collapse = validate_Phenotype("collapseEvent");
-                    break;
-            }
+            // $collapse = validate_Phenotype("collapseEvent")
             if ($collapse) {
                 $(this).removeClass("btn-success").addClass("btn-info");
                 $(this).find('i').removeClass("icon-chevron-down").addClass("icon-chevron-left");
@@ -216,291 +504,153 @@ $(document).ready(function () {
         }
     });
 
-    $(document).on('click', 'button.add', function () {
 
-        parentId = $(this).closest("div[id$='Container']").attr('id');
-        add_symbol(parentId);
-        $("#" + parentId).find(".remove").removeClass('hidden');
-        $add_btn = $(this).remove();
-    });
+    $(document).on('click', ".btn-add", function () {
 
-    $(document).on('click', 'button.remove', function () {
+        var caller = $(this);
+        var newRow = caller[0].parentElement.parentElement;
+        var nr = $(newRow).clone();
 
-        // parent = $(this).closest('.row-fluid');
+        $(newRow.parentElement).append(nr);
 
-        if ($(this).closest('.row-fluid').is(":first-child"))
-            $(this).closest('.row-fluid').next().remove();
-        else {
-            $(this).closest('.row-fluid').prev().remove();
-            if ($(this).closest('.row-fluid').is(":last-child"))
-                $(this).closest('.row-fluid').prev().find(".add_remove_btn").prepend($add_btn);
-        }
+        caller.hide();
+        $($(caller[0].parentElement)[0].children[1]).hide();
 
-        if ($(this).closest('.row-fluid').siblings().length === 1)
-            $(this).closest('.row-fluid').siblings('.row-fluid').find('.remove').addClass('hidden');
-
-        $(this).closest('.row-fluid').remove();
-
-    });
-
-    // AND-OR Toggle Function
-    $(document).on('click', ".btn-toggle", function () {
-        if ($("a", this).hasClass("disabled"))
-            return;
-        if ($(this).find('.btn-primary').length > 0) {
-            if ($(this).parent().attr('id') === "phenotypeContainer") {
-                $(this).parent().find('.logic_phenotype .btn').toggleClass('active');
-                $(this).parent().parent().find('.logic_phenotype .btn').toggleClass('btn-primary');
-            } else {
-                $(this).find('.btn').toggleClass('active');
-                $(this).find('.btn').toggleClass('btn-primary');
-            }
-        }
-    });
-
-    $(document).on('click', '.icon-remove-circle', function () {
-        $(this).parent().siblings('input').val('').focus();
-    });
-
-    $("#reset_phenotype").click(function(e) {
-        e.preventDefault();
-        $('input').val('');
-        $('select').prop('selectedIndex',0);
-        $(".keys").select2('val', 'All');
-    });
-
-    // $(document).on('click', ".clear_all_textbox", function () {
-    //     $('input').val('');
-    // });
-
-//        $idCount = 1;
-    $("#buildQuery").click(function () {
-        $("#query_result").empty();
-//        $('#waiting').show(500);
-
-        $idCount = 1;
-
-        phe = validate_Phenotype("buildQueryEvent");
-
-        if (!phe) {
-            console.log("Build Query: Not Validated");
-            return false;
-        }
         
-        $genotype_phenotype = $('#logic_genotype_phenotype .active').html();
-        $phen_phen = $('.logic_phenotype .active').html() ? $('.logic_phenotype .active').html() : "";
+        $('select.attribute').select2('destroy')
+        $('select.operator').select2('destroy')
+        $('select.value').select2('destroy')
+        if($(this).attr('data-rule') === 'patient') {
+            //$('#pat_container').append($rule)
+        } else if($(this).attr('data-rule') === 'genotype') {
+           // $('#gen_container').append($rule)
+        }
+        initSelect2();
+    });
 
-        $query = "";
+    $(document).on('click', ".btn-remove", function () {
+        var $rule = $(this).closest('.rule')
 
-        $arr = {
-            "queryMetadata": {
-                "queryId": "<identifier>",
-                "queryType": "once|periodic",
-                "queryStart": "<Date, Time>",
-                "queryStop": "<Date, Time>",
-                "queryLabel": "<identifier>",
-                "queryResultLevel": "Exists|Counts|Records",
-                "submitter": {
-                    "id": "SubmitterPersonID",
-                    "name": "First [Middle] Last",
-                    "email": "email@domain.com",
-                    "institution": "AffiliationOfSubmitterPerson",
-                    "urls": ["SubmitterPersonalURL", "..."]
-                },
-                "contact": {
-                    "id": "ContactPersonID",
-                    "name": "First [Middle] Last",
-                    "email": "email@domain.com",
-                    "institution": "AffiliationOfContactPerson",
-                    "urls": ["ContactPersonURL", "..."]
-                }
-            },
-            "query": {
-                "phenotypeFeature": getJSON_Phenotype()
-            }
-        };
+        if($rule.is(':first-child')) {} 
+        else { 
+            if($rule.is(':last-child')) { 
+                $rule.prev().find('.btn-add').toggleClass('hide') 
+            } 
+        }
+        if($rule.siblings().length === 1) { 
+            $rule.siblings().find('.btn-remove').toggleClass('hide') 
+        }
+        $rule.remove()
+    })
 
-        $.each($arr.query, function (key, value) {
-            if (value.length === 0)
-                delete $arr.query[key];
+    function sortSelect(id) {
+        var options = $('select#' + id + ' option');
+        var arr = options.map(function(_, o) { return { t: $(o).text(), v: o.value }; }).get();
+        arr.sort(function(o1, o2) { return o1.t > o2.t ? 1 : o1.t < o2.t ? -1 : 0; });
+        options.each(function(i, o) {
+          o.value = arr[i].v;
+          $(o).text(arr[i].t);
         });
-
-        if (Object.keys($arr.query).length === 0) {
-            alert("You have to select at least one type in order to proceed to a query!");
-            return false;
-        }
-        
-        $.extend($arr, {"queryStatement": $query, "network_to_search": $network_key});
-        console.log(JSON.stringify($arr, null, '\t'));
-        // $arr = JSON.stringify($arr, null, '\t');
-//        alert("queryString -> " + JSON.stringify($arr));
-
-        $('#waiting').show(500);
-        $.ajax({url: baseurl + 'discover/executeQuery/' + $network_key,
-            dataType: 'html',
-            delay: 200,
-            type: 'POST',
-            data: {'jsonAPI': $arr},
-            success: function (data) {
-//                        alert('test -> ' + data);
-                // console.log(data);
-                $('#waiting').hide(500);
-                $("#query_result").html(data);
-            }
-        });
-
-    });
-    
-    function getJSON_Phenotype() {
-        $parentId = $("#phenotypeContainer");
-        $parentType = $parentId.attr('data-type');
-        $query = "";
-        $arr = [];
-        $parentId.children('.type_sample').each(function () {
-            if ($(this).find('select.keys').val().trim()) {
-                
-                $phenotype = {
-                    "querySegmentID": $idCount,
-                    "operator": $(this).find('.conditions').val().toString(),
-                    "phenotypeConcept": {
-                        "cursivePhenotypeConcept": {"term": $(this).find('select.keys').val().toString(), "source": ""}
-                    },
-                    "phenotypeFeature": {"value": $(this).find('.phenotype_values').val().toString(), "units": "", "source": ""}
-                };
-
-                $arr.push($phenotype);
-                if($query == "")
-                    $query = $idCount;
-                else
-                    $query = $query + " " + $phen_phen + " " + $idCount;
-                $idCount++;
-            }
-        });
-
-        $query = "(" + $query + ")";
-        
-//        console.log($phen);
-//        console.log(JSON.stringify($arr, null, "\t"));
-        
-        return $arr;
     }
 
-    function validate_Phenotype($for) {
-        $parentId = $("#phenotypeContainer");
-        $parentType = $parentId.attr('data-type');
+    // https://stackoverflow.com/a/6647367/5510713
+    jQuery.fn.filterByText = function(textbox) {
+      return this.each(function() {
+        var select = this;
+        var options = [];
+        $(select).find('option').each(function() {
+          options.push({value: $(this).val(), text: $(this).text()});
+        });
+        $(select).data('options', options);
 
-        if ($for === "collapseEvent") {
-            if ($parentId.children('.type_sample').length === 1) {
-                if ($parentId.find('select.keys').val().trim().length > 0)
-                {
-                    $.notify({
-                        // options
-                        message: "Non-empty sections cannot be collapsed."
-                      },{
-                        // settings
-                        timer: 200
-                      });
-                    return false;
-                }
-            } else {
-                $error = false;
-                $parentId.children('.type_sample').each(function () {
-                    if ($(this).find('select.keys').val().trim().length > 0) {
-                        $.notify({
-                            // options
-                            message: "Non-empty sections cannot be collapsed."
-                          },{
-                            // settings
-                            timer: 200
-                          });
-                        $error = true;
-                        return false;
-                    }
-                });
-
-                if ($error)
-                    return false;
+        $(textbox).bind('change keyup', function() {
+          var options = $(select).empty().data('options');
+          var search = $.trim($(this).val());
+          var regex = new RegExp(search, "gi");
+          $.each(options, (i) => {
+            var option = options[i];
+            if (option.text.match(regex) !== null) {
+              $(select).append($('<option>').text(option.text).val(option.value));
             }
-            return true;
-        } else if ($for === "buildQueryEvent") {
-            $error = false;
-            $parentId.children('.type_sample').each(function () {
-                if ($(this).find('select.keys').val().trim().length > 0) {
-                    condition_value = $(this).find('.conditions').val();
-                    field_value = $(this).find('.phenotype_values').val();
-                    if (field_value === "--Select a value--") {
-                         $.notify({
-                            // options
-                            message: "You have not entered a phenotype value(s)"
-                          },{
-                            // settings
-                            timer: 200
-                          });
-                        $error = true;
-                    } else if (!phenotype_validation(condition_value, field_value)) {
-                        $error = true;
-                    }
+          });
+        });
+      });
+    };
+
+    /*
+    $('#search_test').autocomplete({
+        source: function(req, res) {
+          $.getJSON(baseurl + 'discovery/search_on_index/' + req, function(attr, st) {
+            res(attr)})
+        },
+
+    })
+
+    $('#search_test2').typeahead( { 
+        minLength: 2,
+        highlighter: function (item) {
+            this.query.trim().split(' ').forEach((term) => {
+                if(term.length > 1) {
+                    item = item.replace(new RegExp( '(' + term + ')', 'gi' ), "<b style='font-weight: bold'>$1</b>" )    
                 }
+            })
+            return item;
+        },
+        source: function(query, process) {
+            str = query.trim().split(' ').filter((term) => term.length != 1).reduce((v1, v2) => v1 + " " + v2)
+            $.getJSON(baseurl + 'discovery/search_on_index/' + str, (data) => {
+                return process(data);
             });
-            return !$error;
         }
-    }
-
-    function phenotype_validation(condition_value, field_value) {
-        if (condition_value === '>' || condition_value === '<' || condition_value === '>=' || condition_value === '<='
-                || condition_value === '=' || condition_value === '≠') {
-            if (!isNumber(field_value)) {
-                $.notify({
-                        // options
-                        message: "A numeric comparison operator was specified but the entered value is not numeric, unable to proceed with the query."
-                      },{
-                        // settings
-                        timer: 200
-                      });
-                return false;
-            }
-            return true;
-        }
-        // Throw error if NULL query entered with anything apart from IS or IS NOT
-        else if (condition_value.toLowerCase() === 'is like' || condition_value.toLowerCase() === 'is'
-                || condition_value.toLowerCase() === 'is not' || condition_value.toLowerCase() === 'is not like') {
-            if (condition_value.toLowerCase() === 'is like' || condition_value.toLowerCase() === 'is not like') {
-                if (field_value.toUpperCase() === 'NULL') {
-                    $.notify({
-                        // options
-                        message: "NULL queries are only possible with 'IS' or 'IS NOT' operators, unable to proceed with the query."
-                      },{
-                        // settings
-                        timer: 200
-                      });
-                    return false;
-                } else if (isNumber(field_value)) {
-                    $.notify({
-                        // options
-                        message: 'You have specified a string comparison operator but supplied a numeric value. Query may not return proper results.'
-                      },{
-                        // settings
-                        timer: 200
-                      });
-                }
-            } else {
-                if (isNumber(field_value)) {
-                    $.notify({
-                        // options
-                        message: 'You have specified a string comparison operator but supplied a numeric value. Query may not return proper results.'
-                      },{
-                        // settings
-                        timer: 200
-                      });
-                    
-                }
-            }
-
-            return true;
-        }
-    }
-
-    $(document).on('focus', '.conditions', function () {
-        $(this).find('option[value="---------------"]').attr('disabled', 'disabled');
     });
+
+
+    $('#search_test3').focus(function() {
+        if($('#search_test3').val().length == 0) {
+            $('#search_test3').siblings('ul.dropdown-menu:not(.custom-menu)').remove()
+            $('#search_test3').siblings('.custom-menu').css('display', 'block')
+        }
+    })
+
+    $('#search_test3').keyup(function() {
+        if($('#search_test3').val().length == 0) {
+            $('#search_test3').siblings('ul.dropdown-menu:not(.custom-menu)').remove()
+            $('#search_test3').siblings('.custom-menu').css('display', 'block')
+        }
+        else
+            $('#search_test3').siblings('.custom-menu').css('display', 'none')
+    })
+
+    $('#search_test3').focusout(function() {
+        $('#search_test3').siblings('.custom-menu').css('display', 'none')
+    })
+
+
+
+    $('#search_test3').typeahead( { 
+        minLength: 2,
+        highlighter: function (item) {
+            this.query.trim().split(' ').forEach((term) => {
+                if(term.length > 1) {
+                    item = item.replace(new RegExp( '(' + term + ')', 'gi' ), "<b class='custom-bold'>$1</b>" )    
+                }
+            })
+            return item;
+        },
+        source: function(query, process) {
+            str = query.trim().split(' ').filter((term) => term.length != 1).reduce((v1, v2) => v1 + " " + v2)
+            $.getJSON(baseurl + 'discovery/search_on_index/' + str, (data) => {
+                return process(data);
+            });
+        }
+    });
+
+
+    $(document).on('click', ".btn-logic", function () {
+        if($(this).hasClass('btn-default')) {
+            $(this).addClass('active').addClass('btn-primary').removeClass('btn-default')
+            $(this).siblings().removeClass('active').addClass('btn-default').removeClass('btn-primary')
+        }
+    })
+    */
 });

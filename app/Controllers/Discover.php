@@ -21,21 +21,18 @@ use Elasticsearch;
 
 class Discover extends CVUI_Controller{
 
-    private $authAdapter;
-
-	/**
+    /**
 	 * Constructor
 	 *
-	 * @return void
 	 */
-	public function __construct()
-	{
-		$this->session = Services::session();
-		$this->db = \Config\Database::connect();
-        $this->setting =  Settings::getInstance($this->db);
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+        parent::setProtected(true);
+        parent::setIsAdmin(true);
+        parent::initController($request, $response, $logger);
 
-        $this->authAdapter = new KeyCloak();
-		$this->authAdapter->setSession($this->session);
+		$this->validation = Services::validation();
+        $this->networkModel = new \App\Models\Network($this->db);
+        $this->userModel = new \App\Models\User($this->db);
     }
 
     public function query_builder($network_key){
@@ -45,7 +42,7 @@ class Discover extends CVUI_Controller{
         if ($network_key) {
             $this->session->set(array('network_key' => $network_key));
         } else {
-            redirect('discover/proceed_to_query/query_builder', 'refresh');
+            return redirect()->to(base_url('discover/proceed_to_query/query_builder'));
         }
 
         // Check if the user is in the master network group for this network
@@ -85,13 +82,13 @@ class Discover extends CVUI_Controller{
         
         if($basic && !$advanced && !$precan)  {
             if(PHENOTYPE_CATEGORIES) {
-                $uidata->javascript = array(JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
+                $uidata->javascript = array(VENDOR.'components/jqueryui/jquery-ui.js',JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
                 $data = $this->wrapData($uidata);
-                return view("discover/query_builder/main", $data);
+                return view("discover/query_builder", $data);
             } else {
-                $this->javascript = array(JS.'bootstrap-notify.js',JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder.js');
+                $this->javascript = array(VENDOR.'components/jqueryui/jquery-ui.js', JS.'bootstrap-notify.js',JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder.js');
                 $data = $this->wrapData($uidata);
-                return view("discover/query_builder/main", $data);
+                return view("discover/query_builder", $data);
             }
         } else {
                 $json = json_decode(file_get_contents(base_url() . "resources/precanned.json"), 1);

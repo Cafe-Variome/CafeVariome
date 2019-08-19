@@ -389,7 +389,7 @@ class Toolbar
 				return;
 			}
 
-			$response->appendBody($script);
+			//$response->appendBody($script);
 		}
 	}
 

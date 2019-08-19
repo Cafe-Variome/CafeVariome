@@ -53,6 +53,8 @@ use CodeIgniter\Database\ConnectionInterface;
             'user_id' => $this->session->get('user_id'),
             'uploadStart' => $now,
             'uploadEnd' => null,
+            'tissue' => $tissue,
+            'patient' => $patient,
             'Status' => 'Pending');
             $this->builder->where('source_id', $source_id);
             $this->builder->where('FileName', $file);
@@ -483,7 +485,7 @@ use CodeIgniter\Database\ConnectionInterface;
     /**
      * VCF Start -  Perform Initial insert into vcf_elastic table
      * to keep track of uploaded file
-     *
+     * @deprecated
      * @param string $file    - The File name we have uploaded
      * @param string $source  - The source name we are adding to
      * @param string $tissue  - The Tissue this VCF data is sampled from
