@@ -9,9 +9,10 @@
  * 
  */
 
-use App\Models\User;
+use App\Models\Network;
 use App\Models\UIData;
-//use App\Models\Source;
+use App\Models\User;
+use App\Models\Source;
 use App\Helpers\AuthHelper;
 use App\Libraries\AuthAdapter;
 use CodeIgniter\Config\Services; 
@@ -26,6 +27,9 @@ class NetworkGroup extends CVUI_Controller{
 	 */
 	protected $validationListTemplate = 'list';
 	
+	private $networkModel;
+
+	private $networkGroupModel;
 
     /**
 	 * Constructor
@@ -37,9 +41,42 @@ class NetworkGroup extends CVUI_Controller{
         parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-        $this->networkModel = new \App\Models\Network($this->db);
-        //$this->userModel = new \App\Models\User($this->db);
+		$this->networkModel = new Network($this->db);
+		$this->networkGroupModel = new \App\Models\NetworkGroup($this->db);
+
+	}
+	
+	public function index(){
+        return redirect()->to(base_url("networkgroup/networkgroups"));
     }
+
+	function networkgroups(){
+		$uidata = new UIData();
+		$uidata->title = "Network Groups";
+
+		$networks = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/get_networks_installation_member_of_with_other_installation_details");
+		$networks = json_decode($networks, true);
+		$networkGroups = $this->networkGroupModel->getNetworkGroups('', null, array('name'));
+		foreach ( $networkGroups as $network_group ) {
+			$network_group['network_name'] = $networks[$network_group['network_key']]['network_name'];
+			$number_sources = $this->networkModel->countSourcesForNetworkGroup($network_group['id']);
+			$network_group['number_of_sources'] = $number_sources;
+			$network_groups_for_installation[] = $network_group;
+		}
+		if (!empty($network_groups_for_installation)) {
+			$uidata->data["groups"] = $network_groups_for_installation;
+		}
+		else {
+			$uidata->data["groups"] = array("error" => "No network groups are available for this installation");
+		}
+
+        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
+        $uidata->javascript = array(VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js', JS.'cafevariome/components/datatable.js',JS. 'cafevariome/networkgroup.js');
+
+		$data = $this->wrapData($uidata);
+
+		return view("networkgroup/networkgroups", $data);
+	}
 
     public function create_networkgroup(){
 
@@ -51,10 +88,10 @@ class NetworkGroup extends CVUI_Controller{
         $this->validation->setRules([
             'group_name' => [
                 'label'  => 'Group name',
-                'rules'  => 'required|alpha_dash|unique_network_group_name_check['.$this->request->getVar('name').','. $this->request->getVar('network') . ']',
+                'rules'  => 'required|alpha_dash|unique_network_group_name_check['. $this->request->getVar('network') . ']',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'callback_unique_network_group_name_check' => '{field} already exists.'
+                    'unique_network_group_name_check' => '{field} already exists.'
                 ]
             ],
             'desc' => [
@@ -71,14 +108,10 @@ class NetworkGroup extends CVUI_Controller{
             'group_type' => [
 				'label' => 'Group Type',
 				'rules' => 'string'
-
             ]
         ]
         );
-		//$this->validation->set_rules('group_name', 'Group name', 'required|alpha_dash|xss_clean|callback_unique_network_group_name_check['.$this->input->post('network').']');
-		//$this->form_validation->set_rules('desc', 'Description', 'required|xss_clean');
-		//$this->form_validation->set_rules('network', 'Network', 'xss_clean');
-		//$this->form_validation->set_rules('group_type', 'Group type', 'xss_clean');
+		
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
 			// Create the new group
 			$data = array ( 'name' => $this->request->getVar('group_name'),
@@ -88,7 +121,7 @@ class NetworkGroup extends CVUI_Controller{
 							'url'		=> base_url()
 			);
 			
-			$network_group_id = $this->networkModel->createNetworkGroup($data);
+			$network_group_id = $this->networkGroupModel->createNetworkGroup($data);
 			if ( $network_group_id ) {
 				$this->session->setFlashdata('message', 'Network group created successfully.');
                 return redirect()->to(base_url('networkgroup/index'));            
@@ -145,8 +178,70 @@ class NetworkGroup extends CVUI_Controller{
 
     }
 
+    function delete_networkgroup(int $id){
+		$uidata = new UIData();
+		$uidata->title = "Delete Network Group";
+		// insert csrf check
+		$uidata->data['group_id'] = $id;
+		$uidata->data['csrf'] = $this->_get_csrf_nonce();
 
+		$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
-    function delete_networkgroup($id = NULL){}
+		$this->validation->setRules([
+            'confirm' => [
+                'label'  => 'Confirmation',
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => '{field} is required.',
+                ]
+            ],
+            'id' => [
+                'label'  => 'Group ID',
+                'rules' => 'required|alpha_numeric',
+                'errors' => [
+                    'required' => '{field} is required.'
+                ]
+            ]
+        ]
+        );
+
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
+			// do we really want to delete?
+			if ($this->request->getVar('confirm') == 'yes')
+			{
+				// do we have a valid request?
+				if ($id != $this->request->getVar('id'))
+				{
+					show_error('This form post did not pass our security checks.');
+				}
+				// do we have the right userlevel?
+				$has_got_network_sources_assigned = $this->networkGroupModel->hasSource($id);
+				if (!$has_got_network_sources_assigned) {
+					$this->networkGroupModel->deleteNetworkGroup($id);		
+					return redirect()->to(base_url('networkgroup/index'));            	
+				}
+				else {
+					$this->session->setFlashdata('message', "Unable to delete network group as sources from another installation are present in the group.");
+				}
+			}
+			return redirect()->to(base_url('networkgroup/index'));            	
+		}
+		$data = $this->wrapData($uidata);
+		return view("networkgroup/delete_networkgroup", $data);
+		
+	}
+
+	function _get_csrf_nonce()
+	{
+		helper('text');
+
+		$key   = random_string('alnum', 8);
+		$value = random_string('alnum', 20);
+		$this->session->setFlashdata('csrfkey', $key);
+		$this->session->setFlashdata('csrfvalue', $value);
+
+		return array($key => $value);
+	}
 
 }

@@ -57,15 +57,39 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->update($data);
     }
 
-
     /**
+	 * getSources
      * 
-     */
-    public function getSources() {
-        $this->builder = $this->db->table($this->table);
+	 * General function to get fetch data from sources table.
+     * 
+     * @author Mehdi Mehtarizadeh
+	 */
+	function getSources(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
+		$this->builder = $this->db->table($this->table);
+		
+		if ($cols) {
+            $this->builder->select($cols);
+        }
+        if ($conds) {
+            $this->builder->where($conds);
+        }
+        if ($groupby) {
+            $this->builder->groupBy($groupby);
+        }
+        if ($isDistinct) {
+            $this->builder->distinct();
+        }
+        if ($limit > 0) {
+            if ($offset > 0) {
+                $this->builder->limit($limit, $offset);
+            }
+            $this->builder->limit($limit);
+        }
+
         $query = $this->builder->get()->getResultArray();
-        return $query;
+        return $query; 
     }
+
 
 
     /**

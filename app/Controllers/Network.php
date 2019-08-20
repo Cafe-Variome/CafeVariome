@@ -10,6 +10,7 @@
  */
 
 use App\Models\User;
+use App\Models\NetworkGroup;
 use App\Models\UIData;
 use App\Models\Source;
 use App\Helpers\AuthHelper;
@@ -76,6 +77,7 @@ class Network extends CVUI_Controller{
     function create_network() {
 
         $uidata = new UIData();
+        $networkGroupModel = new NetworkGroup($this->db);
         $uidata->data['title'] = "Create Network";
 
 
@@ -105,7 +107,7 @@ class Network extends CVUI_Controller{
                                         'group_type' => "master",
                                         'url' => $this->setting->settingData['installation_key']
                                     );
-            $network_group_id = $this->networkModel->createNetworkGroup($network_master_group_data);
+            $network_group_id = $networkGroupModel->createNetworkGroup($network_master_group_data);
 
             $this->session->setFlashdata('message', "Successfully created network $name");
 

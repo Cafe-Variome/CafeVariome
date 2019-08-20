@@ -70,16 +70,37 @@ class User extends Model{
 
         return ($query) ? $query : null;
     }
-
     /**
-     * Gets all users in the installation.
-     * @return array
-     */
+	 * getUsers
+     * 
+	 * General function to get fetch data from users table.
+     * 
+     * @author Mehdi Mehtarizadeh
+	 */
+	function getUsers(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
+		$this->builder = $this->db->table($this->table);
+		
+		if ($cols) {
+            $this->builder->select($cols);
+        }
+        if ($conds) {
+            $this->builder->where($conds);
+        }
+        if ($groupby) {
+            $this->builder->groupBy($groupby);
+        }
+        if ($isDistinct) {
+            $this->builder->distinct();
+        }
+        if ($limit > 0) {
+            if ($offset > 0) {
+                $this->builder->limit($limit, $offset);
+            }
+            $this->builder->limit($limit);
+        }
 
-    public function getUsers(){
-    $this->builder = $this->db->table($this->table);
-    $query = $this->builder->get()->getResultArray();
-    return ($query) ? $query : null;
+        $query = $this->builder->get()->getResultArray();
+        return $query; 
     }
 
     /**

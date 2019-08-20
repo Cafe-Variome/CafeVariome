@@ -19,13 +19,18 @@ class ValidationHelper{
         $this->db = \Config\Database::connect();
     }
 
+    /**
+     * unique_network_group_name_check
+     * @param string $group_name the user input to be checked for uniqueness.
+     * @param string $network_key the network key accompanying group name.
+     * 
+     * @return bool true if the network group name does not exist in the database, false otherwise.
+     * 
+     * @author Mehdi Mehtarizadeh
+     */
+    
     function unique_network_group_name_check(string $group_name, string $network_key): bool {
-        $session = \Config\Services::session();
-
-        $networkModel = new \App\Models\Network($this->db);
-        $token = $session->get('Token');
-
-        //return ($networkModel->getNetworkGroups('', array('network_key' => $network_key, 'name' => $group_name)) ? true : false);
-        return true;
+        $networkGroupModel = new \App\Models\NetworkGroup($this->db);
+        return ($networkGroupModel->getNetworkGroups('', array('network_key' => $network_key, 'name' => $group_name)) ? false : true);
     }
 }

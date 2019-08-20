@@ -11,8 +11,6 @@
 *
 */
 
-use App\Models\Settings;
-
 use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 
@@ -76,16 +74,6 @@ class Network extends Model{
 	 */
 	public function createNetwork ($data) {
 		$this->builder = $this->db->table($this->table);
-		$this->builder->insert($data);
-		$insert_id = $this->db->insertID();
-		return $insert_id;
-	}
-
-	/**
-	 * 
-	 */
-	function createNetworkGroup($data) {
-		$this->builder = $this->db->table('network_groups');
 		$this->builder->insert($data);
 		$insert_id = $this->db->insertID();
 		return $insert_id;
@@ -183,33 +171,7 @@ class Network extends Model{
 		return  $query ? $query[0] : null;
 	}
 
-	/**
-	 * @author Mehdi Mehtarizadeh
-	 * 
-	 * General function to get fetch data from network_groups table.
-	 */
-	function getNetworkGroups(string $cols, array $conds = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
-		$this->builder = $this->db->table('network_groups');
-		
-		if ($cols) {
-            $this->builder->select($cols);
-        }
-        if ($conds) {
-            $this->builder->where($conds);
-        }
-        if ($isDistinct) {
-            $this->builder->distinct();
-        }
-        if ($limit > 0) {
-            if ($offset > 0) {
-                $this->builder->limit($limit, $offset);
-            }
-            $this->builder->limit($limit);
-        }
 
-        $query = $this->builder->get()->getResultArray();
-        return $query; 
-	}
 
 	
 	function addUserToNetworkGroup($user_id, $group_id, $installation_key) {
