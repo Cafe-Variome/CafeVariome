@@ -75,15 +75,14 @@ function edit_user_network_groups_sources() {
 
     // Select all transferred items in the right hand side select element
     // so that they appear in the post request
-    $(".groupsSelected").find('option').each(function ()
-    {
-        $(this).attr('selected', 'selected');
+    $(".groupsSelected").find('option').each(function () {
+        $(this).prop("selected", true);
     });
 
     // Select all transferred items in the right hand side select element
     // so that they appear in the post request
     $(".sourcesSelected").find('option').each(function () {
-         $(this).attr('selected', 'selected');
+         $(this).prop("selected", true);
      });
 
     $('form[name="editUser"]').submit();

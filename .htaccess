@@ -8,7 +8,6 @@ Options All -Indexes
 # Turning on the rewrite engine is necessary for the following rules and features.
 # FollowSymLinks must be enabled for this to work.
 <IfModule mod_rewrite.c>
-	SetEnv CI_ENV development
 
 	Options +FollowSymlinks
 	RewriteEngine On
@@ -19,7 +18,7 @@ Options All -Indexes
 	# RewriteBase /
 
 	# Redirect Trailing Slashes...
-    RewriteRule ^(.*)/$ /$1 [L,R=301]
+    RewriteRule ^(.*)/$ $1 [L,R=301]
 
 	# Rewrite "www.example.com -> example.com"
 	RewriteCond %{HTTPS} !=on
@@ -39,7 +38,6 @@ Options All -Indexes
 </IfModule>
 
 <IfModule !mod_rewrite.c>
-	SetEnv CI_ENV development
 
     # If we don't have mod_rewrite installed, all 404's
     # can be sent to index.php, and everything works as normal.

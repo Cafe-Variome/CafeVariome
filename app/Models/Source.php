@@ -136,7 +136,7 @@ use CodeIgniter\Database\ConnectionInterface;
 
         $sources = $this->builder->get()->getResultArray();
 
-		return $sources ? $sources[0] : null;
+		return $sources;
 	}
 
     public function getSourceIDByName($source) {

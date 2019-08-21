@@ -136,20 +136,20 @@ class Network extends CVUI_Controller{
         $uidata = new UIData();
         $uidata->title = "Edit User Network Groups";
 
-        if ($this->request->getPost() /*&& $this->validation->withRequest($this->request)->run()*/){
+        if ($this->request->getPost()){
             if ($this->request->getVar('groups')) {
 
-                    $group_id = $this->request->getVar('id');
-                    $installation_key = $this->request->getVar('installation_key');
-    
-                    $this->networkModel->deleteAllUsersFromNetworkGroup($group_id);
-                    
-                    $network_key = "";
-                    foreach ($this->request->getVar('groups') as $user_id)
-                            $network_key = $this->networkModel->addUserToNetworkGroup($user_id, $group_id, $installation_key);
-    
-                    if($isMaster) 
-                        $this->networkModel->deleteUserFromAllOtherNetworkGroups($network_key,  $this->request->getVar('groups'));
+                $group_id = $this->request->getVar('id');
+                $installation_key = $this->request->getVar('installation_key');
+
+                $this->networkModel->deleteAllUsersFromNetworkGroup($group_id);
+                
+                $network_key = "";
+                foreach ($this->request->getVar('groups') as $user_id)
+                        $network_key = $this->networkModel->addUserToNetworkGroup($user_id, $group_id, $installation_key);
+
+                if($isMaster) 
+                    $this->networkModel->deleteUserFromAllOtherNetworkGroups($network_key,  $this->request->getVar('groups'));
             }
             else { // No groups selected so remove the user from all network groups
                     $group_id = $this->request->getVar('id');
@@ -157,15 +157,16 @@ class Network extends CVUI_Controller{
                     $installation_key =  $this->request->getVar('installation_key');
                     $this->networkModel->deleteAllUsersFromNetworkGroup($group_id, $isMaster);
             }
-    
             if ($this->request->getVar('sources')) {
-                    $group_id = $this->request->getVar('id');
-                    $installation_key = $this->request->getVar('installation_key');
-    
-                    $this->networkModel->deleteAllSourcesFromNetworkGroup($group_id, $installation_key);
-                    
-                    foreach ($this->input->post('sources') as $source_id)
-                            $this->networkModel->addSourceToNetworkGroup($source_id, $group_id, $installation_key);
+                $group_id = $this->request->getVar('id');
+                $installation_key = $this->request->getVar('installation_key');
+
+                $this->networkModel->deleteAllSourcesFromNetworkGroup($group_id, $installation_key);
+
+                foreach ($this->request->getVar('sources') as $source_id)
+                {
+                    $this->networkModel->addSourceToNetworkGroup($source_id, $group_id, $installation_key);
+                }
             }
             else { // No groups selected so remove the user from all network groups
                     $group_id = $this->request->getVar('id');
@@ -194,12 +195,12 @@ class Network extends CVUI_Controller{
             if(!$isMaster) {
                 $sources = $sourceModel->getSources();
                 $group_sources = $sourceModel->getSourceId($id);
-    
+
                 $ids = [];
                 
                 if ($group_sources) {
                     foreach ($group_sources as $key => $value)
-                    $ids[] = $value;
+                    $ids[] = $value['source_id'];
                 }
 
                 if($ids)
@@ -237,7 +238,6 @@ class Network extends CVUI_Controller{
                 foreach ($group_users as $group_user) {
 
                     for($i = 0; $i < count($users); $i++) {
-                        var_dump($users[$i]->id);
                         if($group_user['id'] == $users[$i]->id) {
                             unset($users[$i]);
                             $users = array_values($users);
@@ -260,7 +260,7 @@ class Network extends CVUI_Controller{
                 'value' =>set_value('remote_user_email'),
             );
             
-            $uidata->data['isMaster'] = $isMaster;
+            $uidata->data['isMaster'] = ($isMaster ? $isMaster : 0);
             $uidata->data['user_id'] = $id;
             $uidata->data['installation_key'] = $this->setting->settingData['installation_key'];
     
@@ -269,8 +269,6 @@ class Network extends CVUI_Controller{
             $data = $this->wrapData($uidata);
             return view('network/edit_network_groups_users', $data);
         }
-
-
     }
 
     /**

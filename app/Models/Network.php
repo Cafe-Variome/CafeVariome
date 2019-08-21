@@ -345,4 +345,11 @@ class Network extends Model{
 			return false;
 		}
 	}
+
+	function addSourceToNetworkGroup(int $source_id, int $group_id, string $installation_key) {
+		$networkGroupModel = new NetworkGroup($this->db);
+		$network_key = $networkGroupModel->getNetworkGroups("network_key", ['id' => $group_id]);
+		$this->builder = $this->db->table('network_groups_sources');
+		$this->builder->insert(array('source_id' => $source_id, 'group_id' => $group_id, 'installation_key' => $installation_key, 'network_key' => $network_key[0]['network_key']));
+	}
 }

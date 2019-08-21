@@ -39,6 +39,16 @@
             <td><?php echo $group['network_name']; ?></td>
             <td><?php echo $group['group_type']; ?></td>
             <td>
+            <?php $isMaster = $group['group_type'] == "master"; ?>
+            <?php if($isMaster): ?>
+                <a data-toggle="tooltip" data-placement="top" title="Assign sources to network group" href="<?php echo base_url('network/edit_user_network_groups'). "/" . $group['id'] . '/1'; ?>" >
+                    <i class="fa fa-database"></i>
+                </a> 
+            <?php else: ?>
+                <a data-toggle="tooltip" data-placement="top" title="Assign sources to network group" href="<?php echo base_url('network/edit_user_network_groups'). "/" . $group['id']; ?>" >
+                    <i class="fa fa-database"></i>
+                </a>             
+            <?php endif; ?>          
             <?php if ( $group['group_type'] == "master" ): ?>
                 <i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Unable to delete master network group"></i>
                 <!-- Unable to delete master network group -->

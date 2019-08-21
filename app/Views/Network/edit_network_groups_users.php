@@ -14,6 +14,15 @@
 	</div>	
 </div>
 <hr>
+<?php if($message): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-info">
+			<?php echo $message ?>
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
 <div class="row">
 	<div class="col">
     <?php if($group_type == 'master'): ?>
@@ -140,7 +149,7 @@
                 <i class="fa fa-backward"></i> Go back
             </a>
         <?php else: ?>
-            <a href="<?php echo base_url() . "groups"; ?>" class="btn btn-secondary" >
+            <a href="<?php echo base_url() . "networkgroup"; ?>" class="btn btn-secondary" >
             <i class="fa fa-backward"></i> Go back
             </a>
         <?php endif; ?>        

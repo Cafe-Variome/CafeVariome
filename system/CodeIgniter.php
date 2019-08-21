@@ -224,7 +224,6 @@ class CodeIgniter
 		$this->spoofRequestMethod();
 
 		Events::trigger('pre_system');
-
 		// Check for a cached page. Execution will stop
 		// if the page has been cached.
 		$cacheConfig = new Cache();

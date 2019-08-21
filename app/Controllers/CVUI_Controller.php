@@ -16,8 +16,8 @@ use CodeIgniter\Config\Services;
 
 class CVUI_Controller extends Controller{
 	
-	private $isProtected;
-	private $isAdmin;
+	private $isProtected = false;
+	private $isAdmin = false;
 	protected $db;
 
 	protected $session;
