@@ -356,7 +356,7 @@ class Network extends CVUI_Controller{
     }
 
     function edit_threshold($network_key) {
-        $network_threshold = AuthHelper::authPostRequest( array('network_key' => $network_key), $this->setting->settingData['auth_server'] . "/network/get_network_threshold");
+        $network_threshold = AuthHelper::authPostRequest(array('network_key' => $network_key), $this->setting->settingData['auth_server'] . "/network/get_network_threshold");
 
         $uidata = new UIData();
         $uidata->data['title'] = "Edit Network Threshold";
@@ -364,7 +364,9 @@ class Network extends CVUI_Controller{
         $uidata->data['network_threshold'] = $network_threshold;
         $uidata->data['network_key'] = $network_key;
 
+        $uidata->javascript = array(JS."/cafevariome/network.js");
         $data = $this->wrapData($uidata);
+
         return view('network/edit_network_threshold', $data);
     }
 

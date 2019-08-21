@@ -88,3 +88,29 @@ function edit_user_network_groups_sources() {
     $('form[name="editUser"]').submit();
 
 }
+
+
+function saveThreshold(event) { 
+    event.preventDefault();
+
+    if(isNaN($("#threshold").val()) || $("#threshold").val() < 0) {
+        alert("Invalid threshold value");
+        return;
+    }
+
+    $.ajax({
+        url: authurl + '/network/set_network_threshold',
+        type: 'POST',
+        dataType: 'JSON',
+        data: {network_key: $("#threshold_network_key").val(), network_threshold: $("#threshold").val()},
+        error: function (jqXhr, textStatus, errorMessage) { // error callback 
+        }
+    }).done(function(data) {
+        window.location = baseurl + "network";
+    });
+
+    //Temporary until proper response generated from auth server. (21/08/2019, Mehdi Mehtarizadeh)
+    window.location = baseurl + "network";
+
+}
+
