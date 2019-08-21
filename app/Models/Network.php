@@ -352,4 +352,22 @@ class Network extends Model{
 		$this->builder = $this->db->table('network_groups_sources');
 		$this->builder->insert(array('source_id' => $source_id, 'group_id' => $group_id, 'installation_key' => $installation_key, 'network_key' => $network_key[0]['network_key']));
 	}
+
+	function getSourcesForNetworkPartOfGroup(string $installation_key, string $network_key) {
+
+		$this->builder = $this->db->table('network_groups_sources s');
+		$this->builder->select("s.source_id, s.group_id");
+		$this->builder->join("network_groups g", "g.id = s.group_id");
+		$this->builder->where(array("g.network_key" =>$network_key, "s.installation_key" => $installation_key));
+		
+		$data = $this->builder->get()->getResultArray();
+		$sources = array();
+
+		foreach ($data as $value) {
+			if(!in_array($value['source_id'], $sources))
+				$sources[] = $value['source_id'];
+		}
+
+		return $sources;
+	}
 }

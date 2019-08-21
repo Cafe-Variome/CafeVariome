@@ -4,6 +4,7 @@
 use App\Helpers\AuthHelper;
 use App\Models\Settings;
 use App\Models\Source;
+use App\Models\Network;
 
 class Query extends CafeVariome{
     function __construct($parameters = []) {
@@ -246,9 +247,9 @@ class Query extends CafeVariome{
     public function search($json_string, string $network_key) {
         $session = \Config\Services::session();
         $sourceModel = new Source($this->db);
+        $networkModel = new Network($this->db);
 
-		error_log("Function: Search");
-    	//$jsonAPI = file_get_contents('php://input');
+        //$jsonAPI = file_get_contents('php://input');
     	// error_log("search: JSONAPI: $jsonAPI");
     	$api = json_decode($json_string, 1);
     	
@@ -259,32 +260,33 @@ class Query extends CafeVariome{
 		}
 		
 		$this->api = $api;
-		// error_log(print_r($this->api,1));
-		//temp data until api updated
+
+        //temp data until api updated
 		//$user_id = 145; 
 		//$network_key = "5339d2fff671474501fb36a2ede8c450";
         $installation_key = $this->setting->settingData['installation_key'];
 
     	$user_id = $session->get('user_id');
 
-
 		$bool = json_decode(AuthHelper::authPostRequest(array('installation_key' => $installation_key, 'network_key' => $network_key), $this->setting->settingData['auth_server'] . "network/checkInstallationIsAMemberOfANetwork"),1);
-        var_dump($sourceModel->getSourcesForInstallationThatUserIdHasCountDisplayGroupAccessTo($user_id, $installation_key));
 
-        exit;
-		// fetch sources for which the user has source display access
-		$sdg_arr = json_decode(AuthHelper::authPostRequest(array('user_id' => $user_id, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_installation_that_user_id_has_source_display_group_access_to"), 1);
+        // fetch sources for which the user has source display access       
+        //Localised the function (Mehdi Mehtarizadeh 21/08/2019)
+		//$sdg_arr = json_decode(AuthHelper::authPostRequest(array('user_id' => $user_id, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_installation_that_user_id_has_source_display_group_access_to"), 1);
+        $sdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, 'source_display');
 
         $sdg_ids = [];
 		if(!array_key_exists('error', $sdg_arr)) {
 			foreach ($sdg_arr as $s) {
 				$sdg_ids[$s['source_id']] = $s['source_id'];
 			}
-			// error_log("sdg IDs -> " . print_r($sdg_ids, 1));
-		}
-		// fetch sources for which the user has data display access (count display group)
-		$cdg_arr = json_decode(AuthHelper::authPostRequest(array('user_id' => $user_id, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_installation_that_user_id_has_count_display_group_access_to"), 1);
-		$cdg_ids = [];
+        }
+        
+        // fetch sources for which the user has data display access (count display group)
+        //Localised the function (Mehdi Mehtarizadeh 21/08/2019)
+		//$cdg_arr = json_decode(AuthHelper::authPostRequest(array('user_id' => $user_id, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_installation_that_user_id_has_count_display_group_access_to"), 1);
+        $cdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, 'count_display');
+        $cdg_ids = [];
 		if(!array_key_exists('error', $cdg_arr)) {
 			foreach ($cdg_arr as $s) {
 				$cdg_ids[$s['source_id']] = $s['source_id'];
@@ -293,11 +295,11 @@ class Query extends CafeVariome{
 		}		
 
 		// Fetch all source id part of the network for this installation
-		$network_sources = json_decode(AuthHelper::authPostRequest(array('network_key' => $network_key, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_network_part_of_group"), 1)['sources'];
-		// error_log("network_sources -> " . print_r($network_sources, 1));		
+		//$network_sources = json_decode(AuthHelper::authPostRequest(array('network_key' => $network_key, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_network_part_of_group"), 1)['sources'];
 
-    	$this->load->model('sources_model');
-		$sources = $this->sources_model->getSourcesForFederatedQuery(); // this and the above needs replacing with a sources model function to get all the data from local databases (need greg's new code)
+        $network_sources = $networkModel->getSourcesForNetworkPartOfGroup($installation_key, $network_key);
+
+        $sources = $sourceModel->getSources('source_id, name, description', array('type !=' => 'federated')); // this and the above needs replacing with a sources model function to get all the data from local databases (need greg's new code)
 		//end fetching sources
 
 		if(!isset($api['logic']) || empty($api['logic'])) {
@@ -336,4 +338,155 @@ class Query extends CafeVariome{
 		// error_log(json_encode($es5_counts));
 		echo json_encode($es5_counts);
     }
+
+    public function process_query($source, $pointer_array) {
+
+        // $notop = "/value:-/"; //needed to detech a NOT query
+		$element = [];
+    	$orarray = explode(") OR (", $pointer_array); //given that we convert all querys into a series of ors we can start by splitting them. (A and (B or c) = (A and B) or (A and C))
+    	
+    	// first step is to create counts for each core component search (the bits in '[]') so we know which order to collect IDs as this will reduce memory use or scan and scroll in ES
+		$numor = 0; // which or we are processing, start at first element in array
+		error_log("Getting Counts");
+    	foreach ($orarray as $and) { //each or element should be an and statement note that we are using brackets to distinguish elements that need to be queried together, i.e [chr:1 and pos:124]
+		    $andarray = explode("] AND [", $and); //create array of '[]' elements
+		    foreach ($andarray as $pointer) { // here we are going to query each '[]' and keep counts for each one.
+		    	// error_log("Pointer: $pointer");
+		        //remove any parantheses or brackets
+    		    $pointer = trim($pointer, "()[]/");
+				$type = explode('/', $pointer)[2];
+				$lookup = $this->getVal($this->api, $pointer);
+				$element[$numor]["$pointer"] = $this->component_switch($type,$lookup,$source,TRUE);
+		    }
+		    $numor++;
+		}
+
+		error_log(print_r($element, 1));
+		error_log("getting IDs");
+		$outids = []; // final output of ids that match query, return count of this.
+		foreach ($element as $current) {
+			asort($current); //sort the counts in an or statement so only need to keep array of smallest number of ids
+		    if (reset($current) == 0) continue; // if smallest is 0 then no need to continue as answer is 0
+		    $andids=[]; //array of ids for current or statement
+
+			foreach ($current as $pointer => $val){
+				$lookup = $this->getVal($this->api, $pointer);
+				$type = explode('/', $pointer)[2];
+
+				if (array_key_exists('operator',$lookup) === FALSE || (substr($lookup['operator'],0,6) !== 'is not' && $lookup['operator'] !== '!=')){
+					error_log("IS");
+					$ids = $this->component_switch($type,$lookup,$source,FALSE);
+					
+					if (count($andids) > 0){
+						$andids = array_intersect($andids, $ids);					
+					}else{
+						$andids = $ids;
+					}					
+				}
+			}
+
+			foreach ($current as $pointer => $val){
+				$type = explode('/', $pointer)[2];
+
+				$lookup = $this->getVal($this->api, $pointer);
+				if (array_key_exists('operator',$lookup) === TRUE && (substr($lookup['operator'],0,6) === 'is not' || $lookup['operator'] === '!=')){
+					error_log("IS NOT");
+					$ids = $this->component_switch($type,$lookup,$source,FALSE);
+
+					if (count($andids) > 0){
+						$andids = array_values(array_diff($andids, $ids));
+					}else{
+						$all_ids =  $this->sources_model->getAllUniqueSubjects($source, FALSE);					
+						$andids = array_values(array_diff($all_ids, $ids));
+					}
+				}
+			}
+
+
+		    $outids = array_unique(array_merge($outids,$andids), SORT_REGULAR);
+		    error_log("outids: " . print_r($outids, 1));
+		    
+		}
+		return $outids;
+	}
+
+    public function makeLogic(&$api) {
+		$api['logic'] = ['-AND' => []];
+		foreach ($api['query']['components'] as $component => $arr) {
+			if(!empty($arr)) {
+				$cnt = 0;
+				foreach ($arr as $entry)
+					array_push($api['logic']['-AND'], "/query/components/$component/" . $cnt++);
+			}
+		}
+    }
+    
+    function decouple($arr, $type = false) {
+		reset($arr); $type = key($arr); 
+		if($type !== 0) {
+			$arr = $arr[$type];
+		}
+		$str = '';
+		foreach ($arr as $key => $el) {
+			if(is_array($el)) {
+				if($this->is_assoc($el)) {
+					$out = $this->decouple($el);
+					if($type === '-AND') {
+						$str = $this->myMerge($this->mySplit($str), $this->mySplit($out));
+					} else {
+						$str = implode(',', array_merge($this->mySplit($str), $this->mySplit($out)));
+					}
+				} else {
+					return implode($type === '-AND' ? '' : ',', $el);
+				}
+			} else {
+				if($type === '-AND') {
+					$str = $this->myMerge($this->mySplit($str), [$el]);
+				} else {
+					$str = implode(',', array_merge($this->mySplit($str), [$el]));
+				}
+			}
+		}
+		return trim($str, ',');
+    }
+    
+    public function generate_pointer_query($result, $jex) {
+    	$qStr = '';
+		foreach (explode(',', $result) as $expOR) {
+		    $oStr = '';
+			foreach (explode('|', $expOR) as $expAND) {
+				$aStr = $expAND;
+		        $aStr = '[' . trim($aStr, ' AND ') . ']';
+		        $oStr .= $aStr . ' AND ';
+		   }
+		   $oStr = trim($oStr, ' AND ');
+		   $qStr .= "($oStr) OR ";
+		}
+		return trim($qStr, ' OR ');
+    }
+    
+    function mySplit($str) {return preg_split('/,/',$str, NULL, PREG_SPLIT_NO_EMPTY);}
+
+    function myMerge($arr1, $arr2) {
+		if(empty($arr1)) $arr = $arr2;
+		elseif(empty($arr2)) $arr = $arr1;
+		else foreach($arr1 as $a1) foreach($arr2 as $a2) $arr[] = $a1 . '|' . $a2;
+		return implode(',', $arr);
+    }
+    
+    function is_assoc($arr) {foreach ($arr as $key => $val) if(is_array($val)) return true; return false;}
+
+    function getVal($jex, $path) {
+		$pArr = explode('/', ltrim($path, '/'));
+		$path = "['" . implode("']['", $pArr) . "']";
+	    return eval("return \$jex{$path};");
+	}
+
+    public function component_switch($type,$lookup,$source,$iscount){
+		if ($type == "phenotype") return $this->phenotype_query($lookup, $source,$iscount);
+		elseif ($type == "sim") return $this->sim_query($lookup, $source, $iscount);
+		elseif ($type == "eav") return $this->eav_query($lookup, $source, $iscount);
+		elseif ($type == "subjectVariant") return $this->sv_query($lookup, $source, $iscount);
+
+	}
 }
