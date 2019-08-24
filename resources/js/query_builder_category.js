@@ -68,34 +68,34 @@ $(function() {
         var phen_attrib = []
         $.ajax({ url: urls['phen_json'], dataType: 'json'})
         .done((jsonData)=> { 
-            log(jsonData)
+            //log(jsonData)
             phen_data = jsonData[0];
 
             $.each( jsonData[0].chr, function( key, value ) {
-                console.log(key + ":" + value);
+                //console.log(key + ":" + value);
                 $('#values_chr').append($('<option></option>').attr('value', value.toLowerCase()).text('Chr:' + value));
             });
 
             $.each( jsonData[0].alternatebases,function( key, value ){
-                console.log(key + ":" + value);
+                //console.log(key + ":" + value);
 
                 $('select.values_altall').append($('<option></option>').attr('value', value.toLowerCase()).text(value))
             });
 
             $.each(jsonData[0].referencebases,function( key, value ) {
-                console.log(key + ":" + value);
+                //console.log(key + ":" + value);
 
                 $('select.values_refall').append($('<option></option>').attr('value', key.toLowerCase()).text(value))
             });
 
             $.each(JSON.parse(jsonData[1]), (hpo, ancestry) => {
-                console.log(hpo + ":" + ancestry);
+                //console.log(hpo + ":" + ancestry);
 
                 $('select#values_phen_left').append($('<option></option>').attr('value', ancestry).text(hpo))
             })
 
             $.each(attributes, function(k, v) {
-                console.log(k + ":" + v);
+                //console.log(k + ":" + v);
 
                 $('select.keys_pat').append($('<option></option>').attr('value', v.toLowerCase()).text(k))
             })
@@ -306,7 +306,7 @@ $(function() {
         $val.append('<option></option>');
 
         phen_data[$(this).val()].forEach(function(val) {
-            console.log(val);
+            //console.log(val);
             $val.append($('<option>', {
                 value: val,
                 text: val.toUpperCase()
@@ -328,8 +328,8 @@ $(function() {
     var modal_data = {};
 
     $('#build_query').click(() => {
-        $('#waiting').removeClass('hide')
-        $('#build_query').attr('disabled', 'disabled');
+        $('#waiting').show();
+        $('#build_query').prop('disabled', 'true');
         $('#query_result tbody').html('')
         $.ajax({ url: urls['qb_json'], dataType: 'json', })
         .done((jsonAPI) => {
@@ -426,8 +426,8 @@ $(function() {
             jsonAPI['query']['components']['phenotype'] = phe;
             jsonAPI['query']['components']['sim'] = sim;
             jsonAPI['logic'] = logic;
-            log(jsonAPI);
-            // log(JSON.stringify(jsonAPI));
+            //log(jsonAPI);
+             log(JSON.stringify(jsonAPI));
 
             $.ajax({url: baseurl + 'AjaxApi/query/' + $('#network_key').val(),
                 dataType: 'html',

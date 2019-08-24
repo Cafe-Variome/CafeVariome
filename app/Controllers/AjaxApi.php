@@ -41,7 +41,7 @@
         */
         $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
 
-        $cafeVariomeQuery->search($api, $network_key);
+        $resp['Phenopackets'] = $cafeVariomeQuery->search($api, $network_key);
         header('Content-Type: application/json');
         echo json_encode($resp);
     }

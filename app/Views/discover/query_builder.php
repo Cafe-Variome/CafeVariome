@@ -19,7 +19,7 @@
     <div class="col">
         <div class="card">
             <h5 class="card-header">PATIENT CHARACTERISTICS</h5>
-            <div class="card-body">
+            <div class="card-body" id="pat_container">
                 <div class="row rule">
                     <div class="col">
                         <select class="input-large attribute keys_pat" style="margin-bottom:15px" tabindex="-1">

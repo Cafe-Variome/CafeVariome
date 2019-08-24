@@ -165,8 +165,8 @@ class Admin extends CVUI_Controller{
     function get_phenotype_attributes_for_network($network_key) {
 
         $token = $this->session->get('Token');
+
         $installation_urls = json_decode(AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key'], 'network_key' => $network_key), $this->setting->settingData['auth_server'] . "network/get_all_installation_ips_for_network"), true);
-        error_log(print_r($installation_urls,1));
 
         $postdata = http_build_query(
                 array(

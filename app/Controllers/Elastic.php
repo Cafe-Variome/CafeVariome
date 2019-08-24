@@ -137,6 +137,7 @@ class Elastic extends CVUI_Controller{
         $force = $data->force;
         $source_id = $data->id;
         $add = $data->add;
+
         if ($force) {
             // if the regenerate was forced set the elastic state for all eav data rows
             error_log("as its forced we are setting elastic to 0");
@@ -146,9 +147,11 @@ class Elastic extends CVUI_Controller{
             $unprocessedFilesCount = $elasticModel->getUnprocessedFilesForSource($source_id);
             error_log("post: ".$unprocessedFilesCount);
         }
+        
         // rebuild the json list for interface
         $elasticModel->regenerateFederatedPhenotypeAttributeValueList($source_id);
         // Call in background the regenerate function
+        error_log("About to call shell_exec...");
         shell_exec("php " . getcwd() . "/index.php Task regenerateElasticsearchIndex " . $source_id ." ". $add);  	
     }
 

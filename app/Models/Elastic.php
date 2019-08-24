@@ -217,22 +217,33 @@ class Elastic extends Model{
         $result = $networkModel->getNetworkSourcesForCurrentInstallation();
 
         $phenotypeModel->deleteAllLocalPhenotypesLookup();
+
         delete_files("resources/phenotype_lookup_data/");
 
         if(isset($result['error'])) return;
+        error_log("before foreach");
 
         foreach ($result as $row) {
-            $data = $phenotypeModel->localPhenotypesLookupValues($row['source_id'], $row['network_key']);
+            try {
+                $data = $phenotypeModel->localPhenotypesLookupValues($row['source_id'], $row['network_key']);
+            } catch (\Exception $ex) {
+                var_dump($ex);
+                exit;
+            }
+
             $json_data = array();
             foreach ($data as $d) {
                 $json_data[] = array("attribute" => $d['phenotype_attribute'], "value" => rtrim($d['phenotype_values'], "|"));
             }
             $json_data = json_encode($json_data);
+            
             if (!file_exists('resources/phenotype_lookup_data/')) {
                 mkdir('resources/phenotype_lookup_data/', 777, true);
             }
             file_put_contents("resources/phenotype_lookup_data/" . $row['network_key'] . ".json", $json_data);
         }
+
+        error_log("after foreach");
 
         //HPO Ancestry JSON FILE
         $neo4jClient =  ClientBuilder::create()
@@ -248,26 +259,25 @@ class Elastic extends Model{
             if (!isset($sourceslist[$network])) $sourceslist[$network] = [];
             array_push($sourceslist[$network], $row[0]);
         }
-
+        error_log("Network Source Numbers: " . count($sourceslist));
         foreach ($sourceslist as $network => $sourcelist) {
             $hpo_terms = $phenotypeModel->getHPOTerms($sourcelist);
+
+            error_log("HPO Term Numbers: " . count($hpo_terms));
+
             foreach ($hpo_terms as $term){
                 $query = "MATCH (c:HPOterm{hpoid:\"".$term."\"})-[:IS_A]->(p:HPOterm) RETURN c.termname as termname, p.hpoid as ph";
-                error_log($query);
                 $result = $neo4jClient->run($query);
+
                 $pars = [];
                 $termname = '';
                 foreach ($result->getRecords() as $record) {
-                    error_log($record->value('ph'));
-                    error_log($record->value('termname'));
                     array_push($pars, $record->value('ph'));
                     $termname = $record->value('termname');
-
                 }  
                 $term .= ' (' . $termname . ')';
                 $ancestors = $this->collect_ids_neo4j('', $pars);
                 $hpo[$term] = $ancestors;
-                // error_log(print_r($hpo,1));
 
                 $flag = false;
                 while(!$flag) {
@@ -279,13 +289,11 @@ class Elastic extends Model{
 
                         if($t !== 'HP:0000001') {
                             $query = "MATCH (c:HPOterm{hpoid:\"".$t."\"})-[:IS_A]->(p:HPOterm) RETURN c.termname as termname, p.hpoid as ph";
-                            error_log($query);
                             $result = $neo4jClient->run($query);
 
                             $pars = [];
                             $termname = '';
                             foreach ($result->getRecords() as $record) {
-                                error_log($record->value('ph'));
                                 array_push($pars, $record->value('ph'));
                             } 
                             $parents = array_merge($parents, $this->collect_ids_neo4j($ancestor, $pars));
@@ -297,11 +305,9 @@ class Elastic extends Model{
                     $hpo[$term] = $parents;
                 }
             }
-
             foreach($hpo as $term => $ancestory) {
                 $hpo[$term] = implode('||', $ancestory);
             }
-            // print_r($hpo);
             file_put_contents("resources/phenotype_lookup_data/" . $network . "_hpo_ancestry.json", json_encode($hpo));
         }
 

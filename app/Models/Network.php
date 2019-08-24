@@ -346,6 +346,14 @@ class Network extends Model{
 		}
 	}
 
+	/**
+	 * addSourceToNetworkGroup
+	 * @param int $source_id
+	 * @param int $group_id
+	 * @param string $installation_key
+	 * 
+	 * @author Mehdi Mehtarizadeh
+	 */
 	function addSourceToNetworkGroup(int $source_id, int $group_id, string $installation_key) {
 		$networkGroupModel = new NetworkGroup($this->db);
 		$network_key = $networkGroupModel->getNetworkGroups("network_key", ['id' => $group_id]);
@@ -353,12 +361,21 @@ class Network extends Model{
 		$this->builder->insert(array('source_id' => $source_id, 'group_id' => $group_id, 'installation_key' => $installation_key, 'network_key' => $network_key[0]['network_key']));
 	}
 
+	/**
+	 * getSourcesForNetworkPartOfGroup
+	 * 
+	 * @param string $installation_key
+	 * @param string $network_key
+	 * 
+	 * @author Mehdi Mehtarizadeh
+	 */
 	function getSourcesForNetworkPartOfGroup(string $installation_key, string $network_key) {
 
 		$this->builder = $this->db->table('network_groups_sources s');
 		$this->builder->select("s.source_id, s.group_id");
 		$this->builder->join("network_groups g", "g.id = s.group_id");
-		$this->builder->where(array("g.network_key" =>$network_key, "s.installation_key" => $installation_key));
+		$this->builder->where("g.network_key" ,$network_key);
+		$this->builder->where("s.installation_key", $installation_key);
 		
 		$data = $this->builder->get()->getResultArray();
 		$sources = array();

@@ -30,10 +30,21 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->emptyTable();
     }
 
-    function localPhenotypesLookupValues($source_id, $network_key) {
+    /**
+     * localPhenotypesLookupValues
+     * Create Local Phenotype Lookup Values and insert them into database.
+     * 
+     * @param int $source_id
+     * @param string $network_key
+     * 
+     * @return array localPhenoTypes
+     */
+    function localPhenotypesLookupValues(int $source_id, string $network_key) {
         $eavModel = new EAV($this->db);
-        
+
         $data = $eavModel->getEAVsForSource($source_id);
+
+        $tempLocalPhenotypes = [];
 
         foreach ($data as $d) {
             $attr = $d['attribute'];
@@ -49,50 +60,47 @@ use CodeIgniter\Database\ConnectionInterface;
             		} else {
             			$value = $this->RoundSigDigs($value, $sigs);
             		}
-            		
             	}
             }
+
             $value = (string)$value;      
+
+            $local_phenotypes = [];
+
+            foreach ($tempLocalPhenotypes as $tlp) {
+                if ($tlp['phenotype_attribute'] == $attr) {
+                    array_push($local_phenotypes, $tlp);
+                }
+            }
             
-
-            $data2 = $this->getLocalPhenotypes(null,['network_key'=> $network_key, 'phenotype_attribute'=>$attr]);
-
-            if(count($data2) > 0) {
-                if(in_array($value, explode("|" , $data2[0]['phenotype_values'])) || (strpos($data2[0]['phenotype_values'], 'Not all values displayed|') !== false)) continue;
+            if(count($local_phenotypes) > 0) {
+                $lastLP = array_pop($local_phenotypes);
+                if(in_array($value, explode("|" , $lastLP['phenotype_values'])) || (strpos($lastLP['phenotype_values'], 'Not all values displayed|') !== false)) continue;
                 else {
                     // Allow displaying of all values
-                    $val = $data2[0]['phenotype_values'] . $value . "|";
-                    $localPhenoTypeUpdateData = ["phenotype_values"=>$val];
-                    $this->updateLocalPhenoTypes($localPhenoTypeUpdateData, ["lookup_id"=>$data2[0]['lookup_id']]);
+                    $val = $lastLP['phenotype_values'] . $value . "|";
+                    $tempLocalPhenotypes[$attr]['phenotype_values'] = $val;
+                    $tempLocalPhenotypes[$attr]['phenotype_attribute'] = $attr;
                 }
             } else {
                 $value = $value . "|";
-                $data = array(
-	                'network_key' =>  $network_key,
-	                'phenotype_attribute' => $attr,
-	                'phenotype_values' => $value);
-				$this->createLocalPhenoTypeLookup($data);
+
+                $tempLocalPhenotypes[$attr] = ["network_key" => $network_key, "phenotype_attribute" => $attr, "phenotype_values" => $value];
             }
+            
         }
-
-        return $this->getLocalPhenotypes('phenotype_attribute, phenotype_values', ["network_key"=>$network_key]);
+        foreach ($tempLocalPhenotypes as $tlp) {
+            $attr = $tlp['phenotype_attribute'];
+            $value = $tlp['phenotype_values'];
+            $sql = "INSERT INTO `local_phenotypes_lookup`(`network_key`, `phenotype_attribute`, `phenotype_values`) VALUES ('$network_key', '$attr', '$value')";
+            $this->db->query($sql);
+        }
+        return $tempLocalPhenotypes;
     }
 
-    function getLocalPhenotypes(string $cols = null,array $conds = null){
+    function updateLocalPhenoTypes(array $updateData,array $conds){
 
-        $this->builder = $this->db->table('local_phenotypes_lookup');
-        if ($cols) {
-            $this->builder->select($cols);
-        }
-        if($conds){
-            $this->builder->where($conds);
-        }
-        $query = $this->builder->get()->getResultArray();
-
-        return $query;
-    }
-
-    function updateLocalPhenoTypes(array $updateData,array $conds = null){
+        
         $this->builder = $this->db->table('local_phenotypes_lookup');
         if($updateData) {
             if($conds){
@@ -100,6 +108,7 @@ use CodeIgniter\Database\ConnectionInterface;
             }
             $this->builder->update($updateData);
         }
+        
     }
 
     function createLocalPhenoTypeLookup($data){

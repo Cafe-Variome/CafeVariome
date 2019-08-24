@@ -269,13 +269,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         $sourceModel->toggleSourceLock($source_id); 		      
     }
 
-    public function regEl($id){
 
-        $elasticModel = new Elastic($this->db);
-
-        $elasticModel->regenerateFederatedPhenotypeAttributeValueList($id);
-
-    }
     /**
      * bulkUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
      *

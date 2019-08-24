@@ -42,7 +42,7 @@ function regenElastic(id,add) {
           success: function (data) {
             console.log(data);
             data = $.parseJSON(data);
-              if (data.Status == "Success") {
+              //if (data.Status == "Success") {
                 $.ajax({url  : baseurl + 'elastic/elastic_start',
                   type: 'POST',
                   data : {u_data : JSON.stringify(dataArray)},
@@ -51,13 +51,13 @@ function regenElastic(id,add) {
                 });
                 setToOff(data.Time);
                 //elasticSearchInterval(id);
-              }
-              else if (data.Status == "Empty") {
-                alert("This Source doesnt have any data uploaded to it yet. Please go to Data tab to rectify this.");
-              }
-              else {
-                  alert("ElasticSearch is fully up to date. Upload more data first.");
-              }
+              //}
+              //else if (data.Status == "Empty") {
+              //  alert("This Source doesnt have any data uploaded to it yet. Please go to Data tab to rectify this.");
+              //}
+             // else {
+              //    alert("ElasticSearch is fully up to date. Upload more data first.");
+              //}
   
           }
       });

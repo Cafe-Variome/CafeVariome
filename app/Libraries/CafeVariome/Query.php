@@ -5,8 +5,13 @@ use App\Helpers\AuthHelper;
 use App\Models\Settings;
 use App\Models\Source;
 use App\Models\Network;
+use App\Models\Elastic;
 
+use Elasticsearch\ClientBuilder;
 class Query extends CafeVariome{
+
+    private $elasticClient;
+
     function __construct($parameters = []) {
         if (array_key_exists('syntax', $parameters)) {
             $this->syntax = $parameters['syntax'];
@@ -17,6 +22,8 @@ class Query extends CafeVariome{
 
         $this->setting =  Settings::getInstance($this->db);
 
+        $hosts = array($this->setting->settingData['elastic_url']);
+        $this->elasticClient =  ClientBuilder::create()->setHosts($hosts)->build();
     }
 
     function parse($query) {
@@ -252,7 +259,7 @@ class Query extends CafeVariome{
         //$jsonAPI = file_get_contents('php://input');
     	// error_log("search: JSONAPI: $jsonAPI");
     	$api = json_decode($json_string, 1);
-    	
+
     	if(json_last_error() !== JSON_ERROR_NONE) {
     		header('Content-Type: application/json');
 	        echo $this->error_codes['400'];
@@ -310,14 +317,16 @@ class Query extends CafeVariome{
 		error_log($result);
 
 		$pointer_query = $this->generate_pointer_query($result, $api);
-		error_log("Pointer query: " . $pointer_query . "\n");
+		//error_log("Pointer query: " . $pointer_query . "\n");
+		//error_log("Network Sources: " . print_r($network_sources) . "\n");
 
 		// $es5_query = $this->generate_es5_query($result, $api);
 		// error_log("search: ES query: " . str_replace('@@@', ' ', $es5_query) . "\n");
 
 		// $sources = ['test_pheno_upload', 'ga4gh_search', 'icm-brice', 'semmelweis-balicza', 'test_spout', 'pseudosubject', 'omim'];
 		// $sources = [['source_id' => "1", 'name' => "test_pheno_upload"]];
-		$sources = [['source_id' => "1", 'name' => "pseudosubject"]];
+        //$sources = [['source_id' => "1", 'name' => "pseudosubject"]];
+        $es5_counts = [];
 		foreach ($sources as $source_array) {
 			$source_id = $source_array['source_id'];
 			if(!in_array($source_id, $network_sources)) continue; //as above
@@ -332,7 +341,7 @@ class Query extends CafeVariome{
 				// add code to return data or link for sources where user has access
 			}			
 		}
-		error_log("Source result: " . print_r($es5_counts, 1));
+		//error_log("Source result: " . print_r($es5_counts, 1));
 
 		header('Content-Type: application/json');
 		// error_log(json_encode($es5_counts));
@@ -408,9 +417,71 @@ class Query extends CafeVariome{
 		    
 		}
 		return $outids;
+    }
+    
+    public function eav_query($lookup,$source, $iscount = TRUE){
+        $elasticModel = new Elastic($this->db);
+        $sourceModel = new Source($this->db);
+        
+		// $lookup = $this->getVal($this->api, $pointer);
+		// if ($lookup['operator'] === '!=') $lookup['operator'] = 'is not';
+		$isnot = ($iscount == TRUE && (substr($lookup['operator'],0,6) === 'is not' || $lookup['operator'] === '!=')) ? TRUE : FALSE; 
+
+        $paramsnew = [];
+        $sourceId = $sourceModel->getSourceIDByName($source);
+        $es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;
+        
+		$paramsnew = ['index' => $es_index, 'size' => 0, 'type' => 'subject'];
+        $paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source; // for source
+
+		$tmp[]['match'] = ['attribute' => $lookup['attribute']];
+
+		switch($lookup['operator']) {
+			case 'is': case '=': case 'is not': case '!=':
+				$tmp[]['match'] = ['value.raw' => $lookup['value']];
+				break;
+			case 'is like': case 'is not like':
+				$tmp[]['wildcard'] = ['value.raw' => $lookup['value']];
+				break;
+			case '>':
+				$tmp[]['range'] = ['value.d' => [ 'gt' => $lookup['value']]];
+				break;
+			case '>=':
+				$tmp[]['range'] = ['value.d' => [ 'gte' => $lookup['value']]];
+				break;
+			case '<':
+				$tmp[]['range'] = ['value.d' => [ 'lt' => $lookup['value']]];
+				break;
+			case '<=':
+				$tmp[]['range'] = ['value.d' => [ 'lte' => $lookup['value']]];
+				break;
+
+		}	
+		$arr = [];		
+		$arr['has_child']['type'] = 'eav';
+		$arr['has_child']['query']['bool']['must'] = $tmp;	
+		$paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
+		$paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
+
+		error_log(json_encode($paramsnew));
+
+		$esquery = $this->elasticClient->search($paramsnew);
+
+		if ($iscount) $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
+		else $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
+
+		if ($isnot){ 
+			$this->load->model('sources_model');
+			$all_ids = $iscount==TRUE ? $this->sources_model->getAllUniqueSubjects($source) : $this->sources_model->getAllUniqueSubjects($source, FALSE);
+			$result = $iscount==TRUE ? $all_ids - $result : array_diff($all_ids,$result) ;
+		}
+		error_log(json_encode($result));
+		return $result;
+		
 	}
 
     public function makeLogic(&$api) {
+
 		$api['logic'] = ['-AND' => []];
 		foreach ($api['query']['components'] as $component => $arr) {
 			if(!empty($arr)) {

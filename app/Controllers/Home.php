@@ -25,9 +25,22 @@ class Home extends CVUI_Controller
 		//$result = $netModel->getAllNetworksSourcesBySourceId(4);
 
 		$this->setting = Settings::getInstance($this->db);
+		//echo substr(php_uname(), 0, 7);
+		//$result = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/get_networks_installation_member_of_with_other_installation_details");
 
-		$result = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/get_networks_installation_member_of_with_other_installation_details");
-		var_dump($result);
+		$sql = "select phenotype_attribute, phenotype_values, network_key from local_phenotypes_lookup where network_key='782565b548c00559ba245d70af042f6b'";
+        $local_phenotypes = $this->db->query($sql)->getResultArray();
+
+        //var_dump($local_phenotypes);
+		$i = 0;
+		$my_arr = [];
+		$my_arr[$i] = "medelou";
+		$i++;
+		$my_arr[$i] = "mmmmm";
+
+		var_dump($my_arr);
+		$my_arr[$i] = "56456456";
+		var_dump($my_arr);
 		exit;
 
 		echo view('home/index', $data);
