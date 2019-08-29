@@ -41,7 +41,8 @@ class Discover extends CVUI_Controller{
 
         if ($network_key) {
             $this->session->set(array('network_key' => $network_key));
-        } else {
+        } 
+        else {
             return redirect()->to(base_url('discover/proceed_to_query/query_builder'));
         }
 
@@ -118,7 +119,7 @@ class Discover extends CVUI_Controller{
                     $uidata->javascript = array(JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_precan_v2_category.js', JS.'query_builder_advanced_v2_category.js');
                 } else {
                     $uidata->data['precanned_queries'] = json_decode(file_get_contents(base_url() . "resources/precanned.json"), 1);
-                 $uidata->javascript = array(JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_precan.js', JS.'query_builder_advanced.js');
+                    $uidata->javascript = array(JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_precan.js', JS.'query_builder_advanced.js');
                 }
 
                 $uidata->data['qb_basic'] = $basic ? 1 : 0;

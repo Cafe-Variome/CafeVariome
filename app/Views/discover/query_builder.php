@@ -13,8 +13,6 @@
 </div>
 <hr>
 
-
-
 <div class="row mb-2">
     <div class="col">
         <div class="card">
@@ -22,12 +20,12 @@
             <div class="card-body" id="pat_container">
                 <div class="row rule">
                     <div class="col">
-                        <select class="input-large attribute keys_pat" style="margin-bottom:15px" tabindex="-1">
+                        <select class="form-control attribute keys_pat" style="margin-bottom:15px" tabindex="-1">
                             <option></option>
                         </select>
                     </div>
                     <div class="col">
-                        <select class="input-large conditions" tabindex="-1">
+                        <select class="form-control conditions" tabindex="-1">
                             <option></option>
                             <option value="is">IS</option>
                             <option value="is like">IS LIKE</option>
@@ -43,7 +41,7 @@
                         </select>
                     </div>
                     <div class="col">
-                        <select class="input-large value values_pat" style="margin-bottom:15px" tabindex="-1">
+                        <select class="form-control value values_pat" style="margin-bottom:15px" tabindex="-1">
                             <option></option>
                         </select>
                     </div>
@@ -57,37 +55,37 @@
     </div>
 </div>
 
-<div class="row mb-2" style="display:none;">
+<div class="row mb-2">
     <div class="col">
         <div class="card">
             <h5 class="card-header">VARIANT</h5>
             <div class="card-body">
                 <div class="row">
                     <div class="col">
-                        <select class="input-medium values values_assembly" tabindex="-1">
+                        <select class="form-control values values_assembly" tabindex="-1">
                             <option></option>
                             <option value='GRCh37' selected="">GRCh37</option>
                         </select>
                     </div>
                     <div class="col">
-                        <select class="input-small values" id="values_chr" tabindex="-1">
+                        <select class="form-control values" id="values_chr" tabindex="-1">
                             <option></option>
                         </select>
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control input-small values_start" placeholder="Chr start" value="42929130">
+                        <input type="text" class="form-control values_start" placeholder="Chr start" value="42929130">
                     </div>
                     <div class="col">
-                        <input type="text" class="form-control input-small values_end" placeholder="Chr end" value="42929131">
+                        <input type="text" class="form-control values_end" placeholder="Chr end" value="42929131">
                     </div>
                     
                     <div class="col">
-                        <select class="input-small values_refall" style="margin-bottom:15px" tabindex="-1">
+                        <select class="form-control values_refall" style="margin-bottom:15px" tabindex="-1">
                             <option></option>
                         </select>
                     </div>
                     <div class="col">
-                        <select class="input-small values_altall" style="margin-bottom:15px" tabindex="-1">
+                        <select class="form-control values_altall" style="margin-bottom:15px" tabindex="-1">
                             <option></option>
                         </select>
                     </div>
@@ -169,12 +167,29 @@
         </div>
     </div>
     <!-- end Phenotype Box -->
-    <br>
-    <div class="row-fluid" id="reset_buildQuery">
-        <div class="">
-            <a class="span2 offset4 btn btn-large" id="reset_query"><i class="icon-trash"></i> Reset</a>
-            <a class="span2 btn btn-large btn-primary" id="build_query"><i class="icon-search"></i> Build Query</a>
-        </div>
+
+</div>
+</div>
+
+<div class="row" id="reset_buildQuery">
+    <div class="col">
+        <a class="btn btn-secondary  btn-lg" id="reset_query"><i class="fa fa-trash"></i> Reset</a>
+        <a class="btn btn-lg btn-primary" id="build_query"><i class="fa fa-search"></i> Build Query</a>
     </div>
 </div>
+
+<hr/>
+
+<table id="query_result" class="table table-hover table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Source</th>
+            <th>Counts</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+
+    
 <?= $this->endSection() ?>

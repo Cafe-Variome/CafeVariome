@@ -17,7 +17,7 @@
         "codeigniter4/framework": "dev-master",
         "twbs/bootstrap": "^4.3",
         "benedmunds/codeigniter-ion-auth": "4.x-dev",
-		"elasticsearch/elasticsearch": "^7.0",
+		"elasticsearch/elasticsearch": "^7.2",
         "select2/select2": "^4.0.7",
         "datatables/datatables": "^1.10.19",
         "phpoffice/phpspreadsheet": "^1.8.2",

@@ -28,22 +28,11 @@
 
     function query($network_key = '') {
         $api = json_encode($this->request->getVar('jsonAPI'));
-        
-        /*
-        $url = 'https://www194.lamp.le.ac.uk/phenopackets_demo/discovery/search';
-        $ch = curl_init($url);
-        $payload = $api;
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $resp['Phenopackets'] = curl_exec($ch);
-        curl_close($ch);
-        */
-        $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
 
+        $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
         $resp['Phenopackets'] = $cafeVariomeQuery->search($api, $network_key);
-        header('Content-Type: application/json');
-        echo json_encode($resp);
+
+        return json_encode($resp);
     }
 
  }

@@ -6,11 +6,13 @@ use App\Models\Settings;
 use App\Models\Source;
 use App\Models\Network;
 use App\Models\Elastic;
+use App\Models\EAV;
 
 use Elasticsearch\ClientBuilder;
 class Query extends CafeVariome{
 
     private $elasticClient;
+    private $db;
 
     function __construct($parameters = []) {
         if (array_key_exists('syntax', $parameters)) {
@@ -256,8 +258,6 @@ class Query extends CafeVariome{
         $sourceModel = new Source($this->db);
         $networkModel = new Network($this->db);
 
-        //$jsonAPI = file_get_contents('php://input');
-    	// error_log("search: JSONAPI: $jsonAPI");
     	$api = json_decode($json_string, 1);
 
     	if(json_last_error() !== JSON_ERROR_NONE) {
@@ -298,7 +298,6 @@ class Query extends CafeVariome{
 			foreach ($cdg_arr as $s) {
 				$cdg_ids[$s['source_id']] = $s['source_id'];
 			}
-			// error_log("cdg IDs: -> " . print_r($cdg_ids, 1));
 		}		
 
 		// Fetch all source id part of the network for this installation
@@ -314,15 +313,11 @@ class Query extends CafeVariome{
 		}
 		
 		$result = $this->decouple($api['logic']); // convert to ORs(AND, AND)
-		error_log($result);
+		error_log("Decouple result : ".$result);
 
 		$pointer_query = $this->generate_pointer_query($result, $api);
-		//error_log("Pointer query: " . $pointer_query . "\n");
-		//error_log("Network Sources: " . print_r($network_sources) . "\n");
 
 		// $es5_query = $this->generate_es5_query($result, $api);
-		// error_log("search: ES query: " . str_replace('@@@', ' ', $es5_query) . "\n");
-
 		// $sources = ['test_pheno_upload', 'ga4gh_search', 'icm-brice', 'semmelweis-balicza', 'test_spout', 'pseudosubject', 'omim'];
 		// $sources = [['source_id' => "1", 'name' => "test_pheno_upload"]];
         //$sources = [['source_id' => "1", 'name' => "pseudosubject"]];
@@ -341,14 +336,14 @@ class Query extends CafeVariome{
 				// add code to return data or link for sources where user has access
 			}			
 		}
-		//error_log("Source result: " . print_r($es5_counts, 1));
 
-		header('Content-Type: application/json');
-		// error_log(json_encode($es5_counts));
-		echo json_encode($es5_counts);
+		return json_encode($es5_counts);
     }
 
     public function process_query($source, $pointer_array) {
+        $sourceModel = new Source($this->db);
+
+        $sourceId = $sourceModel->getSourceIDByName($source);
 
         // $notop = "/value:-/"; //needed to detech a NOT query
 		$element = [];
@@ -388,7 +383,8 @@ class Query extends CafeVariome{
 					
 					if (count($andids) > 0){
 						$andids = array_intersect($andids, $ids);					
-					}else{
+                    }
+                    else{
 						$andids = $ids;
 					}					
 				}
@@ -405,15 +401,20 @@ class Query extends CafeVariome{
 					if (count($andids) > 0){
 						$andids = array_values(array_diff($andids, $ids));
 					}else{
-						$all_ids =  $this->sources_model->getAllUniqueSubjects($source, FALSE);					
-						$andids = array_values(array_diff($all_ids, $ids));
+                        $eavModel = new EAV($this->db);
+
+                        $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source'=> $sourceId, 'elastic' => 1], true);	
+                        $uniqueSubjectIds = [];
+                        foreach ($uniqueSubjectIdsArray as $uid) {
+                            array_push($uniqueSubjectIds, $uid['subject_id']);
+                        }		
+						$andids = array_values(array_diff($uniqueSubjectIds, $ids));
 					}
 				}
 			}
 
 
 		    $outids = array_unique(array_merge($outids,$andids), SORT_REGULAR);
-		    error_log("outids: " . print_r($outids, 1));
 		    
 		}
 		return $outids;
@@ -431,8 +432,9 @@ class Query extends CafeVariome{
         $sourceId = $sourceModel->getSourceIDByName($source);
         $es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;
         
-		$paramsnew = ['index' => $es_index, 'size' => 0, 'type' => 'subject'];
-        $paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source; // for source
+		//$paramsnew = ['index' => $es_index, 'size' => 0, 'type' => 'subject'];
+		$paramsnew = ['index' => $es_index];
+        $paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source . "_eav"; // for source
 
 		$tmp[]['match'] = ['attribute' => $lookup['attribute']];
 
@@ -463,21 +465,28 @@ class Query extends CafeVariome{
 		$paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
 		$paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
 
-		error_log(json_encode($paramsnew));
-
 		$esquery = $this->elasticClient->search($paramsnew);
 
-		if ($iscount) $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
-		else $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
-
+        if ($iscount){
+            $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
+        }
+        else{
+            $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
+        }
 		if ($isnot){ 
-			$this->load->model('sources_model');
-			$all_ids = $iscount==TRUE ? $this->sources_model->getAllUniqueSubjects($source) : $this->sources_model->getAllUniqueSubjects($source, FALSE);
-			$result = $iscount==TRUE ? $all_ids - $result : array_diff($all_ids,$result) ;
-		}
-		error_log(json_encode($result));
-		return $result;
-		
+            $eavModel = new EAV($this->db);
+            $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source'=> $sourceId, 'elastic' => 1], true);	
+            $uniqueSubjectIds = [];
+            foreach ($uniqueSubjectIdsArray as $uid) {
+                array_push($uniqueSubjectIds, $uid['subject_id']);
+            }	
+            
+            $all_ids = ($iscount==TRUE) ? count($uniqueSubjectIds) : $uniqueSubjectIds;
+            $result = $iscount==TRUE ? $all_ids - $result : array_diff($all_ids,$result) ;
+
+        }
+
+        return $result;
 	}
 
     public function makeLogic(&$api) {

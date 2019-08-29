@@ -118,6 +118,9 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * VCF Elastic - Insert into ElasticSearch VCF Files
      *
      * Imported from elastic controller by Mehdi Mehtarizadeh (06/08/2019)
+     *
+     * 08/2019 Removal of mapping types 
+     * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html
      * 
      * @param int $source_id - The source we are inserting into
      * @return N/A
@@ -127,12 +130,12 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         $hosts = array($this->setting->settingData['elastic_url']);
         $elasticClient =  \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
 
-        error_log("vcfElastic");
-
         $uploadModel = new Upload($this->db);
         $elasticModel = new Elastic($this->db);
         $sourceModel = new Source($this->db);
 
+        //Chunk size for bulk indexing in Elasticsearch
+        $chunkSize = 100;
         // Get Pending VCF Files
         $vcf = $elasticModel->getvcfPending($source_id);
 
@@ -154,26 +157,25 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             $params = [];
             $params['index'] = $index_name;
             $map = '{
-                "settings":{ },
                 "mappings":{
-                    "subject":{
-                        "properties":{
-                            "eav_rel":{"type": "join", "relations": {"sub":"eav"}},
-                            "type": {"type": "keyword"},
-                            "subject_id": {"type": "keyword"},
-                            "patient_id": {"type": "keyword"},
-                            "file_name": {"type": "keyword"},
-                            "source": {"type":"keyword"},
-                            "attribute":{"type":"keyword"},
-                            "value":{"type":"text", "fields": {"raw":{"type": "keyword"}, "d":{"type": "long", "ignore_malformed": "true"}, "dt":{"type": "date", "ignore_malformed": "true"}}}                              
-                        }
-                    }
+                    "properties":{
+                        "eav_rel":{"type": "join", "relations": {"sub":"eav"}},
+                        "type": {"type": "keyword"},
+                        "subject_id": {"type": "keyword"},
+                        "patient_id": {"type": "keyword"},
+                        "file_name": {"type": "keyword"},
+                        "source": {"type":"keyword"},
+                        "attribute":{"type":"keyword"},
+                        "value":{"type":"text", "fields": {"raw":{"type": "keyword"},
+                         "d":{"type": "long", "ignore_malformed": "true"},
+                         "dt":{"type": "date", "ignore_malformed": "true"}}}                              
+                    }    
                 }
             }'; 
             $map2 = json_decode($map,1);
             $params['body'] = $map2;		  
-            error_log("params: ".var_dump($params));
-            $response = $elasticClient->index($params);
+            //error_log("params: ".var_dump($params));
+            $elasticClient->indices()->create($params);
             $source_name = $sourceModel->getSourceNameByID($source_id);
             
             // Open file for reading
@@ -182,6 +184,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             $config = ["AF"];
             $headers = [];
             $counter = 0;
+            
             if ($handle) {
                 // Read file line by line
                 while (($line = fgets($handle)) !== false) {
@@ -202,12 +205,17 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                         $values = explode("\t", $line);
                         $link = md5(uniqid());
                         // create parent document
-                        $bulk['body'][] = ["index"=>["_index"=>$index_name, "_type"=>"subject","_id"=>$link]];
-                        $bulk['body'][] = ["record_id"=>$patient, "patient_id"=>$patient, "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_vcf"];
+                        //$bulk['body'][] = ["index"=>["_index"=>$index_name, "_type"=>"subject","_id"=>$link]];
+                        //$bulk['body'][] = ["record_id"=>$patient, "patient_id"=>$patient, "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_vcf"];
+                        $bulk_body_head = ["index"=>["_index"=>$index_name],"_id"=>$link];
+                        $bulk_body_tail = ["record_id"=>$patient, "patient_id"=>$patient, "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_vcf"];
+                        
+                        $bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
+
                         $counter++;
                         // Every thousand documents perform a bulk operation to ElasticSearch
-                        if ($counter%1000 == 0) {      
-                            $responses = $elasticClient->bulk($bulk);			  
+                        if ($counter % $chunkSize == 0) {      
+                            $responses = $elasticClient->bulk($bulk);	
                             $bulk=[];
                             unset ($responses);
                         }
@@ -220,13 +228,20 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                                 foreach ($val as $v) {
                                     if (in_array($v[0], $config)) {
                                         $id = md5(uniqid());
-                                        $bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "routing"=>$link,"_id"=>$id]];
-                                        $bulk['body'][] = ["record_id"=>$values[2], "patient_id"=> $patient,"attribute"=>$v[0],"value"=>$v[1], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                        //$bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "routing"=>$link,"_id"=>$id]];
+                                        //$bulk['body'][] = ["record_id"=>$values[2], "patient_id"=> $patient,"attribute"=>$v[0],"value"=>$v[1], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                        $bulk['routing'] = $link;
+                                        $bulk_body_head = ["index"=>["_index"=>$index_name],"_id"=>$id];
+                                        $bulk_body_tail = ["record_id"=>$values[2], "patient_id"=>$patient, "attribute"=>$v[0],"value"=>$v[1], "eav_rel"=>["name"=>"eav"], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                        
+                                        $bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
+
                                         $counter++;	
-                                        if ($counter%1000 == 0) {      
+                                        if ($counter % $chunkSize == 0) {      
                                             error_log($counter);          	
                                             $responses = $elasticClient->bulk($bulk);
-                                            
+                                            var_dump($responses);		  
+
                                             $bulk=[];
                                             unset ($responses);
                                         }
@@ -238,10 +253,16 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                             }		              
                             else {
                                 $id = md5(uniqid());
-                                $bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "routing"=>$link,"_id"=>$id]];
-                                $bulk['body'][] = ["record_id"=>$patient, "patient_id"=> $patient,"attribute"=>$headers[$i],"value"=>$values[$i], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                //$bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "routing"=>$link,"_id"=>$id]];
+                                //$bulk['body'][] = ["record_id"=>$patient, "patient_id"=> $patient,"attribute"=>$headers[$i],"value"=>$values[$i], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                $bulk['routing'] = $link;
+                                $bulk_body_head = ["index"=>["_index"=>$index_name],"_id"=>$id];
+                                $bulk_body_tail = ["record_id"=>$patient, "patient_id"=>$patient,"attribute"=>$headers[$i],"value"=>$values[$i],"eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                
+                                $bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);  
+                                
                                 $counter++;		
-                                if ($counter%1000 == 0) {      
+                                if ($counter % $chunkSize == 0) {      
                                     error_log($counter);          	
                                     $responses = $elasticClient->bulk($bulk);
                                     
@@ -418,6 +439,9 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     /**
      * Regenerate ElasticSearch Index - Loop through the MySQL eavs table to add to ElasticSearch
      *
+     * 08/2019 Removal of mapping types 
+     * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html
+     * 
      * @param int $source_id - The source we are updating ElasticSearch for
      * @param int $add            - Whether we are adding data without fully remaking the index 
      * @return N/A
@@ -459,30 +483,27 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         // If we need to - create a new index
         if ($flag) {
             $map = '{  
-                "settings":{},
                 "mappings":{
-                    "subject":{
-                        "properties":{
-                            "eav_rel":{"type": "join", "relations": {"sub":"eav"}},
-                            "type": {"type": "keyword"},
-                            "subject_id": {"type": "keyword"},
-                            "source": {"type":"keyword"}, 
-                            "attribute":{"type":"keyword"},
-                            "value":{
-                                "type":"text",
-                                "fields": 
-                                    {"raw":{"type": "keyword"},
-                                    "d":{"type": "double", "ignore_malformed": "true"},
-                                    "dt":{"type": "date", "ignore_malformed": "true"}}}           
-                        }
-                    }
+                    "properties":{
+                        "eav_rel":{"type": "join", "relations": {"sub":"eav"}},
+                        "type": { "type": "keyword" },
+                        "subject_id": {"type": "keyword"},
+                        "source": {"type":"keyword"}, 
+                        "attribute":{"type":"keyword"},
+                        "value":{
+                            "type":"text",
+                            "fields": 
+                                {"raw":{"type": "keyword"},
+                                "d":{"type": "double", "ignore_malformed": "true"},
+                                "dt":{"type": "date", "ignore_malformed": "true"}}}           
+                    }  
                 }
             }';
 
             $map2 = json_decode($map,1);
             $params['body'] = $map2;
 
-            $response = $elasticClient->index($params);
+            $response = $elasticClient->indices()->create($params);
             error_log(print_r($response,1));
             error_log("created index mapping\n"); 
         }       
@@ -490,18 +511,26 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         $sourceModel->updateSource(["elastic_status"=>0], ["source_id" => $source_id]);
 
         // Get all the unique subject ids for this source
-        $unique_ids = $eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>0], true);
-
+        $unique_ids = $eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>1], true);
+        error_log("unique ids:" . count($unique_ids));
         $bulk = [];
         $counta = 0;
         $countparents = 0;
         // start making all the parent documents in ElasticSearch
         foreach($unique_ids as $index_data){
-            $bulk['body'][] = ["index"=>["_index"=>$index_name, "_type"=>"subject","_id"=>$index_data['uid']]];
-            $bulk['body'][] = ["subject_id"=>$index_data['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_eav"];    
+            $bulk['body'][] = ["index"=>[ "_id"=>$index_data['uid'],"_index"=>$index_name]];
+            $bulk['body'][] = ["subject_id"=>$index_data['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"sub", "source"=>$source_name."_eav"];    
+           // $bulk_body_head = ["index"=>["_id"=>$index_data['uid'], "_index"=>$index_name]];
+           // $bulk_body_tail = ["subject_id"=>$index_data['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"sub", "source"=>$source_name."_eav"];
+
+            //$bulk['body'][] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
+
             $countparents++;
+            if($countparents == 0){
+                print_r($bulk);
+            }
+            
             if ($countparents%500 == 0){
-                // error_log($countparents);
                 $responses = $elasticClient->bulk($bulk);
                 $bulk=[];
                 unset ($responses);
@@ -509,50 +538,44 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         }
         // Send the last parents through who didnt get finished in loop
         if (!empty($bulk['body'])){
-            error_log("final");
             $responses = $elasticClient->bulk($bulk);
             $bulk=[];
             unset ($responses);
         }
         error_log("parents indexed");
+
         // Figure out how many documents we need to index
-        $eavsize = count($eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>0]));
+        $eavsize = count($eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>1]));
+
         $bulk=[];
         // We are looping through with the use of limit to increase speed of writing
         $offset = 0;
         while ($offset < $eavsize){
             // Get our current limit chunk of data
-            $eavdata = $eavModel->getEAVs(null, ["source"=>$source_id, "elastic"=>0], false, 1000, $offset);
+            $eavdata = $eavModel->getEAVs(null, ["source"=>$source_id, "elastic"=>1], false, 1000, $offset);
+
             // Loop through our limit chunk
             foreach ($eavdata as $attribute_array){
                 $attribute_array['attribute'] = preg_replace('/\s+/', '_', $attribute_array['attribute']);
-                $bulk['body'][] = ["index"=>["_index"=>$index_name,
-                                            "_type"=>"subject",
-                                            "routing"=>$attribute_array['uid']]];
-                $bulk['body'][] = ["subject_id"=>$attribute_array['subject_id'],
-                                   "attribute"=>$attribute_array['attribute'],
-                                   "value"=>strtolower($attribute_array['value']),
-                                    "eav_rel"=>["name"=>"eav",
-                                    "parent"=>$attribute_array['uid']],
-                                     "type"=>"eav",
-                                     "source"=>$source_name."_eav"];
+                $bulk['routing'] = $attribute_array['uid'];
+                //$bulk_body_head = ["index"=>["_index"=>$index_name]];
+                //$bulk_body_tail = ["subject_id"=>$attribute_array['subject_id'],"attribute"=>$attribute_array['attribute'],"value"=>strtolower($attribute_array['value']), "eav_rel"=>["name"=>"eav","parent"=>$attribute_array['uid']], "type"=>"eav", "source"=>$source_name."_eav"];
+                $bulk['body'][] = ["index"=>["_index"=>$index_name]];
+                $bulk['body'][] = ["subject_id"=>$attribute_array['subject_id'],"attribute"=>$attribute_array['attribute'],"value"=>strtolower($attribute_array['value']), "eav_rel"=>["name"=>"eav","parent"=>$attribute_array['uid']], "type"=>"eav", "source"=>$source_name."_eav"];
+                //$bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
                 $counta++;
                 // Every 500 documents bulk insert to ElasticSearch
                 if ($counta%500 == 0){
-                    // error_log($counta);
                     $responses = $elasticClient->bulk($bulk);
                     $bulk=[];
                     unset ($responses);
-                    // error_log("inserted");
                 }   
             }
             // Update our offset 
-            //error_log(print_r($eavdata,1));
             $offset += 1000;
         }
         // Send the last of our documents through
         if (!empty($bulk['body'])){
-            error_log("final");
             $responses = $elasticClient->bulk($bulk);
         }        
         // The update is now complete. Perform post processing reporting  
