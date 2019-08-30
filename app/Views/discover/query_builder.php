@@ -18,7 +18,7 @@
         <div class="card">
             <h5 class="card-header">PATIENT CHARACTERISTICS</h5>
             <div class="card-body" id="pat_container">
-                <div class="row rule">
+                <div class="row rule mb-1">
                     <div class="col">
                         <select class="form-control attribute keys_pat" style="margin-bottom:15px" tabindex="-1">
                             <option></option>
@@ -47,7 +47,7 @@
                     </div>
                     <div class="col">
                         <button data-rule="patient" class="btn btn-mini btn-success btn-add"><i class="fa fa-plus"></i></button>
-                        <button data-rule="patient" class="btn btn-mini btn-danger btn-remove"><i class="fa fa-minus"></i></button>
+                        <button data-rule="patient" class="btn btn-mini btn-danger btn-remove" style="display:none;"><i class="fa fa-minus"></i></button>
                     </div>
                 </div>
             </div>
@@ -59,8 +59,8 @@
     <div class="col">
         <div class="card">
             <h5 class="card-header">VARIANT</h5>
-            <div class="card-body">
-                <div class="row">
+            <div class="card-body" id="gen_container">
+                <div class="row rule mb-1">
                     <div class="col">
                         <select class="form-control values values_assembly" tabindex="-1">
                             <option></option>
@@ -68,7 +68,7 @@
                         </select>
                     </div>
                     <div class="col">
-                        <select class="form-control values" id="values_chr" tabindex="-1">
+                        <select class="form-control values values_chr" tabindex="-1">
                             <option></option>
                         </select>
                     </div>
@@ -90,8 +90,8 @@
                         </select>
                     </div>
                     <div class="col">
-                        <button data-rule="genotype" class="btn btn-small btn-success"><i class="fa fa-plus"></i></button>
-                        <button data-rule="genotype" class="btn btn-small btn-danger"><i class="fa fa-minus"></i></button>
+                        <button data-rule="genotype" class="btn btn-mini btn-success btn-add"><i class="fa fa-plus"></i></button>
+                        <button data-rule="genotype" class="btn btn-mini btn-danger btn-remove" style="display:none;"><i class="fa fa-minus"></i></button>
                     </div>
                 </div>
             </div>
@@ -99,82 +99,73 @@
     </div>
 </div>
 
-<input type="hidden" value="<?php echo $network_key;?>" id="network_key"/>
-
-
-<div class="row rules" id="genotype_phenotype">
-        <div class="span12">
-
-            <div class="" id="genotypeBox" style="margin-top: 20px;">
-                <div class="collapse" id="gen_container" data-type='genotype'>
-
-                </div>
-                <!-- end genotype -->
-            </div>
-            <!-- overflow: auto; width: 300px; -->
-            <div class="" id="phenotypeBox" style="margin-top: 50px;display:none;">
-                <div class="row-fluid">
-                    <div class="span12 " style="">
-                        <button class="btn btn-large input-block-level btn-success btn-collapse" id="isPhenotype" data-collapseStatus="false" style="text-align: left">
-                        Phenotype
-                        <i class="icon-chevron-left" style="float: right"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="collapse" id="phen_container" data-type='phenotype'>
-                    <div class="row-fluid rule">
-                        <div class="pagination-centered span4" style="margin-left: 138px;">
-                            <div class="input-append" style="margin-bottom: -1px;">
-                                <input class="span11" id="search_filter" type="text" placeholder="filter by keyword" style="text-align: center;">
-                                <span class="add-on"><i class="icon-search"></i></span>
+<div class="row mb-2">
+    <div class="col">
+        <div class="card">
+            <h5 class="card-header">Phenotype</h5>
+            <div class="card-body" id="phen_container">
+                <div class="row rule">
+                    <div class="col">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fa fa-search"></i></div>
                             </div>
-                        <select id='values_phen_left' class="input-xlarge" size="10" style="overflow: auto; width: 300px; margin-bottom: 0px"></select>
-                        <button class="btnAdd btn btn-block">Add</button><br>
+                            <input class="form-control" id="search_filter" type="text" placeholder="filter by keyword" style="text-align: center;" />
+                        </div>  
+                        <select id='values_phen_left' class="form-control" size="10"></select>
+                        <button class="btnAdd btn btn-secondary btn-block">Add</button>
                     </div>
-                    <div class="pagination-centered span4" style="">
-                        <div class="input-append" style="margin-bottom: -1px;">
-                            <input class="span11" id="search_filter2" type="text" placeholder="filter by keyword" style="text-align: center;">
-                            <span class="add-on"><i class="icon-search"></i></span>
+                    <div class="col">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fa fa-search"></i></div>
+                            </div>
+                            <input class="form-control" id="search_filter2" type="text" placeholder="filter by keyword" style="text-align: center;">
+                        </div> 
+                        <select id="values_phen_right" class="form-control" size="10"></select>
+                        <button class="btnRemove btn btn-secondary btn-block">Remove</button>
+                    </div>
+                </div>
+                <hr/>
+                <div class="row rule">
+                    <div class="col-10">
+                        <h4 style="font-weight: bold; text-align: center;">HPO Tree </h4>
+                        <a id='full_screen' style="float: right; margin-left: 0px;" href="" class="btn btn-info">
+                            <i class="fa fa-compress-arrows-alt"></i>
+                        </a>
+                        <div id="jstree_hpo" style="max-height: 400px; overflow: scroll; border: 1px dotted; border-radius: 5px;"></div>
+                    </div>
+                    <div class="col-2">
+                        <div id="phen_logic">
+                            <a class="btn btn-logic btn-block btn-medium btn-primary active">AND</a>
+                            <a class="btn btn-logic btn-block btn-medium btn-secondary">OR</a>
+                            <a class="btn btn-logic btn-block btn-medium btn-secondary">SIM</a>
                         </div>
-                    <select id="values_phen_right" class="input-xlarge" size="10" style="overflow: auto; width: 300px; margin-bottom: 0px"></select>
-                    <button class="btnRemove btn btn-block">Remove</button>
-                </div>
-            </div>
-            <div class="row-fluid rule" style="display:none;">
-                <div class="span10" style="">
-                    <h4 style="font-weight: bold; text-align: center;">HPO Tree </h4>
-                    <a id='full_screen' style="float: right; margin-left: 0px;" href="" class="btn btn-info"><i class="icon-resize-full"></i></a>
-                    <div id="jstree_hpo" style="max-height: 400px; overflow: scroll; margin-left: 15%; border: 1px dotted; border-radius: 5px;"></div>
-                    <!-- <div id="jstree_hpo"></div> -->
-                </div>
-                <div class="span1" id="phen_logic" style="margin-left: 40px;">
-                    <a class="btn btn-logic btn-block btn-medium btn-primary active">AND</a>
-                    <a class="btn btn-logic btn-block btn-medium btn-default">OR</a>
-                    <a class="btn btn-logic btn-block btn-medium btn-default">SIM</a><br>
-                    
-                    <label class="checkbox inline">
-                        <input type="checkbox" id="rel" value="rel"> Rel
-                    </label>
-                    <input type="text" class="form-control input-mini" id="r" placeholder="" value="0.7">
-                    <input type="text" class="form-control input-mini" id="s" placeholder="" value="0">
-                    
-                    <label class="checkbox inline">
-                        <input type="checkbox" id="jc" value="jc"> Jaccard
-                    </label>
-                    <input type="text" class="form-control input-mini" id="j" placeholder="" value="0">
+                        <label class="checkbox inline">
+                            <input type="checkbox" id="rel" value="rel"> Rel
+                        </label>
+                        <input type="text" class="form-control input-mini" id="r" placeholder="" value="0.7">
+                        <input type="text" class="form-control input-mini" id="s" placeholder="" value="0">
+                        
+                        <label class="checkbox inline">
+                            <input type="checkbox" id="jc" value="jc"> Jaccard
+                        </label>
+                        <input type="text" class="form-control input-mini" id="j" placeholder="" value="0">
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <!-- end Phenotype Box -->
+</div>
 
-</div>
-</div>
+<input type="hidden" value="<?php echo $network_key;?>" id="network_key"/>
+
+
 
 <div class="row" id="reset_buildQuery">
     <div class="col">
-        <a class="btn btn-secondary  btn-lg" id="reset_query"><i class="fa fa-trash"></i> Reset</a>
         <a class="btn btn-lg btn-primary" id="build_query"><i class="fa fa-search"></i> Build Query</a>
+        <a class="btn btn-secondary  btn-lg" id="reset_query"><i class="fa fa-trash"></i> Reset</a>
     </div>
 </div>
 

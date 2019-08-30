@@ -20,12 +20,11 @@
 	<meta name="description" content="<?php echo $description ?>" />
 	
     <!-- Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh 11/6/2019 -->
-    <link rel="stylesheet" href="<?php echo base_url(VENDOR."twbs/bootstrap/dist/css/bootstrap.css");?>" />
+    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "twbs/bootstrap/dist/css/bootstrap.css");?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/fontawesome.css"); ?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/brands.css"); ?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/solid.css"); ?>" />
-    <link rel="stylesheet" href="<?php echo base_url(CSS."/jstree/themes/default/style.css");?>" />
-    <link rel="stylesheet" href="<?php echo base_url(VENDOR."select2/select2/dist/css/select2.css");?>" />
+    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "select2/select2/dist/css/select2.css");?>" />
     <style>
     main > .container {
         padding: 80px 15px 80px;
@@ -194,7 +193,6 @@
     
     <!--Initial step to upgrade to boostrap 4.3.1, jquery 4 by Mehdi Mehtarizadeh 11/6/2019 -->
     <script src="<?php echo base_url(VENDOR."twbs/bootstrap/dist/js/bootstrap.bundle.js");?>"></script>
-    <script src="<?php echo base_url(JS."jstree/jstree.js");?>"></script>
     <script src="<?php echo base_url(VENDOR."select2/select2/dist/js/select2.js");?>"></script>
 
     <!-- extra Java Script-->

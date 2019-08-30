@@ -100,8 +100,8 @@ $(function() {
                 $('select.keys_pat').append($('<option></option>').attr('value', v.toLowerCase()).text(k))
             })
             
-            template['patient'] = $('.rules .rule')[0].outerHTML
-            template['genotype'] = $('.rules .rule')[1].outerHTML
+            template['patient'] = $('.rule')[0].outerHTML
+            template['genotype'] = $('.rule')[1].outerHTML
 
             $('select#values_phen_left').filterByText($('input#search_filter'));
             $('select#values_phen_right').filterByText($('input#search_filter2'));
@@ -113,11 +113,14 @@ $(function() {
 
     var hpo_json = {};
 
-
-    $.getJSON(baseurl + "discovery/hpo_query/", (data, st) => {
-        // log(JSON.stringify(data))
-        hpo_json = data;
-        init_hpotree();
+    $.ajax({
+        dataType: "json",
+        url: baseurl + "AjaxApi/hpo_query",
+        data: null,
+        success: function(data){
+            hpo_json = data;
+            init_hpotree();
+        }
     });
 
 
@@ -132,7 +135,7 @@ $(function() {
                         cb.call(this, hpo_json);
                     } else {
                         $.ajax({
-                            url: baseurl + "discovery/hpo_query/"+node.id,
+                            url: baseurl + "AjaxApi/hpo_query/"+node.id,
                             type: 'POST',
                             dataType: 'JSON'
                         }).done(function(data) {
@@ -208,7 +211,7 @@ $(function() {
         destroy_hpotree();
 
         $.ajax({
-            url: baseurl + 'discovery/build_tree',
+            url: baseurl + 'AjaxApi/build_tree',
             type: 'POST',
             dataType: 'JSON',
             data: {'hpo_json' : JSON.stringify(hpo_json), 'ancestry': $('select#values_phen_left').val(), 'hp_term': $('select#values_phen_left :selected').text()},
@@ -506,24 +509,17 @@ $(function() {
 
 
     $(document).on('click', ".btn-add", function () {
-
-        var caller = $(this);
-        var newRow = caller[0].parentElement.parentElement;
-        var nr = $(newRow).clone();
-
-        $(newRow.parentElement).append(nr);
-
-        caller.hide();
-        $($(caller[0].parentElement)[0].children[1]).hide();
-
-        
-        $('select.attribute').select2('destroy')
-        $('select.operator').select2('destroy')
-        $('select.value').select2('destroy')
+        var $rule = $(template[$(this).attr('data-rule')]);
+        $rule.find('.btn-remove').show();
+        $(this).closest('.rule').find('.btn-add').hide();
+        $(this).closest('.rule').find('.btn-remove').show();
+        $('select.attribute').select2('destroy');
+        $('select.operator').select2('destroy');
+        $('select.value').select2('destroy');
         if($(this).attr('data-rule') === 'patient') {
-            //$('#pat_container').append($rule)
+            $('#pat_container').append($rule);
         } else if($(this).attr('data-rule') === 'genotype') {
-           // $('#gen_container').append($rule)
+            $('#gen_container').append($rule);
         }
         initSelect2();
     });
@@ -534,11 +530,11 @@ $(function() {
         if($rule.is(':first-child')) {} 
         else { 
             if($rule.is(':last-child')) { 
-                $rule.prev().find('.btn-add').toggleClass('hide') 
+                $rule.prev().find('.btn-add').show() ;
             } 
         }
         if($rule.siblings().length === 1) { 
-            $rule.siblings().find('.btn-remove').toggleClass('hide') 
+            $rule.siblings().find('.btn-remove').hide();
         }
         $rule.remove()
     })
@@ -577,6 +573,12 @@ $(function() {
       });
     };
 
+    $(document).on('click', ".btn-logic", function () {
+        if($(this).hasClass('btn-secondary')) {
+            $(this).addClass('active').addClass('btn-primary').removeClass('btn-secondary')
+            $(this).siblings().removeClass('active').addClass('btn-secondary').removeClass('btn-primary')
+        }
+    });
     /*
     $('#search_test').autocomplete({
         source: function(req, res) {
@@ -646,11 +648,6 @@ $(function() {
     });
 
 
-    $(document).on('click', ".btn-logic", function () {
-        if($(this).hasClass('btn-default')) {
-            $(this).addClass('active').addClass('btn-primary').removeClass('btn-default')
-            $(this).siblings().removeClass('active').addClass('btn-default').removeClass('btn-primary')
-        }
-    })
+
     */
 });

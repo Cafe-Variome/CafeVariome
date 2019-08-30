@@ -245,7 +245,7 @@ class Admin extends CVUI_Controller{
 
         $phen_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . ".json"), 1);
         $hpo_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json"), 1);
-        echo json_encode([$phen_data, $hpo_data]);
+        return json_encode([$phen_data, $hpo_data]);
     }
 
     function get_json_for_phenotype_lookup() {
@@ -253,7 +253,7 @@ class Admin extends CVUI_Controller{
         $network_key = $this->request->getVar('network_key');
 
         if (file_exists('resources/phenotype_lookup_data/' . $network_key . ".json")) {
-            error_log(file_get_contents("resources/phenotype_lookup_data/" . $network_key . ".json"));
+            //error_log(file_get_contents("resources/phenotype_lookup_data/" . $network_key . ".json"));
             return (file_get_contents("resources/phenotype_lookup_data/" . $network_key . ".json"));
         } else {
             error_log("resources/phenotype_lookup_data/" . $network_key . ".json");
@@ -266,9 +266,9 @@ class Admin extends CVUI_Controller{
         $network_key = $this->request->getVar('network_key');
 
         if (file_exists('resources/phenotype_lookup_data/' . $network_key . "_hpo_ancestry.json")) {
-            echo (file_get_contents("resources/phenotype_lookup_data/" . $network_key . "_hpo_ancestry.json"));
+            return (file_get_contents("resources/phenotype_lookup_data/" . $network_key . "_hpo_ancestry.json"));
         } else {
-            echo false;
+            return false;
         }              
     }
 
