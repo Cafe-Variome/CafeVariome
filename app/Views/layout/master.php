@@ -31,8 +31,6 @@
         }
 
         .footer {
-            position: fixed;
-            bottom: 0;
             width: 100%;
             background-color: #f5f5f5;
         
@@ -183,7 +181,7 @@
         </div>
     </div>
 
-    <footer id="footer" class="footer fixed-bottom mt-auto py-3">
+    <footer id="footer" class="footer mt-auto py-3">
         <div class="container">
             <span class="text-muted">Powered by CafeVariome</span>             
         </div>
