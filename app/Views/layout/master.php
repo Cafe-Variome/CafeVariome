@@ -26,41 +26,41 @@
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/solid.css"); ?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "select2/select2/dist/css/select2.css");?>" />
     <style>
-    main > .container {
-        padding: 80px 15px 80px;
-    }
-
-    .footer {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        background-color: #f5f5f5;
-    
-    }
-
-    .footer > .container {
-        padding-right: 15px;
-        padding-left: 15px;
-    }
-
-    code {
-        font-size: 80%;
-    }
-
-    .bd-placeholder-img {
-        font-size: 1.125rem;
-        text-anchor: middle;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-
-      @media (min-width: 768px) {
-        .bd-placeholder-img-lg {
-          font-size: 3.5rem;
+        main > .container {
+            padding: 80px 15px 80px;
         }
-      }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f5f5f5;
+        
+        }
+
+        .footer > .container {
+            padding-right: 15px;
+            padding-left: 15px;
+        }
+
+        code {
+            font-size: 80%;
+        }
+
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
     </style>
     <!-- TODO: Move from Cafe Variome 2 source code once necessary. Some files may not be necessary. -->
     <!-- TODO: The links to files which are moved are put above this section. -->
@@ -87,9 +87,7 @@
     <?php endforeach;?>
 
     <!-- favicon and touch icons -->
-    <?php  if ( $setting->settingData['cafevariome_central'] ): ?>
-    <link rel="shortcut icon" href="<?php echo base_url(IMAGES.'ico/favicon.ico');?>" />
-    <?php endif; ?>
+    <link rel="shortcut icon" href="<?php echo base_url(IMAGES.'logos/favicon.ico');?>" />
     <link rel="apple-touch-icon" href="<?php echo base_url(IMAGES.'ico/apple-touch-icon-precompresse.png');?>" />
     <link rel="apple-touch-icon" sizes="57x57" href="<?php echo base_url(IMAGES.'ico/apple-touch-icon-57x57-precompressed.png');?>" />
     <link rel="apple-touch-icon" sizes="72x72" href="<?php echo base_url(IMAGES.'ico/apple-touch-icon-72x72-precompressed.png');?>" />
