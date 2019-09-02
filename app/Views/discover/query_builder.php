@@ -110,7 +110,7 @@
                             <div class="input-group-prepend">
                             <div class="input-group-text"><i class="fa fa-search"></i></div>
                             </div>
-                            <input class="form-control" id="search_filter" type="text" placeholder="filter by keyword" style="text-align: center;" />
+                            <input class="form-control" id="search_filter_phen_left" type="text" placeholder="filter by keyword" style="text-align: center;" />
                         </div>  
                         <select id='values_phen_left' class="form-control" size="10"></select>
                         <button class="btnAdd btn btn-secondary btn-block">Add</button>
@@ -120,7 +120,7 @@
                             <div class="input-group-prepend">
                             <div class="input-group-text"><i class="fa fa-search"></i></div>
                             </div>
-                            <input class="form-control" id="search_filter2" type="text" placeholder="filter by keyword" style="text-align: center;">
+                            <input class="form-control" id="search_filter_phen_right" type="text" placeholder="filter by keyword" style="text-align: center;">
                         </div> 
                         <select id="values_phen_right" class="form-control" size="10"></select>
                         <button class="btnRemove btn btn-secondary btn-block">Remove</button>

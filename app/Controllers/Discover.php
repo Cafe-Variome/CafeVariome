@@ -105,7 +105,6 @@ class Discover extends CVUI_Controller{
                                 if(!in_array($value['source'], $this->data['precanned_queries']))
                                     $uidata->data['precanned_queries'][] = $value['source'];
                             }
-
                             if($value['status'] == 1)
                                 $uidata->data['precan_active'][] = array('api' => htmlspecialchars(json_encode($value)), 'queryString' => $value['queryString'], 'user_email' => $value['user_email'], 'date_time' => $value['date_time'], 'notes' => $value['notes'], 'source' => $value['source'], 'case_control' => $value['case_control']);
                             elseif($value['status'] == -1)

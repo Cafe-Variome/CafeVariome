@@ -103,8 +103,7 @@ $(function() {
             template['patient'] = $('.rule')[0].outerHTML
             template['genotype'] = $('.rule')[1].outerHTML
 
-            $('select#values_phen_left').filterByText($('input#search_filter'));
-            $('select#values_phen_right').filterByText($('input#search_filter2'));
+            $('select#values_phen_left').filterByText($('#search_filter_phen_left'));
 
             initSelect2();
         })
@@ -178,8 +177,11 @@ $(function() {
                         $('select#values_phen_right option[value="' + txt + '"]').text('*' + f)
                 }
             })
-            sortSelect('values_phen_right')
+            sortSelect('values_phen_right');
+            $('select#values_phen_right').filterByText($('#search_filter_phen_right'));
+
         });
+
     }
 
     function destroy_hpotree() {
