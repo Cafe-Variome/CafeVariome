@@ -268,9 +268,6 @@ class Query extends CafeVariome{
 		
 		$this->api = $api;
 
-        //temp data until api updated
-		//$user_id = 145; 
-		//$network_key = "5339d2fff671474501fb36a2ede8c450";
         $installation_key = $this->setting->settingData['installation_key'];
 
     	$user_id = $session->get('user_id');
@@ -279,7 +276,6 @@ class Query extends CafeVariome{
 
         // fetch sources for which the user has source display access       
         //Localised the function (Mehdi Mehtarizadeh 21/08/2019)
-		//$sdg_arr = json_decode(AuthHelper::authPostRequest(array('user_id' => $user_id, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_installation_that_user_id_has_source_display_group_access_to"), 1);
         $sdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, 'source_display');
 
         $sdg_ids = [];
@@ -487,6 +483,66 @@ class Query extends CafeVariome{
         }
 
         return $result;
+	}
+
+    public function phenotype_query($lookup,$source,$iscount = TRUE){
+        $elasticModel = new Elastic($this->db);
+        $sourceModel = new Source($this->db);
+
+		error_log("PHENOTYPE QUERY");
+
+		$isnot = ($iscount == TRUE && substr($lookup['operator'],0,6) === 'is not') ? TRUE : FALSE; 
+
+		switch($lookup['operator']) {
+			case 'is': case 'is not': case '=':
+				$tmp[]['match'] = ['value.raw' => strtolower($lookup['value'])];
+				break;
+			case 'is like': case 'is not like':
+				$tmp[]['wildcard'] = ['value.raw' => strtolower($lookup['value'])];
+				break;
+        }
+
+        $paramsnew = [];
+        $sourceId = $sourceModel->getSourceIDByName($source);
+        $es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;
+        
+		// Elasticsearch query
+        //$paramsnew = ['index' => $es_index, 'size' => 0, 'type' => 'subject'];
+        $paramsnew = ['index' => $es_index];
+
+		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source . "_eav"; // for source
+		$paramsnew['body']['query']['bool']['must'][1]['has_child']['type'] = 'eav';
+		$paramsnew['body']['query']['bool']['must'][1]['has_child']['query']['bool']['must'] = $tmp;
+
+		$negop = 'must_not';
+		
+		if (array_key_exists('negated',$lookup) && $lookup['negated'] == 'True') $negop = 'must'; //need to add negated to phenotype component
+		error_log($negop);
+		$paramsnew['body']['query']['bool'][$negop][0]['has_child']['type'] = 'eav';
+		$paramsnew['body']['query']['bool'][$negop][0]['has_child']['query']['bool']['must'][0]['match']['attribute'] = 'negated';
+		$paramsnew['body']['query']['bool'][$negop][0]['has_child']['query']['bool']['must'][1]['match']['value'] = '1';
+
+		$paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
+		error_log(json_encode($paramsnew));
+		$esquery = $this->elasticClient->search($paramsnew);
+		//error_log("es5_count: " . json_encode($esquery));
+		if ($iscount) $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
+		else $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
+		if ($isnot){ 
+            $eavModel = new EAV($this->db);
+            $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source'=> $sourceId, 'elastic' => 1], true);	
+            $uniqueSubjectIds = [];
+            foreach ($uniqueSubjectIdsArray as $uid) {
+                array_push($uniqueSubjectIds, $uid['subject_id']);
+            }	
+            $all_ids = ($iscount==TRUE) ? count($uniqueSubjectIds) : $uniqueSubjectIds;
+            $result = $iscount==TRUE ? $all_ids - $result : array_diff($all_ids,$result) ;
+		}
+		// end ES
+
+        return $result;
+		
+
 	}
 
     public function makeLogic(&$api) {

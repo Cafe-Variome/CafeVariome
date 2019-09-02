@@ -255,8 +255,6 @@ $(function() {
             },
             "plugins" : [ "wholerow", "checkbox"]
         });
-
-
         $('#hpoTreeModal').modal('show');
     })
 
