@@ -171,7 +171,12 @@
 
 <hr/>
 
-<table id="query_result" class="table table-hover table-bordered table-striped">
+<div id="waiting" style="text-align: center;display:none;">
+<br />Searching...<br />
+<img src="<?php echo base_url("resources/images/loading.gif");   ?>" title="Loader" alt="Loader" />
+</div>
+
+<table id="query_result" class="table table-hover table-bordered table-striped" style="display:none;">
     <thead>
         <tr>
             <th>Source</th>

@@ -450,9 +450,9 @@ $(function() {
                     })
                 },
                 'complete': function(data) {
-                    $('#query_result').removeClass('hide');
+                    $('#query_result').show();
                     $('#build_query').removeClass('disabled');
-                    $('#waiting').addClass('hide')
+                    $('#waiting').hide();
                 },
             })
         }).fail(()=> alert(error['load_json']));

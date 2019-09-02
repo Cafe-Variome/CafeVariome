@@ -28,6 +28,10 @@ class Query extends CafeVariome{
         $this->elasticClient =  ClientBuilder::create()->setHosts($hosts)->build();
     }
 
+    /**
+     * @deprecated
+     */
+    
     function parse($query) {
         
         $query_data = array();
