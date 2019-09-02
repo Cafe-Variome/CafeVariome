@@ -201,8 +201,8 @@ $(function() {
             var txt = $(el).val().split(') ')[1] + ' ' + $(el).val().split(') ')[0] + ')';
             $('#jstree_hpo a:contains("' + txt + '")').each(function(e) {
                 $("#jstree_hpo").jstree("deselect_node", $(this).attr('id'))
-            })
-
+            });
+            $('select#values_phen_right').filterByText($('#search_filter_phen_right'));
         });
     });
     
