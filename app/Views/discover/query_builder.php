@@ -12,7 +12,7 @@
 	</div>	
 </div>
 <hr>
-
+<!-- Patient Characteristics -->
 <div class="row mb-2">
     <div class="col">
         <div class="card">
@@ -55,6 +55,7 @@
     </div>
 </div>
 
+<!-- VARIANT -->
 <div class="row mb-2">
     <div class="col">
         <div class="card">
@@ -98,7 +99,7 @@
         </div>    
     </div>
 </div>
-
+<!-- Phenotype and HPO Tree -->
 <div class="row mb-2">
     <div class="col">
         <div class="card">
@@ -160,8 +161,6 @@
 
 <input type="hidden" value="<?php echo $network_key;?>" id="network_key"/>
 
-
-
 <div class="row" id="reset_buildQuery">
     <div class="col">
         <a class="btn btn-lg btn-primary" id="build_query"><i class="fa fa-search"></i> Build Query</a>
@@ -170,12 +169,13 @@
 </div>
 
 <hr/>
-
+<!-- Loader -->
 <div id="waiting" style="text-align: center;display:none;">
 <br />Searching...<br />
 <img src="<?php echo base_url("resources/images/loading.gif");   ?>" title="Loader" alt="Loader" />
 </div>
 
+<!-- Result Table -->
 <table id="query_result" class="table table-hover table-bordered table-striped" style="display:none;">
     <thead>
         <tr>
