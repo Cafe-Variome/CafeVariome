@@ -129,6 +129,7 @@ class KeyCloak{
             $authUrl = $this->provider->getAuthorizationUrl();
             $_SESSION['oauth2state'] = $this->provider->getState();
             header('Location: '.$authUrl);
+
             exit;
         
         // Check given state against previously stored one to mitigate CSRF attack

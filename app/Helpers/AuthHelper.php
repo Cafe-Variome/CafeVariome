@@ -31,7 +31,7 @@ class AuthHelper
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
     curl_setopt($ch,CURLOPT_POST, true);
     curl_setopt($ch,CURLOPT_POSTFIELDS, $data);
-    error_log(print_r($data,1));
+
     $result = curl_exec($ch);
 
     $session_status = json_decode($result, 1);
