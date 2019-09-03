@@ -62,7 +62,7 @@ class CVUI_Controller extends Controller{
 	/**
 	 * Wraps UIData object into an array. The array is then passed to the view.
 	 *
-	 * @param string     $uidata
+	 * @param array     $uidata
 	 *
 	 * @return array
 	 */
