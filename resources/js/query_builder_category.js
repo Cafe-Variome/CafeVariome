@@ -2,7 +2,7 @@ $(function() {
     // console.log alias
     const log = console.log.bind(console)
     // urls object
-    const urls = {'qb_config': baseurl + 'resources/js/config.json', 'qb_json': baseurl + 'resources/js/querybuilder.json', 'phen_json': baseurl + 'admin/get_phenotype_attributes_for_network/' + $('#network_key').val() }
+    const urls = {'qb_config': baseurl + 'resources/js/config.json', 'qb_json': baseurl + 'resources/js/querybuilder.json', 'phen_json': baseurl + 'AjaxApi/getPhenotypeAttributes/' + $('#network_key').val() }
     // error object
     const error = {
         'load_config': 'Error: Unable to load query builder config file.',
