@@ -82,13 +82,15 @@ class Source extends CVUI_Controller{
         // Loop through each source
         foreach ($returned_groups as $source_id => $selected_groups) {
             if (!empty($selected_groups)) { // If there's groups assigned to this source then pass to the view
-                $this->data['source_network_groups'][$source_id] = $selected_groups;
+                $uidata->data['source_network_groups'][$source_id] = $selected_groups;
             }
-        }                                                
+        }        
+                                   
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = array(JS.'cafevariome/source.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
         $data = $this->wrapData($uidata);
+
         return view('source/sources', $data);
     }
 
@@ -271,7 +273,7 @@ class Source extends CVUI_Controller{
         }
     }
 
-    public function edit_source($source_id = NULL) {
+    public function edit_source(int $source_id = NULL) {
 
         $uidata = new UIData();
 
@@ -331,7 +333,7 @@ class Source extends CVUI_Controller{
             //check to see if we are creating the user
             //redirect them back to the admin page
             
-            //$update_data['source_id'] = $this->request->getVar('source_id');
+            $update_data['source_id'] = $this->request->getVar('source_id');
             $update_data['name'] = $this->request->getVar('name');
             $update_data['email'] = $this->request->getVar('email');
             $update_data['uri'] = $this->request->getVar('uri');
@@ -436,6 +438,9 @@ class Source extends CVUI_Controller{
                 'type' => 'dropdown',
                 'value' => set_value('type', $source_data['type']),
             );
+
+            $uidata->javascript = array(JS.'cafevariome/components/transferbox.js',JS.'cafevariome/source.js');
+
 
             $data = $this->wrapData($uidata);
 
