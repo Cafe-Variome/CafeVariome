@@ -255,7 +255,7 @@ class Network extends Model{
 
 	function addSourceFromInstallationToNetworkGroup($data) {
 		$this->builder = $this->db->table('network_groups_sources');
-		$this->builder->insert('network_groups_sources', $data);
+		$this->builder->insert($data);
 		$insert_id = $this->db->insertID();
 		return $insert_id;
 	}
