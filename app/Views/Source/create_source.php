@@ -91,15 +91,15 @@
 </div>
 <div class="form-group row">
 	<div class="col">
-		<select size="5" multiple id="sdg_left">
+		<select size="10" multiple id="sdg_left" class="form-control">
     	</select>	
 	</div>
 	<div class="col">
-		<br><input type="button" value="&gt;&gt;"/><br><br>
-        <input type="button" value="&lt;&lt;"/>	
+		<input type="button" onclick="moveItem(event);" class="form-control btn btn-success btn-lg btn-block" value="Add &gt;&gt;"/>
+        <input type="button" onclick="removeItem(event);" class="form-control btn btn-danger btn-lg btn-block" value="&lt;&lt; Remove"/>
 	</div>
 	<div class="col">
-		<select size="5" multiple id="sdg_right" name="groups[]" class="groupsSelected">
+		<select size="10" multiple id="sdg_right" name="groups[]" class="groupsSelected form-control">
 		</select>	
 	</div>
 </div>
@@ -110,15 +110,15 @@
 </div>
 <div class="form-group row">
 	<div class="col">
-		<select size="5" multiple id="cdg_left">
+		<select size="10" multiple id="cdg_left" class="form-control">
         </select>
 	</div>
 	<div class="col">
-		<br><input type="button" value="&gt;&gt;"/><br><br>
-        <input type="button" value="&lt;&lt;"/>
+		<input type="button" onclick="moveItem(event);" class="form-control btn btn-success btn-lg btn-block" value="Add &gt;&gt;"/>
+        <input type="button" onclick="removeItem(event);" class="form-control btn btn-danger btn-lg btn-block" value="&lt;&lt; Remove"/>
 	</div>
 	<div class="col">
-		<select size="5" multiple id="cdg_right" name="groups[]" class="groupsSelected">
+		<select size="10" multiple id="cdg_right" name="groups[]" class="groupsSelected form-control">
         </select>
 	</div>
 </div>

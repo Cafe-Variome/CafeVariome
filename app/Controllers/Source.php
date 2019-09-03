@@ -266,7 +266,7 @@ class Source extends CVUI_Controller{
                 'value' => set_value('type'),
             );
 
-            $uidata->javascript = array(JS.'cafevariome/source.js');
+            $uidata->javascript = array(JS.'cafevariome/components/transferbox.js', JS.'cafevariome/source.js');
 
             $data = $this->wrapData($uidata);
             return view('source/create_source', $data);
