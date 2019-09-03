@@ -79,7 +79,9 @@ class Discover extends CVUI_Controller{
         $advanced = $this->session->get('query_builder_advanced') == "yes" ? 1 : 0;
         $precan = $this->session->get('query_builder_precan') == "yes" ? 1 : 0;
         $this->data['create_precan_query'] = $this->session->get('create_precan_query');
-        
+
+        $uidata->stickyFooter = false;
+
         if($basic && !$advanced && !$precan)  {
             if(PHENOTYPE_CATEGORIES) {
                 $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js',JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
