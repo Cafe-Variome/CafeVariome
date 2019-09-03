@@ -85,7 +85,7 @@ class CVUI_Controller extends Controller{
 
 		$data["javascript"] = $uidata->javascript;
 		$data["css"] = $uidata->css;
-
+		$data["stickyFooter"] = $uidata->stickyFooter;
 		//Include additional data attributes specific to each view
 		foreach ($uidata->data as $dataKey => $dataValue) {
 			$data[$dataKey] = $dataValue;

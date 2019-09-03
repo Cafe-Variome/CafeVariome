@@ -27,22 +27,24 @@
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "select2/select2/dist/css/select2.css");?>" />
     <style>
         main > .container {
-            padding: 80px 15px 80px;
+            padding: 80px 15px 0;
         }
 
         .footer {
+            <?php if($stickyFooter): ?>
+            position: fixed;
+            left: 0;
+            bottom: 0;
+            <?php endif; ?>
+
             width: 100%;
+
             background-color: #f5f5f5;
-        
         }
 
         .footer > .container {
             padding-right: 15px;
             padding-left: 15px;
-        }
-
-        code {
-            font-size: 80%;
         }
 
         .bd-placeholder-img {
