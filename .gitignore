@@ -126,3 +126,4 @@ nb-configuration.xml
 /phpunit*.xml
 resources/elastic_search_status_complete
 resources/elastic_search_status_incomplete
+resources/elastic_search_status_complete

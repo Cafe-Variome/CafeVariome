@@ -23,13 +23,22 @@ class Admin extends CVUI_Controller{
 	 *
 	 */
     public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
-        parent::setProtected(false);
-        parent::setIsAdmin(false);
+        parent::setProtected(true);
+        parent::setIsAdmin(true);
         parent::initController($request, $response, $logger);
 
 		$this->session = Services::session();
 		$this->db = \Config\Database::connect();
         $this->setting =  Settings::getInstance($this->db);
+    }
+
+    function index(){
+        $uidata = new UIData();
+        $uidata->title = "Administrator Dashboard";
+
+
+        $data = $this->wrapData($uidata);
+        return view("Admin/Index", $data);
     }
 
     function settings($message = NULL) {
