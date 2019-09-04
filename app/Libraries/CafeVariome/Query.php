@@ -556,8 +556,89 @@ class Query extends CafeVariome{
         return $result;
 		
 
+    }
+    
+    public function sim_query($lookup,$source, $count = TRUE){
+        // $lookup = $this->getVal($this->api, $pointer);
+        //var_dump($this->api);
+        
+         error_log("lookup is: ".print_r($lookup,1));
+		if (array_key_exists('r',$lookup)){
+            error_log("SIM QUERY");
+
+			$r = $lookup['r']; $s = $lookup['s']; $id_str = '';
+			foreach ($lookup['ids'] as $id) {$id_str .= 'n.hpoid = \"' . $id . '\" or '; }
+			$id_str = trim($id_str, ' or ');
+			$neo_query = '{"statements":[{"statement":"MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel > ' . $r . ' and m.source = \\"' . $source . '\\" and (' . $id_str . ') with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, n.hpoid as hpoid with omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > ' . $s . ' return omimid, subjectid, summax ORDER BY summax DESC"}]}';
+			error_log($neo_query);
+        
+            $url = 'http://localhost:7474/db/data/transaction/commit';
+            $ch = curl_init($url);
+            // $payload = $neo_query;
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $neo_query);
+
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+            curl_setopt($ch, CURLOPT_USERPWD, "neo4j");
+
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $resp = curl_exec($ch);
+            curl_close($ch);
+
+            error_log($source . " : " . $resp);
+            
+            $resp = json_decode($resp, 1);
+
+            if($count === true) {
+                error_log($source . " : " . count($resp['results'][0]['data']));
+                return count($resp['results'][0]['data']);
+            } else {
+                $pat_ids = [];
+                foreach ($resp['results'][0]['data'] as $d) {
+                    $pat_ids[] = substr($d['row'][1] . "_$source", 0, 20);
+                }
+                // asort($pat_ids);
+                error_log($source . " : " . json_encode($pat_ids));
+                return $pat_ids;
+            }
+        }
+		// if (array_key_exists('r',$lookup)){	} // add code for jaccard	
+
 	}
 
+    public function sv_query($lookup,$source, $iscount = TRUE){
+        $elasticModel = new Elastic($this->db);
+        $sourceModel = new Source($this->db);
+
+		error_log("SUBJECT VARIANT QUERY");
+		// $lookup = $this->getVal($this->api, $pointer);
+		$arr = [];
+		foreach ($lookup as $key => $value) { // replace with actual parameters
+			$tmp = [];
+			$tmp[]['match'] = ['attribute' => $key];
+			$tmp[]['match'] = ['value.raw' => $value];
+			$arr_child['has_child']['type'] = 'eav';
+
+			$arr_child['has_child']['query']['bool']['must'] = $tmp;
+			$arr[] = $arr_child;
+		}
+
+        $paramsnew = [];
+        $sourceId = $sourceModel->getSourceIDByName($source);
+        $es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;
+
+		$paramsnew = ['index' => $es_index, 'size' => 0];
+        $paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source . "_eav"; // for source
+		$paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
+		$paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
+		// error_log(json_encode($paramsnew));
+		$esquery = $this->client->search($paramsnew);
+
+		if ($iscount) $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
+		else $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
+
+    }
+    
     public function makeLogic(&$api) {
 
 		$api['logic'] = ['-AND' => []];
@@ -627,7 +708,7 @@ class Query extends CafeVariome{
 
     function getVal($jex, $path) {
 		$pArr = explode('/', ltrim($path, '/'));
-		$path = "['" . implode("']['", $pArr) . "']";
+        $path = "['" . implode("']['", $pArr) . "']";
 	    return eval("return \$jex{$path};");
 	}
 
