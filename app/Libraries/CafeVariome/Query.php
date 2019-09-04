@@ -7,6 +7,7 @@ use App\Models\Source;
 use App\Models\Network;
 use App\Models\Elastic;
 use App\Models\EAV;
+use App\Libraries\ElasticSearch;
 
 use Elasticsearch\ClientBuilder;
 class Query extends CafeVariome{
@@ -261,6 +262,10 @@ class Query extends CafeVariome{
         $session = \Config\Services::session();
         $sourceModel = new Source($this->db);
         $networkModel = new Network($this->db);
+        $elasticModel = new Elastic($this->db);
+
+        $hosts = (array)$this->setting->settingData['elastic_url'];
+        $elasticSearch = new ElasticSearch($hosts);
 
     	$api = json_decode($json_string, 1);
 
@@ -323,18 +328,22 @@ class Query extends CafeVariome{
         //$sources = [['source_id' => "1", 'name' => "pseudosubject"]];
         $es5_counts = [];
 		foreach ($sources as $source_array) {
-			$source_id = $source_array['source_id'];
-			if(!in_array($source_id, $network_sources)) continue; //as above
-			$es5_counts[$source_array['name']] = "Access denied"; // not sure if this correct, yes if they are not in sg then access denied, but if in should get counts
 
-			if (array_key_exists($source_id, $sdg_ids)) {
-				$es5_counts[$source_array['name']] = $this->process_query($source_array['name'], $pointer_query);
-				// $es5_counts[$source_array['name']] = count($this->es5v2_records($source_array['name'], $pointer_query));
-				// $es5_counts[$source_array['name']] = count($this->es5v2_records($source_array['name'], $pointer_query));
-			}
-			if (array_key_exists($source_id, $cdg_ids)) {  //don't need to be in cdg to just get counts
-				// add code to return data or link for sources where user has access
-			}			
+            $elasticIndexName = $elasticModel->getTitlePrefix() . "_" . $source_array['source_id'];
+            if ($elasticSearch->indexExists($elasticIndexName)) {
+                $source_id = $source_array['source_id'];
+                if(!in_array($source_id, $network_sources)) continue; //as above
+                $es5_counts[$source_array['name']] = "Access denied"; // not sure if this correct, yes if they are not in sg then access denied, but if in should get counts
+    
+                if (array_key_exists($source_id, $sdg_ids)) {
+                    $es5_counts[$source_array['name']] = $this->process_query($source_array['name'], $pointer_query);
+                    // $es5_counts[$source_array['name']] = count($this->es5v2_records($source_array['name'], $pointer_query));
+                    // $es5_counts[$source_array['name']] = count($this->es5v2_records($source_array['name'], $pointer_query));
+                }
+                if (array_key_exists($source_id, $cdg_ids)) {  //don't need to be in cdg to just get counts
+                    // add code to return data or link for sources where user has access
+                }
+            }
 		}
 
 		return json_encode($es5_counts);
