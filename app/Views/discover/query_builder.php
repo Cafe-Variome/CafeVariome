@@ -143,7 +143,7 @@
                             <a class="btn btn-logic btn-block btn-medium btn-secondary">SIM</a>
                         </div>
                         <label class="checkbox inline">
-                            <input type="checkbox" id="rel" value="rel"> Rel
+                            <input type="checkbox" id="rel" value="rel" checked disabled> Rel
                         </label>
                         <input type="text" class="form-control input-mini" id="r" placeholder="" value="0.7">
                         <input type="text" class="form-control input-mini" id="s" placeholder="" value="0">
