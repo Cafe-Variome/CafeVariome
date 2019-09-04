@@ -288,7 +288,7 @@ class Network extends CVUI_Controller{
                 'type' => 'text',
                 'rows' => '5',
                 'cols' => '3',
-                'style' => 'width:50%',
+                'class' => 'form-control',
                 'value' => set_value('justification'),
             );
             $networks = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "/network/get_networks_installation_not_a_member_of");
