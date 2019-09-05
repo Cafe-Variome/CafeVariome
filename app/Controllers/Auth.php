@@ -139,9 +139,6 @@ class Auth extends CVUI_Controller
 		if($this->authAdapter->loggedIn())
 		{
 			error_log("redirecting to auth index...");
-            if (!isset($_GET['r'])) {
-				return redirect()->to(base_url($_GET['r']));
-			}
 			return redirect()->to(base_url('auth/index'));
 		}
 		else{
@@ -214,9 +211,6 @@ class Auth extends CVUI_Controller
 
 	public function klogin(){
 		$l = $this->authAdapter->login('', '', false);
-		var_dump($l);
-		var_dump($_SESSION);
-		var_dump($this->authAdapter->loggedIn());
 
 		if($l){
 
@@ -225,7 +219,11 @@ class Auth extends CVUI_Controller
 				$this->session->remove('_cvReturnUrl');
 				header('Location: '.base_url( $redirect));
 				exit;
-            }
+			}
+			else if($this->authAdapter->isAdmin()){
+				header('Location: '.base_url('admin/index'));
+				exit;	
+			}
 			header('Location: '.base_url('auth/index'));
 			exit;
 		}
