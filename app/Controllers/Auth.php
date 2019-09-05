@@ -240,9 +240,11 @@ class Auth extends CVUI_Controller
 	 */
 	public function logout()
 	{
+		$this->authAdapter->logout();
+
 		$this->data['title'] = 'Logout';
 		// log the user out
-		$this->ionAuth->logout();
+		//$this->ionAuth->logout();
 
 		// redirect them to the login page
 		$this->session->setFlashdata('message', $this->ionAuth->messages());

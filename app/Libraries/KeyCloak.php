@@ -34,6 +34,7 @@ class KeyCloak{
 
         $this->db = \Config\Database::connect();
         $this->setting =  Settings::getInstance($this->db);
+        $this->session =  \Config\Services::session();
 
         $this->serverURI = $this->setting->settingData["key_cloak_uri"];
         $this->serverPort = $this->setting->settingData["key_cloak_port"];
@@ -60,6 +61,9 @@ class KeyCloak{
         }
     }
 
+    /**
+     * @deprecated 
+    */
     public function setSession(&$session){
         $this->keyCloakSession = &$session;
     }
@@ -76,7 +80,7 @@ class KeyCloak{
         return $user;
     }
     public function getUsername(){
-        return $this->keyCloakSession->get('username');
+        return $this->session->get('username');
     }
 
     /**
@@ -86,7 +90,7 @@ class KeyCloak{
 	 * 
 	 **/
     public function getUserId(){
-        return $this->keyCloakSession->get('user_id');
+        return $this->session->get('user_id');
     }
 
     /**
@@ -100,7 +104,7 @@ class KeyCloak{
 	 */
 	public function isAdmin(int $id=0): bool
 	{
-        $is_admin = $this->keyCloakSession->get('is_admin');
+        $is_admin = $this->session->get('is_admin');
         return ($is_admin) ? $is_admin : false;
 	}
 
@@ -240,23 +244,20 @@ class KeyCloak{
             $this->error_logout(2);
             return FALSE;
         }	
-        $this->keyCloakSession->set($session_data);
+        $this->session->set($session_data);
 
-        error_log("User: " . $this->keyCloakSession->get('email') . " has logged in || " . date("Y-m-d H:i:s"));  	
+        error_log("User: " . $this->session->get('email') . " has logged in || " . date("Y-m-d H:i:s"));  	
         //header('Location: '.base_url('auth/index'));
         return true;
     }
 
     public function logout():bool
     {
-		$this->session->remove(['identity', 'user_id']);
-		// Destroy the session
+    	// Destroy the session
 		$this->session->destroy();
 
-		// Recreate the session
-		session_start();
-
-		session_regenerate_id(true);
+        header('Location: '.base_url());
+        exit;
     }
 
     /**
@@ -267,8 +268,8 @@ class KeyCloak{
      * @return N/A
      */
     function error_logout($error) {
-        if($this->keyCloakSession->get('email'))
-                error_log("User: " . $this->keyCloakSession->userdata('email') . " has logged out || " . date("Y-m-d H:i:s"));
+        if($this->session->get('email'))
+                error_log("User: " . $this->session->userdata('email') . " has logged out || " . date("Y-m-d H:i:s"));
             //$this->keyCloakSession->destroy();
             $this->provider = new \Stevenmaguire\OAuth2\Client\Provider\Keycloak([
                 'authServerUrl'         => $this->serverURI,

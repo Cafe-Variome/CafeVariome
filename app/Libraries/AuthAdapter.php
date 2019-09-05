@@ -31,8 +31,6 @@ class AuthAdapter{
         switch($authRoutine){
             case 'KeyCloakFirst':
                 $this->authEngine = new KeyCloak();
-                $session       = \Config\Services::session();
-                $this->authEngine->setSession($session);
                 if(!$this->authEngine->checkKeyCloakServer()){
                     //Keycloak Server not available
                     //Switch to other 
