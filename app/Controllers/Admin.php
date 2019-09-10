@@ -11,7 +11,9 @@
 
 use App\Models\UIData;
 use App\Models\Settings;
+use App\Models\Network;
 use App\Models\Source;
+use App\Models\User;
 use App\Helpers\AuthHelper;
 
 use CodeIgniter\Config\Services;
@@ -39,6 +41,36 @@ class Admin extends CVUI_Controller{
 
         $data = $this->wrapData($uidata);
         return view("Admin/Index", $data);
+    }
+
+    function user(){
+        $uidata = new UIData();
+        $uidata->title = "Users";
+
+        $userModel = new User($this->db);
+        $networkModel = new Network($this->db);
+
+		$uidata->data['message'] = $this->session->getFlashdata('activation_email_unsuccessful');
+
+        $uidata->data['users'] = $userModel->getUsers();
+
+    
+		$users_groups_data = $networkModel->getCurrentNetworkGroupsForUsers();
+
+        $users_groups = array();
+		// If there were groups fetch from auth server for users then add them to the view
+		if (! array_key_exists('error', $users_groups_data)) {
+			foreach ( $users_groups_data as $group ) {
+				$users_groups[$group['user_id']][] = array('network_name' => $group['network_name'], 'group_id' => $group['group_id'], 'group_name' => $group['name'], 'group_description' => $group['description']);
+			}
+			$uidata->data['users_groups'] = $users_groups;
+		}
+        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
+
+        $uidata->javascript = array(JS."cafevariome/components/datatable.js", JS."cafevariome/admin.js", VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+
+        $data = $this->wrapData($uidata);
+        return view("Admin/User", $data);
     }
 
     function settings($message = NULL) {

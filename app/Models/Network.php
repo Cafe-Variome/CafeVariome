@@ -414,4 +414,21 @@ class Network extends Model{
 		$query = $this->builder->get()->getResultArray();
 		return $query;
 	}
+
+	/**
+     * Get Current Network Groups For Users - Get a list of Administrator-made Network Groups
+     *
+     * @param N/A
+	 * @return array $query - Array containing varius details about Network Groups
+     */
+	function getCurrentNetworkGroupsForUsers() {
+		$this->builder = $this->db->table('users_groups_networks');
+		$this->builder->join('network_groups', 'network_groups.id = users_groups_networks.group_id');
+		$this->builder->join('networks', 'networks.network_key = users_groups_networks.network_key');
+		$query = $this->builder->get()->getResultArray();
+		if (!$query) {
+			$query = ['error' => 'Unable to get current networks for sources in this installation'];
+		}
+		return $query;
+	}
 }
