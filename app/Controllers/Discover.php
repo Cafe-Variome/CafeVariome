@@ -12,6 +12,7 @@
 use App\Models\UIData;
 use App\Models\Settings;
 use App\Models\Source;
+use App\Models\Network;
 use App\Libraries\KeyCloak;
 use App\Libraries\CafeVariome;
 use App\Libraries\CafeVariome\Query;
@@ -35,7 +36,33 @@ class Discover extends CVUI_Controller{
         $this->userModel = new \App\Models\User($this->db);
     }
 
-    public function query_builder($network_key){
+    public function index(){
+        return redirect()->to(base_url("discover/select_network"));
+    }
+
+    public function select_network(){
+        $uidata = new UIData();   
+        $uidata->title = "Select Network";
+
+        $networkModel = new Network($this->db);
+        $sourceModel = new Source($this->db);
+
+        $user_id = $this->session->get('user_id');
+        $networks = $networkModel->getNetworksUserMemberOf($user_id);
+
+        $uidata->data['networks'] = array();
+
+        foreach ($networks as $key => $value) {
+            $uidata->data['networks'] += array($value['name'] => $value['network_key']);
+        }
+        
+        $uidata->javascript = array(JS."cafevariome/discover.js");
+
+        $data = $this->wrapData($uidata);
+        return view('discover/select_network', $data);
+    }
+
+    public function query_builder($network_key = null){
         
         $uidata = new UIData();
 
@@ -43,7 +70,7 @@ class Discover extends CVUI_Controller{
             $this->session->set(array('network_key' => $network_key));
         } 
         else {
-            return redirect()->to(base_url('discover/proceed_to_query/query_builder'));
+            return redirect()->to(base_url('discover/select_network'));
         }
 
         // Check if the user is in the master network group for this network

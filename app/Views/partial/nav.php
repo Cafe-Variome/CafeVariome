@@ -22,6 +22,11 @@
 			<li class="nav-item">
 				<span class="nav-link text-white">Hello <?= $session->get('first_name') ?>!</span>
 			</li>
+			<li class="nav-item">
+				<a class="nav-link" href="<?= base_url("discover/index") ?>">
+					Discover
+				</a> 
+			</li>
 			<?php if($auth->isAdmin()): ?>
 			<li class="nav-item">
 				<a class="nav-link" href="<?= base_url("admin/index") ?>">

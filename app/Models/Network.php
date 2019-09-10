@@ -387,4 +387,31 @@ class Network extends Model{
 
 		return $sources;
 	}
+
+	/**
+	 * getSourcesForNetworkPartOfGroup
+	 * 
+	 * @param int $user_id
+	 * @return array|null
+	 * @author Mehdi Mehtarizadeh
+	 */
+	public function getNetworksUserMemberOf(int $user_id) {
+		$this->builder = $this->db->table('users_groups_networks');
+		$this->builder->select("group_id");
+		$this->builder->where("user_id", $user_id);
+		$query = $this->builder->get()->getResultArray();
+
+		$groupIds = array();
+		foreach ($query as $gid) {
+			array_push($groupIds, $gid['group_id']);
+		}
+
+		$this->builder = $this->db->table('network_groups');
+		$this->builder->select("name, network_key");
+		$this->builder->whereIn("id", $groupIds);
+		$this->builder->where("group_type", "master");
+
+		$query = $this->builder->get()->getResultArray();
+		return $query;
+	}
 }
