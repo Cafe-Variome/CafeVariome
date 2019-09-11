@@ -261,6 +261,12 @@ class KeyCloak{
     }
 
     /**
+     * 
+     */
+    public function register(){
+
+    }
+    /**
      * Error Logout - Log out user from keycloak due to failure of passing local login
      *                checks
      *
@@ -368,6 +374,14 @@ class KeyCloak{
             .substr($charid,20,12)
             .chr(125);// "}"
         return $uuid;
+    }
+
+    function getKeyCloakConfig(){
+        $kcConf = array();
+        $kcConf['authServerUrl'] = $this->serverURI;
+        $kcConf['realm'] = $this->realm;
+        
+        return $kcConf ;
     }
 }
 
