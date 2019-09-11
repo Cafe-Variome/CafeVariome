@@ -43,6 +43,9 @@ class Admin extends CVUI_Controller{
         return view("Admin/Index", $data);
     }
 
+    /**
+     * @deprecated
+    */
     function user(){
         $uidata = new UIData();
         $uidata->title = "Users";
