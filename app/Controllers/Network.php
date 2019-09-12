@@ -144,9 +144,9 @@ class Network extends CVUI_Controller{
 
                 $this->networkModel->deleteAllUsersFromNetworkGroup($group_id);
                 
-                $network_key = "";
+                $network_key = $this->networkModel->getNetworkKeybyGroupId($group_id);
                 foreach ($this->request->getVar('groups') as $user_id)
-                        $network_key = $this->networkModel->addUserToNetworkGroup($user_id, $group_id, $installation_key);
+                        $this->networkModel->addUserToNetworkGroup($user_id, $group_id, $installation_key, $network_key);
 
                 if($isMaster) 
                     $this->networkModel->deleteUserFromAllOtherNetworkGroups($network_key,  $this->request->getVar('groups'));
