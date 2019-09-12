@@ -13,6 +13,7 @@
  class KeyCloakApi{
 
     private $keycloakConfig;
+    private $accessToken; 
 
     function __construct(Keycloak $keycloak = null){
         if ($keycloak) {
@@ -25,16 +26,20 @@
     }
 
     private function getAccessToken():string{
-        $access = "";
-        $url = '/realms/'.$this->keycloakConfig['realm'].'/protocol/openid-connect/token';
-        $post_fields = "client_id=admin-cli&username=admin&password=13759806&grant_type=password";
-        $headers = array();
-        $headers[] = 'Content-Type: application/x-www-form-urlencoded';
-        //$result = $this->apiCall($url, explode('&', $post_fields));
-        $result = json_decode($this->curlCall($url,false,$post_fields,$headers),1);
+        if ($this->accessToken != null) {
+            return $this->accessToken;
+        }
+        else{
+            $access = "";
+            $url = '/realms/'.$this->keycloakConfig['realm'].'/protocol/openid-connect/token';
+            $post_fields = "client_id=admin-cli&username=admin&password=13759806&grant_type=password";
+            $headers = array();
+            $headers[] = 'Content-Type: application/x-www-form-urlencoded';
+            $result = json_decode($this->curlCall($url,false,$post_fields,$headers),1);
 
-        $access = $result['access_token'];
-        return $access;
+            $access = $result['access_token'];
+            return $access;
+        }
     }
 
     function userExists(string $email):bool{
