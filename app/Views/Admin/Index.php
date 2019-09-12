@@ -54,12 +54,12 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                <a href="<?= base_url("admin/user") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/user.png") ?>"></a>
+                <a href="<?= base_url("user") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/user.png") ?>"></a>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <a href="<?= base_url("admin/user") ?>">Users</a>
+                <a href="<?= base_url("user") ?>">Users</a>
             </div>
         </div>
     </div>
