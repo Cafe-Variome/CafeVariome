@@ -29,6 +29,9 @@ class User extends Model{
         $this->db =& $db;
     }
 
+    function createUser(string $email, string $username, array $groups = [], array $data = [], &$authadapter){
+        $authadapter->register($email, $username, $data, $groups);
+    }
     /**
      * Gets user object by Id.
      * @param int id User ID

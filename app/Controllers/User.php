@@ -51,66 +51,124 @@ class User extends CVUI_Controller{
 
         $uidata = new UIData();
         $uidata->title = "Create New User";
-
+        $uidata->stickyFooter = false;
         $networkModel = new Network($this->db);
 
         $groups = $networkModel->getNetworkGroupsForInstallation();
 
-        $uidata->data['groups'] = $groups;
-        //display the create user form
-        //set the flash data error message if there is one
-        $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-
-
-        $uidata->data['username'] = array(
-                'name' => 'username',
-                'id' => 'username',
-                'type' => 'text',
-                'value' => set_value('email'),
-        );
-        $uidata->data['first_name'] = array(
-                'name'  => 'first_name',
-                'id'    => 'first_name',
-                'type'  => 'text',
-                'value' => set_value('first_name'),
-        );
-        $uidata->data['last_name'] = array(
-                'name'  => 'last_name',
-                'id'    => 'last_name',
-                'type'  => 'text',
-                'value' => set_value('last_name'),
-        );
-        $uidata->data['email'] = array(
-                'name'  => 'email',
-                'id'    => 'email',
-                'type'  => 'text',
-                'value' => set_value('email'),
-        );
-        $uidata->data['company'] = array(
-                'name'  => 'company',
-                'id'    => 'company',
-                'type'  => 'text',
-                'value' => set_value('company'),
-        );
-        $uidata->data['password'] = array(
-                'name'  => 'password',
-                'id'    => 'password',
-                'type'  => 'password',
-                'value' => set_value('password'),
-        );
-        $uidata->data['password_confirm'] = array(
-                'name'  => 'password_confirm',
-                'id'    => 'password_confirm',
-                'type'  => 'password',
-                'value' => set_value('password_confirm'),
-        );
-        $uidata->data['orcid'] = array(
-                'name' => 'orcid',
-                'id' => 'orcid',
-                'type' => 'text',
-                'value' => set_value('orcid'),
+        $this->validation->setRules([
+            'email' => [
+                'label'  => 'Email',
+                'rules'  => 'required|valid_email|is_unique[users.username]',
+                'errors' => [
+                    'required' => '{field} is required.',
+                    'is_unique' => '{field} already exists.',
+                    'valid_email' => 'Please check the Email field. It does not appear to be valid.'
+                ]
+            ],
+            'first_name' => [
+                    'label'  => 'First Name',
+                    'rules'  => 'required',
+                    'errors' => [
+                        'required' => '{field} is required.'
+                    ]
+            ],
+            'last_name' => [
+                'label'  => 'Last Name',
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => '{field} is required.',
+                ]
+            ],
+            'company' => [
+                'label'  => 'Institute/Laboratory/Company Name',
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => '{field} is required.'
+                ]
+            ]                            
+        ]
         );
 
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+
+            $email    = $this->request->getVar('email');
+            $groups = ($this->request->getVar('groups') != null) ? $this->request->getVar('groups') : [];
+            $installation_key = $this->request->getVar('installation_key');
+            $is_admin = ($this->request->getVar('isadmin') != null) ? 1 : 0;
+            $remote = ($this->request->getVar('isremote') != null) ? 1 : 0;
+            $first_name = $this->request->getVar('first_name');
+            $last_name = $this->request->getVar('last_name');
+
+            $data = [
+                    "installation_key" => $installation_key,
+                    "first_name" => $first_name,
+                    "last_name" => $last_name,
+                    "is_admin" => $is_admin,
+                    "remote" => $remote
+            ];
+
+            $userModel = new \App\Models\User($this->db);
+            $userModel->createUser($email, $email, $groups, $data, $this->authAdapter);
+            return redirect()->to(base_url("user/users"));
+
+        }
+        else { 
+            $uidata->data['groups'] = $groups;
+            //display the create user form
+            //set the flash data error message if there is one
+            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+
+            $uidata->data['first_name'] = array(
+                    'name'  => 'first_name',
+                    'id'    => 'first_name',
+                    'type'  => 'text',
+                    'class' => 'form-control',
+                    'value' => set_value('first_name'),
+            );
+            $uidata->data['last_name'] = array(
+                    'name'  => 'last_name',
+                    'id'    => 'last_name',
+                    'type'  => 'text',
+                    'class' => 'form-control',
+                    'value' => set_value('last_name'),
+            );
+            $uidata->data['email'] = array(
+                    'name'  => 'email',
+                    'id'    => 'email',
+                    'type'  => 'text',
+                    'class' => 'form-control',
+                    'value' => set_value('email'),
+            );
+            $uidata->data['company'] = array(
+                    'name'  => 'company',
+                    'id'    => 'company',
+                    'type'  => 'text',
+                    'class' => 'form-control',
+                    'value' => set_value('company'),
+            );
+            $uidata->data['isadmin'] = array(
+                'name'  => 'isadmin',
+                'id'    => 'isadmin',
+                'class' => 'custom-control-input',
+                'value' => 1,
+            );
+            $uidata->data['isremote'] = array(
+                'name'  => 'isremote',
+                'id'    => 'isremote',
+                'class' => 'custom-control-input',
+                'value' => 1,
+            );
+            // Uncomment in order to add orcid field
+            /*
+            $uidata->data['orcid'] = array(
+                    'name' => 'orcid',
+                    'id' => 'orcid',
+                    'type' => 'text',
+                    'value' => set_value('orcid'),
+            );
+            */
+        }
         $data = $this->wrapData($uidata);
         return view("user/create_user", $data);
     }

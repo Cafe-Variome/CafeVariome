@@ -11,6 +11,7 @@ namespace App\Libraries;
 use App\Models\Settings;
 use App\Models\User;
 use App\Helpers\AuthHelper;
+use App\Models\Network;
 
 class KeyCloak{
 
@@ -263,8 +264,38 @@ class KeyCloak{
     /**
      * 
      */
-    public function register(){
+    public function register(string $email, string $username, string $password, array $additionaldata, array $groups){
+        $ionAuth = new IonAuth();
+        $result = $ionAuth->register($email, $password, $email, $additionaldata);
+        if ($result){
+            //Assuming $result is user_id
+            if( $groups ){
+                $networkModel = new Network($this->db);
+                $installation_key = $additionaldata["installation_key"];
+                foreach ($groups as $g) {
+                    $groups_exploded = explode(',', $g);
+                    $group_id = $groups_exploded[0];
+                    $network_key = $groups_exploded[1];
 
+                    $id = $networkModel->addUserToNetworkGroup($result, $group_id, $installation_key, $network_key);
+                }
+            }
+            // Create user in Keycloak H2 database 
+
+            $keyCloakApi = new KeyCloakApi($this);
+            if (!$keyCloakApi->userExists($email)) {
+                $first_name = $additionaldata['first_name'];
+                $last_name = $additionaldata['last_name'];
+                $keyCloakApi->createUser($email, $first_name, $last_name);
+                
+                $user_id =  $keyCloakApi->getUserId($email);
+                $keyCloakApi->setPassword($user_id, $password);
+
+                //Send email confirmation
+                
+            }
+
+        }
     }
     /**
      * Error Logout - Log out user from keycloak due to failure of passing local login

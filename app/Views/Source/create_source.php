@@ -31,7 +31,6 @@
 
 <div class="form-group">
 <?php echo form_label('Source Name', 'name'); ?>
-
 	<?php echo form_input($name); ?>
 	<small class="form-text text-muted">
 		(no spaces allowed but underscores and dashes are accepted, <br />uppercase characters will be converted to lowercase)

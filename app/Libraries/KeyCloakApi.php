@@ -14,9 +14,14 @@
 
     private $keycloakConfig;
 
-    function __construct(){
-        $keyCloak = new KeyCloak();
-        $this->keycloakConfig = $keyCloak->getKeyCloakConfig();
+    function __construct(Keycloak $keycloak = null){
+        if ($keycloak) {
+            $this->keycloakConfig = $keycloak->getKeyCloakConfig();
+        }
+        else {
+            $keyCloak = new KeyCloak();
+            $this->keycloakConfig = $keyCloak->getKeyCloakConfig(); 
+        }
     }
 
     private function getAccessToken():string{
@@ -47,6 +52,43 @@
         return false;
     }
 
+    function createUser(string $email, string $first_name, string $last_name):void{
+        $access = $this->getAccessToken();
+        $url = '/admin/realms/'.$this->keycloakConfig['realm'].'/users?realm='.$this->keycloakConfig['realm'];
+        $post_fields = "{\"username\" : \"$email\", \"emailVerified\": true, \"enabled\": true, \"email\" : \"$email\", \"firstName\": \"$first_name\", \"lastName\": \"$last_name\", \"realmRoles\": [ \"offline_access\"  ], \"clientRoles\": {\"account\": [ \"manage-account\", \"view-profile\" ] }}'";
+        $headers = array();
+        $headers[] = 'Accept: application/json';
+        $headers[] = 'Content-Type: application/json';
+        $headers[] = 'Authorization: Bearer '.$access;
+        $this->curlCall($url,false,$post_fields,$headers);
+    }
+
+    function getUserId(string $email){
+        $access = $this->getAccessToken();
+        $url = '/admin/realms/'.$this->keycloakConfig['realm'].'/users?username='.$email;
+        $custom_request = 'GET';
+        $headers = array();
+        $headers[] = 'Authorization: Bearer '.$access;
+        $result = json_decode($this->curlCall($url,$custom_request,false,$headers),1);
+
+        if (count($result) == 1) {
+            return $result[0]['id'];
+        }
+
+        return null;
+    }
+
+    function setPassword(string $user_id, string $password): void{
+        $access = $this->getAccessToken();
+        $url = '/admin/realms/'.$this->keycloakConfig['realm'].'/users/'.$user_id.'/reset-password';
+        $post_fields = "{\"type\" : \"password\", \"temporary\": true, \"value\" : \"$password\" }";
+        $custom_request = 'PUT';
+        $headers = array();
+        $headers[] = 'Authorization: Bearer '.$access;
+        $headers[] = 'Content-Type: application/json';
+        $this->curlCall($url,$custom_request,$post_fields,$headers);
+    
+    }
 
     public function curlCall(string $url, $custom_request = false,$post_fields = false, $headers) {
         $ch = curl_init();
