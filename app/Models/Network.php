@@ -172,15 +172,17 @@ class Network extends Model{
 	}
 
 
-
-	
-	function addUserToNetworkGroup($user_id, $group_id, $installation_key) {
-
+	function getNetworkKeybyGroupId(int $group_id){
 		$this->builder = $this->db->table('network_groups');
 		$this->builder->select("network_key");
 		$this->builder->where('id', $group_id);
 		$query = $this->builder->get()->getResultArray();
 		$network_key = $query[0]['network_key'];
+
+		return $network_key;
+	}
+	
+	function addUserToNetworkGroup(int $user_id, int $group_id, string $installation_key, string $network_key) {
 		$data = array ( 'group_id' => $group_id,
 						'user_id' => $user_id,
 						'installation_key' => $installation_key,
@@ -189,8 +191,8 @@ class Network extends Model{
 
 		$this->builder = $this->db->table('users_groups_networks');				
 		$this->builder->insert( $data);
-		//$insert_id = $this->db->insertID();
-		return $network_key;
+		$insert_id = $this->db->insertID();
+		return $insert_id;
 	}
 
 	function deleteAllUsersFromNetworkGroup($group_id, $isMaster = false) {
