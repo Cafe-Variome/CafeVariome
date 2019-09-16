@@ -206,6 +206,12 @@ class Network extends Model{
 
 	}
 
+	function deleteUserFromAllNetworkGroups(int $user_id){
+		$this->builder = $this->db->table('users_groups_networks');				
+		$this->builder->where('user_id', $user_id);
+		$this->builder->delete();
+	}
+	
 	function deleteAllUsersFromNetworkGroup($group_id, $isMaster = false) {
 		if($isMaster) {
 			$this->builder = $this->db->table('network_groups');
