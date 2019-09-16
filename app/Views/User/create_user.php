@@ -75,7 +75,7 @@
             <button type="reset" class="btn btn-secondary">
                 <i class="fa fa-minus"></i> Clear
             </button>
-            <a href="<?php echo base_url() . "auth_federated/users"; ?>" class="btn btn-secondary" >
+            <a href="<?php echo base_url() . "user/users"; ?>" class="btn btn-secondary" >
                 <i class="fa fa-backward"></i> Go back
             </a>
         </div>
