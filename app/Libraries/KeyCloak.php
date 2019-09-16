@@ -297,6 +297,50 @@ class KeyCloak{
 
         }
     }
+
+    public function update(int $user_id, array $additionaldata, array $groups){
+        $ionAuthModel = new \App\Models\IonAuthModel();
+        $networkModel = new Network($this->db);
+
+        if($ionAuthModel->update($user_id, $additionaldata))
+        {
+            //network groups user is already in
+            $user_groups = $networkModel->getNetworkGroupsForInstallationForUser($user_id);
+            $installation_key = $this->setting->settingData["installation_key"];
+
+            foreach ($groups as $g) {
+                $found = false;
+                $group_id = explode(',', $g)[0];
+                $network_key = explode(',', $g)[1];
+
+                foreach ($user_groups as $ug) {
+                    if (explode(',', $g)[0] == $ug['group_id']){
+                        $found = true;
+                    }
+                }
+                if(!$found){
+                    //add user to new groups
+                    $networkModel->addUserToNetworkGroup($user_id, $group_id, $installation_key, $network_key);
+                }
+            }
+            foreach ($user_groups as $ug) {
+                $found = false;
+                $network_key = $ug['network_key'];
+                $group_id = $ug['group_id'];
+                foreach ($groups as $g) {
+                    if (explode(',', $g)[0] == $ug['group_id']){
+                        $found = true;
+                    }
+                }
+                if (!$found){
+                    //add user to new groups
+                    $networkModel->deleteUserFromNetworkGroup($user_id, $group_id, $installation_key, $network_key);
+                }
+            }
+        }
+
+
+    }
     /**
      * Error Logout - Log out user from keycloak due to failure of passing local login
      *                checks
@@ -411,8 +455,10 @@ class KeyCloak{
         $kcConf = array();
         $kcConf['authServerUrl'] = $this->serverURI;
         $kcConf['realm'] = $this->realm;
-        
-        return $kcConf ;
+        $kcConf['client_id'] = $this->clientId;
+        $kcConf['client_secret'] = $this->clientSecret;
+
+        return $kcConf;
     }
 }
 

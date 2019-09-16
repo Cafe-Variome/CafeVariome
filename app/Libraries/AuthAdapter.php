@@ -64,6 +64,15 @@ class AuthAdapter{
         return $this->authEngine->register($email, $username, $password, $additionaldata, $groups);
     }
 
+    public function update(int $user_id, array $additionaldata, array $groups = []){
+        if(get_class($this->authEngine) == 'IonAuth'){
+            return (new \App\Models\IonAuthModel())->update($user_id, $additionaldata);
+        }
+        else{
+            return $this->authEngine->update($user_id, $additionaldata, $groups);
+        }
+    }
+
     public function logout():bool{
         return $this->authEngine->logout();
     }

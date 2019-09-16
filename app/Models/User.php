@@ -32,6 +32,11 @@ class User extends Model{
     function createUser(string $email, string $username, array $groups = [], array $data = [], &$authadapter){
         $authadapter->register($email, $username, $data, $groups);
     }
+
+    function updateUser(int $user_id,array $groups = [], array $data = [], &$authadapter){
+        $authadapter->update($user_id, $data, $groups);
+    }
+
     /**
      * Gets user object by Id.
      * @param int id User ID

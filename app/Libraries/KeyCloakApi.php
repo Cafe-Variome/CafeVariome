@@ -95,6 +95,14 @@
     
     }
 
+    function logout(){
+        $url = '/admin/realms/'.$this->keycloakConfig['realm'].'/users/'.$key['user']['id'].'/logout';
+        $post_fields = 'POST';
+        $headers = array();
+        $headers[] = 'Authorization: Bearer '.$access;
+        $result = json_decode($this->build_curl_command($url,false,$post_fields,$headers),1);
+    }
+
     public function curlCall(string $url, $custom_request = false,$post_fields = false, $headers) {
         $ch = curl_init();
         $uri = $this->keycloakConfig['authServerUrl']. $url;

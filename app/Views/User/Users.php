@@ -54,10 +54,10 @@
             <td><?php if ($user['active']) { echo 'Active'; } else { echo 'Inactive'; } ?></td>
             <td><?php if ($user['remote']) { echo 'Remote User'; } else { echo 'Local User'; } ?></td>
             <td>
-                <a data-toggle="tooltip" data-placement="top" title="Edit User" href="<?php echo base_url('auth_federated/edit_user'). "/" . $user['id']; ?>" >
+                <a data-toggle="tooltip" data-placement="top" title="Edit User" href="<?php echo base_url('user/edit_user'). "/" . $user['id']; ?>" >
                     <i class="fa fa-edit"></i>
                 </a>
-                <a data-toggle="tooltip" data-placement="top" title="Delete User" href="<?php echo base_url('auth_federated/delete'). "/" . $user['id']; ?>" >
+                <a data-toggle="tooltip" data-placement="top" title="Delete User" href="<?php echo base_url('user/delete_user'). "/" . $user['id']; ?>" >
                     <i class="fa fa-trash"></i>
                 </a>
         </tr>
