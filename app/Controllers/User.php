@@ -257,13 +257,15 @@ class User extends CVUI_Controller{
                 $first_name = $this->request->getVar('first_name');
                 $last_name = $this->request->getVar('last_name');
                 $company = $this->request->getVar('company');
+                $active = ($this->request->getVar('active') != null) ? 1 : 0;
 
                 $data = [
                         "first_name" => $first_name,
                         "last_name" => $last_name,
                         "company" => $company,
                         "is_admin" => $is_admin,
-                        "remote" => $remote
+                        "remote" => $remote,
+                        "active" => $active
                 ];
     
                 $userModel = new \App\Models\User($this->db);
@@ -331,6 +333,13 @@ class User extends CVUI_Controller{
                     'class' => 'custom-control-input',
                     'value' => set_value('isremote', $user['remote']),
                     'checked' => ($user['remote'] == 1) ? true : false
+                );
+                $uidata->data['active'] = array(
+                    'name'  => 'active',
+                    'id'    => 'active',
+                    'class' => 'custom-control-input',
+                    'value' => set_value('active', $user['active']),
+                    'checked' => ($user['active'] == 1) ? true : false
                 );
             }
             $data = $this->wrapData($uidata);

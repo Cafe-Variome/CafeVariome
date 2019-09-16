@@ -61,6 +61,12 @@
     </div>
     <div class="form-group">
         <div class="custom-control custom-checkbox">
+            <?php echo form_checkbox($active); ?>
+            <?php echo form_label('User status', 'active', array("class"=>"custom-control-label")); ?>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="custom-control custom-checkbox">
             <?php echo form_checkbox($isadmin); ?>
             <?php echo form_label('Assign admin rights to user for this installation.', 'isadmin', array("class"=>"custom-control-label")); ?>
         </div>
