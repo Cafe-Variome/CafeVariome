@@ -195,6 +195,17 @@ class Network extends Model{
 		return $insert_id;
 	}
 
+	function deleteUserFromNetworkGroup(int $user_id, int $group_id, string $installation_key, string $network_key){
+		$this->builder = $this->db->table('users_groups_networks');				
+		$this->builder->where('user_id', $user_id);
+		$this->builder->where('group_id', $group_id);
+		$this->builder->where('installation_key', $installation_key);
+		$this->builder->where('network_key', $network_key);
+
+		$this->builder->delete();
+
+	}
+
 	function deleteAllUsersFromNetworkGroup($group_id, $isMaster = false) {
 		if($isMaster) {
 			$this->builder = $this->db->table('network_groups');
@@ -431,6 +442,17 @@ class Network extends Model{
 		if (!$query) {
 			$query = ['error' => 'Unable to get current networks for sources in this installation'];
 		}
+		return $query;
+	}
+
+	function getNetworkGroupsForInstallationForUser(int $user_id) {
+		$this->builder = $this->db->table('users_groups_networks');
+		$this->builder->select('users_groups_networks.group_id, network_groups.network_key');
+		$this->builder->join('network_groups', 'network_groups.id = users_groups_networks.group_id');
+		$this->builder->join('networks', 'networks.network_key = users_groups_networks.network_key');
+		$this->builder->where('user_id', $user_id);
+		$query = $this->builder->get()->getResultArray();
+		
 		return $query;
 	}
 }
