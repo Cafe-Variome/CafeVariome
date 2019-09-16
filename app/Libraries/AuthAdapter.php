@@ -73,6 +73,10 @@ class AuthAdapter{
         }
     }
 
+    public function delete(int $user_id){
+        $this->authEngine->deleteUser($user_id);
+    }
+
     public function logout():bool{
         return $this->authEngine->logout();
     }

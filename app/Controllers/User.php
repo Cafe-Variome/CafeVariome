@@ -336,11 +336,46 @@ class User extends CVUI_Controller{
             $data = $this->wrapData($uidata);
             return view("user/edit_user", $data);  
         }
-      
     }
 
     function delete_user(int $id){
+        $uidata = new UIData();
+        $userModel = new \App\Models\User($this->db);
 
+        $uidata->title = "Delete User";
+
+        $user = $userModel->getUsers('id, first_name, last_name', ["id" => $id]);
+        if (count($user) != 1) {
+            return redirect()->to(base_url("user/users"));
+        }
+        else {
+            $user = $user[0];
+            $uidata->data['id'] = $user['id'];
+            $uidata->data['first_name'] = $user['first_name']; 
+            $uidata->data['last_name'] = $user['last_name']; 
+
+            $this->validation->setRules([
+                'confirm' => [
+                    'label'  => 'confirmation',
+                    'rules'  => 'required',
+                    'errors' => [
+                        'required' => '{field} is required.'
+                    ]
+                ]         
+            ]);
+            if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+                if ($this->request->getVar('confirm') == 'yes') {
+                    //delete user
+                    $userModel->deleteUser((int)$user['id'], $this->authAdapter);
+                    return redirect()->to(base_url("user/users"));
+                }
+                else {
+                    return redirect()->to(base_url("user/users"));
+                }
+            }
+            $data = $this->wrapData($uidata);
+            return view("user/delete_user", $data);
+        }
     }
 
     function user(int $id){

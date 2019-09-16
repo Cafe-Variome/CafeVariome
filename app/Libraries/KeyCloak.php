@@ -341,6 +341,16 @@ class KeyCloak{
 
 
     }
+
+    public function deleteUser(int $user_id){
+        $ionAuthModel = new \App\Models\IonAuthModel();
+        $networkModel = new Network($this->db);
+
+        if($ionAuthModel->deleteUser($user_id)){
+            $networkModel->deleteUserFromAllNetworkGroups($user_id);
+        }
+    }
+
     /**
      * Error Logout - Log out user from keycloak due to failure of passing local login
      *                checks
