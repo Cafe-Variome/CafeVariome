@@ -26,6 +26,10 @@ class KeyCloak{
     private $clientId;
     private $clientSecret;
 
+    private $adminId;
+    private $adminUsername;
+    private $adminPassword;
+    
     private $loginURI;
     private $logoutURI;
 
@@ -42,6 +46,10 @@ class KeyCloak{
         $this->realm = $this->setting->settingData["key_cloak_realm"];
         $this->clientId = $this->setting->settingData["key_cloak_client_id"];
         $this->clientSecret = $this->setting->settingData["key_cloak_client_secret"];
+
+        $this->adminId = $this->setting->settingData["key_cloak_admin_id"];
+        $this->adminUsername = $this->setting->settingData["key_cloak_admin_username"];
+        $this->adminPassword = $this->setting->settingData["key_cloak_admin_password"];
 
         $this->loginURI = $this->setting->settingData["key_cloak_login_uri"];
         $this->logoutURI = $this->setting->settingData["key_cloak_logout_uri"];
@@ -290,7 +298,7 @@ class KeyCloak{
                 
                 $user_id =  $keyCloakApi->getUserId($email);
                 $keyCloakApi->setPassword($user_id, $password);
-
+                $keyCloakApi->logout();
                 //Send email confirmation
                 
             }
@@ -338,8 +346,6 @@ class KeyCloak{
                 }
             }
         }
-
-
     }
 
     public function deleteUser(int $user_id){
@@ -467,7 +473,9 @@ class KeyCloak{
         $kcConf['realm'] = $this->realm;
         $kcConf['client_id'] = $this->clientId;
         $kcConf['client_secret'] = $this->clientSecret;
-
+        $kcConf['admin_id'] = $this->adminId;
+        $kcConf['admin_username'] = $this->adminUsername;
+        $kcConf['admin_password'] = $this->adminPassword;
         return $kcConf;
     }
 }

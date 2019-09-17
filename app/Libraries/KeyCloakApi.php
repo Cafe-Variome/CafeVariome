@@ -32,11 +32,10 @@
         else{
             $access = "";
             $url = '/realms/'.$this->keycloakConfig['realm'].'/protocol/openid-connect/token';
-            $post_fields = "client_id=admin-cli&username=admin&password=13759806&grant_type=password";
+            $post_fields = "client_id=admin-cli&username=".$this->keycloakConfig['admin_username']."&password=".$this->keycloakConfig['admin_password']."&grant_type=password";
             $headers = array();
             $headers[] = 'Content-Type: application/x-www-form-urlencoded';
             $result = json_decode($this->curlCall($url,false,$post_fields,$headers),1);
-
             $access = $result['access_token'];
             return $access;
         }
@@ -96,11 +95,12 @@
     }
 
     function logout(){
-        $url = '/admin/realms/'.$this->keycloakConfig['realm'].'/users/'.$key['user']['id'].'/logout';
+        $access = $this->getAccessToken();
+        $url = '/admin/realms/'.$this->keycloakConfig['realm'].'/users/'.$this->keycloakConfig['admin_id'].'/logout';
         $post_fields = 'POST';
         $headers = array();
         $headers[] = 'Authorization: Bearer '.$access;
-        $result = json_decode($this->build_curl_command($url,false,$post_fields,$headers),1);
+        $result = json_decode($this->curlCall($url,false,$post_fields,$headers),1);
     }
 
     public function curlCall(string $url, $custom_request = false,$post_fields = false, $headers) {
