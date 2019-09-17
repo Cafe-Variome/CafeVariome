@@ -407,12 +407,37 @@ class Connection extends BaseConnection implements ConnectionInterface
 				$obj->constraint_name    = $row->from . ' to ' . $row->table . '.' . $row->to;
 				$obj->table_name         = $table;
 				$obj->foreign_table_name = $row->table;
+				$obj->sequence           = $row->seq;
 
 				$retVal[] = $obj;
 			}
 		}
 
 		return $retVal;
+	}
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Returns platform-specific SQL to disable foreign key checks.
+	 *
+	 * @return string
+	 */
+	protected function _disableForeignKeyChecks()
+	{
+		return 'PRAGMA foreign_keys = OFF';
+	}
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Returns platform-specific SQL to enable foreign key checks.
+	 *
+	 * @return string
+	 */
+	protected function _enableForeignKeyChecks()
+	{
+		return 'PRAGMA foreign_keys = ON';
 	}
 
 	//--------------------------------------------------------------------
@@ -504,7 +529,7 @@ class Connection extends BaseConnection implements ConnectionInterface
 	 *
 	 * @return boolean
 	 */
-	protected function supportsForeignKeys(): bool
+	public function supportsForeignKeys(): bool
 	{
 		$result = $this->simpleQuery('PRAGMA foreign_keys');
 

@@ -406,14 +406,40 @@ class Connection extends BaseConnection implements ConnectionInterface
 		$retVal = [];
 		foreach ($query as $row)
 		{
-			$obj                     = new \stdClass();
-			$obj->constraint_name    = $row->constraint_name;
-			$obj->table_name         = $row->table_name;
-			$obj->foreign_table_name = $row->foreign_table_name;
-			$retVal[]                = $obj;
+			$obj                      = new \stdClass();
+			$obj->constraint_name     = $row->constraint_name;
+			$obj->table_name          = $row->table_name;
+			$obj->column_name         = $row->column_name;
+			$obj->foreign_table_name  = $row->foreign_table_name;
+			$obj->foreign_column_name = $row->foreign_column_name;
+			$retVal[]                 = $obj;
 		}
 
 		return $retVal;
+	}
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Returns platform-specific SQL to disable foreign key checks.
+	 *
+	 * @return string
+	 */
+	protected function _disableForeignKeyChecks()
+	{
+		return 'SET CONSTRAINTS ALL DEFERRED';
+	}
+
+	//--------------------------------------------------------------------
+
+	/**
+	 * Returns platform-specific SQL to enable foreign key checks.
+	 *
+	 * @return string
+	 */
+	protected function _enableForeignKeyChecks()
+	{
+		return 'SET CONSTRAINTS ALL IMMEDIATE;';
 	}
 
 	//--------------------------------------------------------------------

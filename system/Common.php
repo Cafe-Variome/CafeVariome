@@ -111,7 +111,7 @@ if (! function_exists('config'))
 
 //--------------------------------------------------------------------
 
-if (! function_exists('db_connnect'))
+if (! function_exists('db_connect'))
 {
 	/**
 	 * Grabs a database connection and returns it to the user.
@@ -815,7 +815,7 @@ if (! function_exists('force_https'))
 		$response->setHeader('Strict-Transport-Security', 'max-age=' . $duration);
 		$response->redirect($uri);
 		$response->sendHeaders();
-		
+
 		exit();
 	}
 }
@@ -1079,7 +1079,23 @@ if (! function_exists('dd'))
 	 */
 	function dd(...$vars)
 	{
+		Kint::$aliases[] = 'dd';
 		Kint::dump(...$vars);
 		exit;
+	}
+}
+
+
+//--------------------------------------------------------------------
+
+if (! function_exists('trace'))
+{
+	/**
+	 * Provides a backtrace to the current execution point, from Kint.
+	 */
+	function trace()
+	{
+		Kint::$aliases[] = 'trace';
+		Kint::trace();
 	}
 }

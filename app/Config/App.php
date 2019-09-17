@@ -264,18 +264,4 @@ class App extends BaseConfig
 	*/
 	public $CSPEnabled = false;
 
-
-	/*
-	|--------------------------------------------------------------------------
-	| Cafe Variome UI Constants
-	|--------------------------------------------------------------------------
-	| @author Mehdi Mehtarizadeh
-	| This section contains constants for running Cafe Variome. 
-	| 
-	| 
-	| 
-	*/
-
-
-
 }

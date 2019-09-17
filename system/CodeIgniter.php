@@ -65,7 +65,7 @@ class CodeIgniter
 	/**
 	 * The current version of CodeIgniter Framework
 	 */
-	const CI_VERSION = '4.0.0-beta.3';
+	const CI_VERSION = '4.0.0-rc.1';
 
 	/**
 	 * App startup time.
@@ -224,6 +224,7 @@ class CodeIgniter
 		$this->spoofRequestMethod();
 
 		Events::trigger('pre_system');
+
 		// Check for a cached page. Execution will stop
 		// if the page has been cached.
 		$cacheConfig = new Cache();
@@ -354,6 +355,12 @@ class CodeIgniter
 		else
 		{
 			$response = $this->response;
+
+			// Set response code for CLI command failures
+			if (is_numeric($returned) || $returned === false)
+			{
+				$response->setStatusCode(400);
+			}
 		}
 
 		if ($response instanceof Response)
@@ -967,6 +974,17 @@ class CodeIgniter
 	 */
 	public function storePreviousURL($uri)
 	{
+		// Ignore CLI requests
+		if (is_cli())
+		{
+			return;
+		}
+		// Ignore AJAX requests
+		if (method_exists($this->request, 'isAJAX') && $this->request->isAJAX())
+		{
+			return;
+		}
+
 		// This is mainly needed during testing...
 		if (is_string($uri))
 		{
