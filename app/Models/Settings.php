@@ -32,24 +32,24 @@ class Settings extends Model{
      * @return object
      */
 
-  public function __construct(ConnectionInterface &$db, bool $returnFull = false)
-  {
-      $this->db =& $db;
-      if (!$returnFull) {    
-        $settings = $this->findAll();
-        $c = 0;
-        foreach ($settings as $row) {
-          $c++;
+    public function __construct(ConnectionInterface &$db, bool $returnFull = false)
+    {
+        $this->db =& $db;
+        if (!$returnFull) {    
+          $settings = $this->findAll();
+          $c = 0;
+          foreach ($settings as $row) {
+            $c++;
 
-          if ( $row['value'] == "off") {
-              $this->settingData[$row['setting_key']] = false;
+            if ( $row['value'] == "off") {
+                $this->settingData[$row['setting_key']] = false;
+            }
+            else {
+                $this->settingData[$row['setting_key']] =  $row['value'];               
+            }
           }
-          else {
-              $this->settingData[$row['setting_key']] =  $row['value'];               
-          }
-        }
+      }
     }
-  }
 
     public static function getInstance(ConnectionInterface &$db)
     {
@@ -61,5 +61,32 @@ class Settings extends Model{
       return self::$_settings;
     }
 
+    public function getSettings(string $cols = null, array $conds = null, int $limit = -1, int $offset = -1){
+        $builder = $this->db->table($this->table);		
+
+        if ($cols) {
+            $builder->select($cols);
+        }
+        if ($conds) {
+            $builder->where($conds);
+        }
+        if ($limit > 0) {
+            if ($offset > 0) {
+                $builder->limit($limit, $offset);
+            }
+            $builder->limit($limit);
+        }
+
+        $query = $builder->get()->getResultArray();
+        return $query; 
+    }
+
+    public function updateSettings(array $data, array $conds) {
+      $this->builder = $this->db->table($this->table);
+      if ($conds) {
+          $this->builder->where($conds);
+      }
+      $this->builder->update($data);
+  }
+
 }
-?>

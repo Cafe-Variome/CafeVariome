@@ -21,6 +21,14 @@ use CodeIgniter\Config\Services;
 class Admin extends CVUI_Controller{
 
     /**
+	 * Validation list template.
+	 *
+	 * @var string
+	 */
+    protected $validationListTemplate = 'list';
+
+
+    /**
 	 * Constructor
 	 *
 	 */
@@ -32,6 +40,9 @@ class Admin extends CVUI_Controller{
 		$this->session = Services::session();
 		$this->db = \Config\Database::connect();
         $this->setting =  Settings::getInstance($this->db);
+
+        $this->validation = Services::validation();
+
     }
 
     function index(){
@@ -47,15 +58,39 @@ class Admin extends CVUI_Controller{
     function settings() {
         $uidata = new UIData();
         $uidata->title = "Settings";
+        $uidata->stickyFooter = false;
 
-        $settings = $this->setting->settingData;
-        var_dump($settings);exit;
+        $settingModel = new Settings($this->db, true);
+
+        $settings =  $settingModel->getSettings();
         $uidata->data['settings'] = $settings;
+        /*
+        $validationRules = [];
+
+        foreach ($settings as $s) {
+            $validationRules[$s['setting_key']] = [
+                'label' => $s['setting_name'],
+                'rules' => $s['validation_rules'],
+                'errors' => [
+
+                ]
+            ];
+        }
+
+        $this->validation->setRules($validationRules);
+        */
+        
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+            foreach ($settings as $s) {
+                $settingModel->updateSettings(['value' => $this->request->getVar($s["setting_key"])], ['setting_key' =>  $s["setting_key"]]);
+            }
+            return redirect()->to(base_url("admin/settings"));
+        }
+        else{
+            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+        }
 
         $data = $this->wrapData($uidata);
         return view("admin/settings", $data);
     }
-
-
-
 }
