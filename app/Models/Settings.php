@@ -21,7 +21,7 @@ class Settings extends Model{
   public $settingData = Array();
 
 	protected $table      = 'settings';
-	protected $primaryKey = 'settings_id';
+	protected $primaryKey = 'setting_id';
 
 	protected $tempReturnType = 'array';
 
@@ -32,22 +32,23 @@ class Settings extends Model{
      * @return object
      */
 
-  public function __construct(ConnectionInterface &$db)
+  public function __construct(ConnectionInterface &$db, bool $returnFull = false)
   {
       $this->db =& $db;
-      $settings = $this->findAll();
-      $c = 0;
-      foreach ($settings as $row) {
-        $c++;
+      if (!$returnFull) {    
+        $settings = $this->findAll();
+        $c = 0;
+        foreach ($settings as $row) {
+          $c++;
 
-        if ( $row['value'] == "off") {
-                  $this->settingData[$row['name']] = false;
+          if ( $row['value'] == "off") {
+              $this->settingData[$row['setting_key']] = false;
+          }
+          else {
+              $this->settingData[$row['setting_key']] =  $row['value'];               
+          }
         }
-        else {
-              $this->settingData[$row['name']] =  $row['value'];               
-        }
-
-      }
+    }
   }
 
     public static function getInstance(ConnectionInterface &$db)
