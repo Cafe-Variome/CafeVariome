@@ -62,24 +62,6 @@
             }
         }
     </style>
-    <!-- TODO: Move from Cafe Variome 2 source code once necessary. Some files may not be necessary. -->
-    <!-- TODO: The links to files which are moved are put above this section. -->
-    <!-- TODO: Prepare css minification. -->
-
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."global.css");?>" /> -->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."prettify.css");?>" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."jquery-ui.css");?>" />
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."fileUploader.css");?>" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."DT_bootstrap.css");?>" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."jquery.cluetip.css");?>" type="text/css" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."bootstrap-arrows.css");?>" type="text/css" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."cookiecuttr.css");?>" type="text/css" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."jquery.treetable.css");?>" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."jquery.treetable.theme.default.css");?>" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."jquery.switchButton.css");?>" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."bootstrap-editable.css");?>" type="text/css" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."spectrum.css");?>" />-->
-    <!--<link rel="stylesheet" href="<?php echo base_url(CSS."jquery.growl.css");?>" />-->
 
     <!-- extra CSS-->
     <?php foreach($css as $c):?>
@@ -98,49 +80,7 @@
         var baseurl = "<?php print base_url(); ?>";
         var authurl = "<?php print rtrim($setting->settingData['auth_server'],"/"); // remove trailing slash from the auth_server config variable ?>";
     </script>
-    <!-- note: jstree requires the addBack function that wasn't added to jQuery until 1.8, therefore I have changed 1.7.1 to 1.8.1 (tb143) -->
-    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>-->
 
-
-
-    <!-- TODO: Move from Cafe Variome 2 source code once necessary. Some files may not be necessary. -->
-    <!-- TODO: The links to files which are moved are put above this section. -->
-    <!-- TODO: Prepare js minification. -->
-                            
-    <!--<script src="<?php echo base_url(JS."libs/underscore-1.3.1.min.js");?>"></script>-->
-    <!--<script src="<?php  echo base_url(JS."plugins.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."script.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."cafevariome.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."bootbox.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."jquery-ui.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."bootstrap-editable.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."jquery.dataTables.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."DT_bootstrap.js");?>"></script>-->
-    <!--<script src="<?php //echo base_url(JS."jquery.ibutton.js");?>"></script> -->
-    <!--<script src="<?php echo base_url(JS."jquery.metadata.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."spectrum.js");?>"></script> -->
-    <!--<script src="<?php echo base_url(JS."jquery.cluetip.js");?>"></script>-->
-    <!-- <script src="<?php echo base_url(JS."highcharts.js");?>"></script> -->
-    <!--<script src="<?php echo base_url(JS."bootstrap-arrows.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."jquery.cookiecuttr.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."jquery.cookie.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."jquery.maskedinput.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."jquery.treetable.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."jquery.switchButton.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."select2.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."jquery.dataTables.delay.min.js");?>"></script>-->
-    <!--<script src="<?php // echo base_url(JS."jquery.hideShowPassword.min.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."json3.js");?>"></script> -->
-    <!--<script src="<?php echo base_url(JS."/tinymce/tinymce.min.js");?>"></script>-->        
-    <!-- tb143 -->
-    <!--<script src="<?php echo base_url(JS."phenotypeList.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."form_complete.js");?>"></script>-->
-    
-    <!--<script src="<?php echo base_url(JS."json3.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."jquery.fileUploader.js");?>"></script>-->
-    <!--<script src="<?php echo base_url(JS."bootstrap-notify.js");?>"></script>-->
-    
-    <!--<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">-->
     <?php if ($setting->settingData['messaging']): ?>
         <!-- TODO: Move from Cafe Variome 2 source code once necessary. Some files may not be necessary. -->
         <!-- TODO: The links to files which are moved are put above this section. -->
