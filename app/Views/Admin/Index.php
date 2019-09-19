@@ -96,10 +96,12 @@
     <div class="col">
         <div class="row">
             <div class="col">
+                <a href="<?= base_url("admin/settings") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/settings.png") ?>"></a>           
             </div>
         </div>
         <div class="row">
             <div class="col">
+            <a href="<?= base_url("admin/settings") ?>">Settings</a>
             </div>
         </div>
     </div>
