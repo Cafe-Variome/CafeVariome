@@ -12,6 +12,7 @@ use App\Models\Settings;
 use App\Models\User;
 use App\Helpers\AuthHelper;
 use App\Models\Network;
+use CafeVariome\Email;
 
 class KeyCloak{
 
@@ -300,7 +301,11 @@ class KeyCloak{
                 $keyCloakApi->setPassword($user_id, $password);
                 $keyCloakApi->logout();
                 //Send email confirmation
-                
+                $emailAdapter = \Config\Services::email();
+
+                $credEmailInstance = EmailFactory::createCredentialsEmail($emailAdapter);
+                $credEmailInstance->setCredentials($email, $password);
+                $credEmailInstance->send();
             }
 
         }
