@@ -48,9 +48,15 @@
 			</li>
 			<?php endif; ?>
 			<li class="nav-item">
+				<?php if ($auth->getAuthEngineName() === "app\libraries\keycloak"): ?>
+				<a class="nav-link" href="<?= $setting->settingData['key_cloak_uri'] . "/realms/". $setting->settingData['key_cloak_realm'] ."/account/" ?>">
+					Profile
+				</a> 
+				<?php else : ?>
 				<a class="nav-link" href="<?= base_url("auth/profile") ?>">
 					Profile
 				</a> 
+				<?php endif ?>
 			</li>
 			<li class="nav-item">
 				<a class="nav-link" href="<?= base_url("auth/logout") ?>">Logout</a>	
