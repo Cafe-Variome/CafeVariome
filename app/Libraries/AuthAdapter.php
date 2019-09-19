@@ -93,4 +93,8 @@ class AuthAdapter{
         return $this->authEngine->isAdmin($id);
     }
 
+    public function getAuthEngineName(bool $lower_case = true): string{
+        return ($lower_case) ? strtolower(get_class($this->authEngine)) : get_class($this->authEngine);
+    }
+
 }
