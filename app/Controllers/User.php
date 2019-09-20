@@ -172,7 +172,7 @@ class User extends CVUI_Controller{
             */
         }
         $data = $this->wrapData($uidata);
-        return view("user/create_user", $data);
+        return view("User/Create_User", $data);
     }
 
     function users(){
@@ -202,7 +202,7 @@ class User extends CVUI_Controller{
         $uidata->javascript = array(JS."cafevariome/components/datatable.js", JS."cafevariome/admin.js", VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
         $data = $this->wrapData($uidata);
-        return view("user/users", $data);
+        return view("User/Users", $data);
     }
 
     function edit_user(int $id){
@@ -343,7 +343,7 @@ class User extends CVUI_Controller{
                 );
             }
             $data = $this->wrapData($uidata);
-            return view("user/edit_user", $data);  
+            return view("User/Edit_User", $data);  
         }
     }
 
@@ -383,7 +383,7 @@ class User extends CVUI_Controller{
                 }
             }
             $data = $this->wrapData($uidata);
-            return view("user/delete_user", $data);
+            return view("User/Delete_User", $data);
         }
     }
 

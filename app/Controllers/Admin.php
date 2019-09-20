@@ -84,13 +84,13 @@ class Admin extends CVUI_Controller{
             foreach ($settings as $s) {
                 $settingModel->updateSettings(['value' => $this->request->getVar($s["setting_key"])], ['setting_key' =>  $s["setting_key"]]);
             }
-            return redirect()->to(base_url("admin/settings"));
+            return redirect()->to(base_url("Admin/Settings"));
         }
         else{
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
         }
 
         $data = $this->wrapData($uidata);
-        return view("admin/settings", $data);
+        return view("Admin/Settings", $data);
     }
 }

@@ -54,7 +54,7 @@ class AuthHelper
         $uri = str_replace("https://", "", $uri);
       }
 
-      $fp = @fsockopen($uri, $port, $errno, $errstr, 30);
+      $fp = @fsockopen($uri, $port, $errno, $errstr, 10);
 
       if ($fp) {
         //server is available

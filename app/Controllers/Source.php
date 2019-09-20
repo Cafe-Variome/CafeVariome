@@ -91,7 +91,7 @@ class Source extends CVUI_Controller{
 
         $data = $this->wrapData($uidata);
 
-        return view('source/sources', $data);
+        return view('Source/Sources', $data);
     }
 
     public function create_source() {
@@ -269,7 +269,7 @@ class Source extends CVUI_Controller{
             $uidata->javascript = array(JS.'cafevariome/components/transferbox.js', JS.'cafevariome/source.js');
 
             $data = $this->wrapData($uidata);
-            return view('source/create_source', $data);
+            return view('Source/Create_Source', $data);
         }
     }
 
@@ -444,7 +444,7 @@ class Source extends CVUI_Controller{
 
             $data = $this->wrapData($uidata);
 
-            return view('source/edit_source', $data);
+            return view('Source/Edit_Source', $data);
         }
     }
 
@@ -531,7 +531,7 @@ class Source extends CVUI_Controller{
             );
 
             $data = $this->wrapData($uidata);
-            return view('source/delete_source', $data);
+            return view('Source/Delete_Source', $data);
             }
             //redirect them back to the auth page
             return redirect()->to(base_url("source/sources"));
@@ -549,7 +549,7 @@ class Source extends CVUI_Controller{
 
         $data = $this->wrapData($uidata);
 
-        return view('source/status', $data);
+        return view('Source/Status', $data);
     }
 
     public function getSourceStatus($source_id){

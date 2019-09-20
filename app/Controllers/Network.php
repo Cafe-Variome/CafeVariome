@@ -68,7 +68,7 @@ class Network extends CVUI_Controller{
         $uidata->javascript = array(JS.'cafevariome/network.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
         $data = $this->wrapData($uidata);
-        return view("network/networks", $data);
+        return view("Network/Networks", $data);
     }
 
     /**
@@ -128,7 +128,7 @@ class Network extends CVUI_Controller{
 
             $data = $this->wrapData($uidata);
 
-            return view('network/create_network', $data);
+            return view('Network/Create_Network', $data);
         }
     }
 
@@ -267,7 +267,7 @@ class Network extends CVUI_Controller{
             $uidata->javascript = array(JS."cafevariome/network.js", JS."cafevariome/components/transferbox.js");
     
             $data = $this->wrapData($uidata);
-            return view('network/edit_network_groups_users', $data);
+            return view('Network/Edit_Network_Groups_Users', $data);
         }
     }
 
@@ -300,7 +300,7 @@ class Network extends CVUI_Controller{
 
             $data = $this->wrapData($uidata);
 
-            return view('network/join_network', $data);
+            return view('Network/Join_Network', $data);
         }
     }
 
@@ -367,7 +367,7 @@ class Network extends CVUI_Controller{
         $uidata->javascript = array(JS."/cafevariome/network.js");
         $data = $this->wrapData($uidata);
 
-        return view('network/edit_network_threshold', $data);
+        return view('Network/Edit_Network_Threshold', $data);
     }
 
     function _get_csrf_nonce()

@@ -37,7 +37,7 @@ class Discover extends CVUI_Controller{
     }
 
     public function index(){
-        return redirect()->to(base_url("discover/select_network"));
+        return redirect()->to(base_url("Discover/select_network"));
     }
 
     public function select_network(){
@@ -59,7 +59,7 @@ class Discover extends CVUI_Controller{
         $uidata->javascript = array(JS."cafevariome/discover.js");
 
         $data = $this->wrapData($uidata);
-        return view('discover/select_network', $data);
+        return view('Discover/Select_Network', $data);
     }
 
     public function query_builder($network_key = null){
@@ -70,7 +70,7 @@ class Discover extends CVUI_Controller{
             $this->session->set(array('network_key' => $network_key));
         } 
         else {
-            return redirect()->to(base_url('discover/select_network'));
+            return redirect()->to(base_url('Discover/Select_Network'));
         }
 
         // Check if the user is in the master network group for this network
@@ -113,11 +113,11 @@ class Discover extends CVUI_Controller{
             if(PHENOTYPE_CATEGORIES) {
                 $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js',JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
                 $data = $this->wrapData($uidata);
-                return view("discover/query_builder", $data);
+                return view("Discover/Query_Builder", $data);
             } else {
                 $this->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js', JS.'bootstrap-notify.js',JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder.js');
                 $data = $this->wrapData($uidata);
-                return view("discover/query_builder", $data);
+                return view("Discover/Query_Builder", $data);
             }
         } else {
                 $json = json_decode(file_get_contents(base_url() . "resources/precanned.json"), 1);

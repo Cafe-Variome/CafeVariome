@@ -62,7 +62,7 @@ use CodeIgniter\Config\Services;
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
 
         $data = $this->wrapData($uidata);
-        return view('upload/json', $data);
+        return view('Upload/Json', $data);
     }
 
     /**
@@ -87,7 +87,7 @@ use CodeIgniter\Config\Services;
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js'];
 
         $data = $this->wrapData($uidata);
-        return view('upload/vcf', $data);
+        return view('Upload/Vcf', $data);
     }
 
     function bulk_import($source_id = null) {
@@ -111,7 +111,7 @@ use CodeIgniter\Config\Services;
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
 
         $data = $this->wrapData($uidata);
-        return view('upload/bulk_import', $data);
+        return view('Upload/Bulk_Import', $data);
     }
 
     /**

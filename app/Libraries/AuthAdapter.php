@@ -50,7 +50,7 @@ class AuthAdapter{
     }
 
     public function login($username = '', $password = '', $remember = ''){
-        if(get_class($this->authEngine) == 'IonAuth'){
+        if(get_class($this->authEngine) == 'App\Libraries\IonAuth'){
             return $this->authEngine->login($username, $password, $remember);
         }
         else{

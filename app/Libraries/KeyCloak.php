@@ -449,6 +449,11 @@ class KeyCloak{
      * @return bool 
      */
     public function checkKeyCloakServer(){
+        if (strpos($this->serverURI, '/auth') !== false){
+
+            $uri = str_replace("/auth","",$this->serverURI);
+            return AuthHelper::checkServer($uri, $this->serverPort);
+        }
         return AuthHelper::checkServer($this->serverURI, $this->serverPort);  
     }
 

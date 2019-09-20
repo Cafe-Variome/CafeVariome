@@ -114,7 +114,7 @@
 <!-- TODO: Body to be moved and adapted. -->
 <body class="d-flex flex-column h-100">
     <header>
-        <?= $this->include('partial\nav') ?>
+        <?= $this->include('partial/nav') ?>
     </header>
     
     <main role="main" class="flex-shrink-0">

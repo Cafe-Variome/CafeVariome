@@ -75,7 +75,7 @@ class NetworkGroup extends CVUI_Controller{
 
 		$data = $this->wrapData($uidata);
 
-		return view("networkgroup/networkgroups", $data);
+		return view("Networkgroup/Networkgroups", $data);
 	}
 
     public function create_networkgroup(){
@@ -132,7 +132,7 @@ class NetworkGroup extends CVUI_Controller{
                 $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
                 
                 $data = $this->wrapData($uidata);
-				return view('networkgroup/create_networkgroup', $data);
+				return view('Networkgroup/Create_Networkgroup', $data);
 			}
 		}
 		else {
@@ -173,7 +173,7 @@ class NetworkGroup extends CVUI_Controller{
             
             $data = $this->wrapData($uidata);
 
-			return view('networkgroup/create_networkgroup', $data);
+			return view('Networkgroup/Create_Networkgroup', $data);
 		}		
 
     }
@@ -228,7 +228,7 @@ class NetworkGroup extends CVUI_Controller{
 			return redirect()->to(base_url('networkgroup/index'));            	
 		}
 		$data = $this->wrapData($uidata);
-		return view("networkgroup/delete_networkgroup", $data);
+		return view("Networkgroup/Delete_Networkgroup", $data);
 		
 	}
 

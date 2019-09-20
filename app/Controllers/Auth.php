@@ -166,7 +166,7 @@ class Auth extends CVUI_Controller
 					//if the login is successful
 					//redirect them back to the home page
 					$this->session->setFlashdata('message', $this->ionAuth->messages());
-					return redirect()->to(base_url());
+					return redirect()->to(base_url('auth/index'));
 				}
 				else
 				{
@@ -174,11 +174,11 @@ class Auth extends CVUI_Controller
 					// redirect them back to the login page
 					$this->session->setFlashdata('message', $this->ionAuth->errors($this->validationListTemplate));
 					// use redirects instead of loading views for compatibility with MY_Controller libraries
-					return redirect()->back()->withInput();
+					return redirect()->to(base_url('auth/login'));
 	
 				}
 				$data = $this->wrapData($uidata);
-				return view($this->viewsFolder . DIRECTORY_SEPARATOR . 'login', $data);
+				return view('auth/login', $data);
 			}
 			else
 			{

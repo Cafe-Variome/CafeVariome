@@ -55,7 +55,7 @@ class Elastic extends CVUI_Controller{
         $uidata->javascript = [JS."cafevariome/elastic.js", JS."/bootstrap-notify.js"];
 
         $data = $this->wrapData($uidata);
-        return view('Elastic/status', $data);
+        return view('Elastic/Status', $data);
     }
 
 

@@ -1,4 +1,4 @@
-<?= $this->extend('layout\master') ?>
+<?= $this->extend('layout/master') ?>
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
