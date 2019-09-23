@@ -12,7 +12,7 @@ use App\Models\Settings;
 use App\Models\User;
 use App\Helpers\AuthHelper;
 use App\Models\Network;
-use CafeVariome\Email;
+use App\Libraries\CafeVariome\Email\EmailFactory;
 
 class KeyCloak{
 
