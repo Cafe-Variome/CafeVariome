@@ -178,7 +178,8 @@ class User extends CVUI_Controller{
     function users(){
         $uidata = new UIData();
         $uidata->title = "Users";
-
+        $uidata->stickyFooter = false;
+        
         $userModel = new \App\Models\User($this->db);
         $networkModel = new Network($this->db);
 

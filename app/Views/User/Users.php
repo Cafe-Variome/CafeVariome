@@ -65,7 +65,7 @@
     </tbody>
 </table>
 
-<div class="row">
+<div class="form-group row">
     <div class="col">
         <a href="<?php echo base_url() . "user/create_user";?>" class="btn btn-primary" >
             <i class="icon-user icon-white"></i> Create new user</a>
