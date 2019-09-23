@@ -43,17 +43,11 @@ use CodeIgniter\Config\Services;
      */
     public function json($source) {
         // Check if user is logged in and admin
-        //if ($this->ion_auth->in_group("curator")) { 
-            // Since this is a shared function for curators and admin check that the curator is a curator for this source
-            $user_id = $this->authAdapter->getUserId();
-            $source_id = $this->sourceModel->getSourceIDByName($source);
+        // Since this is a shared function for curators and admin check that the curator is a curator for this source
+        $user_id = $this->authAdapter->getUserId();
+        $source_id = $this->sourceModel->getSourceIDByName($source);
 
-            $can_curate_source = $this->sourceModel->canCurateSource($source_id, $user_id);
-            if (!$can_curate_source) {
-                //show_error("Sorry, you are not listed as a curator for that particular source.");
-            }
-        //}
-        // data for hidden input for source
+            // data for hidden input for source
         $uidata = new UIData();
         $uidata->title = "Upload JSON (Bulk Import)";
         $uidata->data['source'] = $source;
@@ -75,12 +69,9 @@ use CodeIgniter\Config\Services;
 
         $uidata = new UIData();
         $uidata->title = "Upload VCF";
-        //if ($this->ion_auth->in_group("curator")) // Since this is a shared function for curators and admin check that the curator is a curator for this source
+        // Since this is a shared function for curators and admin check that the curator is a curator for this source
         $user_id = $this->authAdapter->getUserId();
-        $can_curate_source = $this->sourceModel->canCurateSource($source_id, $user_id);
-        if (!$can_curate_source) {
-                //show_error("Sorry, you are not listed as a curator for that particular source.");
-            }
+
         $uidata->data['source_id'] = $source_id;
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css', CSS.'upload_data.css');
 
@@ -96,13 +87,9 @@ use CodeIgniter\Config\Services;
         $uidata = new UIData();
         $uidata->title = "Bulk Import";
 
-        //if ($this->ion_auth->in_group("curator")) { // Since this is a shared function for curators and admin check that the curator is a curator for this source
-            $user_id = $this->authAdapter->getUserID();
-            $can_curate_source = $this->sourceModel->canCurateSource($source_id, $user_id);
-            if (!$can_curate_source) {
-                //show_error("Sorry, you are not listed as a curator for that particular source.");
-            }
-        
+        // Since this is a shared function for curators and admin check that the curator is a curator for this source
+        $user_id = $this->authAdapter->getUserID();
+
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
 
         $uidata->data['source_id'] = $source_id;
