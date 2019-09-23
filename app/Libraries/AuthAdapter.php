@@ -60,6 +60,9 @@ class AuthAdapter{
 
     public function register(string $email, string $username,  array $additionaldata, array $groups = []){
         $password = uniqid();
+        //Add special character, uppercase, lowercase and number to meet requirements imposed by Keycloak API
+        $password .= "!Kc1";
+        //Temporarily log the password, development only
         error_log("password is: ".$password);
         return $this->authEngine->register($email, $username, $password, $additionaldata, $groups);
     }
