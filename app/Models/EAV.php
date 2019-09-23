@@ -16,7 +16,7 @@ use CodeIgniter\Database\ConnectionInterface;
 class EAV extends Model{
 
 	protected $db;
-    protected $table      = 'EAVs';
+    protected $table      = 'eavs';
     protected $builder;
 
     protected $primaryKey = 'id';

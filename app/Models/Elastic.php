@@ -72,7 +72,7 @@ class Elastic extends Model{
      */
     function getvcfPending($source_id) {
 
-        $this->builder = $this->db->table('UploadDataStatus');
+        $this->builder = $this->db->table('uploaddatastatus');
 
         $this->builder->select('FileName,tissue,patient');
         $this->builder->like('FileName', '.vcf', 'before'); 
@@ -90,7 +90,7 @@ class Elastic extends Model{
      * @return N/A 
      */
     function vcfWrap($file, $source_id) {
-        $this->builder = $this->db->table('UploadDataStatus');
+        $this->builder = $this->db->table('uploaddatastatus');
 
         $now = date('Y-m-d H:i:s');
         $Status = "Success";
@@ -111,7 +111,7 @@ class Elastic extends Model{
      */
     function getUnprocessedFilesForSource(int $source_id): int {
 
-        $this->builder = $this->db->table('UploadDataStatus');
+        $this->builder = $this->db->table('uploaddatastatus');
 
         $this->builder->where('source_id', $source_id);
         $count = $this->builder->countAllResults(); 
