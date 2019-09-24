@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
 	<a class="navbar-brand" href="<?php echo base_url() . (( ! $setting->settingData['cafevariome_central'] ) ? "home" : ''); ?>">
 		<!--<img width="123" height="60" src="<?php echo base_url() . "resources/images/logos/" . $setting->settingData['logo'];?>">-->
-		Cafe Variome
+		<?= $setting->settingData['site_title'] ?>
 	</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
