@@ -235,12 +235,15 @@ class Elastic extends Model{
             foreach ($data as $d) {
                 $json_data[] = array("attribute" => $d['phenotype_attribute'], "value" => rtrim($d['phenotype_values'], "|"));
             }
-            $json_data = json_encode($json_data);
             
             if (!file_exists('resources/phenotype_lookup_data/')) {
                 mkdir('resources/phenotype_lookup_data/', 777, true);
             }
-            file_put_contents("resources/phenotype_lookup_data/" . $row['network_key'] . ".json", $json_data);
+            //Check the length of the data array, if it is empty, don't append it to the file.
+            if (count($json_data) > 0) {
+                //Data must be written to the file in every iteration, in case the file is overwritten, some data is lost.
+                file_put_contents("resources/phenotype_lookup_data/" . $row['network_key'] . ".json", json_encode($json_data), FILE_APPEND);
+            }
         }
 
         error_log("after foreach");
@@ -308,7 +311,11 @@ class Elastic extends Model{
             foreach($hpo as $term => $ancestory) {
                 $hpo[$term] = implode('||', $ancestory);
             }
-            file_put_contents("resources/phenotype_lookup_data/" . $network . "_hpo_ancestry.json", json_encode($hpo));
+            //Check the length of the data array, if it is empty, don't append it to the file.
+            if (count($hpo) > 0) {
+                //Data must be written to the file in every iteration, in case the file is overwritten, some data is lost.
+                file_put_contents("resources/phenotype_lookup_data/" . $network . "_hpo_ancestry.json", json_encode($hpo), FILE_APPEND);
+            }
         }
 
         return;
