@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin";?>">Dashboard Home</a></li>
+  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -69,7 +69,7 @@
     <div class="col">
         <a href="<?php echo base_url() . "user/create_user";?>" class="btn btn-primary" >
             <i class="icon-user icon-white"></i> Create new user</a>
-        <a href="<?php echo base_url() . "admin";?>" class="btn btn-secondary" >
+        <a href="<?php echo base_url() . "admin/index";?>" class="btn btn-secondary" >
             <i class="fa fa-home"></i> Admin Dashboard</a>
     </div>
 </div>

@@ -3,12 +3,12 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
   <li class="breadcrumb-item">
-    <a href="<?php echo base_url() . (($session->get('admin_or_curate') == "curate") ? "curate" : "admin") ?>">
+    <a href="<?php echo base_url() . (($session->get('admin_or_curate') == "curate") ? "curate" : "admin/index") ?>">
         <?php ($session->get('admin_or_curate') == "curate") ? print("Curators Home") : print ("Dashboard Home") ?>
     </a>
   </li>
   <li class="breadcrumb-item">
-    <a href="<?php echo base_url() . (($session->get('admin_or_curate') == "curate") ? "curate" : "admin")."/variants";?>">
+    <a href="<?php echo base_url() . (($session->get('admin_or_curate') == "curate") ? "curate" : "admin/index")."/variants";?>">
         Records
     </a>
    </li>

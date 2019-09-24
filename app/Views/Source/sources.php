@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin";?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -112,7 +112,7 @@
 		<a class="btn btn-primary btn-medium" href="<?php echo base_url('admin/variants') ?>" data-content="Switches to the records admin interface to allow you to modify records." data-original-title="Edit Records">
 			<i class="fa fa-edit"></i>  Edit records
 		</a>
-		<a href="<?php echo base_url() . "admin";?>" class="btn btn-secondary" >
+		<a href="<?php echo base_url() . "admin/index";?>" class="btn btn-secondary" >
 			<i class="fa fa-home"></i> Admin Dashboard
 		</a>
 	</div>
