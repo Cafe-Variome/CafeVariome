@@ -80,7 +80,7 @@ class Admin extends CVUI_Controller{
         $this->validation->setRules($validationRules);
         */
         
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+        if ($this->request->getPost() /*&& $this->validation->withRequest($this->request)->run()*/) {
             foreach ($settings as $s) {
                 $settingModel->updateSettings(['value' => $this->request->getVar($s["setting_key"])], ['setting_key' =>  $s["setting_key"]]);
             }
