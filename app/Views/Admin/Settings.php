@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin";?>">Dashboard Home</a></li>
+  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -28,9 +28,11 @@
         <input type="text" class="form-control" name="<?= $s['setting_key'] ?>" value="<?= $s['value'] ?>">
     </div>
     <div class="col-3">
+        <?php if($s['info'] != null): ?>
         <button type="button" class="btn btn-info" data-toggle="tooltip" data-placement="right" title="<?= $s['info'] ?>">
             <i class="fa fa-question-circle"></i>
         </button>
+        <?php endif ?>
     </div>
 </div>
 <?php endforeach; ?>
