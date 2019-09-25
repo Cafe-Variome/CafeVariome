@@ -16,21 +16,25 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                <a href="<?= base_url("source") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/source.png") ?>"></a>
+                <a href="<?= base_url("elastic/status") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/source.png") ?>"></a>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <a href="<?= base_url("source") ?>">Sources</a>
+                <a href="<?= base_url("elastic/status") ?>">Sources</a>
             </div>
         </div>
     </div>
     <div class="col">
         <div class="row">
-            <div class="col"></div>
+            <div class="col">
+                <a href="<?= base_url("elastic/status") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/Elasticsearch.png") ?>"></a>
+            </div>
         </div>
         <div class="row">
-            <div class="col"></div>
+            <div class="col">
+                <a href="<?= base_url("elastic/status") ?>">Elatsic Search</a>
+            </div>
         </div>
     </div>
     <div class="col">

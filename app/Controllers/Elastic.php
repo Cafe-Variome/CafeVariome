@@ -14,7 +14,7 @@
 use App\Models\UIData;
 use App\Models\Settings;
 use App\Models\Source;
-
+use App\Libraries\ElasticSearch;
 use CodeIgniter\Config\Services;
 
 class Elastic extends CVUI_Controller{
@@ -35,12 +35,27 @@ class Elastic extends CVUI_Controller{
 
     public function Status(){
         $uidata = new UIData();
-
         $uidata->title = "Index Status";
 
+        $elasticSearch = new ElasticSearch((array)$this->setting->settingData['elastic_url']);
+        $elasticModel = new \App\Models\Elastic($this->db);
         $sourceModel = new Source($this->db);
-        $uidata->data['elastic_update'] = $sourceModel->getSourceElasticStatus();
-        $uidata->data['isRunning'] = $this->checkElasticSearch();
+        $sources = $sourceModel->getSources('source_id, name, elastic_status');
+        //ping elasticsearch
+        $uidata->data['isRunning'] = $elasticSearch->ping();
+
+        $title_prefix = $elasticModel->getTitlePrefix();
+        
+        for ($i=0; $i < count($sources); $i++) { 
+            if($elasticSearch->indexExists($title_prefix . "_" .$sources[$i]['source_id']) != null){
+                $sources[$i]['elastic_index'] = true;
+            }
+            else {
+                $sources[$i]['elastic_index'] = false;
+            }
+        }
+
+        $uidata->data['elastic_update'] = $sources;
 
         $title = $this->setting->settingData["site_title"];
         $host = strtolower(preg_replace("/\s.+/", '', $title)); 
