@@ -107,6 +107,10 @@ use CodeIgniter\Database\ConnectionInterface;
         return null;
     }
 
+
+    /**
+     * @deprecated
+     */
     function getSourceElasticStatus() {
         $this->builder = $this->db->table($this->table);
 
