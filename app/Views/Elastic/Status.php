@@ -13,21 +13,16 @@
 	</div>	
 </div>
 <hr>
-<?php if (isset($isRunning)): ?>
 <div class="row">
   <div class="col">
-    <a onclick="regenerateElasticSearchIndex();" class="btn btn-secondary" rel="popover" data-content="Click to regenerate the ElasticSearch index for all variants. This should be done after importing new data." data-original-title="Regenerate ElasticSearch Index"><i class="icon-list-alt"></i>  Regenerate ElasticSearch Index</a>
+  Elasticsearch Service Status: 
+  <?php if ($isRunning): ?>
+    <span class="text-success">Running</span>
+  <?php else: ?>
+    <span class="text-danger">Not Running</span>
+  <?php endif; ?>
   </div>
 </div>
-<?php else: ?>
-<div class="row">
-  <div class="col">
-    <button type="button" id="elasticon" class="btn disabled"></button>
-  </div>
-</div>
-<div class="row" id="buttonswitch"></div>
-<?php endif; ?>
-
 <br/>
 <table class="table table-bordered table-hover table-striped" id="index_table">
   <thead>
@@ -42,17 +37,17 @@
     <?php foreach ($elastic_update as $row): ?> 
     <tr id="index_<?php echo $row['source_id']; ?>">
       <td><?php echo $host."_".$row['source_id']." (Source: ".$row['name'].")"; ?></td>
-        <?php if ($row['elastic_status'] == 1): ?>
+        <?php if ($row['elastic_index'] == true): ?>
+          <td style="background-color: lightgreen;">
+            <i class="fa fa-check"></i>
+            Up to Date
+          </td>                                  
+        <?php else: ?>
           <td style="background-color: lightblue;">
               <i class="fa fa-plus"></i>
               Update Possible
             <!-- Update Possible -->
-          </td>                                   
-        <?php else: ?>
-          <td style="background-color: lightgreen;">
-            <i class="fa fa-check"></i>
-            Up to Date
-          </td>                                    
+          </td>                                               
       <?php endif; ?>
 
       <td>                                    
