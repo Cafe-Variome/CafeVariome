@@ -46,12 +46,6 @@ class Elastic extends CVUI_Controller{
         $host = strtolower(preg_replace("/\s.+/", '', $title)); 
         $uidata->data['host'] = $host;
 
-        // Check the status of maintenance cron job file, if it's empty then cron job won't run
-        if (file_exists(FCPATH . '/resources/cron/crontab')) {
-            if (filesize(FCPATH . '/resources/cron/crontab') != 0) {
-                $uidata->data['isCronEnabled'] = TRUE;
-            }
-        }
         $uidata->javascript = [JS."cafevariome/elastic.js", JS."/bootstrap-notify.js"];
 
         $data = $this->wrapData($uidata);
