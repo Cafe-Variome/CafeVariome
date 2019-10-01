@@ -153,7 +153,7 @@ class Auth extends CVUI_Controller
 			// validate form input
 			$this->validation->setRule('identity', str_replace(':', '', lang('Auth.login_identity_label')), 'required');
 			$this->validation->setRule('password', str_replace(':', '', lang('Auth.login_password_label')), 'required');
-	
+			
 			if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 			{
 				// check to see if the user is logging in
@@ -165,14 +165,17 @@ class Auth extends CVUI_Controller
 				{
 					//if the login is successful
 					//redirect them back to the home page
-					$this->session->setFlashdata('message', $this->ionAuth->messages());
+					//$this->session->setFlashdata('message', $this->ionAuth->messages());
+					if ($this->ionAuth->isAdmin($this->ionAuth->getUserId())) {
+						return redirect()->to(base_url('Admin/Index'));
+					}
 					return redirect()->to(base_url('auth/index'));
 				}
 				else
 				{
 					// if the login was un-successful
 					// redirect them back to the login page
-					$this->session->setFlashdata('message', $this->ionAuth->errors($this->validationListTemplate));
+					//$this->session->setFlashdata('message', $this->ionAuth->errors($this->validationListTemplate));
 					// use redirects instead of loading views for compatibility with MY_Controller libraries
 					return redirect()->to(base_url('auth/login'));
 	
