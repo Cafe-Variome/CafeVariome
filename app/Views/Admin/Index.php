@@ -16,12 +16,12 @@
     <div class="col">
         <div class="row">
             <div class="col">
-                <a href="<?= base_url("elastic/status") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/source.png") ?>"></a>
+                <a href="<?= base_url("source") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/source.png") ?>"></a>
             </div>
         </div>
         <div class="row">
             <div class="col">
-                <a href="<?= base_url("elastic/status") ?>">Sources</a>
+                <a href="<?= base_url("source") ?>">Sources</a>
             </div>
         </div>
     </div>
