@@ -17,7 +17,7 @@ use App\Helpers\AuthHelper;
 use App\Libraries\AuthAdapter;
 use CodeIgniter\Config\Services; 
 
-class NetworkGroup extends CVUI_Controller{
+class Networkgroup extends CVUI_Controller{
 
 	/**
 	 * Validation list template.
@@ -38,8 +38,8 @@ class NetworkGroup extends CVUI_Controller{
     public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
         parent::setProtected(true);
         parent::setIsAdmin(true);
-        parent::initController($request, $response, $logger);
-
+		parent::initController($request, $response, $logger);
+		
 		$this->validation = Services::validation();
 		$this->networkModel = new Network($this->db);
 		$this->networkGroupModel = new \App\Models\NetworkGroup($this->db);
