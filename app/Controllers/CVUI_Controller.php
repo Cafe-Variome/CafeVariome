@@ -148,11 +148,13 @@ class CVUI_Controller extends Controller{
 
 	private function checkAuthentication(bool $checkIsAdmin) {
 		if ($checkIsAdmin) {
-			if (!$this->authAdapter->loggedIn()) {
+			if ($this->authAdapter->loggedIn()) {
 				$this->session->set('_cvReturnUrl', uri_string());
 				if (!$this->authAdapter->isAdmin()) {
 					header('Location: '.base_url("auth/login"));
 				}
+			}
+			else {
 				header('Location: '.base_url("auth/login"));
 				exit;
 			}
