@@ -16,18 +16,41 @@
 use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 use GraphAware\Neo4j\Client\ClientBuilder;
+use App\Models\Settings;
 
 
 class Neo4j extends Model{
 
+    private $setting;
+
+    private $neo4jUsername;
+    private $neo4jPassword;
+    private $neo4jAddress;
+    private $neo4jPort;
+
     public function __construct(ConnectionInterface &$db){
 
         $this->db =& $db;
+        $this->setting =  Settings::getInstance($this->db);
+
+        $this->neo4jUsername = $this->setting->settingData['neo4j_username'];
+        $this->neo4jPassword = $this->setting->settingData['neo4j_password'];
+        $this->neo4jAddress = $this->setting->settingData['neo4j_server'];
+        $this->neo4jPort = $this->setting->settingData['neo4j_port'];
     }
 
     public function toUpdate($data,$source_name) {
+
+        $baseNeo4jAddress = $this->neo4jAddress;
+        if (strpos($baseNeo4jAddress, 'http://') !== false) {
+            $baseNeo4jAddress = str_replace("http://","",$baseNeo4jAddress);
+        }
+        if (strpos($baseNeo4jAddress, 'https://') !== false) {
+            $baseNeo4jAddress = str_replace("https://","",$baseNeo4jAddress);
+        }
+
         $client = ClientBuilder::create()
-        ->addConnection('default', 'http://neo4j:password@localhost:7474')
+        ->addConnection('default', 'http://'. $this->neo4jUsername . ':' .$this->neo4jPassword .'@'.$baseNeo4jAddress.':'.$this->neo4jPort)
         ->setDefaultTimeout(60)
         ->build();	    
         $keys = array_keys($data);
