@@ -562,6 +562,11 @@ class Query extends CafeVariome{
         // $lookup = $this->getVal($this->api, $pointer);
         //var_dump($this->api);
         
+        $neo4jUsername = $this->setting->settingData['neo4j_username'];
+        $neo4jPassword = $this->setting->settingData['neo4j_password'];
+        $neo4jAddress = $this->setting->settingData['neo4j_server'];
+        $neo4jPort = $this->setting->settingData['neo4j_port'];
+
          error_log("lookup is: ".print_r($lookup,1));
 		if (array_key_exists('r',$lookup)){
             error_log("SIM QUERY");
@@ -572,14 +577,14 @@ class Query extends CafeVariome{
 			$neo_query = '{"statements":[{"statement":"MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel > ' . $r . ' and m.source = \\"' . $source . '\\" and (' . $id_str . ') with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, n.hpoid as hpoid with omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > ' . $s . ' return omimid, subjectid, summax ORDER BY summax DESC"}]}';
 			error_log($neo_query);
         
-            $url = 'http://localhost:7474/db/data/transaction/commit';
+            $url = $neo4jAddress.'/db/data/transaction/commit';
             $ch = curl_init($url);
             // $payload = $neo_query;
             curl_setopt($ch, CURLOPT_POSTFIELDS, $neo_query);
 
             curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
             curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-            curl_setopt($ch, CURLOPT_USERPWD, "neo4j");
+            curl_setopt($ch, CURLOPT_USERPWD, $neo4jUsername.":".$neo4jPassword);
 
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $resp = curl_exec($ch);
