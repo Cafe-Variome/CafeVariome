@@ -97,6 +97,7 @@ class Source extends CVUI_Controller{
     public function create_source() {
 
         $uidata = new UIData();
+        $uidata->stickyFooter = false;
 
         $uidata->data['title'] = "Create Source";
 
