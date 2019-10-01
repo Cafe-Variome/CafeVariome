@@ -97,8 +97,8 @@ class Network extends CVUI_Controller{
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
 
             $name = strtolower($this->request->getVar('name')); // Convert the network name to lowercase
-
-            $network = json_decode(AuthHelper::authPostRequest(array('installation_base_url' => $base_url(), 'network_name' => $name, 'installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/create_network"),1);
+            $installation_url = base_url();
+            $network = json_decode(AuthHelper::authPostRequest(array('installation_base_url' => $installation_url, 'network_name' => $name, 'installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/create_network"),1);
 
 			$this->networkModel->createNetwork(array ('network_name' => $network['network_name'],'network_key' => $network['network_key'],'network_type' => 'federated'));
             $network_master_group_data = array (    'name' => $network['network_name'],
