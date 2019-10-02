@@ -135,7 +135,7 @@ class Network extends CVUI_Controller{
     function edit_user_network_groups($id, $isMaster = false) {
         $uidata = new UIData();
         $uidata->title = "Edit User Network Groups";
-
+        $uidata->stickyFooter = false;
         if ($this->request->getPost()){
             if ($this->request->getVar('groups')) {
 
