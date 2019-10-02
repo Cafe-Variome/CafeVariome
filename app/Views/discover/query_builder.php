@@ -12,6 +12,15 @@
 	</div>	
 </div>
 <hr>
+<?php if($message): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-info">
+			<?php echo $message ?>
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
 <!-- Patient Characteristics -->
 <div class="row mb-2">
     <div class="col">
@@ -163,7 +172,7 @@
 
 <div class="row" id="reset_buildQuery">
     <div class="col">
-        <a class="btn btn-lg btn-primary" id="build_query"><i class="fa fa-search"></i> Build Query</a>
+        <a class="btn btn-lg btn-primary<?= ($elasticSearchEnabled ? "" : " disabled"); ?>" id="build_query"><i class="fa fa-search"></i> Build Query</a>
         <a class="btn btn-secondary  btn-lg" id="reset_query"><i class="fa fa-trash"></i> Reset</a>
     </div>
 </div>
