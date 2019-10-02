@@ -24,9 +24,13 @@ class User extends Model{
    // protected $tempReturnType = 'array';
 
 
-    public function __construct(ConnectionInterface &$db){
-
-        $this->db =& $db;
+    public function __construct(ConnectionInterface &$db = null){
+        if ($db != null) {
+            $this->db =& $db;
+        }
+        else {
+            $this->db = \Config\Database::connect();
+        }
     }
 
     function createUser(string $email, string $username, array $groups = [], array $data = [], &$authadapter){
