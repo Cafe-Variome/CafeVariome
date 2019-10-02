@@ -76,10 +76,6 @@ class Discover extends CVUI_Controller{
         // Check if the user is in the master network group for this network
         
         $user_id = $this->authAdapter->getUserId();
-        $is_user_member_of_master_network_group_for_network = true;//$this->network_model->isUserMemberOfMasterNetworkGroupForNetwork($user_id, $network_key);
-        if (!$is_user_member_of_master_network_group_for_network) {
-            show_error("You are not a member of the master group for this network so cannot access any discovery interfaces. In order to search any networks you need to get an administrator to add you to the master network group for each network.");
-        }
         
         $uidata->data['network_key'] = $network_key;
         
@@ -96,68 +92,22 @@ class Discover extends CVUI_Controller{
         $this->session->set(array('federated_installs' => $data['installation_urls']));
         $this->session->set(array('network_threshold' => $data['network_threshold']));
 
+        $uidata->data["elasticSearchEnabled"] = true;
         if (!$this->checkElasticSearch()) {
-            echo "The query builder interface is currently not accessible as Elasticsearch is not running. Please get an administrator to start Elasticsearch and then try again.";
-            exit;
+            $uidata->data["elasticSearchEnabled"] = false;
+            $uidata->data["message"] = "The query builder interface is currently not accessible as Elasticsearch is not running. Please get an administrator to start Elasticsearch and then try again.";
         }
 
         $uidata->title = "Discover - Query Builder";
         $uidata->css = array(VENDOR.'vakata/jstree/dist/themes/default/style.css', CSS.'jquery.querybuilder.css');  
-        $basic = $this->session->get('query_builder_basic') == "yes" ? 1 : 0;
-        $advanced = $this->session->get('query_builder_advanced') == "yes" ? 1 : 0;
-        $precan = $this->session->get('query_builder_precan') == "yes" ? 1 : 0;
-        $this->data['create_precan_query'] = $this->session->get('create_precan_query');
+
 
         $uidata->stickyFooter = false;
 
-        if($basic && !$advanced && !$precan)  {
-            if(PHENOTYPE_CATEGORIES) {
-                $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js',JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
-                $data = $this->wrapData($uidata);
-                return view("Discover/Query_Builder", $data);
-            } else {
-                $this->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js', JS.'bootstrap-notify.js',JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder.js');
-                $data = $this->wrapData($uidata);
-                return view("Discover/Query_Builder", $data);
-            }
-        } else {
-                $json = json_decode(file_get_contents(base_url() . "resources/precanned.json"), 1);
-                if($json) {
 
-                    $this->data['precan_active'] = [];
-                    $this->data['precan_inactive'] = [];
-
-                    foreach ($json as $key => $value) {
-                        if(isset($value['network_key']) && $value['network_key'] == $network_key) {
-                            if(!isset($uidata->data['precanned_queries']))
-                                $uidata->data['precanned_queries'][] = $value['source'];
-                            else {
-                                if(!in_array($value['source'], $this->data['precanned_queries']))
-                                    $uidata->data['precanned_queries'][] = $value['source'];
-                            }
-                            if($value['status'] == 1)
-                                $uidata->data['precan_active'][] = array('api' => htmlspecialchars(json_encode($value)), 'queryString' => $value['queryString'], 'user_email' => $value['user_email'], 'date_time' => $value['date_time'], 'notes' => $value['notes'], 'source' => $value['source'], 'case_control' => $value['case_control']);
-                            elseif($value['status'] == -1)
-                                $uidata->data['precan_inactive'][] = array('api' => htmlspecialchars(json_encode($value)), 'queryString' => $value['queryString'], 'user_email' => $value['user_email'], 'date_time' => $value['date_time'], 'notes' => $value['notes'], 'source' => $value['source'], 'case_control' => $value['case_control']);
-                        }
-                    }
-                }
-
-                if(PHENOTYPE_CATEGORIES) {
-                    $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_precan_v2_category.js', JS.'query_builder_advanced_v2_category.js');
-                } else {
-                    $uidata->data['precanned_queries'] = json_decode(file_get_contents(base_url() . "resources/precanned.json"), 1);
-                    $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_precan.js', JS.'query_builder_advanced.js');
-                }
-
-                $uidata->data['qb_basic'] = $basic ? 1 : 0;
-                $uidata->data['qb_advanced'] = $advanced ? 1 : 0;
-                $uidata->data['qb_precan'] = $precan ? 1 : 0;
-
-                $data = $this->wrapData($uidata);
-                return view("query_builder/main_precan_v2", $data);
-
-        }
+        $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js',JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
+        $data = $this->wrapData($uidata);
+        return view("Discover/Query_Builder", $data);
     }
 
     function checkElasticSearch() {
