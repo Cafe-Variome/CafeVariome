@@ -67,7 +67,7 @@ class CVUI_Controller extends Controller{
 	 * @return array
 	 */
 
-	protected function wrapData($uidata)
+	protected function wrapData(UIData $uidata): array
 	{
 		$config = new \Config\App();
 
@@ -99,28 +99,6 @@ class CVUI_Controller extends Controller{
 		//Get dynamic menus from CMS from database and pass to nav template
 		$cmsModel = new Cms_model($this->db);
 		$data['cmsModel'] = &$cmsModel;
-
-		/**
-		 * ToDo: Make the below snippet compatible with CI4 as the authentication model is added. 
-		 */
-		/*
-		if ($this->config->item('messaging')) {
-			if ($this->ion_auth->logged_in() ) {
-				$this->load->model('messages_model');
-				$user_id = $this->session->userdata('user_id');
-				$unread_messages = $this->messages_model->get_message_count($user_id);
-				$toMenu['unread_messages'] = $unread_messages;
-			}
-		}
-		
-
-		$toHeader["basejs"] = view("template/basejs",$this->data,true);
-		
-		$toBody["header"] = view("template/header",$toHeader,true);
-		$toBody["footer"] = view("template/footer",'',true);
-		
-		$toTpl["body"] = view("template/".$this->template,$toBody,true);
-		*/
 
 		return $data;
 
