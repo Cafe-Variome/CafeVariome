@@ -1,7 +1,21 @@
-<h1><?php echo lang('Auth.edit_user_heading');?></h1>
-<p><?php echo lang('Auth.edit_user_subheading');?></p>
-
-<div id="infoMessage"><?php echo $message;?></div>
+<?= $this->extend('layout/master') ?>
+<?= $this->section('content') ?>
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
+  </ol>
+</nav>
+<div class="row">
+	<div class="col">
+		<h2><?= $title ?></h2>	
+	</div>	
+</div>
+<hr>
+<?php if($message): ?>
+<div class="alert alert-info">
+    <?php echo $message; ?>
+</div>
+<?php endif ?>
 
 <?php echo form_open(uri_string());?>
 
@@ -63,3 +77,5 @@
       <p><?php echo form_submit('submit', lang('Auth.edit_user_submit_btn'));?></p>
 
 <?php echo form_close();?>
+
+<?= $this->endSection() ?>
