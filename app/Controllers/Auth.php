@@ -721,8 +721,9 @@ class Auth extends CVUI_Controller
 	 */
 	public function edit_user(int $id)
 	{
-		$this->data['title'] = lang('Auth.edit_user_heading');
-
+		$uidata = new UIData();
+		$uidata->title = "Profile";
+		$uidata->stickyFooter = false;
 		if (! $this->ionAuth->loggedIn() || (! $this->ionAuth->isAdmin() && ! ($this->ionAuth->user()->row()->id == $id)))
 		{
 			return redirect()->to(base_url('/auth'));
@@ -796,57 +797,60 @@ class Auth extends CVUI_Controller
 					$this->session->setFlashdata('message', $this->ionAuth->errors($this->validationListTemplate));
 				}
 				// redirect them back to the admin page if admin, or to the base url if non admin
-				return $this->redirectUser();
+				return redirect()->to(base_url('home/index'));
 			}
 		}
 
 		// display the edit user form
 
 		// set the flash data error message if there is one
-		$this->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : ($this->ionAuth->errors($this->validationListTemplate) ? $this->ionAuth->errors($this->validationListTemplate) : $this->session->getFlashdata('message'));
+		$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : ($this->ionAuth->errors($this->validationListTemplate) ? $this->ionAuth->errors($this->validationListTemplate) : $this->session->getFlashdata('message'));
 
 		// pass the user to the view
-		$this->data['user']          = $user;
-		$this->data['groups']        = $groups;
-		$this->data['currentGroups'] = $currentGroups;
+		$uidata->data['user']          = $user;
+		$uidata->data['groups']        = $groups;
+		$uidata->data['currentGroups'] = $currentGroups;
 
-		$this->data['first_name'] = [
+		$uidata->data['first_name'] = [
 			'name'  => 'first_name',
 			'id'    => 'first_name',
 			'type'  => 'text',
 			'value' => set_value('first_name', $user->first_name ?: ''),
 		];
-		$this->data['last_name'] = [
+		$uidata->data['last_name'] = [
 			'name'  => 'last_name',
 			'id'    => 'last_name',
 			'type'  => 'text',
 			'value' => set_value('last_name', $user->last_name ?: ''),
 		];
-		$this->data['company'] = [
+		$uidata->data['company'] = [
 			'name'  => 'company',
 			'id'    => 'company',
 			'type'  => 'text',
 			'value' => set_value('company', empty($user->company) ? '' : $user->company),
 		];
-		$this->data['phone'] = [
+		$uidata->data['phone'] = [
 			'name'  => 'phone',
 			'id'    => 'phone',
 			'type'  => 'text',
 			'value' => set_value('phone', empty($user->phone) ? '' : $user->phone),
 		];
-		$this->data['password'] = [
+		$uidata->data['password'] = [
 			'name' => 'password',
 			'id'   => 'password',
 			'type' => 'password',
 		];
-		$this->data['password_confirm'] = [
+		$uidata->data['password_confirm'] = [
 			'name' => 'password_confirm',
 			'id'   => 'password_confirm',
 			'type' => 'password',
 		];
-		$this->data['ionAuth'] = $this->ionAuth;
+		$uidata->data['ionAuth'] = $this->ionAuth;
 
-		return $this->renderPage($this->viewsFolder . DIRECTORY_SEPARATOR . 'edit_user', $this->data);
+		$data = $this->wrapData($uidata);
+
+		return view('auth/edit_user', $data);
+		//return $this->renderPage($this->viewsFolder . DIRECTORY_SEPARATOR . 'edit_user', $this->data);
 	}
 
 	/**
