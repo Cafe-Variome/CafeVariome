@@ -80,32 +80,8 @@
         var baseurl = "<?php print base_url(); ?>";
         var authurl = "<?php print rtrim($setting->settingData['auth_server'],"/"); // remove trailing slash from the auth_server config variable ?>";
     </script>
-
-    <?php if ($setting->settingData['messaging']): ?>
-        <!-- TODO: Move from Cafe Variome 2 source code once necessary. Some files may not be necessary. -->
-        <!-- TODO: The links to files which are moved are put above this section. -->
-		<!--<script type="text/javascript" src="<?php echo base_url(JS."jquery.tokeninput.js");?>"></script>-->
-		<!--<link rel="stylesheet" type="text/css" href="<?php echo base_url(CSS."token-input.css");?>" />-->
-		<!--<link rel="stylesheet" type="text/css" href="<?php echo base_url(CSS."token-input-facebook.css");?>" />-->
-		<!--<link rel="stylesheet" type="text/css" href="<?php echo base_url(CSS."token-input-mac.css");?>" />-->
-		<!--<script type="text/javascript">
-			$(document).ready(function () {
-				$("#messaging-user-input").tokenInput("<?php print rtrim($setting->settingData['auth_server'],"/") . '/auth_messages/lookup_users';?>", {
-					hintText: "Type a username",
-					theme: "facebook",
-					crossDomain: false // Setting to crossDomain to false makes it work with the cross domain CV auth server (not sure why!?)
-				});
-				
-//				var navheight = $('#nav_container').height();
-//				var padding = navheight * 1.3;
-//				alert("height -> " + navheight + " padding -> " + padding);
-//				alert("change to -> " + $("body").css("padding-top"));
-//				$("body").css({"padding-top":padding + "px"});
-			});
-		</script>-->
-		<?php endif; ?>
-        <!--Initial step to upgrade to boostrap 4.3.1, jquery 3.4 by Mehdi Mehtarizadeh 11/6/2019 -->
-        <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
+    <!--Initial step to upgrade to boostrap 4.3.1, jquery 3.4 by Mehdi Mehtarizadeh 11/6/2019 -->
+    <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
 
 
 
