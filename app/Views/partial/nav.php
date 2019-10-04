@@ -53,7 +53,7 @@
 					Profile
 				</a> 
 				<?php else : ?>
-				<a class="nav-link" href="<?= base_url("auth/profile") ?>">
+				<a class="nav-link" href="<?= base_url("auth/edit_user/".$auth->getUserId()) ?>">
 					Profile
 				</a> 
 				<?php endif ?>
