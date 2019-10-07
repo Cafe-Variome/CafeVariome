@@ -804,7 +804,8 @@ class Auth extends CVUI_Controller
 		// display the edit user form
 
 		// set the flash data error message if there is one
-		$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : ($this->ionAuth->errors($this->validationListTemplate) ? $this->ionAuth->errors($this->validationListTemplate) : $this->session->getFlashdata('message'));
+		//$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : ($this->ionAuth->errors($this->validationListTemplate) ? $this->ionAuth->errors($this->validationListTemplate) : $this->session->getFlashdata('message'));
+		$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) :  $this->session->getFlashdata('message');
 
 		// pass the user to the view
 		$uidata->data['user']          = $user;
@@ -816,34 +817,40 @@ class Auth extends CVUI_Controller
 			'id'    => 'first_name',
 			'type'  => 'text',
 			'value' => set_value('first_name', $user->first_name ?: ''),
+			'class' => 'form-control'
 		];
 		$uidata->data['last_name'] = [
 			'name'  => 'last_name',
 			'id'    => 'last_name',
 			'type'  => 'text',
 			'value' => set_value('last_name', $user->last_name ?: ''),
+			'class' => 'form-control'
 		];
 		$uidata->data['company'] = [
 			'name'  => 'company',
 			'id'    => 'company',
 			'type'  => 'text',
 			'value' => set_value('company', empty($user->company) ? '' : $user->company),
+			'class' => 'form-control'
 		];
 		$uidata->data['phone'] = [
 			'name'  => 'phone',
 			'id'    => 'phone',
 			'type'  => 'text',
 			'value' => set_value('phone', empty($user->phone) ? '' : $user->phone),
+			'class' => 'form-control'
 		];
 		$uidata->data['password'] = [
 			'name' => 'password',
 			'id'   => 'password',
 			'type' => 'password',
+			'class' => 'form-control'
 		];
 		$uidata->data['password_confirm'] = [
 			'name' => 'password_confirm',
 			'id'   => 'password_confirm',
 			'type' => 'password',
+			'class' => 'form-control'
 		];
 		$uidata->data['ionAuth'] = $this->ionAuth;
 
