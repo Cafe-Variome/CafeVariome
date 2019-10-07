@@ -18,40 +18,38 @@
 <?php endif ?>
 
 <?php echo form_open(uri_string());?>
+<?php echo form_hidden('id', $user->id);?>
 
-      <p>
-            <?php echo form_label(lang('Auth.edit_user_fname_label'), 'first_name');?> <br />
-            <?php echo form_input($first_name);?>
-      </p>
-
-      <p>
-            <?php echo form_label(lang('Auth.edit_user_lname_label'), 'last_name');?> <br />
-            <?php echo form_input($last_name);?>
-      </p>
-
-      <p>
-            <?php echo form_label(lang('Auth.edit_user_company_label'), 'company');?> <br />
-            <?php echo form_input($company);?>
-      </p>
-
-      <p>
-            <?php echo form_label(lang('Auth.edit_user_phone_label'), 'phone');?> <br />
-            <?php echo form_input($phone);?>
-      </p>
-
-      <p>
-            <?php echo form_label(lang('Auth.edit_user_password_label'), 'password');?> <br />
-            <?php echo form_input($password);?>
-      </p>
-
-      <p>
-            <?php echo form_label(lang('Auth.edit_user_password_confirm_label'), 'password_confirm');?><br />
-            <?php echo form_input($password_confirm);?>
-      </p>
+<div class="form-group">
+    <?php echo form_label(lang('Auth.edit_user_fname_label'), 'first_name');?>
+    <?php echo form_input($first_name);?>
+</div>
+<div class="form-group">
+    <?php echo form_label(lang('Auth.edit_user_lname_label'), 'last_name');?> <br />
+    <?php echo form_input($last_name);?>
+</div>
+<div class="form-group">
+    <?php echo form_label(lang('Auth.edit_user_company_label'), 'company');?> <br />
+    <?php echo form_input($company);?>
+</div>
+<div class="form-group">
+    <?php echo form_label(lang('Auth.edit_user_phone_label'), 'phone');?> <br />
+    <?php echo form_input($phone);?>
+</div>
+<div class="form-group">
+    <?php echo form_label(lang('Auth.edit_user_password_label'), 'password');?> <br />
+    <?php echo form_input($password);?>
+</div>
+<div class="form-group">
+    <?php echo form_label(lang('Auth.edit_user_password_confirm_label'), 'password_confirm');?><br />
+    <?php echo form_input($password_confirm);?>
+</div>
+<div class="form-group">
+</div>
 
       <?php if ($ionAuth->isAdmin()): ?>
 
-          <h3><?php echo lang('Auth.edit_user_groups_heading');?></h3>
+          <h5><?php echo lang('Auth.edit_user_groups_heading');?></h5>
           <?php foreach ($groups as $group):?>
               <label class="checkbox">
               <?php
@@ -72,9 +70,11 @@
 
       <?php endif ?>
 
-      <?php echo form_hidden('id', $user->id);?>
-
-      <p><?php echo form_submit('submit', lang('Auth.edit_user_submit_btn'));?></p>
+<div class="form-group row">
+    <div class="col">
+        <?php echo form_submit('submit', lang('Auth.edit_user_submit_btn'), ['class' => 'btn btn-primary']);?>
+    </div>
+</div>
 
 <?php echo form_close();?>
 
