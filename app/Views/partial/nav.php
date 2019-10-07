@@ -20,7 +20,7 @@
 			</li>
 		<?php else: ?>
 			<li class="nav-item">
-				<span class="nav-link text-white">Hello <?= $session->get('first_name') ?>!</span>
+				<span class="nav-link text-white">Hello <?= $auth->getName() ?>!</span>
 			</li>
 			<li class="nav-item">
 				<a class="nav-link" href="<?= base_url("discover/index") ?>">
