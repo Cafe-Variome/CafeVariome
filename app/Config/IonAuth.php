@@ -233,8 +233,8 @@ class IonAuth extends \CodeIgniter\Config\BaseConfig
 
 		// templates for messages
 		'messages' => [
-			'list'   => 'Messages\list',
-			'single' => 'Messages\single',
+			'list'   => 'Messages/list',
+			'single' => 'Messages/single',
 		],
 	];
 }
