@@ -135,6 +135,32 @@ class User extends Model{
     }
 
     /**
+     * getName
+     * @param int $id 
+     * @param bool $fullName
+     * @return string user's first (and last name) or username if both first and last name are null
+     */
+    public function getName(int $id, bool $fullName = false): string
+    {
+        $user = $this->getUsers('username, first_name, last_name', ["id" => $id]);
+        $name = '';
+        if (count($user) == 1) {
+            if ($user[0]['first_name'] == null && $user[0]['last_name']) {
+                $name = $user[0]['username'];
+            }
+            else {  
+                if ($fullName) {
+                    $name = $user[0]['first_name'] . ' ' . $user[0]['last_name'];
+                }
+                else {
+                    $name = $user[0]['first_name'];
+                }
+            }
+        }
+        return $name;
+    }
+
+    /**
      * Add Remote User - Add a  minimal new user as remote 
      *
      * @param string $email   - The email of the new user
