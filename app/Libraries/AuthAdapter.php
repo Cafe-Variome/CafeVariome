@@ -10,6 +10,9 @@ namespace App\Libraries;
  * This adapter class provides a simple and unified interface for auhentication.
  * It is an abstraction layer for all authentication engines used in the software.
  */
+
+ use App\Models\User;
+
 class AuthAdapter{
 
     /**
@@ -94,6 +97,14 @@ class AuthAdapter{
 
     public function isAdmin(int $id=0):bool{
         return $this->authEngine->isAdmin($id);
+    }
+
+    public function getName(int $id=0, bool $fullName = false): string
+    {
+        $userModel = new User();
+
+        $id ? $id : $id = $this->getUserId();
+        return $userModel->getName($id, $fullName);
     }
 
     public function getAuthEngineName(bool $lower_case = true): string{
