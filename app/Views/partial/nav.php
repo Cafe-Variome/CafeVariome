@@ -23,19 +23,19 @@
 				<span class="nav-link text-white">Hello <?= $auth->getName() ?>!</span>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="<?= base_url("discover/index") ?>">
+				<a class="nav-link<?= ($uriSegments->controllerName == 'discover') ? " active": "" ?>" href="<?= base_url("discover/index") ?>">
 					Discover
 				</a> 
 			</li>
 			<?php if($auth->isAdmin()): ?>
 			<li class="nav-item">
-				<a class="nav-link" href="<?= base_url("admin/index") ?>">
+				<a class="nav-link<?= ($uriSegments->controllerName == 'admin') ? " active": "" ?>" href="<?= base_url("admin/index") ?>">
 					Admin Dashboard
 				</a> 
 			</li>
 			<?php else: ?>
 			<li class="nav-item">
-				<a class="nav-link" href="<?= base_url("auth/index") ?>">
+				<a class="nav-link<?= ($uriSegments->controllerName == 'auth') ? " active": "" ?>" href="<?= base_url("auth/index") ?>">
 					Dashboard
 				</a> 
 			</li>
@@ -53,7 +53,7 @@
 					Profile
 				</a> 
 				<?php else : ?>
-				<a class="nav-link" href="<?= base_url("auth/edit_user/".$auth->getUserId()) ?>">
+				<a class="nav-link<?= ($uriSegments->methodName == 'edit_user') ? " active": "" ?>" href="<?= base_url("auth/edit_user/".$auth->getUserId()) ?>">
 					Profile
 				</a> 
 				<?php endif ?>

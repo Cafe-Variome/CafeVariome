@@ -11,6 +11,7 @@ use CodeIgniter\Controller;
 use App\Models\UIData;
 use App\Models\cms_model;
 use App\Models\Settings;
+use App\Models\URISegment;
 use App\Libraries\AuthAdapter;
 use CodeIgniter\Config\Services;
 
@@ -86,6 +87,9 @@ class CVUI_Controller extends Controller{
 		$data["javascript"] = $uidata->javascript;
 		$data["css"] = $uidata->css;
 		$data["stickyFooter"] = $uidata->stickyFooter;
+
+		$data["uriSegments"] = $this->getURISegments();
+
 		//Include additional data attributes specific to each view
 		foreach ($uidata->data as $dataKey => $dataValue) {
 			$data[$dataKey] = $dataValue;
@@ -146,6 +150,28 @@ class CVUI_Controller extends Controller{
 		
 
 
+	}
+
+	protected function getURISegments(bool $lowercase = true)
+	{
+		$uri = \uri_string();
+		$lowercase ? $uri = strtolower($uri) : $uri;
+
+		$segments = explode('/', $uri);
+		$uriSegments = new URISegment();
+
+		if (count($segments) > 0) {
+			$uriSegments->controllerName = $segments[0];
+			if (count($segments) > 1) {
+				$uriSegments->methodName = $segments[1];
+				if (count($segments) > 2) {
+					for ($i=2; $i < count($segments); $i++) { 
+						$uriSegments->params[$i] = $segments[$i];
+					}
+				}
+			}
+		}
+		return $uriSegments;
 	}
 
 }
