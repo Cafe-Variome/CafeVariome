@@ -93,6 +93,7 @@ class Discover extends CVUI_Controller{
         $this->session->set(array('network_threshold' => $data['network_threshold']));
 
         $uidata->data["elasticSearchEnabled"] = true;
+        $uidata->data["message"] = null;
         if (!$this->checkElasticSearch()) {
             $uidata->data["elasticSearchEnabled"] = false;
             $uidata->data["message"] = "The query builder interface is currently not accessible as Elasticsearch is not running. Please get an administrator to start Elasticsearch and then try again.";
