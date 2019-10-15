@@ -17,11 +17,6 @@ class Home extends CVUI_Controller
 		$udata->title = "Home";
 		$data = $this->wrapData($udata);
 
-
-		echo view('Home/Index', $data);
+		return view('Home/Index', $data);
 	}
-
-
-	//--------------------------------------------------------------------
-
 }
