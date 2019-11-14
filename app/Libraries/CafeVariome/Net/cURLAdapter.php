@@ -43,7 +43,7 @@
         return curl_setopt($this->adapterInstance, $option, $value);
     }
 
-    public function Send(): mixed
+    public function Send()
     {
         return curl_exec($this->adapterInstance);
     }
