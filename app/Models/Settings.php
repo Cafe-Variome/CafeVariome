@@ -32,10 +32,15 @@ class Settings extends Model{
      * @return object
      */
 
-    public function __construct(ConnectionInterface &$db, bool $returnFull = false)
+    public function __construct(ConnectionInterface &$db = null, bool $returnFull = false)
     {
-        $this->db =& $db;
-        if (!$returnFull) {    
+          if ($db != null) {
+            $this->db =& $db;
+          }
+          else {
+              $this->db = \Config\Database::connect();
+          }
+          if (!$returnFull) {    
           $settings = $this->findAll();
           $c = 0;
           foreach ($settings as $row) {
