@@ -34,13 +34,22 @@ class NetworkInterface
     public function CreateNetwork(array $data)
     {
         $this->adapterw('networkapi/createNetwork', $data);
-        return $this->networkAdapter->Send();
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
     }
 
     public function AddInstallationToNetwork(array $data)
     {
         $this->adapterw('networkapi/addInstallationToNetwork', $data);
-        return $this->networkAdapter->Send();
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
+    public function GetNetworksByInstallationKey(string $installation_key)
+    {
+        $this->adapterw('networkapi/getNetworksByInstallationKey', ['installation_key' => $installation_key]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
     }
 
     public function adapterw(string $uriTail, array $data)
@@ -48,6 +57,17 @@ class NetworkInterface
         $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
         $this->networkAdapter->setOption(CURLOPT_POST, true);
         $this->networkAdapter->setOption(CURLOPT_POSTFIELDS, $data);
+    }
+
+    private function processResponse($response)
+    {
+        $responseObj = json_decode($response);
+        if ($responseObj->data) {
+            return $responseObj->data;
+        }
+        else{
+            return $responseObj->status;
+        }
     }
 
     /**
