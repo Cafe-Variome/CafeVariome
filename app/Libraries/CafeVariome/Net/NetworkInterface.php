@@ -62,12 +62,7 @@ class NetworkInterface
     private function processResponse($response)
     {
         $responseObj = json_decode($response);
-        if ($responseObj->data) {
-            return $responseObj->data;
-        }
-        else{
-            return $responseObj->status;
-        }
+        return $responseObj;
     }
 
     /**
