@@ -33,20 +33,20 @@
 	<tbody>
 		<?php foreach ( $networks as $network ):?>
 		<tr>
-			<td><?php echo $network['network_id']; ?></td>
-			<td><?php echo $network['network_name']; ?></td>
+			<td><?php echo $network->network_key; ?></td>
+			<td><?php echo $network->network_name; ?></td>
 			<td>
-				<?php foreach ( $network['installations'] as $network_key => $installation ): ?>
-				<a href="<?php echo $installation['installation_base_url'];?>"><?php echo $installation['installation_base_url']; ?></a><br />
-				<?php endforeach; ?>
+				<?php //foreach ( $network['installations'] as $network_key => $installation ): ?>
+				<a href="<?php //echo $installation['installation_base_url'];?>"><?php //echo $installation['installation_base_url']; ?></a><br />
+				<?php //endforeach; ?>
 			</td>
-			<td><?php echo $network['count']; ?></td>
+			<td><?php //echo $network['count']; ?></td>
 			<td>
-			<a rel="popover" data-content="Set query results threshold value" data-original-title="Threshold" href="<?php echo base_url('network/edit_threshold') . '/' . $network['network_key'] . '/1'?>" >
+			<a rel="popover" data-content="Set query results threshold value" data-original-title="Threshold" href="<?php echo base_url('network/edit_threshold') . '/' . $network->network_key . '/1'?>" >
 				<i class="fa fa-lock"></i>
 			</a>
-			<?php if (isset($groups[$network['network_name']])): ?>
-			<a rel="popover" data-content="Add/Remove users for this network" data-original-title="Edit Network Users" href="<?php echo base_url('network/edit_user_network_groups') . '/' . $groups[$network['network_name']] . '/1'?>" >
+			<?php if (isset($groups[$network->network_name])): ?>
+			<a rel="popover" data-content="Add/Remove users for this network" data-original-title="Edit Network Users" href="<?php echo base_url('network/edit_user_network_groups') . '/' . $groups[$network->network_name] . '/1'?>" >
 				<i class="fa fa-edit"></i>
 			</a>
 			<?php else: ?>
@@ -54,7 +54,7 @@
 				<i class="fa fa-edit"></i>
 			</a>
 			<?php endif; ?>		
-			<a href="<?php echo base_url('network/leave_network') . "/" . $network['network_key'] . "/" . $network['network_name']; ?>" rel="popover" data-content="Click to leave the network. N.B. this action cannot be undone and you will need to request to join the network again. If you are the last member of the network then this network will be permanently deleted." data-original-title="Leave Network">
+			<a href="<?php echo base_url('network/leave_network') . "/" . $network->network_key . "/" . $network->network_name; ?>" rel="popover" data-content="Click to leave the network. N.B. this action cannot be undone and you will need to request to join the network again. If you are the last member of the network then this network will be permanently deleted." data-original-title="Leave Network">
 				<i class="fa fa-trash"></i>
 			</a>
 			</td>
