@@ -13,6 +13,16 @@
 	</div>	
 </div>
 <hr>
+<?php if($message): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-info">
+			<?php echo $message ?>
+			</div>
+		</div>
+	</div>
+	<hr>
+<?php endif; ?>
 <?php if ( ! $networks ): ?>
 <div class="row">
 	<div class="col">

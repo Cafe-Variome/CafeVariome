@@ -15,6 +15,7 @@ use App\Models\UIData;
 use App\Models\Source;
 use App\Helpers\AuthHelper;
 use App\Libraries\AuthAdapter;
+use App\Libraries\CafeVariome\Net\NetworkInterface;
 use CodeIgniter\Config\Services;
 
 class Network extends CVUI_Controller{
@@ -54,15 +55,29 @@ class Network extends CVUI_Controller{
 
     public function networks()
     {
-
         $uidata = new UIData();
         $uidata->data['title'] = "Networks";
-        $data = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']),  $this->setting->settingData['auth_server'] . "network/get_networks_installation_member_of_with_other_installation_details");
-        $installations_for_networks = json_decode($data, true);
-        $master_groups = $this->networkModel->getMasterGroups();
+        $uidata->data['message'] = '';
+        //$data = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']),  $this->setting->settingData['auth_server'] . "network/get_networks_installation_member_of_with_other_installation_details");
+        //$installations_for_networks = json_decode($data, true);
 
-        $uidata->data['groups'] = $master_groups;
-        $uidata->data['networks'] = $installations_for_networks;
+        $networks = [];
+
+        $networkInterface = new NetworkInterface();
+        try {
+            $response = $networkInterface->GetNetworksByInstallationKey($this->setting->settingData['installation_key']);
+            if ($response->status) {
+                $networks = $response->data;
+            }
+            $master_groups = $this->networkModel->getMasterGroups();
+    
+            $uidata->data['groups'] = $master_groups;
+        } catch (\Exception $ex) {
+            $uidata->data['message'] = 'There was a problem retrieving networks. Please try again.';
+        }
+        
+        
+        $uidata->data['networks'] = $networks;
             
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = array(JS.'cafevariome/network.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
@@ -79,7 +94,6 @@ class Network extends CVUI_Controller{
         $uidata = new UIData();
         $networkGroupModel = new NetworkGroup($this->db);
         $uidata->data['title'] = "Create Network";
-
 
         // Validate form input
         $this->validation->setRules([
@@ -98,38 +112,65 @@ class Network extends CVUI_Controller{
 
             $name = strtolower($this->request->getVar('name')); // Convert the network name to lowercase
             $installation_url = base_url();
-            $network = json_decode(AuthHelper::authPostRequest(array('installation_base_url' => $installation_url, 'network_name' => $name, 'installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/create_network"),1);
+            //$network = json_decode(AuthHelper::authPostRequest(array('installation_base_url' => $installation_url, 'network_name' => $name, 'installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/create_network"),1);
 
-			$this->networkModel->createNetwork(array ('network_name' => $network['network_name'],'network_key' => $network['network_key'],'network_type' => 'federated'));
-            $network_master_group_data = array (    'name' => $network['network_name'],
-                                        'description' => $network['network_name'],
-                                        'network_key' => $network['network_key'],
-                                        'group_type' => "master",
-                                        'url' => $this->setting->settingData['installation_key']
-                                    );
-            $network_group_id = $networkGroupModel->createNetworkGroup($network_master_group_data);
+            $networkInterface = new NetworkInterface();
+            $response = $networkInterface->CreateNetwork(['network_name' => $name, 'network_type' => 1, 'network_threshold' => 0, 'network_status' => 1]);
+            if ($response->status == 0) {
+                //something failed
+                $this->session->set('message', $response->message);
+                $this->session->markAsFlashdata('message');
+            }
+            else {
+                //operation successful
 
-            $this->session->setFlashdata('message', "Successfully created network $name");
+                $network_key = $response->data->network_key;
 
+                //Add Installation to Network
+                $addInstallationResponse = $networkInterface->AddInstallationToNetwork(['installation_key' => $this->setting->settingData['installation_key'], 'network_key' => $network_key]);
 
-			return redirect()->to(base_url('network/index'));            
-        } else {
+                //create local replication of network
 
-            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+                if ($addInstallationResponse->status == 0) {
+                    $this->session->set('message', $response->message);
+                    $this->session->markAsFlashdata('message');
+                }
+                else {
+                    $this->networkModel->createNetwork(array ('network_name' => $name,
+                        'network_key' => $response->data->network_key,
+                        'network_type' => 1
+                    ));
 
-            $uidata->data['name'] = array(
-                'name' => 'name',
-                'id' => 'name',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' =>set_value('name'),
-            );
-            $uidata->data['validation'] = $this->validation;
+                    $network_master_group_data = array ('name' => $name,
+                                'description' => $name,
+                                'network_key' => $response->data->network_key,
+                                'group_type' => "master",
+                                'url' => $this->setting->settingData['installation_key']
+                                );
+                    $network_group_id = $networkGroupModel->createNetworkGroup($network_master_group_data);
 
-            $data = $this->wrapData($uidata);
+                    return redirect()->to(base_url('network/index'));
+                }
 
-            return view('Network/Create_Network', $data);
-        }
+            
+            }
+       } 
+
+        $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+
+        $uidata->data['name'] = array(
+            'name' => 'name',
+            'id' => 'name',
+            'type' => 'text',
+            'class' => 'form-control',
+            'value' =>set_value('name'),
+        );
+        $uidata->data['validation'] = $this->validation;
+
+        $data = $this->wrapData($uidata);
+
+        return view('Network/Create_Network', $data);
+        
     }
 
     function edit_user_network_groups($id, $isMaster = false) {
