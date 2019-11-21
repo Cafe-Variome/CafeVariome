@@ -292,6 +292,6 @@ use CodeIgniter\Database\ConnectionInterface;
                 ));
         $query = $this->builder->get()->getResultArray();
         return $query;
-            }
-
+    }
+    
  }
