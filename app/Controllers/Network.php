@@ -444,14 +444,14 @@ class Network extends CVUI_Controller{
                     'value' =>set_value('network_threshold', $network_threshold),
                 );
             }
-    
-            $uidata->data['network_key'] = $network_key;
-    
-            $uidata->javascript = array(JS."/cafevariome/network.js");
-            $data = $this->wrapData($uidata);
-    
-            return view('Network/Edit_Network_Threshold', $data); 
         }
+
+        $uidata->data['network_key'] = $network_key;
+    
+        $uidata->javascript = array(JS."/cafevariome/network.js");
+        $data = $this->wrapData($uidata);
+
+        return view('Network/Edit_Network_Threshold', $data); 
     }
 
     function _get_csrf_nonce()
