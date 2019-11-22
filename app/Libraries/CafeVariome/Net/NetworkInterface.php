@@ -52,6 +52,20 @@ class NetworkInterface
         return $this->processResponse($response);
     }
 
+    public function GetNetworkThreshold(int $network_key)
+    {
+        $this->adapterw('networkapi/getNetworkThreshold', ['network_key' => $network_key]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
+    public function SetNetworkThreshold(int $network_key, int $network_threshold)
+    {
+        $this->adapterw('networkapi/setNetworkThreshold', ['network_key' => $network_key, 'network_threshold' => $network_threshold]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
     public function adapterw(string $uriTail, array $data)
     {
         $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
