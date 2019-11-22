@@ -75,7 +75,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <a href="<?= base_url("networkgroup") ?>">Ntework Groups</a>
+                <a href="<?= base_url("networkgroup") ?>">Network Groups</a>
             </div>
         </div>
     </div>
