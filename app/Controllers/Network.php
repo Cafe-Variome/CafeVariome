@@ -397,18 +397,61 @@ class Network extends CVUI_Controller{
     }
 
     function edit_threshold($network_key) {
-        $network_threshold = AuthHelper::authPostRequest(array('network_key' => $network_key), $this->setting->settingData['auth_server'] . "/network/get_network_threshold");
+
+        $networkInterface = new NetworkInterface();
+        $response = $networkInterface->GetNetworkThreshold((int)$network_key);
 
         $uidata = new UIData();
         $uidata->data['title'] = "Edit Network Threshold";
 
-        $uidata->data['network_threshold'] = $network_threshold;
-        $uidata->data['network_key'] = $network_key;
+        // Validate form input
+        $this->validation->setRules([
+            'network_threshold' => [
+                'label'  => 'Network Threshold',
+                'rules'  => 'required|alpha_dash|is_natural',
+                'errors' => [
+                    'required' => '{field} is required.',
+                    'is_natural' => '{field} must be a positive integer.'
+                ]
+            ]
+        ]
+        );
 
-        $uidata->javascript = array(JS."/cafevariome/network.js");
-        $data = $this->wrapData($uidata);
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+            $network_threshold = (int)$this->request->getVar('network_threshold');
 
-        return view('Network/Edit_Network_Threshold', $data);
+            $thresholdResponse = $networkInterface->SetNetworkThreshold($network_key, $network_threshold);
+            if ($thresholdResponse->status == 1) {
+                return redirect()->to(base_url('network/index'));
+            }
+
+        }
+        else {
+            if ($response->status == 0) {
+                //something failed
+                return redirect()->to(base_url('network/index'));
+            }
+            else{
+                $network_threshold = $response->data->network_threshold;
+                //$uidata->data['network_threshold'] = $network_threshold;
+                $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+
+                $uidata->data['network_threshold'] = array(
+                    'name' => 'network_threshold',
+                    'id' => 'network_threshold',
+                    'type' => 'text',
+                    'class' => 'form-control',
+                    'value' =>set_value('network_threshold', $network_threshold),
+                );
+            }
+    
+            $uidata->data['network_key'] = $network_key;
+    
+            $uidata->javascript = array(JS."/cafevariome/network.js");
+            $data = $this->wrapData($uidata);
+    
+            return view('Network/Edit_Network_Threshold', $data); 
+        }
     }
 
     function _get_csrf_nonce()

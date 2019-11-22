@@ -89,7 +89,10 @@ function edit_user_network_groups_sources() {
 
 }
 
-
+/**
+ * 
+ * @deprecated
+ */
 function saveThreshold(event) { 
     event.preventDefault();
 
