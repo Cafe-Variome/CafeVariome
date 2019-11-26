@@ -20,7 +20,7 @@ class Network extends Model{
     protected $table      = 'networks';
     protected $builder;
 
-    protected $primaryKey = 'network_id';
+    protected $primaryKey = 'network_key';
 	
 	public function __construct(ConnectionInterface &$db){
 
@@ -33,10 +33,22 @@ class Network extends Model{
 	 * Retrieve all networks
 	 */
 	function getNetworks(){
-		$this->builder = $this->db->table('networks');
+		$this->builder = $this->db->table($this->table);
 		$query = $this->builder->get()->getResultArray();
 
 		return $query;
+	}
+
+	public function deleteNetwork(int $network_key)
+	{
+		$this->builder = $this->db->table($this->table);
+		$this->builder->where(['network_key' => $network_key]);
+		$this->builder->delete();
+	}
+
+	public function leaveNetwork(Type $var = null)
+	{
+		# code...
 	}
 
 	/**

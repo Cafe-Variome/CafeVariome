@@ -22,8 +22,11 @@ class NetworkInterface
 
     private $setting; 
 
+    private $installation_key;
+
     public function __construct() {
         $this->setting = new Settings();
+        $this->installation_key = $this->setting->settingData['installation_key'];
 
         $this->serverURI = $this->setting->settingData['auth_server'];
         $curlOptions = [CURLOPT_RETURNTRANSFER => TRUE];
@@ -52,6 +55,13 @@ class NetworkInterface
         return $this->processResponse($response);
     }
 
+    public function GetNetwork(int $network_key)
+    {
+        $this->adapterw('networkapi/getNetwork', ['network_key' => $network_key]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
     public function GetNetworkThreshold(int $network_key)
     {
         $this->adapterw('networkapi/getNetworkThreshold', ['network_key' => $network_key]);
@@ -66,10 +76,18 @@ class NetworkInterface
         return $this->processResponse($response);
     }
 
+    public function LeaveNetwork(int $network_key)
+    {
+        $this->adapterw('networkapi/leaveNetwork', ['network_key' => $network_key]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
     public function adapterw(string $uriTail, array $data)
     {
         $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
         $this->networkAdapter->setOption(CURLOPT_POST, true);
+        $data['installation_key'] = $this->installation_key; 
         $this->networkAdapter->setOption(CURLOPT_POSTFIELDS, $data);
     }
 

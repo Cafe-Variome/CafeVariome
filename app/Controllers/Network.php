@@ -454,6 +454,56 @@ class Network extends CVUI_Controller{
         return view('Network/Edit_Network_Threshold', $data); 
     }
 
+    public function leave_network(int $network_key)
+    {
+        $networkInterface = new NetworkInterface();
+        $networkResponse = $networkInterface->GetNetwork((int)$network_key);
+
+        $uidata = new UIData();
+        $uidata->title = "Leave Network";
+
+        if ($networkResponse->status == 0 || $networkResponse->data == null) {
+            return redirect()->to(base_url('network/index'));
+        }
+        else {
+
+            $this->validation->setRules([
+                'confirm' => [
+                    'label'  => 'confirmation',
+                    'rules'  => 'required',
+                    'errors' => [
+                        'required' => '{field} is required.'
+                    ]
+                ]          
+            ]);
+
+            if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+                if ($this->request->getVar('confirm') == 'yes') {
+                    $networkResponse = $networkInterface->LeaveNetwork($network_key);
+                    
+                    if ($networkResponse->status == 1) {
+                        //Left the network.
+                        //Now delete the local replica if it exists.
+                        $this->networkModel->deleteNetwork($network_key);
+                        return redirect()->to(base_url('network/index'));
+                    }
+                }
+            }
+
+            $uidata->data['confirm'] = array(
+                'name' => 'confirm',
+                'type' => 'radio',
+                'class' => 'form-control',
+            );
+
+            $uidata->data['network_key'] = $network_key;
+            $uidata->data['network_name'] = $networkResponse->data->network_name;
+            
+            $data = $this->wrapData($uidata);
+            return view('Network/Leave_Network', $data); 
+        }
+    }
+
     function _get_csrf_nonce()
 	{
         helper('text');
