@@ -174,6 +174,7 @@ class Network extends CVUI_Controller{
     }
 
     function edit_user_network_groups($id, $isMaster = false) {
+
         $uidata = new UIData();
         $uidata->title = "Edit User Network Groups";
         $uidata->stickyFooter = false;
@@ -320,6 +321,8 @@ class Network extends CVUI_Controller{
         $uidata = new UIData();
         $uidata->data['title'] = "Join Network";
 
+        $networkInterface = new NetworkInterface();
+
         if (!isset($_POST['network'])) {
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
@@ -332,10 +335,18 @@ class Network extends CVUI_Controller{
                 'class' => 'form-control',
                 'value' => set_value('justification'),
             );
-            $networks = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "/network/get_networks_installation_not_a_member_of");
-            $data = json_decode($networks, true);
 
-            $uidata->data['networks'] = $data;
+            $networks_response = $networkInterface->GetAvailableNetworks();
+            
+            $networks = [];
+
+            if ($networks_response->status == 1) {
+                $networks = $networks_response->data;
+            }
+
+            //$data = json_decode($networks, true);
+
+            $uidata->data['networks'] = $networks;
             
             $uidata->javascript = array(JS.'cafevariome/network.js');
 
@@ -349,7 +360,7 @@ class Network extends CVUI_Controller{
      * 
      */
     function process_network_join_request() {
-        error_log("original admin");
+        
         $result['network_key'] = $this->request->getVar('networks');
         $result['justification'] = $this->request->getVar('justification');
 
@@ -363,7 +374,7 @@ class Network extends CVUI_Controller{
         $result['email'] = $user[0]->email;
         $result['auth_server'] =  $this->setting->settingData['auth_server'];
         $networks = AuthHelper::authPostRequest($result,  $this->setting->settingData['auth_server'] . "/network/join_network_request");
-        error_log("networks -> $networks");
+
         $data = json_decode($networks, 1);
 
         if (array_key_exists('network_request_id', $data)) {

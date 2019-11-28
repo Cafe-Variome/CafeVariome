@@ -28,7 +28,7 @@
 		<div class="form-group">
 			<select name="networks" id="networks" class="form-control">
 			<?php foreach ($networks as $network) : ?>
-				<option value="<?php echo $network['network_key']; ?>" selected="selected"><?php echo $network['network_name']; ?></option>
+				<option value="<?php echo $network->network_key; ?>" selected="selected"><?php echo $network->network_name; ?></option>
 			<?php endforeach; ?>
 			</select>
 		</div>

@@ -83,6 +83,13 @@ class NetworkInterface
         return $this->processResponse($response);
     }
 
+    public function GetAvailableNetworks()
+    {
+        $this->adapterw('networkapi/getAvailableNetworks', []);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
     public function adapterw(string $uriTail, array $data)
     {
         $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
