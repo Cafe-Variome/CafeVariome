@@ -16,7 +16,7 @@ use CodeIgniter\Database\ConnectionInterface;
 class NetworkRequest extends Model 
 {
     protected $db;
-    protected $table      = 'network_request';
+    protected $table      = 'network_requests';
     protected $builder;
 
     protected $primaryKey = 'id';
@@ -35,31 +35,6 @@ class NetworkRequest extends Model
         
         $this->builder = $this->db->table($this->table);
 
-    }
-
-    private function initiateResponse(int $status, array $data = null)
-    {
-        $this->response = new NetworkAPIResponse($status, $data);
-    }
-
-    private function setResponseMessage(string $message)
-    {
-        $this->response->setMessage($message);
-    }
-
-    public function getResponse(): NetworkAPIResponse
-    {
-        return $this->response;
-    }
-
-    public function getResponseArray(): array
-    {
-        return $this->response->toArray();
-    }
-
-    public function getResponseJSON(): string
-    {
-        return $this->response->toJSON();
     }
 
     public function createNetworkRequest(array $data): bool
