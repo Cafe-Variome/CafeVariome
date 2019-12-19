@@ -1,4 +1,4 @@
-<?php namespace App\Libraries\Net;
+<?php namespace App\Libraries\CafeVariome\Net;
 
 /**
  * APIResponse.php
