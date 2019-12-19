@@ -13,13 +13,21 @@
 	</div>	
 </div>
 <hr>
-
+<?php if($message): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-info">
+			<?php echo $message ?>
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
 <?php if ( isset($networks) ): ?>
 	<?php if (array_key_exists('error', $networks) ): ?>
 		<p>There are no networks available for you to join (or you are already a member of all existing networks).</p>
 		<p>Go to the <a href="<?php echo base_url() . "network/create_network"; ?>">create networks page</a> if you would like to start a new network.</p>
 	<?php else: ?>
-		<?php echo form_open("networks/join_network", array('name' => 'joinNetwork')); ?>
+		<?php echo form_open("network/join_network", array('name' => 'joinNetwork')); ?>
 		<div class="row mb-2">
 			<div class="col">
 				Select a network you wish to join.
@@ -38,7 +46,7 @@
 			<?php echo form_textarea($justification); ?>
 		</div>
 
-		<button type="submit" onclick="join_network();" class="btn btn-primary"><i class="fa fa-file"></i>  Join Network</button>
+		<button type="submit" class="btn btn-primary"><i class="fa fa-file"></i>  Join Network</button>
 		<a href="<?php echo base_url() . "network"; ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
 		<?php echo form_close(); ?>
 	<?php endif; ?>
