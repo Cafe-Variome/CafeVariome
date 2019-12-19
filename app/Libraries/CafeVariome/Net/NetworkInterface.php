@@ -90,6 +90,13 @@ class NetworkInterface
         return $this->processResponse($response);
     }
 
+    public function RequestToJoinNetwork(int $network_key, string $email, string $justification)
+    {
+        $this->adapterw('networkapi/requestToJoinNetwork', ['network_key' => $network_key, 'email' => $email, 'justification' => $justification]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
     public function adapterw(string $uriTail, array $data)
     {
         $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
