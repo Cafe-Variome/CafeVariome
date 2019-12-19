@@ -320,10 +320,40 @@ class Network extends CVUI_Controller{
 
         $uidata = new UIData();
         $uidata->data['title'] = "Join Network";
+        // Validate form input
+        $this->validation->setRules([
+            'justification' => [
+                'label'  => 'Justification',
+                'rules'  => 'required|alpha_dash',
+                'errors' => [
+                    'required' => '{field} is required.',
+                ]
+            ]
+        ]
+        );
+
+        $uidata->javascript = array(JS.'cafevariome/network.js');
+
 
         $networkInterface = new NetworkInterface();
 
-        if (!isset($_POST['network'])) {
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+
+            $network_key = $this->request->getVar('networks');
+            $justification = $this->request->getVar('justification');
+
+            $user_id = $this->authAdapter->getUserId();
+            $userModel = new User($this->db);
+            $user = $userModel->getUserById($user_id);
+
+            $email = $user[0]->email;
+
+            $join_response = $networkInterface->RequestToJoinNetwork($network_key, $email, $justification);
+
+            return redirect()->to(base_url('network/index'));
+        }
+        else {
+
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
             $uidata->data['justification'] = array(
@@ -344,16 +374,14 @@ class Network extends CVUI_Controller{
                 $networks = $networks_response->data;
             }
 
-            //$data = json_decode($networks, true);
-
             $uidata->data['networks'] = $networks;
             
-            $uidata->javascript = array(JS.'cafevariome/network.js');
 
             $data = $this->wrapData($uidata);
 
             return view('Network/Join_Network', $data);
         }
+
     }
 
     /**
@@ -361,6 +389,8 @@ class Network extends CVUI_Controller{
      */
     function process_network_join_request() {
         
+
+
         $result['network_key'] = $this->request->getVar('networks');
         $result['justification'] = $this->request->getVar('justification');
 
