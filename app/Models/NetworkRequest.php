@@ -37,6 +37,31 @@ class NetworkRequest extends Model
 
     }
 
+    function getNetworkRequests(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
+	
+		if ($cols) {
+            $this->builder->select($cols);
+        }
+        if ($conds) {
+            $this->builder->where($conds);
+        }
+        if ($groupby) {
+            $this->builder->groupBy($groupby);
+        }
+        if ($isDistinct) {
+            $this->builder->distinct();
+        }
+        if ($limit > 0) {
+            if ($offset > 0) {
+                $this->builder->limit($limit, $offset);
+            }
+            $this->builder->limit($limit);
+        }
+
+        $query = $this->builder->get()->getResultArray();
+        return $query; 
+    }
+
     public function createNetworkRequest(array $data): bool
     {
         try {
@@ -50,6 +75,4 @@ class NetworkRequest extends Model
             return false;
         }
     }
-    
-
 }
