@@ -9,6 +9,7 @@
  */
 
 use App\Models\UIData;
+use App\Libraries\CafeVariome\Net\NetworkInterface;
 
 
 class NetworkRequest extends CVUI_Controller 
@@ -45,5 +46,48 @@ class NetworkRequest extends CVUI_Controller
         
         $data = $this->wrapData($uidata);
         return view('NetworkRequest/NetworkRequests', $data);
+    }
+
+    public function acceptrequest(int $id)
+    {
+        $networkRequest = $this->networkRequestModel->getNetworkRequests(null, ['id' => $id]);
+
+        if (count($networkRequest) == 1) {
+            $networkInterface = new NetworkInterface();
+
+            $response = $networkInterface->AcceptRequest($networkRequest[0]['token']);
+
+            if ($response->status) {
+                $data = ['status' =>  1]; // Status 1 indicates an accepted request.
+                $this->networkRequestModel->updateNetworkRequests($data ,['id' => $id]);// Update status in local database.
+            }
+            else {
+                
+            }
+        }
+
+        return redirect()->to(base_url("networkrequest/networkrequests"));
+
+    }
+
+    public function denyrequest(int $id)
+    {
+        $networkRequest = $this->networkRequestModel->getNetworkRequests(null, ['id' => $id]);
+
+        if (count($networkRequest) == 1) {
+            $networkInterface = new NetworkInterface();
+
+            $response = $networkInterface->DenyRequest($networkRequest[0]['token']);
+
+            if ($response->status) {
+                $data = ['status' =>  0]; // Status 0 indicates denied request.
+                $this->networkRequestModel->updateNetworkRequests($data ,['id' => $id]);// Update status in local database.
+            }
+            else {
+                
+            } 
+        }
+
+        return redirect()->to(base_url("networkrequest/networkrequests"));
     }
 }

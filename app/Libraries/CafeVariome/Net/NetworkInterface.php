@@ -97,6 +97,20 @@ class NetworkInterface
         return $this->processResponse($response);
     }
 
+    public function AcceptRequest(string $token)
+    {
+        $this->adapterw('networkapi/acceptRequest', ['token' => $token]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
+    public function DenyRequest(string $token)
+    {
+        $this->adapterw('networkapi/denyRequest', ['token' => $token]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
     public function adapterw(string $uriTail, array $data)
     {
         $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
