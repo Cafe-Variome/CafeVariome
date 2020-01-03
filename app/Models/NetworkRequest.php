@@ -75,4 +75,11 @@ class NetworkRequest extends Model
             return false;
         }
     }
+
+    public function updateNetworkRequests(array $data, array $conds = null) {
+        if ($conds) {
+            $this->builder->where($conds);
+        }
+        return $this->builder->update($data);
+    }
 }
