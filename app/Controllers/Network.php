@@ -58,9 +58,6 @@ class Network extends CVUI_Controller{
         $uidata = new UIData();
         $uidata->data['title'] = "Networks";
         $uidata->data['message'] = '';
-        //$data = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']),  $this->setting->settingData['auth_server'] . "network/get_networks_installation_member_of_with_other_installation_details");
-        //$installations_for_networks = json_decode($data, true);
-
         $networks = [];
 
         $networkInterface = new NetworkInterface();
