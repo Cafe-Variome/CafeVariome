@@ -48,7 +48,7 @@ class Admin extends CVUI_Controller{
     function index(){
         $uidata = new UIData();
         $uidata->title = "Administrator Dashboard";
-
+        $uidata->stickyFooter = false;
 
         $data = $this->wrapData($uidata);
         return view("Admin/Index", $data);

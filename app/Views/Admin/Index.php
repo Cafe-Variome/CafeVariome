@@ -9,7 +9,7 @@
 <div class="row">
     <div class="col">
         <h4>Data</h4>
-    <div>
+    </div>
 </div>
 <hr/>
 <div class="row text-center">
@@ -47,11 +47,54 @@
     </div>
 </div>
 <hr/>
-
+<div class="row">
+    <div class="col">
+        <h4>Networks</h4>
+    </div>
+</div>
+<hr/>
+<div class="row text-center">
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                <a href="<?= base_url("network") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/network.png") ?>"></a>           
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <a href="<?= base_url("network") ?>">Networks</a>
+            </div>
+        </div>        
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                <a href="<?= base_url("networkgroup") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/group.png") ?>"></a>           
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <a href="<?= base_url("networkgroup") ?>">Network Groups</a>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="row">
+            <div class="col">
+                <a href="<?= base_url("networkrequest") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/networkrequest.png") ?>"></a>           
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <a href="<?= base_url("networkrequest") ?>">Network Requests</a>
+            </div>
+        </div>        
+    </div>
+</div>
 <div class="row">
     <div class="col">
         <h4>Access Control</h4>
-    <div>
+    </div>
 </div>
 <hr/>
 <div class="row text-center">
@@ -69,15 +112,11 @@
     </div>
     <div class="col">
         <div class="row">
-            <div class="col">
-                <a href="<?= base_url("networkgroup") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/group.png") ?>"></a>           
-            </div>
+            <div class="col"></div>
         </div>
         <div class="row">
-            <div class="col">
-                <a href="<?= base_url("networkgroup") ?>">Network Groups</a>
-            </div>
-        </div>
+            <div class="col"></div>
+        </div>        
     </div>
     <div class="col">
         <div class="row">
@@ -92,7 +131,7 @@
 <div class="row">
     <div class="col">
         <h4>Settings</h4>
-    <div>
+    </div>
 </div>
 <hr/>
 
@@ -121,14 +160,10 @@
     </div>
     <div class="col">
         <div class="row">
-            <div class="col">
-                <a href="<?= base_url("network") ?>"><img src="<?= base_url(IMAGES."cafevariome/dashboard/network.png") ?>"></a>           
-            </div>
+            <div class="col"></div>
         </div>
         <div class="row">
-            <div class="col">
-                <a href="<?= base_url("network") ?>">Networks</a>
-            </div>
+            <div class="col"></div>
         </div>        
     </div>
 </div>
