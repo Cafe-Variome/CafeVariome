@@ -26,7 +26,8 @@ class NetworkGroup extends Model{
 
     function __construct(ConnectionInterface &$db){
 		$this->db =& $db;
-		$this->setting =  Settings::getInstance($this->db);
+        $this->setting =  Settings::getInstance($this->db);
+        $this->builder = $this->db->table($this->table);
     }
 
     /**
@@ -37,7 +38,6 @@ class NetworkGroup extends Model{
      * @author Mehdi Mehtarizadeh
 	 */
 	function getNetworkGroups(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
-		$this->builder = $this->db->table($this->table);
 		
 		if ($cols) {
             $this->builder->select($cols);
@@ -66,14 +66,12 @@ class NetworkGroup extends Model{
 	 * createNetworkGroup
 	 */
 	function createNetworkGroup(array $data) {
-		$this->builder = $this->db->table($this->table);
 		$this->builder->insert($data);
 		$insert_id = $this->db->insertID();
 		return $insert_id;
     }
     
     function deleteNetworkGroup(int $id){
-        $this->builder = $this->db->table($this->table);
         $this->builder->where('id', $id);
         $this->builder->delete();
     }
