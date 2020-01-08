@@ -16,6 +16,7 @@ use App\Models\Source;
 use App\Helpers\AuthHelper;
 use App\Libraries\AuthAdapter;
 use CodeIgniter\Config\Services; 
+use App\Libraries\CafeVariome\Net\NetworkInterface;
 
 class Networkgroup extends CVUI_Controller{
 
@@ -54,11 +55,8 @@ class Networkgroup extends CVUI_Controller{
 		$uidata = new UIData();
 		$uidata->title = "Network Groups";
 
-		$networks = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/get_networks_installation_member_of_with_other_installation_details");
-		$networks = json_decode($networks, true);
-		$networkGroups = $this->networkGroupModel->getNetworkGroups('', null, array('name'));
+		$networkGroups = $this->networkGroupModel->getNetworkGroups(null, null, array('name'), true);
 		foreach ( $networkGroups as $network_group ) {
-			$network_group['network_name'] = $networks[$network_group['network_key']]['network_name'];
 			$number_sources = $this->networkModel->countSourcesForNetworkGroup($network_group['id']);
 			$network_group['number_of_sources'] = $number_sources;
 			$network_groups_for_installation[] = $network_group;
