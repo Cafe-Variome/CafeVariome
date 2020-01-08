@@ -432,6 +432,10 @@ class Network extends Model{
 		$this->builder->where("user_id", $user_id);
 		$query = $this->builder->get()->getResultArray();
 
+		if (!$query) {
+			return $query;
+		}
+		
 		$groupIds = array();
 		foreach ($query as $gid) {
 			array_push($groupIds, $gid['group_id']);
