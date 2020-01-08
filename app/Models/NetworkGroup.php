@@ -37,7 +37,7 @@ class NetworkGroup extends Model{
      * 
      * @author Mehdi Mehtarizadeh
 	 */
-	function getNetworkGroups(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
+	function getNetworkGroups(string $cols = null, array $conds = null, array $groupby = null, bool $includeNetworks, bool $isDistinct = false, int $limit = -1, int $offset = -1){
 		
 		if ($cols) {
             $this->builder->select($cols);
@@ -47,6 +47,9 @@ class NetworkGroup extends Model{
         }
         if ($groupby) {
             $this->builder->groupBy($groupby);
+        }
+        if ($includeNetworks) {
+            $this->builder->join('networks', $this->table.'.network_key = networks.network_key');
         }
         if ($isDistinct) {
             $this->builder->distinct();
