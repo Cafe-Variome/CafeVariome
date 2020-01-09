@@ -221,7 +221,6 @@ class Elastic extends Model{
         delete_files("resources/phenotype_lookup_data/");
 
         if(isset($result['error'])) return;
-        error_log("before foreach");
 
         foreach ($result as $row) {
             try {
@@ -245,8 +244,6 @@ class Elastic extends Model{
                 file_put_contents("resources/phenotype_lookup_data/" . $row['network_key'] . ".json", json_encode($json_data), FILE_APPEND);
             }
         }
-
-        error_log("after foreach");
 
         //HPO Ancestry JSON FILE
 
@@ -276,7 +273,7 @@ class Elastic extends Model{
             if (!isset($sourceslist[$network])) $sourceslist[$network] = [];
             array_push($sourceslist[$network], $row[0]);
         }
-        error_log("Network Source Numbers: " . count($sourceslist));
+
         foreach ($sourceslist as $network => $sourcelist) {
             $hpo_terms = $phenotypeModel->getHPOTerms($sourcelist);
 
