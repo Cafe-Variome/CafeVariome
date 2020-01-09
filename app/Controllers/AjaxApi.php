@@ -17,6 +17,8 @@
 use CodeIgniter\Controller;
 use App\Helpers\AuthHelper;
 use App\Models\Settings;
+use App\Libraries\CafeVariome\Net\NetworkInterface;
+
 
  class AjaxApi extends Controller{
 
@@ -123,7 +125,14 @@ use App\Models\Settings;
      */
     function getPhenotypeAttributes(string $network_key) {
         if ($this->request->isAJAX()) {
-            $installation_urls = json_decode(AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key'], 'network_key' => $network_key), $this->setting->settingData['auth_server'] . "network/get_all_installation_ips_for_network"), true);
+            $networkInterface = new NetworkInterface();
+            $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key);
+
+            $installations = [];
+
+            if ($response->status) {
+                $installations = $response->data;
+            }
 
             $postdata = http_build_query(
                 array(
@@ -144,13 +153,14 @@ use App\Models\Settings;
     
             $data = array();
     
-            foreach ($installation_urls as $url) {
-                $url = rtrim($url['installation_base_url'], "/") . "/AjaxApi/get_json_for_phenotype_lookup";
+            foreach ($installations as $installation) {
+                $url = rtrim($installation->base_url, "/") . "/AjaxApi/get_json_for_phenotype_lookup";
                 try{
                     $result = @file_get_contents($url, 1, $context);
                 }
                 catch (\Exception $ex) {
-                    return json_encode(var_dump($ex));
+                    error_log($ex->getMessage());
+                    //return json_encode(var_dump($ex));
                 }
                 if ($result) {
                     foreach (json_decode($result, 1) as $res) {
@@ -193,14 +203,6 @@ use App\Models\Settings;
                 ]
             ];
             $context = stream_context_create($opts);
-            $data = '';
-            foreach ($installation_urls as $url) {
-                $url = rtrim($url['installation_base_url'], "/") . "/AjaxApi/get_json_for_hpo_ancestry";
-                $data = @file_get_contents($url, 1, $context);
-            }
-    
-            if($data) {
-                file_put_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json", json_encode($data));
             $hpoDataString = '';
             foreach ($installations as $installation) {
                 $url = rtrim($installation->base_url, "/") . "/AjaxApi/get_json_for_hpo_ancestry";
