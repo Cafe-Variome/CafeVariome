@@ -201,6 +201,13 @@ use App\Models\Settings;
     
             if($data) {
                 file_put_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json", json_encode($data));
+            $hpoDataString = '';
+            foreach ($installations as $installation) {
+                $url = rtrim($installation->base_url, "/") . "/AjaxApi/get_json_for_hpo_ancestry";
+                $hpoDataString = @file_get_contents($url, 1, $context);
+                if ($hpoDataString) {
+                    file_put_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json", json_encode($hpoDataString)); 
+                }
             }
     
             $phen_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . ".json"), 1);
