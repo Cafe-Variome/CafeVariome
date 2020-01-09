@@ -111,6 +111,13 @@ class NetworkInterface
         return $this->processResponse($response);
     }
 
+    public function GetInstallationsByNetworkKey(int $network_key)
+    {
+        $this->adapterw('networkapi/getInstallationsByNetworkKey', ['network_key' => $network_key]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+    
     public function adapterw(string $uriTail, array $data)
     {
         $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
