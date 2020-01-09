@@ -37,7 +37,7 @@ class NetworkGroup extends Model{
      * 
      * @author Mehdi Mehtarizadeh
 	 */
-	function getNetworkGroups(string $cols = null, array $conds = null, array $groupby = null, bool $includeNetworks, bool $isDistinct = false, int $limit = -1, int $offset = -1){
+	function getNetworkGroups(string $cols = null, array $conds = null, array $groupby = null, bool $includeNetworks = false, bool $isDistinct = false, int $limit = -1, int $offset = -1){
 		
 		if ($cols) {
             $this->builder->select($cols);
