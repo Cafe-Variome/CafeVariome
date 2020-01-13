@@ -42,7 +42,7 @@
 	];
 	$options = array();
 	foreach ($networks as $network) {
-		$options[$network['network_key']] = $network['network_name'];
+		$options[$network->network_key] = $network->network_name;
 	}
 	echo form_dropdown('network', $options, 'mysql', $style);
 ?>
