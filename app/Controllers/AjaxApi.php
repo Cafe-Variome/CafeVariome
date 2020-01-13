@@ -145,8 +145,8 @@ use App\Libraries\CafeVariome\Net\NetworkInterface;
                 array(
                     'method' => 'POST',
                     'header' => 'Content-type: application/x-www-form-urlencoded',
-                    'content' => $postdata,
-                    'timeout' => 1
+                    'content' => $postdata
+                    //'timeout' => 10 //Removed timeout
                 )
             );
             $context = stream_context_create($opts);
@@ -156,11 +156,10 @@ use App\Libraries\CafeVariome\Net\NetworkInterface;
             foreach ($installations as $installation) {
                 $url = rtrim($installation->base_url, "/") . "/AjaxApi/get_json_for_phenotype_lookup";
                 try{
-                    $result = @file_get_contents($url, 1, $context);
+                    $result = file_get_contents($url, 1, $context);
                 }
                 catch (\Exception $ex) {
                     error_log($ex->getMessage());
-                    //return json_encode(var_dump($ex));
                 }
                 if ($result) {
                     foreach (json_decode($result, 1) as $res) {
@@ -198,8 +197,8 @@ use App\Libraries\CafeVariome\Net\NetworkInterface;
                 [
                     'method' => 'POST',
                     'header' => 'Content-type: application/x-www-form-urlencoded',
-                    'content' => $postdata,
-                    'timeout' => 1
+                    'content' => $postdata
+                    //'timeout' => 1 // Removed timeout 
                 ]
             ];
             $context = stream_context_create($opts);
@@ -219,13 +218,14 @@ use App\Libraries\CafeVariome\Net\NetworkInterface;
     }
 
     function get_json_for_phenotype_lookup() {
+
         $modification_time = $this->request->getVar('modification_time');
         $network_key = $this->request->getVar('network_key');
 
         if (file_exists('resources/phenotype_lookup_data/' . $network_key . ".json")) {
             return (file_get_contents("resources/phenotype_lookup_data/" . $network_key . ".json"));
         } else {
-            error_log("resources/phenotype_lookup_data/" . $network_key . ".json");
+            return false;
         }              
     }
 
