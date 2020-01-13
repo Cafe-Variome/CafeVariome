@@ -9,16 +9,13 @@ function regenElastic(id,add) {
          callElastic(id,false,true);
       }
       else {
-        if ($('#update_'+id+'_force').prop('checked')) {
           force = confirm("A forced Regeneration will completely rebuild your ElasticSearch Index. Do you wish to continue?");
           if (force) {
             callElastic(id,force,false);
           }
-        }
-        else {
-          force = false;
-          callElastic(id,force,false);
-        }   
+          else{
+            callElastic(id,force,false);
+          } 
       }   
   //  }
   }

@@ -108,15 +108,7 @@ class Elastic extends CVUI_Controller{
             }
         }
         else {
-            if ($force == "true") {
-                error_log("forced");
-                $elasticModel->setElasticFlagForSource($source_id);
-            }	    	
-            $count = $elasticModel->getElasticFlagForSource($source_id);
-            error_log(print_r($count,1));
-            
-            if ($count['elastic_status'] > 0) {
-
+            if ($force) {
                 $count = $elasticModel->getEAVsCountForSource($source_id);
                 $time = $count/2786;
                 $result = ['Status' => 'Success','Time'=> $time];

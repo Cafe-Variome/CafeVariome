@@ -29,8 +29,7 @@
     <tr>
         <th>ElasticSearch Index Name</th>
         <th>Status</th>
-        <th>Regenerate</th>
-        <th>Update</th>
+        <th>Action</th>
     </tr>
   </thead>
   <tbody id="index_grid">
@@ -51,21 +50,11 @@
       <?php endif; ?>
 
       <td>                                    
-        <?php if ($row['elastic_status'] != 1): ?>       
-          <a class="btn btn-secondary disabled" id="update_<?php echo $row['name']; ?>" data-toggle="tooltip" data-placement="top" title="Click to regenerate this ElasticSearch Index">
-            <i class="fa fa-list"></i>  Regenerate <?php echo $host."_".$row['source_id']; ?> 
-          </a>
-          To force the Regenerate:
-          <input class="check" title="Check this Box if you wish to force the update." id="update_<?php echo $row['name']; ?>_force" type="checkbox" value="Force?" />
-        <?php else: ?>
-          <a onclick="regenElastic('<?php echo $row['source_id']; ?>', false);" class="btn btn-secondary" id="update_<?php echo $row['name']; ?>" data-toggle="tooltip" data-placement="top" title="Click to regenerate this ElasticSearch Index">
-            <i class="fa fa-list"></i>  Regenerate <?php echo $host."_".$row['source_id']; ?>
-          </a>
-        <?php endif; ?>                                                                    
-      </td>
-      <td>
-        <a onclick="regenElastic('<?php echo $row['source_id']; ?>',true);" class="btn btn-secondary"  data-toggle="tooltip" data-placement="top" title="Click to append newly-uploaded data to ElasticSearch (This does not affect data already present)">
-          <i class="fa fa-list"></i>  Update <?php echo $host."_".$row['source_id']; ?>
+        <a onclick="regenElastic('<?php echo $row['source_id']; ?>', false);" id="update_<?php echo $row['name']; ?>" data-toggle="tooltip" data-placement="top" title="Click to regenerate this ElasticSearch Index">
+          <span class="fa fa-redo text-info"></span>
+        </a>
+        <a onclick="regenElastic('<?php echo $row['source_id']; ?>',true);" data-toggle="tooltip" data-placement="top" title="Click to append newly-uploaded data to ElasticSearch (This does not affect data already present)">
+          <span class="fa fa-sync text-warning"></span>
         </a>
       </td>
       </tr>
