@@ -138,7 +138,7 @@ class Elastic extends Model{
 
     /**
      * setElasticFlagForSource
-     * Make all files for source be fresh by setting the elastic status flag
+     * Set elastic_status flag to 1 for a source.
      *
      * @param int $source_id - The name of the source
      * @return N/A
