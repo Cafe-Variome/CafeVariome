@@ -437,14 +437,10 @@ $(function() {
                         if(val != null) {
                             resp = $.parseJSON(val)
                             $.each(resp, function(key, val1) {
-                                if(key !== 'site_title') {
-                                    if($('#query_result tbody tr' + '#' + val.id + '_' + key).length == 0) {
-                                        $('#query_result tbody').append("<tr id = " + val.id + '_' + key + ">" +
-                                            "<td>" + key.titleCase() + "</a></td>" +
-                                            "<td>" + (val1.length > 0 ? "<a href='' class='hover_test'>" + val1.length + "</a>" : "0")  + "</td>" +
-                                        "</tr>")
-                                    }
-                                }
+                                //if($('#query_result tbody tr' + '#' + key).length == 0) {
+                                    trow = "<tr id = " + key + "><td>" + key.titleCase() + "</a></td><td>" + ((val1 != "Access Denied") ? (val1.length > 0 ? val1.length  : "0") : val1) + "</td></tr>";
+                                    $('#query_result tbody').append(trow);
+                                //}
                             })    
                         }
                     })

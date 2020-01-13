@@ -18,6 +18,7 @@ use App\Libraries\CafeVariome;
 use App\Libraries\CafeVariome\Query;
 use App\Helpers\AuthHelper;
 use CodeIgniter\Config\Services;
+use App\Libraries\CafeVariome\Net\NetworkInterface;
 use Elasticsearch;
 
 class Discover extends CVUI_Controller{
@@ -65,6 +66,7 @@ class Discover extends CVUI_Controller{
     public function query_builder($network_key = null){
         
         $uidata = new UIData();
+        $networkInterface = new NetworkInterface();
 
         if ($network_key) {
             $this->session->set(array('network_key' => $network_key));
@@ -82,15 +84,22 @@ class Discover extends CVUI_Controller{
         error_log("User: " . $this->session->get('email') . " has chosen network: $network_key || " . date("Y-m-d H:i:s"));
 
         $token = $this->session->get('Token');
-        $installation_urls = json_decode(AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key'], 'network_key' => $network_key), $this->setting->settingData['auth_server'] . "network/get_all_installation_ips_for_network"), true);
-        $data = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/get_all_installations_for_network");
 
-        $data = stripslashes($data);
-        $data = json_decode($data, 1);
-        if (array_key_exists('error', $data)) show_error($data['error']);
+        //$installation_urls = json_decode(AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key'], 'network_key' => $network_key), $this->setting->settingData['auth_server'] . "network/get_all_installation_ips_for_network"), true);
+        //$data = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/get_all_installations_for_network");
+        
+        $installations = [];
+        $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key);
+
+        if($response->status){
+            $installations = $response->data;
+        }
+        //$data = stripslashes($data);
+        //$data = json_decode($data, 1);
+
         // Set the federated installs in the session so they can be used by variantcount
-        $this->session->set(array('federated_installs' => $data['installation_urls']));
-        $this->session->set(array('network_threshold' => $data['network_threshold']));
+        //$this->session->set(array('federated_installs' => $installations['installation_urls']));
+        //$this->session->set(array('network_threshold' => $installations['network_threshold']));
 
         $uidata->data["elasticSearchEnabled"] = true;
         $uidata->data["message"] = null;
@@ -102,9 +111,7 @@ class Discover extends CVUI_Controller{
         $uidata->title = "Discover - Query Builder";
         $uidata->css = array(VENDOR.'vakata/jstree/dist/themes/default/style.css', CSS.'jquery.querybuilder.css');  
 
-
         $uidata->stickyFooter = false;
-
 
         $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js',JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
         $data = $this->wrapData($uidata);
