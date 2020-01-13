@@ -81,6 +81,8 @@ class Networkgroup extends CVUI_Controller{
         $uidata = new UIData();
 		$uidata->title = "Create Group";
 
+		$networkInterface = new NetworkInterface();
+
         //validate form input
         
         $this->validation->setRules([
@@ -134,10 +136,14 @@ class Networkgroup extends CVUI_Controller{
 			}
 		}
 		else {
-			$networks_installation_member_of = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/get_networks_installation_member_of_with_other_installation_details");
-			//$networks_installation_member_of = json_decode($networks_installation_member_of, 1);
-            if ( ! empty($networks_installation_member_of) ) {
-					$uidata->data['networks'] = json_decode($networks_installation_member_of, TRUE);
+			$response = $networkInterface->GetNetworksByInstallationKey($this->setting->settingData['installation_key']);
+			$networks = [];
+			if ($response->status) {
+				$networks = $response->data;
+			}
+
+            if (!empty($networks) ) {
+				$uidata->data['networks'] = $networks;
 			}
 
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
