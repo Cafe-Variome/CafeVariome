@@ -281,10 +281,8 @@ class Query extends CafeVariome{
 
     	$user_id = $session->get('user_id');
 
-		$bool = json_decode(AuthHelper::authPostRequest(array('installation_key' => $installation_key, 'network_key' => $network_key), $this->setting->settingData['auth_server'] . "network/checkInstallationIsAMemberOfANetwork"),1);
-
         // fetch sources for which the user has source display access       
-        //Localised the function (Mehdi Mehtarizadeh 21/08/2019)
+        // Localised the function (Mehdi Mehtarizadeh 21/08/2019)
         $sdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, 'source_display');
 
         $sdg_ids = [];
@@ -296,7 +294,6 @@ class Query extends CafeVariome{
         
         // fetch sources for which the user has data display access (count display group)
         //Localised the function (Mehdi Mehtarizadeh 21/08/2019)
-		//$cdg_arr = json_decode(AuthHelper::authPostRequest(array('user_id' => $user_id, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_installation_that_user_id_has_count_display_group_access_to"), 1);
         $cdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, 'count_display');
         $cdg_ids = [];
 		if(!array_key_exists('error', $cdg_arr)) {
@@ -306,8 +303,6 @@ class Query extends CafeVariome{
 		}		
 
 		// Fetch all source id part of the network for this installation
-		//$network_sources = json_decode(AuthHelper::authPostRequest(array('network_key' => $network_key, 'installation_key' => $installation_key), $this->setting->settingData['auth_server'] . "/api/auth_general/get_sources_for_network_part_of_group"), 1)['sources'];
-
         $network_sources = $networkModel->getSourcesForNetworkPartOfGroup($installation_key, $network_key);
 
         $sources = $sourceModel->getSources('source_id, name, description', array('type !=' => 'federated')); // this and the above needs replacing with a sources model function to get all the data from local databases (need greg's new code)
@@ -323,9 +318,6 @@ class Query extends CafeVariome{
 		$pointer_query = $this->generate_pointer_query($result, $api);
 
 		// $es5_query = $this->generate_es5_query($result, $api);
-		// $sources = ['test_pheno_upload', 'ga4gh_search', 'icm-brice', 'semmelweis-balicza', 'test_spout', 'pseudosubject', 'omim'];
-		// $sources = [['source_id' => "1", 'name' => "test_pheno_upload"]];
-        //$sources = [['source_id' => "1", 'name' => "pseudosubject"]];
         $es5_counts = [];
 		foreach ($sources as $source_array) {
 
@@ -333,9 +325,10 @@ class Query extends CafeVariome{
             if ($elasticSearch->indexExists($elasticIndexName)) {
                 $source_id = $source_array['source_id'];
                 if(!in_array($source_id, $network_sources)) continue; //as above
-                $es5_counts[$source_array['name']] = "Access denied"; // not sure if this correct, yes if they are not in sg then access denied, but if in should get counts
+                $es5_counts[$source_array['name']] = "Access Denied"; // not sure if this correct, yes if they are not in sg then access denied, but if in should get counts
     
-                if (array_key_exists($source_id, $sdg_ids)) {
+                if (array_key_exists($source_id, $sdg_ids))
+                {
                     $es5_counts[$source_array['name']] = $this->process_query($source_array['name'], $pointer_query);
                     // $es5_counts[$source_array['name']] = count($this->es5v2_records($source_array['name'], $pointer_query));
                     // $es5_counts[$source_array['name']] = count($this->es5v2_records($source_array['name'], $pointer_query));
