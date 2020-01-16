@@ -36,84 +36,84 @@ class NetworkInterface
 
     public function CreateNetwork(array $data)
     {
-        $this->adapterw('networkapi/createNetwork', $data);
+        $this->adapterw('NetworkApi/createNetwork', $data);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function AddInstallationToNetwork(array $data)
     {
-        $this->adapterw('networkapi/addInstallationToNetwork', $data);
+        $this->adapterw('NetworkApi/addInstallationToNetwork', $data);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function GetNetworksByInstallationKey(string $installation_key)
     {
-        $this->adapterw('networkapi/getNetworksByInstallationKey', ['installation_key' => $installation_key]);
+        $this->adapterw('NetworkApi/getNetworksByInstallationKey', ['installation_key' => $installation_key]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function GetNetwork(int $network_key)
     {
-        $this->adapterw('networkapi/getNetwork', ['network_key' => $network_key]);
+        $this->adapterw('NetworkApi/getNetwork', ['network_key' => $network_key]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function GetNetworkThreshold(int $network_key)
     {
-        $this->adapterw('networkapi/getNetworkThreshold', ['network_key' => $network_key]);
+        $this->adapterw('NetworkApi/getNetworkThreshold', ['network_key' => $network_key]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function SetNetworkThreshold(int $network_key, int $network_threshold)
     {
-        $this->adapterw('networkapi/setNetworkThreshold', ['network_key' => $network_key, 'network_threshold' => $network_threshold]);
+        $this->adapterw('NetworkApi/setNetworkThreshold', ['network_key' => $network_key, 'network_threshold' => $network_threshold]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function LeaveNetwork(int $network_key)
     {
-        $this->adapterw('networkapi/leaveNetwork', ['network_key' => $network_key]);
+        $this->adapterw('NetworkApi/leaveNetwork', ['network_key' => $network_key]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function GetAvailableNetworks()
     {
-        $this->adapterw('networkapi/getAvailableNetworks', []);
+        $this->adapterw('NetworkApi/getAvailableNetworks', []);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function RequestToJoinNetwork(int $network_key, string $email, string $justification)
     {
-        $this->adapterw('networkapi/requestToJoinNetwork', ['network_key' => $network_key, 'email' => $email, 'justification' => $justification]);
+        $this->adapterw('NetworkApi/requestToJoinNetwork', ['network_key' => $network_key, 'email' => $email, 'justification' => $justification]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function AcceptRequest(string $token)
     {
-        $this->adapterw('networkapi/acceptRequest', ['token' => $token]);
+        $this->adapterw('NetworkApi/acceptRequest', ['token' => $token]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function DenyRequest(string $token)
     {
-        $this->adapterw('networkapi/denyRequest', ['token' => $token]);
+        $this->adapterw('NetworkApi/denyRequest', ['token' => $token]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
 
     public function GetInstallationsByNetworkKey(int $network_key)
     {
-        $this->adapterw('networkapi/getInstallationsByNetworkKey', ['network_key' => $network_key]);
+        $this->adapterw('NetworkApi/getInstallationsByNetworkKey', ['network_key' => $network_key]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
