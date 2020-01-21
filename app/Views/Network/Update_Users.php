@@ -32,7 +32,7 @@
     <?php endif; ?>		
 	</div>
 </div>
-<?php echo form_open("network/edit_user_network_groups/".$user_id."/".$isMaster, array('name' => 'editUser')); ?>
+<?php echo form_open("Network/Update_Users/".$user_id."/".$isMaster, array('name' => 'editUser')); ?>
 <?php echo form_hidden(array('installation_key' => $installation_key)); ?>  
 <?php if(isset($users) || isset($group_users)): ?>
 
@@ -145,7 +145,7 @@
             <i class="fa fa-save"></i>  Save
         </button>
         <?php if($group_type == 'master'): ?>
-            <a href="<?php echo base_url() . "networks"; ?>" class="btn btn-secondary" >
+            <a href="<?php echo base_url() . "Networks"; ?>" class="btn btn-secondary" >
                 <i class="fa fa-backward"></i> Go back
             </a>
         <?php else: ?>

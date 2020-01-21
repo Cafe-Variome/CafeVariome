@@ -27,7 +27,7 @@
 		<p>There are no networks available for you to join (or you are already a member of all existing networks).</p>
 		<p>Go to the <a href="<?php echo base_url() . "network/create_network"; ?>">create networks page</a> if you would like to start a new network.</p>
 	<?php else: ?>
-		<?php echo form_open("network/join_network", array('name' => 'joinNetwork')); ?>
+		<?php echo form_open("Network/Join", array('name' => 'joinNetwork')); ?>
 		<div class="row mb-2">
 			<div class="col">
 				Select a network you wish to join.

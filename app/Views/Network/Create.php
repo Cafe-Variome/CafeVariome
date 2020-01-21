@@ -27,7 +27,7 @@
 		</div>
 	</div>
 <?php endif; ?>
-<?php echo form_open("network/create_network", array('name' => 'createNetwork')); ?>
+<?php echo form_open("Network/Create", array('name' => 'createNetwork')); ?>
 <div class="form-group">
 <?php echo form_label('Network Name', 'name'); ?>
 

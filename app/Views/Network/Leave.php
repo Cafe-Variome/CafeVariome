@@ -3,7 +3,7 @@
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
   <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "network";?>">Networks</a></li>
+  <li class="breadcrumb-item"><a href="<?php echo base_url() . "Network";?>">Networks</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -14,7 +14,7 @@
 </div>
 <hr>
 
-<?php echo form_open("network/leave_network/$network_key"); ?>
+<?php echo form_open("Network/Leave/$network_key"); ?>
 <div class="form-group">
   <span class="text-danger">Warning: Are you sure you want to leave <?= $network_name ?>?</span>
 </div>
@@ -32,7 +32,7 @@
 <div class="form-group row">
     <div class="col">
         <button type="submit" class="btn btn-primary"><i class="fa fa-door-open"></i>  Leave Network</button>
-        <a href="<?php echo base_url() . "network"; ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>        
+        <a href="<?php echo base_url() . "Network"; ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>        
     </div>
 </div>
 

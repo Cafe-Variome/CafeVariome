@@ -22,7 +22,7 @@
 		</div>
 	</div>
 <?php endif; ?>
-<?php echo form_open("network/edit_threshold/$network_key"); ?>
+<?php echo form_open("Network/Update_Threshold/$network_key"); ?>
 
 <div class="form-group">
   <?php echo form_label('Network Threshold', 'network_threshold'); ?>
