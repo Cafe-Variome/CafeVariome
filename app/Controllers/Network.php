@@ -46,14 +46,14 @@ class Network extends CVUI_Controller{
     }
 
     public function index(){
-        return redirect()->to(base_url("network/networks"));
+        return redirect()->to(base_url($this->controllerName.'/Networks'));
     }
 
     /**
      * 
      */
 
-    public function networks()
+    public function Networks()
     {
         $uidata = new UIData();
         $uidata->data['title'] = "Networks";
@@ -80,13 +80,13 @@ class Network extends CVUI_Controller{
         $uidata->javascript = array(JS.'cafevariome/network.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
         $data = $this->wrapData($uidata);
-        return view("Network/Networks", $data);
+        return view($this->viewDirectory."/List", $data);
     }
 
     /**
-     * create_network
+     * Create
      */
-    function create_network() {
+    function Create() {
 
         $uidata = new UIData();
         $networkGroupModel = new NetworkGroup($this->db);
@@ -109,7 +109,6 @@ class Network extends CVUI_Controller{
 
             $name = strtolower($this->request->getVar('name')); // Convert the network name to lowercase
             $installation_url = base_url();
-            //$network = json_decode(AuthHelper::authPostRequest(array('installation_base_url' => $installation_url, 'network_name' => $name, 'installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/create_network"),1);
 
             $networkInterface = new NetworkInterface();
             $response = $networkInterface->CreateNetwork(['network_name' => $name, 'network_type' => 1, 'network_threshold' => 0, 'network_status' => 1]);
@@ -146,10 +145,8 @@ class Network extends CVUI_Controller{
                                 );
                     $network_group_id = $networkGroupModel->createNetworkGroup($network_master_group_data);
 
-                    return redirect()->to(base_url('network/index'));
+                    return redirect()->to(base_url($this->controllerName.'/index'));
                 }
-
-            
             }
        } 
 
@@ -166,11 +163,11 @@ class Network extends CVUI_Controller{
 
         $data = $this->wrapData($uidata);
 
-        return view('Network/Create_Network', $data);
+        return view($this->viewDirectory.'/Create', $data);
         
     }
 
-    function edit_user_network_groups($id, $isMaster = false) {
+    function Update_Users($id, $isMaster = false) {
 
         $uidata = new UIData();
         $uidata->title = "Edit User Network Groups";
@@ -213,7 +210,7 @@ class Network extends CVUI_Controller{
                     $this->networkModel->deleteAllSourcesFromNetworkGroup($group_id, $installation_key);
             }
     
-			return redirect()->to(base_url('network/index'));            
+			return redirect()->to(base_url($this->controllerName.'/index'));            
         }
         else{
 
@@ -306,14 +303,14 @@ class Network extends CVUI_Controller{
             $uidata->javascript = array(JS."cafevariome/network.js", JS."cafevariome/components/transferbox.js");
     
             $data = $this->wrapData($uidata);
-            return view('Network/Edit_Network_Groups_Users', $data);
+            return view($this->viewDirectory.'/Update_Users', $data);
         }
     }
 
     /**
      * 
      */
-    function join_network(){
+    function Join(){
 
         $uidata = new UIData();
         $uidata->data['title'] = "Join Network";
@@ -347,7 +344,7 @@ class Network extends CVUI_Controller{
 
             $join_response = $networkInterface->RequestToJoinNetwork($network_key, $email, $justification);
 
-            return redirect()->to(base_url('network/index'));
+            return redirect()->to(base_url($this->controllerName.'/index'));
         }
         else {
 
@@ -376,18 +373,15 @@ class Network extends CVUI_Controller{
 
             $data = $this->wrapData($uidata);
 
-            return view('Network/Join_Network', $data);
+            return view($this->viewDirectory.'/Join', $data);
         }
-
     }
 
     /**
-     * 
+     * @deprecated
      */
     function process_network_join_request() {
         
-
-
         $result['network_key'] = $this->request->getVar('networks');
         $result['justification'] = $this->request->getVar('justification');
 
@@ -434,7 +428,7 @@ class Network extends CVUI_Controller{
         }
     }
 
-    function edit_threshold($network_key) {
+    function Update_Threshold($network_key) {
 
         $networkInterface = new NetworkInterface();
         $response = $networkInterface->GetNetworkThreshold((int)$network_key);
@@ -460,14 +454,14 @@ class Network extends CVUI_Controller{
 
             $thresholdResponse = $networkInterface->SetNetworkThreshold($network_key, $network_threshold);
             if ($thresholdResponse->status == 1) {
-                return redirect()->to(base_url('network/index'));
+                return redirect()->to(base_url($this->controllerName.'/index'));
             }
 
         }
         else {
             if ($response->status == 0) {
                 //something failed
-                return redirect()->to(base_url('network/index'));
+                return redirect()->to(base_url($this->controllerName.'/index'));
             }
             else{
                 $network_threshold = $response->data->network_threshold;
@@ -489,10 +483,10 @@ class Network extends CVUI_Controller{
         $uidata->javascript = array(JS."/cafevariome/network.js");
         $data = $this->wrapData($uidata);
 
-        return view('Network/Edit_Network_Threshold', $data); 
+        return view($this->viewDirectory.'/Update_Threshold', $data); 
     }
 
-    public function leave_network(int $network_key)
+    public function Leave(int $network_key)
     {
         $networkInterface = new NetworkInterface();
         $networkResponse = $networkInterface->GetNetwork((int)$network_key);
@@ -501,7 +495,7 @@ class Network extends CVUI_Controller{
         $uidata->title = "Leave Network";
 
         if ($networkResponse->status == 0 || $networkResponse->data == null) {
-            return redirect()->to(base_url('network/index'));
+            return redirect()->to(base_url($this->controllerName.'/index'));
         }
         else {
 
@@ -523,7 +517,7 @@ class Network extends CVUI_Controller{
                         //Left the network.
                         //Now delete the local replica if it exists.
                         $this->networkModel->deleteNetwork($network_key);
-                        return redirect()->to(base_url('network/index'));
+                        return redirect()->to(base_url($this->controllerName.'/index'));
                     }
                 }
             }
@@ -538,7 +532,7 @@ class Network extends CVUI_Controller{
             $uidata->data['network_name'] = $networkResponse->data->network_name;
             
             $data = $this->wrapData($uidata);
-            return view('Network/Leave_Network', $data); 
+            return view($this->viewDirectory.'/Leave', $data); 
         }
     }
 
