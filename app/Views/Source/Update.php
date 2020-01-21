@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "source";?>">Sources</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url('Admin/Index');?>">Dashboard Home</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url($controllerName);?>">Sources</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -25,7 +25,7 @@
 <?php endif; ?>
 <?php
 	$hidden = array('source_id' => $source_id);
-	echo form_open("source/edit_source", '', $hidden);
+	echo form_open($controllerName."/Update", '', $hidden);
 ?>
 
 <div class="form-group">
@@ -154,7 +154,7 @@
 		<button type="submit" onclick="select_groups()" name="submit" class="btn btn-primary">
 			<i class="fa fa-file"></i>  Save Source
 		</button>
-		<a href="<?php echo base_url() . "source/sources"; ?>" class="btn btn-secondary" >
+		<a href="<?php echo base_url($controllerName. '/List'); ?>" class="btn btn-secondary" >
 			<i class="fa fa-backward"></i> Go back
 		</a>
 	</div>

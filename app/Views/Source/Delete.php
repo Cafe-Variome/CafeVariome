@@ -2,9 +2,9 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "source";?>">Sources</a></li>
-    <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url('admin/index');?>">Dashboard Home</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url($controllerName);?>">Sources</a></li>
+	<li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
 <div class="row">
@@ -14,7 +14,7 @@
 </div>
 <hr>
 
-<?php echo form_open("source/delete_source/" . $source_id . "/" . $source); ?>
+<?php echo form_open($controllerName."/Delete/" . $source_id . "/" . $source); ?>
 <?php echo form_hidden(array('source' => $source)); ?>
 <?php echo form_hidden(array('source_id' => $source_id)); ?>
 <div class="form-group">
@@ -36,7 +36,7 @@
 		<button type="submit" name="submit" class="btn btn-primary">
 			<i class="fa fa-trash"></i>  Delete Source
 		</button>
-		<a href="<?php echo base_url() . "source";?>" class="btn btn-secondary" >
+		<a href="<?php echo base_url($controllerName);?>" class="btn btn-secondary" >
 			<i class="fa fa-backward"></i> Go back
 		</a>	
 	</div>

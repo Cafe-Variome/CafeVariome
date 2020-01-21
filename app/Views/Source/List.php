@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo base_url('admin/index');?>">Dashboard Home</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -72,13 +72,13 @@
 			</td>
 			<td>
 			<?php if ( $source['type'] != "api" && $source['type'] != "central" ): ?>
-				<a href="<?php echo base_url('source/edit_source'). "/" . $source['source_id']; ?>" rel="popover" data-content="Modify curators, groups general information for this source" data-original-title="Edit Source">
+				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $source['source_id']; ?>" rel="popover" data-content="Modify curators, groups general information for this source" data-original-title="Edit Source">
 					<i class="fa fa-edit"></i>
 				</a>
 			<?php endif; ?>
-				<a href="<?php echo base_url('source/delete_source'). "/" . $source['source_id'] . "/" . $source['name']; ?>" rel="popover" data-content="Delete the source entry. N.B. records related to this source will not be deleted from the database." data-original-title="Delete Source">
+				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] . "/" . $source['name']; ?>" rel="popover" data-content="Delete the source entry. N.B. records related to this source will not be deleted from the database." data-original-title="Delete Source">
 					<i class="fa fa-trash"></i></a>
-				<a href="<?php echo base_url('source/status'). "/" . $source['source_id']; ?>" rel="popover" data-content="View the the status of uploaded files to this source." data-original-title="Source File Status">
+				<a href="<?php echo base_url($controllerName. '/Status'). "/" . $source['source_id']; ?>" rel="popover" data-content="View the the status of uploaded files to this source." data-original-title="Source File Status">
 					<i class="fa fa-info-circle"></i>
 				</a>
 			</td>
@@ -106,65 +106,13 @@
 
 <div class="row">
 	<div class="col">
-		<a href="#" class="btn btn-primary btn-medium" data-target="#addSourceModal" data-toggle="modal" data-backdrop="false" rel="popover" data-content="Fill in a form to add a new source to your installation." data-original-title="Add Source">
+		<a href="<?php echo base_url($controllerName.'/Create') ?>" class="btn btn-primary btn-medium" rel="popover" data-content="Fill in a form to add a new source to your installation." data-original-title="Add Source">
 			<i class="fa fa-file"></i>  Create source
 		</a>
-		<a class="btn btn-primary btn-medium" href="<?php echo base_url('admin/variants') ?>" data-content="Switches to the records admin interface to allow you to modify records." data-original-title="Edit Records">
-			<i class="fa fa-edit"></i>  Edit records
-		</a>
-		<a href="<?php echo base_url() . "admin/index";?>" class="btn btn-secondary" >
+		<a href="<?php echo base_url('Admin/Index');?>" class="btn btn-secondary" >
 			<i class="fa fa-home"></i> Admin Dashboard
 		</a>
 	</div>
-</div>
-
-
-
-<div id="addSourceModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addSourceModalLabel" aria-hidden="true">
-	<div class="modal-dialog" role="document">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h4 class="modal-title" align="center" id="addSourceModalTitle">Add a new source</h4>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          			<span aria-hidden="true">&times;</span>
-        		</button>
-			</div>
-			<div class="modal-body">
-				<div class="row">
-					<div class="col">
-						<a class="btn btn-primary btn-medium" href="<?php echo base_url('source/create_source') ?>" >
-							<i class="fa fa-file"></i>  Create local source
-						</a>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col">
-						<small class="form-text text-muted">Create a new source in your local installation to which records can be added.</small>				
-					</div>
-				</div>
-				<?php if ($setting->settingData['federated']): ?>
-				<hr/>
-				<div class="row">
-					<div class="col">
-					<a class="btn btn-primary btn-medium" href="<?php echo base_url('sources/create_federated_source') ?>" >
-						<i class="fa fa-file"></i>  Add federated source</a>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col">
-						<small class="form-text text-muted">Select which federated sources are discoverable, N.B. you must have set up federated source details in the settings page of the admin dashboard.</small>				
-					</div>
-				</div>	
-				<?php endif; ?>
-			</div>
-			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-			</div>			
-		</div>
-	</div>
-
-
-
 </div>
 
 <div id="addVariantsModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addVariantsModalLabel" aria-hidden="true">

@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "source";?>">Sources</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url('admin/index');?>">Dashboard Home</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url($controllerName);?>">Sources</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -27,7 +27,7 @@
 		</div>
 	</div>
 <?php endif; ?>
-<?php echo form_open("source/create_source"); ?>
+<?php echo form_open($controllerName . '/Create'); ?>
 
 <div class="form-group">
 <?php echo form_label('Source Name', 'name'); ?>
@@ -160,7 +160,7 @@
 		<button type="submit" onclick="select_groups()" name="submit" class="btn btn-primary">
 			<i class="fa fa-file"></i>  Create Source
 		</button>
-		<a href="<?php echo base_url() . "admin/index"; ?>" class="btn btn-secondary" >
+		<a href="<?php echo base_url('Admin/Index'); ?>" class="btn btn-secondary" >
 			<i class="fa fa-backward"></i> Go back
 		</a>
 	</div>

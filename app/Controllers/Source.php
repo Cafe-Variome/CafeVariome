@@ -41,12 +41,11 @@ class Source extends CVUI_Controller{
 
     }
 
-    public function index(){
-        return redirect()->to(base_url("source/sources"));
-
+    public function Index(){
+        return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-    public function sources() {
+    public function List() {
 
         $uidata = new UIData();
         $uidata->title = "Sources";
@@ -91,10 +90,10 @@ class Source extends CVUI_Controller{
 
         $data = $this->wrapData($uidata);
 
-        return view('Source/Sources', $data);
+        return view($this->viewDirectory.'/List', $data);
     }
 
-    public function create_source() {
+    public function Create() {
 
         $uidata = new UIData();
         $uidata->stickyFooter = false;
@@ -201,7 +200,7 @@ class Source extends CVUI_Controller{
                 $groups = $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
             }
 
-			return redirect()->to(base_url('source/index'));            
+            return redirect()->to(base_url($this->controllerName.'/Index'));
         } else {
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
@@ -270,13 +269,14 @@ class Source extends CVUI_Controller{
             $uidata->javascript = array(JS.'cafevariome/components/transferbox.js', JS.'cafevariome/source.js');
 
             $data = $this->wrapData($uidata);
-            return view('Source/Create_Source', $data);
+            return view($this->viewDirectory.'/Create', $data);
         }
     }
 
-    public function edit_source(int $source_id = NULL) {
+    public function Update(int $source_id = NULL) {
 
         $uidata = new UIData();
+        $uidata->stickyFooter = false;
 
         $uidata->data['source_id'] = $source_id;
         $uidata->data['title'] = "Edit Source";
@@ -445,13 +445,13 @@ class Source extends CVUI_Controller{
 
             $data = $this->wrapData($uidata);
 
-            return view('Source/Edit_Source', $data);
+            return view($this->viewDirectory.'/Update', $data);
         }
     }
 
-    public function delete_source($source_id = NULL, $source = NULL) {
+    public function Delete($source_id = NULL, $source = NULL) {
         if (!$source) {
-            return redirect()->to(base_url("source/sources"));          
+            return redirect()->to(base_url($this->controllerName.'/List'));
         }
 
         $uidata = new UIData();
@@ -532,15 +532,15 @@ class Source extends CVUI_Controller{
             );
 
             $data = $this->wrapData($uidata);
-            return view('Source/Delete_Source', $data);
+            return view($this->viewDirectory.'/Delete', $data);
             }
             //redirect them back to the auth page
-            return redirect()->to(base_url("source/sources"));
+            return redirect()->to(base_url($this->controllerName.'/List'));
         }
 
-    public function status($source_id = null) {  
+    public function Status($source_id = null) {  
         if (!$source_id) {
-            return redirect()->to(base_url("source/sources"));
+            return redirect()->to(base_url($this->controllerName.'/List'));
         }
         $uidata = new UIData();
         $uidata->title = "Status";
@@ -550,7 +550,7 @@ class Source extends CVUI_Controller{
 
         $data = $this->wrapData($uidata);
 
-        return view('Source/Status', $data);
+        return view($this->viewDirectory.'/Status', $data);
     }
 
     public function getSourceStatus($source_id){
