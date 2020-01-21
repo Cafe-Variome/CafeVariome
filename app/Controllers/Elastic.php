@@ -156,7 +156,10 @@ class Elastic extends CVUI_Controller{
         shell_exec("php " . getcwd() . "/index.php Task regenerateElasticsearchIndex " . $source_id ." ". $add);  	
     }
 
-    function checkElasticSearch() {
+    /**
+     * @deprecated
+    */
+    private function checkElasticSearch() {
         $hosts = (array)$this->setting->settingData['elastic_url'];
         $client = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
     
