@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-	<li class="breadcrumb-item"><a href="<?php echo base_url() . 'admin/index';?>">Dashboard Home</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url('Admin/Index');?>">Dashboard Home</a></li>
 	<li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -52,11 +52,11 @@
 			</td>
 			<td><?php echo $network->installations_count; ?></td>
 			<td>
-				<a href="<?php echo base_url('network/Update_Threshold' . '/' . $network->network_key . '/1') ?>" data-toggle="tooltip" data-placement="top" title="Edit Network Threshold">
+				<a href="<?php echo base_url($controllerName.'/Update_Threshold' . '/' . $network->network_key . '/1') ?>" data-toggle="tooltip" data-placement="top" title="Edit Network Threshold">
 					<span class="fa fa-tachometer-alt text-warning"></i>
 				</a>
 			<?php if (isset($groups[$network->network_name])): ?>
-				<a href="<?php echo base_url('network/Update_Users' . '/' . $groups[$network->network_name] . '/1') ?>" data-toggle="tooltip" data-placement="top" title="Edit Users in Network">
+				<a href="<?php echo base_url($controllerName.'/Update_Users' . '/' . $groups[$network->network_name] . '/1') ?>" data-toggle="tooltip" data-placement="top" title="Edit Users in Network">
 					<span class="fa fa-user text-info"></i>
 				</a>
 			<?php else: ?>
@@ -64,7 +64,7 @@
 					<span class="fa fa-user text-default"></i>
 				</a>
 			<?php endif; ?>
-				<a href="<?php echo base_url('network/Leave' . '/' . $network->network_key . '/' . $network->network_name); ?>" data-toggle="tooltip" data-placement="top" title="Leave Network">
+				<a href="<?php echo base_url($controllerName.'/Leave' . '/' . $network->network_key . '/' . $network->network_name); ?>" data-toggle="tooltip" data-placement="top" title="Leave Network">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 			</td>
@@ -78,8 +78,8 @@
 
 <div class="row">
 	<div class="col">
-		<a href="<?php echo base_url() . 'Network/Create'; ?>" class="btn btn-primary" ><i class="fa fa-file"></i> Create Network </a>
-		<a href="<?php echo base_url() . 'Network/Join'; ?>" class="btn btn-primary" ><i class="fa fa-sign-in-alt"></i> Join an Existing Network</a>
+		<a href="<?php echo base_url($controllerName.'/Create'); ?>" class="btn btn-primary" ><i class="fa fa-file"></i> Create Network </a>
+		<a href="<?php echo base_url($controllerName.'/Join'); ?>" class="btn btn-primary" ><i class="fa fa-sign-in-alt"></i> Join an Existing Network</a>
 	</div>
 </div>
 

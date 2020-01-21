@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . 'admin/index';?>">Dashboard Home</a></li>
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . 'network';?>">Networks</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url('Admin/Index');?>">Dashboard Home</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url($controllerName);?>">Networks</a></li>
 	<li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -32,7 +32,7 @@
 	<?php endif; ?>
     </div>
 </div>
-<?php echo form_open('Network/Update_Users/' . $user_id . '/' . $isMaster, ['name' => 'editUser']); ?>
+<?php echo form_open($controllerName.'/Update_Users/' . $user_id . '/' . $isMaster, ['name' => 'editUser']); ?>
 <?php echo form_hidden(['installation_key' => $installation_key]); ?>  
 <?php if(isset($users) || isset($group_users)): ?>
 
@@ -149,11 +149,11 @@ endif;?>
 			<i class="fa fa-save"></i>  Save
 		</button>
 		<?php if($group_type === 'master'): ?>
-			<a href="<?php echo base_url() . 'Networks'; ?>" class="btn btn-secondary" >
+			<a href="<?php echo base_url($controllerName); ?>" class="btn btn-secondary" >
 				<i class="fa fa-backward"></i> Go back
 			</a>
 		<?php else: ?>
-			<a href="<?php echo base_url() . 'networkgroup'; ?>" class="btn btn-secondary" >
+			<a href="<?php echo base_url('NetworkGroup'); ?>" class="btn btn-secondary" >
 			<i class="fa fa-backward"></i> Go back
 			</a>
 		<?php endif; ?>        

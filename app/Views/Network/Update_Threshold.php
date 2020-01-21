@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . 'admin/index';?>">Dashboard Home</a></li>
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . 'network';?>">Networks</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url('Admin/Index');?>">Dashboard Home</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url($controllerName);?>">Networks</a></li>
 	<li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -22,7 +22,7 @@
 		</div>
 	</div>
 <?php endif; ?>
-<?php echo form_open("Network/Update_Threshold/$network_key"); ?>
+<?php echo form_open($controllerName."/Update_Threshold/$network_key"); ?>
 
 <div class="form-group">
   <?php echo form_label('Network Threshold', 'network_threshold'); ?>
