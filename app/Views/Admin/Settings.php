@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo base_url('Admin/Index');?>">Dashboard Home</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -17,7 +17,7 @@
     <?php echo $message; ?>
 </div>
 <?php endif ?>
-<?php echo form_open("admin/settings"); ?>
+<?php echo form_open($controllerName."/Settings"); ?>
 
 <?php foreach ($settings as $s): ?>
 <div class="form-group row">
@@ -42,7 +42,7 @@
     <button type="submit" name="submit" class="btn btn-primary">
         <i class="fa fa-file"></i>  Save Settings
         </button>
-        <a href="<?php echo base_url() . "admin/index"; ?>" class="btn btn-secondary" >
+        <a href="<?php echo base_url('Admin/Index'); ?>" class="btn btn-secondary" >
             <i class="fa fa-backward"></i> Go back
         </a>        
     </div>

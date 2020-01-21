@@ -45,17 +45,17 @@ class Admin extends CVUI_Controller{
 
     }
 
-    function index(){
+    function Index(){
         $uidata = new UIData();
         $uidata->title = "Administrator Dashboard";
         $uidata->stickyFooter = false;
 
         $data = $this->wrapData($uidata);
-        return view("Admin/Index", $data);
+        return view($this->viewDirectory. '/Index', $data);
     }
 
 
-    function settings() {
+    function Settings() {
         $uidata = new UIData();
         $uidata->title = "Settings";
         $uidata->stickyFooter = false;
@@ -84,13 +84,13 @@ class Admin extends CVUI_Controller{
             foreach ($settings as $s) {
                 $settingModel->updateSettings(['value' => $this->request->getVar($s["setting_key"])], ['setting_key' =>  $s["setting_key"]]);
             }
-            return redirect()->to(base_url("Admin/Settings"));
+            return redirect()->to(base_url($this->controllerName.'/Settings'));
         }
         else{
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
         }
 
         $data = $this->wrapData($uidata);
-        return view("Admin/Settings", $data);
+        return view($this->viewDirectory. '/Settings', $data);
     }
 }
