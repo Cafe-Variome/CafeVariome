@@ -2,7 +2,8 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo base_url('Admin/Index');?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo base_url($controllerName);?>">Users</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -12,7 +13,7 @@
 	</div>	
 </div>
 <hr>
-<?php echo form_open("user/delete_user/".$id); ?>
+<?php echo form_open($controllerName.'/Delete/'.$id); ?>
 <div class="form-group">
     <span class="text-danger">
         Warning: Are you sure you want to delete user <?= $first_name . ' ' . $last_name ?>?  
@@ -32,7 +33,7 @@
     <button type="submit" name="submit" class="btn btn-primary">
         <i class="fa fa-trash"></i>  Delete User
     </button>
-    <a href="<?php echo base_url("user/users");?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
+    <a href="<?php echo base_url($controllerName.'/List');?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
 </div>
 
 <?php echo form_close(); ?>

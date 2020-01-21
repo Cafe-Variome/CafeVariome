@@ -2,7 +2,8 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo base_url('Admin/Index');?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo base_url($controllerName);?>">Users</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -18,11 +19,11 @@
 </div>
 <?php endif ?>
 
-<?php echo form_open("user/edit_user/". $user_id); ?>
+<?php echo form_open($controllerName.'/Create'); ?>
     <?php echo form_hidden(array('installation_key' => $setting->settingData['installation_key'])); ?>	
     <div class="form-group">
         <?php echo form_label('Email as Username: (*)', 'email'); ?>
-        <?php echo form_input($email, '', ['disabled' => 'disabled']); ?>
+        <?php echo form_input($email); ?>
     </div>
     <div class="form-group">
         <?php echo form_label('First Name: (*)', 'first_name'); ?>
@@ -50,20 +51,10 @@
         <?php $count = count($groups) + 1; $additional = 'size="' . $count . '"'; ?>
         <select size="<?php echo $count; ?>" name="groups[]"  multiple="multiple" class="form-control">
             <?php foreach ($groups as $group): ?>
-            <?php if (array_search($group['id'], $selected_groups) !== false): ?>
-                <option value="<?php echo $group['id'] . "," . $group['network_key']; ?>" selected><?php echo $group['description'] . " (Network:" . $group['network_name'] . ")"; ?></option>
-            <?php else: ?>
-                <option value="<?php echo $group['id'] . "," . $group['network_key']; ?>"><?php echo $group['description'] . " (Network:" . $group['network_name'] . ")"; ?></option>
-            <?php endif ?>
+                <option value="<?php echo $group['id'] . "," . $group['network_key']; ?>" ><?php echo $group['description'] . " (Network:" . $group['network_name'] . ")"; ?></option>
             <?php endforeach; ?>
         </select>
     <?php endif; ?>
-    </div>
-    <div class="form-group">
-        <div class="custom-control custom-checkbox">
-            <?php echo form_checkbox($active); ?>
-            <?php echo form_label('User status', 'active', array("class"=>"custom-control-label")); ?>
-        </div>
     </div>
     <div class="form-group">
         <div class="custom-control custom-checkbox">
@@ -80,9 +71,12 @@
     <div class="form-group row">
         <div class="col">
             <button type="submit" name="submit" class="btn btn-primary">
-                <i class="fa fa-save"></i>  Save User
+                <i class="fa fa-file"></i>  Create User
             </button>
-            <a href="<?php echo base_url() . "user/users"; ?>" class="btn btn-secondary" >
+            <button type="reset" class="btn btn-secondary">
+                <i class="fa fa-minus"></i> Clear
+            </button>
+            <a href="<?php echo base_url($controllerName.'/List'); ?>" class="btn btn-secondary" >
                 <i class="fa fa-backward"></i> Go back
             </a>
         </div>

@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo base_url('Admin/Index');?>">Dashboard Home</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -54,10 +54,10 @@
             <td><?php if ($user['active']) { echo 'Active'; } else { echo 'Inactive'; } ?></td>
             <td><?php if ($user['remote']) { echo 'Remote User'; } else { echo 'Local User'; } ?></td>
             <td>
-                <a data-toggle="tooltip" data-placement="top" title="Edit User" href="<?php echo base_url('user/edit_user'). "/" . $user['id']; ?>" >
+                <a data-toggle="tooltip" data-placement="top" title="Edit User" href="<?php echo base_url($controllerName.'/Update'). "/" . $user['id']; ?>" >
                     <i class="fa fa-edit"></i>
                 </a>
-                <a data-toggle="tooltip" data-placement="top" title="Delete User" href="<?php echo base_url('user/delete_user'). "/" . $user['id']; ?>" >
+                <a data-toggle="tooltip" data-placement="top" title="Delete User" href="<?php echo base_url($controllerName.'/Delete'). "/" . $user['id']; ?>" >
                     <i class="fa fa-trash"></i>
                 </a>
         </tr>
@@ -67,12 +67,11 @@
 
 <div class="form-group row">
     <div class="col">
-        <a href="<?php echo base_url() . "user/create_user";?>" class="btn btn-primary" >
+        <a href="<?php echo base_url($controllerName. '/Create');?>" class="btn btn-primary" >
             <i class="icon-user icon-white"></i> Create new user</a>
-        <a href="<?php echo base_url() . "admin/index";?>" class="btn btn-secondary" >
+        <a href="<?php echo base_url('Admin/Index');?>" class="btn btn-secondary" >
             <i class="fa fa-home"></i> Admin Dashboard</a>
     </div>
 </div>
-
 
 <?= $this->endSection() ?>

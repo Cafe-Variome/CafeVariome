@@ -43,11 +43,11 @@ class User extends CVUI_Controller{
 
     }
 
-    function index(){
-        return redirect()->to(base_url("user/users"));
+    function Index(){
+        return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-    function create_user(){
+    function Create(){
 
         $uidata = new UIData();
         $uidata->title = "Create New User";
@@ -112,7 +112,7 @@ class User extends CVUI_Controller{
 
             $userModel = new \App\Models\User($this->db);
             $userModel->createUser($email, $email, $groups, $data, $this->authAdapter);
-            return redirect()->to(base_url("user/users"));
+            return redirect()->to(base_url($this->controllerName.'/List'));
 
         }
         else { 
@@ -172,10 +172,10 @@ class User extends CVUI_Controller{
             */
         }
         $data = $this->wrapData($uidata);
-        return view("User/Create_User", $data);
+        return view($this->viewDirectory. '/Create', $data);
     }
 
-    function users(){
+    function List(){
         $uidata = new UIData();
         $uidata->title = "Users";
         $uidata->stickyFooter = false;
@@ -203,10 +203,10 @@ class User extends CVUI_Controller{
         $uidata->javascript = array(JS."cafevariome/components/datatable.js", JS."cafevariome/admin.js", VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
         $data = $this->wrapData($uidata);
-        return view("User/Users", $data);
+        return view($this->viewDirectory. '/List', $data);
     }
 
-    function edit_user(int $id){
+    function Update(int $id){
         $uidata = new UIData();
         $uidata->title = "Edit User";
         $uidata->stickyFooter = false;
@@ -216,7 +216,7 @@ class User extends CVUI_Controller{
 
         $user = $userModel->getUsers(null, ["id" => $id]);
         if (count($user) != 1) {
-            return redirect()->to(base_url("user/users"));
+            return redirect()->to(base_url($this->controllerName.'/List'));
         }
         else {
             $user = $user[0];
@@ -271,8 +271,7 @@ class User extends CVUI_Controller{
     
                 $userModel = new \App\Models\User($this->db);
                 $userModel->updateUser($id, $groups, $data, $this->authAdapter);
-                return redirect()->to(base_url("user/users"));
-    
+                return redirect()->to(base_url($this->controllerName.'/List'));
             }
             else { 
                 $uidata->data['groups'] = $groups;
@@ -344,11 +343,11 @@ class User extends CVUI_Controller{
                 );
             }
             $data = $this->wrapData($uidata);
-            return view("User/Edit_User", $data);  
+            return view($this->viewDirectory. '/Update', $data);  
         }
     }
 
-    function delete_user(int $id){
+    function Delete(int $id){
         $uidata = new UIData();
         $userModel = new \App\Models\User($this->db);
 
@@ -356,7 +355,7 @@ class User extends CVUI_Controller{
 
         $user = $userModel->getUsers('id, first_name, last_name', ["id" => $id]);
         if (count($user) != 1) {
-            return redirect()->to(base_url("user/users"));
+            return redirect()->to(base_url($this->controllerName.'/List'));
         }
         else {
             $user = $user[0];
@@ -377,18 +376,18 @@ class User extends CVUI_Controller{
                 if ($this->request->getVar('confirm') == 'yes') {
                     //delete user
                     $userModel->deleteUser((int)$user['id'], $this->authAdapter);
-                    return redirect()->to(base_url("user/users"));
+                    return redirect()->to(base_url($this->controllerName.'/List'));
                 }
                 else {
-                    return redirect()->to(base_url("user/users"));
+                    return redirect()->to(base_url($this->controllerName.'/List'));
                 }
             }
             $data = $this->wrapData($uidata);
-            return view("User/Delete_User", $data);
+            return view($this->viewDirectory. '/Delete', $data);
         }
     }
 
-    function user(int $id){
+    function Details(int $id){
 
     }
 }
