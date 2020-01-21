@@ -64,7 +64,7 @@ class Elastic extends CVUI_Controller{
         $uidata->javascript = [JS."cafevariome/elastic.js", JS."/bootstrap-notify.js"];
 
         $data = $this->wrapData($uidata);
-        return view('Elastic/Status', $data);
+        return view($this->viewDirectory.'/Status', $data);
     }
 
 
@@ -155,9 +155,6 @@ class Elastic extends CVUI_Controller{
         error_log("About to call shell_exec...");
         shell_exec("php " . getcwd() . "/index.php Task regenerateElasticsearchIndex " . $source_id ." ". $add);  	
     }
-
-
-
 
     function checkElasticSearch() {
         $hosts = (array)$this->setting->settingData['elastic_url'];
