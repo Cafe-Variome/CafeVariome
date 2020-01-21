@@ -2,15 +2,15 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
-    <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
+	<li class="breadcrumb-item"><a href="<?php echo base_url() . 'admin/index';?>">Dashboard Home</a></li>
+	<li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+    </div>
 </div>
 <hr>
 <?php if($message): ?>
@@ -23,7 +23,7 @@
 	</div>
 	<hr>
 <?php endif; ?>
-<?php if ( ! $networks ): ?>
+<?php if (! $networks): ?>
 <div class="row">
 	<div class="col">
 		<p>You are currently not a member of any networks.</p>
@@ -41,12 +41,12 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach ( $networks as $network ):?>
+		<?php foreach ($networks as $network):?>
 		<tr>
 			<td><?php echo $network->network_key; ?></td>
 			<td><?php echo $network->network_name; ?></td>
 			<td>
-				<?php foreach ( $network->installations as $installation ): ?>
+				<?php foreach ($network->installations as $installation): ?>
 				<a href="<?php echo $installation->base_url;?>"><?php echo $installation->name; ?></a><br />
 				<?php endforeach; ?>
 			</td>
@@ -63,8 +63,8 @@
 				<a data-toggle="tooltip" data-placement="top" title="Users of this network cannot be edited on this installation.">
 					<span class="fa fa-user text-default"></i>
 				</a>
-			<?php endif; ?>		
-				<a href="<?php echo base_url('network/Leave' . "/" . $network->network_key . "/" . $network->network_name); ?>" data-toggle="tooltip" data-placement="top" title="Leave Network">
+			<?php endif; ?>
+				<a href="<?php echo base_url('network/Leave' . '/' . $network->network_key . '/' . $network->network_name); ?>" data-toggle="tooltip" data-placement="top" title="Leave Network">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 			</td>
@@ -78,8 +78,8 @@
 
 <div class="row">
 	<div class="col">
-		<a href="<?php echo base_url() . "Network/Create"; ?>" class="btn btn-primary" ><i class="fa fa-file"></i> Create Network </a>
-		<a href="<?php echo base_url() . "Network/Join"; ?>" class="btn btn-primary" ><i class="fa fa-sign-in-alt"></i> Join an Existing Network</a>
+		<a href="<?php echo base_url() . 'Network/Create'; ?>" class="btn btn-primary" ><i class="fa fa-file"></i> Create Network </a>
+		<a href="<?php echo base_url() . 'Network/Join'; ?>" class="btn btn-primary" ><i class="fa fa-sign-in-alt"></i> Join an Existing Network</a>
 	</div>
 </div>
 
