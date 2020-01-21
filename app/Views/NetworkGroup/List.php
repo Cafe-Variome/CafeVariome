@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo base_url("Admin/Index");?>">Dashboard Home</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -41,11 +41,11 @@
             <td>
             <?php $isMaster = $group['group_type'] == "master"; ?>
             <?php if($isMaster): ?>
-                <a data-toggle="tooltip" data-placement="top" title="Assign sources to network group" href="<?php echo base_url('network/edit_user_network_groups'). "/" . $group['id'] . '/1'; ?>" >
+                <a data-toggle="tooltip" data-placement="top" title="Assign sources to network group" href="<?php echo base_url('Network/Update_Users'). "/" . $group['id'] . '/1'; ?>" >
                     <i class="fa fa-database"></i>
                 </a> 
             <?php else: ?>
-                <a data-toggle="tooltip" data-placement="top" title="Assign sources to network group" href="<?php echo base_url('network/edit_user_network_groups'). "/" . $group['id']; ?>" >
+                <a data-toggle="tooltip" data-placement="top" title="Assign sources to network group" href="<?php echo base_url('Network/Update_Users'). "/" . $group['id']; ?>" >
                     <i class="fa fa-database"></i>
                 </a>             
             <?php endif; ?>          
@@ -56,7 +56,7 @@
                 <i class="fa fa-trash"data-toggle="tooltip" data-placement="top" title="Unable to delete group with sources assigned"></i>
                 <!-- Unable to delete group with sources assigned -->
             <?php else: ?>
-                <a data-toggle="tooltip" data-placement="top" title="Remove network group" href="<?php echo base_url('networkgroup/delete_networkgroup'). "/" . $group['id']; ?>" >
+                <a data-toggle="tooltip" data-placement="top" title="Remove network group" href="<?php echo base_url($controllerName.'/Delete'). "/" . $group['id']; ?>" >
                     <i class="fa fa-trash"></i>
                 </a>
             <?php endif; ?>
@@ -68,7 +68,7 @@
 <?php endif; ?>
 <div class="row">
     <div class="col">
-        <a href="<?php echo base_url() . "networkgroup/create_networkgroup";?>" class="btn btn-primary" >
+        <a href="<?php echo base_url($controllerName) .'/Create';?>" class="btn btn-primary" >
             <i class="fa fa-file"></i> Create new network group
         </a>
     </div>

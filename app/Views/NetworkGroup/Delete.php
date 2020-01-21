@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  	<li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
-  	<li class="breadcrumb-item"><a href="<?php echo base_url() . "networkgroup";?>">Network Groups</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url("admin/index");?>">Dashboard Home</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url($controllerName);?>">Network Groups</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -27,7 +27,7 @@
         Are you sure you want to delete the group?
     </div>
 </div>
-<?php echo form_open("networkgroup/delete_networkgroup/" . $group_id); ?>
+<?php echo form_open($controllerName . "/Delete/" . $group_id); ?>
 <div class="form-check">
     <input type="radio" name="confirm" value="yes" class="form-check-input">
     <label for="confirm" class="form-check-label">Yes:</label>
@@ -44,7 +44,7 @@
 <div class="row">
     <div class="col">
         <button type="submit" name="submit" class="btn btn-primary"><i class="fa fa-trash"></i>  Delete Group</button>
-        <a href="<?php echo base_url() . "networkgroup";?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
+        <a href="<?php echo base_url($controllerName);?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
     </div>
 </div>
 

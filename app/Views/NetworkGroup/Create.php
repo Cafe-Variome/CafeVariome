@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  	<li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
-  	<li class="breadcrumb-item"><a href="<?php echo base_url() . "networkgroup";?>">Network Groups</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url("admin/index");?>">Dashboard Home</a></li>
+  	<li class="breadcrumb-item"><a href="<?php echo base_url($controllerName);?>">Network Groups</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -29,10 +29,10 @@
 <?php endif; ?>
 <?php if ( ! isset($networks)): ?>
 <div class="alert alert-info">
-	<p>You do not appear to be part of any networks so cannot create network groups. You should <a href="<?php echo base_url() . "network";?>" >create or join a network</a>.</p>
+	<p>You do not appear to be part of any networks so cannot create network groups. You should <a href="<?php echo base_url("Network");?>" >create or join a network</a>.</p>
 </div>
 <?php else: ?>
-<?php echo form_open("networkgroup/create_networkgroup"); ?>
+<?php echo form_open($controllerName. '/Create'); ?>
 
 <div class="form-group">
 <?php echo form_label('Network Name', 'network'); ?>
@@ -68,7 +68,7 @@
 <div class="form-group row">
 	<div class="col">
 	<button type="submit" name="submit" class="btn btn-primary"> Create Group</button>
-	<a href="<?php echo base_url() . "networkgroup";?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>	
+	<a href="<?php echo base_url($controllerName);?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>	
 	</div>
 </div>
 

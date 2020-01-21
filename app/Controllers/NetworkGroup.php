@@ -18,7 +18,7 @@ use App\Libraries\AuthAdapter;
 use CodeIgniter\Config\Services; 
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 
-class Networkgroup extends CVUI_Controller{
+class NetworkGroup extends CVUI_Controller{
 
 	/**
 	 * Validation list template.
@@ -47,11 +47,11 @@ class Networkgroup extends CVUI_Controller{
 
 	}
 	
-	public function index(){
-        return redirect()->to(base_url("networkgroup/networkgroups"));
+	public function Index(){
+        return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-	function networkgroups(){
+	public function List(){
 		$uidata = new UIData();
 		$uidata->title = "Network Groups";
 
@@ -73,10 +73,10 @@ class Networkgroup extends CVUI_Controller{
 
 		$data = $this->wrapData($uidata);
 
-		return view("Networkgroup/Networkgroups", $data);
+		return view($this->viewDirectory.'/List', $data);
 	}
 
-    public function create_networkgroup(){
+    public function Create(){
 
         $uidata = new UIData();
 		$uidata->title = "Create Group";
@@ -118,13 +118,13 @@ class Networkgroup extends CVUI_Controller{
 							'description' =>$this->request->getVar('desc'),
 							'group_type' => $this->request->getVar('group_type'),
 							'network_key' => $this->request->getVar('network'),
-							'url'		=> base_url()
+							'url' => base_url()
 			);
 			
 			$network_group_id = $this->networkGroupModel->createNetworkGroup($data);
 			if ( $network_group_id ) {
 				$this->session->setFlashdata('message', 'Network group created successfully.');
-                return redirect()->to(base_url('networkgroup/index'));            
+                return redirect()->to(base_url($this->controllerName . '/index'));            
 			}
 			else {
 				$uidata->data['group_name'] = "";
@@ -132,7 +132,7 @@ class Networkgroup extends CVUI_Controller{
                 $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
                 
                 $data = $this->wrapData($uidata);
-				return view('Networkgroup/Create_Networkgroup', $data);
+				return view($this->viewDirectory.'/Create', $data);
 			}
 		}
 		else {
@@ -177,12 +177,12 @@ class Networkgroup extends CVUI_Controller{
             
             $data = $this->wrapData($uidata);
 
-			return view('Networkgroup/Create_Networkgroup', $data);
+			return view($this->viewDirectory.'/Create', $data);
 		}		
 
     }
 
-    function delete_networkgroup(int $id){
+    public function Delete(int $id){
 		$uidata = new UIData();
 		$uidata->title = "Delete Network Group";
 		// insert csrf check
@@ -223,16 +223,16 @@ class Networkgroup extends CVUI_Controller{
 				$has_got_network_sources_assigned = $this->networkGroupModel->hasSource($id);
 				if (!$has_got_network_sources_assigned) {
 					$this->networkGroupModel->deleteNetworkGroup($id);		
-					return redirect()->to(base_url('networkgroup/index'));            	
+					return redirect()->to(base_url($this->controllerName.'/index'));            	
 				}
 				else {
 					$this->session->setFlashdata('message', "Unable to delete network group as sources from another installation are present in the group.");
 				}
 			}
-			return redirect()->to(base_url('networkgroup/index'));            	
+			return redirect()->to(base_url($this->controllerName.'/index'));            	
 		}
 		$data = $this->wrapData($uidata);
-		return view("Networkgroup/Delete_Networkgroup", $data);
+		return view($this->viewDirectory.'/Delete', $data);
 		
 	}
 
