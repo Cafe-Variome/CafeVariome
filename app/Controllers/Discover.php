@@ -38,7 +38,7 @@ class Discover extends CVUI_Controller{
     }
 
     public function index(){
-        return redirect()->to(base_url("Discover/select_network"));
+        return redirect()->to(base_url($this->controllerName. '/Select_Network'));
     }
 
     public function select_network(){
@@ -60,7 +60,7 @@ class Discover extends CVUI_Controller{
         $uidata->javascript = array(JS."cafevariome/discover.js");
 
         $data = $this->wrapData($uidata);
-        return view('Discover/Select_Network', $data);
+        return view($this->viewDirectory.'/Select_Network', $data);
     }
 
     public function query_builder($network_key = null){
@@ -72,7 +72,7 @@ class Discover extends CVUI_Controller{
             $this->session->set(array('network_key' => $network_key));
         } 
         else {
-            return redirect()->to(base_url('Discover/Select_Network'));
+            return redirect()->to(base_url($this->controllerName. '/Select_Network'));
         }
 
         // Check if the user is in the master network group for this network
@@ -115,7 +115,7 @@ class Discover extends CVUI_Controller{
 
         $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js',JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
         $data = $this->wrapData($uidata);
-        return view("Discover/Query_Builder", $data);
+        return view($this->viewDirectory. '/Query_Builder', $data);
     }
 
     function checkElasticSearch() {
