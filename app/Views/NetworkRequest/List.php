@@ -2,7 +2,7 @@
 <?= $this->section('content') ?>
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?php echo base_url('admin/index');?>">Dashboard Home</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -44,8 +44,8 @@
             </td>
             <td>
             <?php if($networkRequest['status'] == '-1'): ?>
-                <a href="<?= base_url('networkrequest/acceptrequest/'.$networkRequest['id']) ?>" data-toggle="tooltip" data-placement="top" title="Accept Request"><span class="fa fa-check text-success"></span></a>
-                <a href="<?= base_url('networkrequest/denyrequest/'.$networkRequest['id']) ?>" data-toggle="tooltip" data-placement="top" title="Deny Request"><span class="fa fa-times text-danger"></span></a>
+                <a href="<?= base_url($controllerName . '/acceptrequest/'.$networkRequest['id']) ?>" data-toggle="tooltip" data-placement="top" title="Accept Request"><span class="fa fa-check text-success"></span></a>
+                <a href="<?= base_url($controllerName . '/denyrequest/'.$networkRequest['id']) ?>" data-toggle="tooltip" data-placement="top" title="Deny Request"><span class="fa fa-times text-danger"></span></a>
             <?php endif; ?>
             </td>
         </tr>

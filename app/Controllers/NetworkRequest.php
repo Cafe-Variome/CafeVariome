@@ -29,11 +29,11 @@ class NetworkRequest extends CVUI_Controller
         $this->networkRequestModel = new \App\Models\NetworkRequest();
     }
 
-    public function index(){
-        return redirect()->to(base_url("networkrequest/networkrequests"));
+    public function Index(){
+        return redirect()->to(base_url($this->controllerName . '/List'));
     }
 
-    public function networkrequests()
+    public function List()
     {
         $uidata = new UIData();
         $uidata->data['title'] = "Network Requests";
@@ -45,7 +45,7 @@ class NetworkRequest extends CVUI_Controller
         $uidata->javascript = array(VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js', JS.'cafevariome/components/datatable.js',JS. 'cafevariome/networkrequest.js');
         
         $data = $this->wrapData($uidata);
-        return view('NetworkRequest/NetworkRequests', $data);
+        return view($this->viewDirectory . '/List', $data);
     }
 
     public function acceptrequest(int $id)
@@ -66,7 +66,7 @@ class NetworkRequest extends CVUI_Controller
             }
         }
 
-        return redirect()->to(base_url("networkrequest/networkrequests"));
+        return redirect()->to(base_url($this->controllerName.'/List'));
 
     }
 
@@ -88,6 +88,6 @@ class NetworkRequest extends CVUI_Controller
             } 
         }
 
-        return redirect()->to(base_url("networkrequest/networkrequests"));
+        return redirect()->to(base_url($this->controllerName.'/List'));
     }
 }
