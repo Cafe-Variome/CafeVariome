@@ -109,6 +109,8 @@ class CVUI_Controller extends Controller{
 		$cmsModel = new Cms_model($this->db);
 		$data['cmsModel'] = &$cmsModel;
 
+		$data['controllerName'] = $this->getClassName();
+
 		return $data;
 
 	}	
