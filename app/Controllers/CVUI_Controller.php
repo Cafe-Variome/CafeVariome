@@ -25,6 +25,10 @@ class CVUI_Controller extends Controller{
 	protected $authAdapter;
 	protected $setting;
 
+	protected $controllerName;
+
+	protected $viewDirectory;
+
 	private $authAdapterConfig;
 
 	/**
@@ -52,7 +56,8 @@ class CVUI_Controller extends Controller{
 			$this->checkAuthentication($this->isAdmin);
 		}
 
-
+		$this->controllerName = $this->getClassName();
+		$this->viewDirectory = $this->controllerName;
 		//Load form helper
 		//Might be moved to a more suitable location
 		helper('form');
@@ -112,6 +117,7 @@ class CVUI_Controller extends Controller{
 		$this->isProtected = $protected;
 		$this->isAdmin = $isAdmin;
 	}
+
 	protected function setProtected(bool $protected){
 		$this->isProtected = $protected;
 	}
@@ -174,4 +180,15 @@ class CVUI_Controller extends Controller{
 		return $uriSegments;
 	}
 
+	private function getClassName()
+	{
+		$className = get_class($this);
+		
+		try {
+			$classNameArray = explode('\\', $className);
+			return $classNameArray[count($classNameArray) - 1];
+		} catch (\Throwable $th) {
+			return $className; 
+		}
+	}
 }
