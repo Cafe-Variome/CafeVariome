@@ -86,6 +86,12 @@ class ElasticSearch{
      * @return bool
      */
     function ping():bool{
-        return $this->client->ping();
+        try {
+            $status = $this->client->ping();
+            return $status;
+
+        } catch (\Exception $ex) {
+            return false;
+        }
     }
 }
