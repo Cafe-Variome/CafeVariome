@@ -33,7 +33,7 @@
         </div>
         <div class="row">
             <div class="col">
-                <a href="<?= base_url("elastic/status") ?>">Elatsic Search</a>
+                <a href="<?= base_url("elastic/status") ?>">Elastic Search</a>
             </div>
         </div>
     </div>
