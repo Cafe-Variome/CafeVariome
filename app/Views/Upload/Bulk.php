@@ -3,8 +3,8 @@
 
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "admin/index";?>">Dashboard Home</a></li>
-  <li class="breadcrumb-item"><a href="<?php echo base_url() . "source";?>">Sources</a></li>
+    <li class="breadcrumb-item"><a href="<?= base_url('Admin/Index') ?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?= base_url('Source') ?>">Sources</a></li>
     <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
@@ -82,16 +82,11 @@ if (!is_writable(FCPATH . 'upload/')) {
   </tbody>
 </table>
 <hr>
-
-<a href="<?php
-if ($session->get('admin_or_curate') == "curate") {
-    echo base_url() . "curate/variants";
-} else {
-    echo base_url() . "admin/variants";
-}
-?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
-
-
+<div class="row">
+  <div class="col">
+    <a class="btn btn-secondary" href="<?= base_url('Source') ?>"><i class="fa fa-backward"></i> Go back</a>
+  </div>
+</div>
 <div id="uploadInfoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">

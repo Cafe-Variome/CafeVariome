@@ -1,21 +1,13 @@
 <?= $this->extend('layout/master') ?>
 <?= $this->section('content') ?>
+
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
-  <li class="breadcrumb-item">
-    <a href="<?php echo base_url() . (($session->get('admin_or_curate') == "curate") ? "curate" : "admin/index") ?>">
-        <?php ($session->get('admin_or_curate') == "curate") ? print("Curators Home") : print ("Dashboard Home") ?>
-    </a>
-  </li>
-  <li class="breadcrumb-item">
-    <a href="<?php echo base_url() . (($session->get('admin_or_curate') == "curate") ? "curate" : "admin/index")."/variants";?>">
-        Records
-    </a>
-   </li>
-   <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
+    <li class="breadcrumb-item"><a href="<?= base_url('Admin/Index') ?>">Dashboard Home</a></li>
+    <li class="breadcrumb-item"><a href="<?= base_url('Source') ?>">Sources</a></li>
+    <li class="breadcrumb-item active" aria-current="page"><?= $title ?></li>
   </ol>
 </nav>
-
 <div class="row">
 	<div class="col">
 		<h2><?= $title ?></h2>	
@@ -25,7 +17,7 @@
 <div id="load"></div>
 <div class="row">
     <div class="col">
-        <h4>Import jsons into <?php echo $source; ?></h3>
+        <h4>Import jsons into <?php echo $source_name; ?></h3>
         <p>This is built to only work with PhenoPackets. </p>
         <p>Up to 200 files can be uploaded in each batch. If you have more files to upload please break your upload into chunks.</p>
 
@@ -38,7 +30,7 @@
     <span class="btn btn-default btn-file" style="padding-top: 10px; line-height: normal;">
         <input type="file" name="userfile[]" id="jsonFile" multiple required/>
     </span>
-    <input type="hidden" id="source_id" value="<?php echo $source ?>" />
+    <input type="hidden" id="source_id" value="<?php echo $source_id ?>" />
     <br/><br/>
     <div class="pagination-centered">
         <button class="span3 btn btn-large btn-primary " type="submit">Upload File</button>
@@ -50,7 +42,6 @@
         <p>The Status table will refresh every 5 seconds. However as long as the search box is highlighted the refresh will not occur.</p>
     </div>
 </div>
-<input type="hidden" value="<?php echo $source ?>" name="source" id="source">
 <table class="table table-hover table-striped" id="file_table">
     <thead>
         <tr>
@@ -68,13 +59,7 @@
 <hr>
 <div class="row">
     <div class="col">
-    <a href="<?php
-    if ($session->get('admin_or_curate') == "curate") {
-        echo base_url() . "curate/variants";
-    } else {
-        echo base_url() . "source";
-    }
-    ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
+        <a class="btn btn-secondary" href="<?= base_url('Source') ?>"><i class="fa fa-backward"></i> Go back</a>
     </div>
 </div>
 

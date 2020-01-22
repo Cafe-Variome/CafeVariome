@@ -41,22 +41,24 @@ use CodeIgniter\Config\Services;
      * @param string $source - The source name we will be uploading to
      * @return N/A
      */
-    public function json($source) {
+    public function Json($source_id) {
         // Check if user is logged in and admin
         // Since this is a shared function for curators and admin check that the curator is a curator for this source
         $user_id = $this->authAdapter->getUserId();
-        $source_id = $this->sourceModel->getSourceIDByName($source);
+        //$source_id = $this->sourceModel->getSourceIDByName($source);
 
-            // data for hidden input for source
+        // data for hidden input for source
         $uidata = new UIData();
         $uidata->title = "Upload JSON (Bulk Import)";
-        $uidata->data['source'] = $source;
+        $uidata->data['source_id'] = $source_id;
+        $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
+
         // preparing webpage
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
 
         $data = $this->wrapData($uidata);
-        return view('Upload/Json', $data);
+        return view($this->viewDirectory . '/Json', $data);
     }
 
     /**
@@ -65,23 +67,25 @@ use CodeIgniter\Config\Services;
      *
      * @return N/A
      */
-    public function vcf($source_id) {
+    public function VCF($source_id) {
 
         $uidata = new UIData();
         $uidata->title = "Upload VCF";
         // Since this is a shared function for curators and admin check that the curator is a curator for this source
         $user_id = $this->authAdapter->getUserId();
 
+        $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
         $uidata->data['source_id'] = $source_id;
+        
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css', CSS.'upload_data.css');
 
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js'];
 
         $data = $this->wrapData($uidata);
-        return view('Upload/Vcf', $data);
+        return view($this->viewDirectory . '/VCF', $data);
     }
 
-    function bulk_import($source_id = null) {
+    function Bulk($source_id = null) {
         // Check whether the user is either an admin or a curator that has the required permissions to do this action
 
         $uidata = new UIData();
@@ -98,7 +102,7 @@ use CodeIgniter\Config\Services;
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
 
         $data = $this->wrapData($uidata);
-        return view('Upload/Bulk_Import', $data);
+        return view($this->viewDirectory . '/Bulk', $data);
     }
 
     /**
@@ -109,8 +113,7 @@ use CodeIgniter\Config\Services;
      * Echo result to js front end to determine response to user
      * @param string $_POST['source'] - The source name we will be uploading to and checking against
      * @param int $_POST['size']      - The size in bytes of file/files to be uploaded
-     * @return string Green(Success)|Yellow(Not enough space on server)|Red(Source is locked)
-        Red(Source doesnt exist)
+     * @return string Green(Success)|Yellow(Not enough space on server)|Red(Source is locked) Red(Source doesnt exist)
         */
     public function validateUpload() {
         // Source we are checking against
