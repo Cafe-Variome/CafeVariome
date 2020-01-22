@@ -17,7 +17,7 @@ $('#addVariantsModal').on('show.bs.modal', function (event) {
     // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
     var modal = $(this);
     modal.find('.modal-title').text('Add Records To ' + sourceDesc);
-    modal.find('#bulkImport').attr('href', baseurl + "upload/bulk_import/" + sourceId);
-    modal.find('#phenoPacketsImport').attr('href', baseurl + "upload/json/" + sourceId);
+    modal.find('#bulkImport').attr('href', baseurl + "Upload/Bulk/" + sourceId);
+    modal.find('#phenoPacketsImport').attr('href', baseurl + "Upload/Json/" + sourceId);
   })
 
