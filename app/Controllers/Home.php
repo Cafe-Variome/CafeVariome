@@ -9,7 +9,7 @@ use App\Helpers\AuthHelper;
 class Home extends CVUI_Controller
 {
 
-	public function index()
+	public function Index()
 	{
 		$this->db = \Config\Database::connect();
 
@@ -17,6 +17,6 @@ class Home extends CVUI_Controller
 		$udata->title = "Home";
 		$data = $this->wrapData($udata);
 
-		return view('Home/Index', $data);
+		return view($this->viewDirectory. '/Index', $data);
 	}
 }
