@@ -223,11 +223,11 @@ use CodeIgniter\Database\ConnectionInterface;
         // SELECT UploadDataStatus.FileName, UploadDataStatus.uploadStart, UploadDataStatus.uploadStart, UploadDataStatus.Status, UploadDataStatus.elasticStatus, users.email FROM UploadDataStatus INNER JOIN users ON UploadDataStatus.user_id=users.id;
         
         $this->builder = $this->db->table('uploaddatastatus');
-        $this->builder->select('UploadDataStatus.ID,UploadDataStatus.FileName,UploadDataStatus.uploadEnd,UploadDataStatus.uploadStart,UploadDataStatus.Status,UploadDataStatus.elasticStatus,UploadDataStatus.patient,UploadDataStatus.tissue,users.email,sources.name');
-        $this->builder->join('users', 'UploadDataStatus.user_id=users.id', 'inner');
-        $this->builder->join('sources', 'UploadDataStatus.source_id=sources.source_id', 'inner');
+        $this->builder->select('uploaddatastatus.ID,uploaddatastatus.FileName,uploaddatastatus.uploadEnd,uploaddatastatus.uploadStart,uploaddatastatus.Status,uploaddatastatus.elasticStatus,uploaddatastatus.patient,uploaddatastatus.tissue,users.email,sources.name');
+        $this->builder->join('users', 'uploaddatastatus.user_id=users.id', 'inner');
+        $this->builder->join('sources', 'uploaddatastatus.source_id=sources.source_id', 'inner');
         if ($source_id != 'all') {
-            $this->builder->where('UploadDataStatus.source_id', $source_id);
+            $this->builder->where('uploaddatastatus.source_id', $source_id);
         }
         $query = $this->builder->get()->getResultArray();
         return $query;
