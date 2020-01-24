@@ -660,7 +660,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             else {
                 // We are making a group which wasnt in an indexed array
                 if (!$one_group) {
-                    if (!$done['negated']['true'] && !empty($done['negated']['uid'])) {
+                    if (!empty($done['negated']['uid']) && !$done['negated']['true']) {
                         $uploadModel->jsonInsert($done['negated']['uid'],$source,$file,$id,'negated',0);	
                     }
                     $uid = md5(uniqid(rand(),true));
