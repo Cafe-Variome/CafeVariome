@@ -46,7 +46,7 @@ class CVUI_Controller extends Controller{
 		// $this->session = \Config\Services::session();
 		$this->session = \Config\Services::session();
 		$this->db = \Config\Database::connect();
-        $this->setting =  Settings::getInstance($this->db);
+        $this->setting =  Settings::getInstance();
 
         // If the controller needs authorisation, initiate AuthAdapater object accordingly.
 		if ($this->isProtected) {
