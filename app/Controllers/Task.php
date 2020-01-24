@@ -21,6 +21,7 @@ use App\Models\Elastic;
 use App\Models\Settings;
 use App\Models\EAV;
 use App\Models\Neo4j;
+use CodeIgniter\Config;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
@@ -28,7 +29,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
     function __construct(){
         $this->db = \Config\Database::connect();
-		$this->setting =  Settings::getInstance($this->db);
+        $this->setting =  Settings::getInstance();
     }
 
     /**
