@@ -15,9 +15,12 @@ use App\Models\UIData;
 use App\Models\Settings;
 use App\Models\Source;
 use App\Libraries\ElasticSearch;
+use App\Libraries\CafeVariome\ShellHelper;
 use CodeIgniter\Config\Services;
 
 class Elastic extends CVUI_Controller{
+
+    private $shellHelperInstance;
 
     /**
 	 * Constructor
@@ -31,6 +34,8 @@ class Elastic extends CVUI_Controller{
 		$this->session = Services::session();
 		$this->db = \Config\Database::connect();
         $this->setting =  Settings::getInstance($this->db);
+
+        $this->shellHelperInstance = new ShellHelper();
     }
 
     public function Status(){
@@ -137,7 +142,7 @@ class Elastic extends CVUI_Controller{
         $data = json_decode($_POST['u_data']);
         $force = $data->force;
         $source_id = $data->id;
-        $add = $data->add;
+        $add = (int)$data->add;
 
         if ($force) {
             // if the regenerate was forced set the elastic state for all eav data rows
@@ -151,9 +156,9 @@ class Elastic extends CVUI_Controller{
         
         // rebuild the json list for interface
         $elasticModel->regenerateFederatedPhenotypeAttributeValueList($source_id);
+        
         // Call in background the regenerate function
-        error_log("About to call shell_exec...");
-        shell_exec("php " . getcwd() . "/index.php Task regenerateElasticsearchIndex " . $source_id ." ". $add);  	
+        $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchIndex $source_id $add");
     }
 
     /**
