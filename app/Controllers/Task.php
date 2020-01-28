@@ -447,7 +447,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * @param int $add            - Whether we are adding data without fully remaking the index 
      * @return N/A
      */
-    public function regenerateElasticsearchIndex($source_id, $add) {
+    public function regenerateElasticsearchIndex(int $source_id, bool $add) {
         // Begin timer and load models
         $first  = new \DateTime();
         $hosts = (array)$this->setting->settingData['elastic_url'];
@@ -474,13 +474,14 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             // If we are not adding to the index then we need to delete the current index
             if (!$add) {
                 $response = $elasticClient->indices()->delete($params);
-                error_log("deleted ES5 index\n");
+                echo ("deleted ES5 index\n");
                 $flag = true;
             }      
         }
         else{
                 $flag = true;
         }
+
         // If we need to - create a new index
         if ($flag) {
             $map = '{  
@@ -506,14 +507,13 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
             $response = $elasticClient->indices()->create($params);
             error_log(print_r($response,1));
-            error_log("created index mapping\n"); 
         }       
         // Set the elastic state of data to stale  
         $sourceModel->updateSource(["elastic_status"=>0], ["source_id" => $source_id]);
 
         // Get all the unique subject ids for this source
-        $unique_ids = $eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>1], true);
-        error_log("unique ids:" . count($unique_ids));
+        $unique_ids = $eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>0], true);
+
         $bulk = [];
         $counta = 0;
         $countparents = 0;
@@ -543,17 +543,15 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             $bulk=[];
             unset ($responses);
         }
-        error_log("parents indexed");
-
         // Figure out how many documents we need to index
-        $eavsize = count($eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>1]));
+        $eavsize = count($eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>0]));
 
         $bulk=[];
         // We are looping through with the use of limit to increase speed of writing
         $offset = 0;
         while ($offset < $eavsize){
             // Get our current limit chunk of data
-            $eavdata = $eavModel->getEAVs(null, ["source"=>$source_id, "elastic"=>1], false, 1000, $offset);
+            $eavdata = $eavModel->getEAVs(null, ["source"=>$source_id, "elastic"=>0], false, 1000, $offset);
 
             // Loop through our limit chunk
             foreach ($eavdata as $attribute_array){
@@ -587,7 +585,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
         if(file_exists("resources/elastic_search_status_incomplete"))
                 rename("resources/elastic_search_status_incomplete", "resources/elastic_search_status_complete");
-        echo "Completed";
+
         error_log("Completed ES5 $index_name");   
         // Determine how long it took
         $second = new \DateTime();	
