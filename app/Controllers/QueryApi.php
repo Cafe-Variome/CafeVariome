@@ -1,9 +1,9 @@
 <?php namespace App\Controllers;
 
 /**
- * NetworkApi.php
+ * QueryApi.php
  * 
- * Created : 01/10/2019
+ * Created : 27/01/2020
  * 
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
@@ -11,7 +11,6 @@
  * This controller contains RESTful listeners for network operations. 
  * Most methods are ported from netauth.php in the previous version.
  */
-
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Controller;
@@ -19,11 +18,10 @@ use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
-use App\Models\NetworkRequest;
 use App\Libraries\CafeVariome\Core\APIResponseBundle;
 
-class NetworkApi extends ResourceController{
-
+class QueryApi extends ResourceController
+{
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
@@ -36,41 +34,27 @@ class NetworkApi extends ResourceController{
         
     }
 
-    public function requestToJoinNetwork()
+    public function Query()
     {
         $network_key = $this->request->getVar('network_key');
-        $installation_key = $this->request->getVar('installation_key');
-        $email = $this->request->getVar('email');
-        $justification = $this->request->getVar('justification');
-        $ip = $this->request->getVar('ip_address');
-        $token =  $this->request->getVar('token');
-        $url =  $this->request->getVar('url');
+        $queryString = $this->request->getVar('query');
+        $user_id = $this->request->getVar('user_id');
 
-        $networkRequest = [
-            'network_key' => $network_key,
-            'installation_key' => $installation_key,
-            'email' => $email,
-            'justification' => $justification,
-            'ip' => $ip,
-            'token' => $token,
-            'url' => $url,
-            'status' => -1 // Indicates a pending request
-        ];
+        $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
 
         $apiResponseBundle = new APIResponseBundle();
         $networkRequestModel = new NetworkRequest();
-
+        $resp = [];
         try {
-            $networkRequestModel->createNetworkRequest($networkRequest);
-            $apiResponseBundle->initiateResponse(1);
+            $resp = $cafeVariomeQuery->search($queryString, $network_key);
+            $apiResponseBundle->initiateResponse(1, $resp);
             
         } catch (\Exception $ex) {
             error_log($ex->getMessage());
             $apiResponseBundle->initiateResponse(0);
             $apiResponseBundle->setResponseMessage($ex->getMessage());
         }
-        
+
         return $this->respond($apiResponseBundle->getResponseJSON());
     }
-
 }
