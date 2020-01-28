@@ -79,6 +79,7 @@ class Discover extends CVUI_Controller{
         
         $user_id = $this->authAdapter->getUserId();
         
+        $uidata->data['user_id'] = $user_id;
         $uidata->data['network_key'] = $network_key;
         
         error_log("User: " . $this->session->get('email') . " has chosen network: $network_key || " . date("Y-m-d H:i:s"));
