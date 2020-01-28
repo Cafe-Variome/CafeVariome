@@ -18,14 +18,18 @@ use CodeIgniter\Controller;
 use App\Helpers\AuthHelper;
 use App\Models\Settings;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
+use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 use App\Models\Source;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
+use App\Libraries\CafeVariome\ShellHelper;
 
  class AjaxApi extends Controller{
 
 	protected $db;
 
-	protected $setting;
+    protected $setting;
+    
+    private $shellHelperInstance;
 
     /**
 	 * Constructor
@@ -39,15 +43,40 @@ use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 
         $this->sourceModel = new Source($this->db);
         $this->uploadModel = new \App\Models\Upload($this->db);
+
+        $this->shellHelperInstance = new ShellHelper();
     }
 
     function query($network_key = '') {
-        $api = json_encode($this->request->getVar('jsonAPI'));
+        $networkInterface = new NetworkInterface();
 
+        $queryString = json_encode($this->request->getVar('jsonAPI'));
+        $user_id = $this->request->getVar('user_id');
+
+        $results = [];
         $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
-        $resp['Phenopackets'] = $cafeVariomeQuery->search($api, $network_key);
+        $loaclResults = $cafeVariomeQuery->search($queryString, $network_key, $user_id); // Execute locally
+        array_push($results, $loaclResults);
 
-        return json_encode($resp);
+        $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
+        $installations = [];
+
+        if ($response->status) {
+            $installations = $response->data;
+
+            foreach ($installations as $installation) {
+                if ($installation->installation_key != $this->setting->settingData['installation_key']) {
+                    // Send the query
+                    $queryNetInterface = new QueryNetworkInterface($installation->base_url);
+                    $queryResponse = $queryNetInterface->query($queryString, (int) $network_key, $user_id);
+                    if ($queryResponse->status) {
+                        array_push($results, $queryResponse->data);
+                    }
+                }
+            }
+        }
+
+        return json_encode($results);
     }
 
     function hpo_query($id = ''){
@@ -390,9 +419,9 @@ use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
         $this->sourceModel->toggleSourceLock($source_id);
         $uid = md5(uniqid(rand(),true));
         $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
-        // Create thread to begin SQL insert in the background
 
-        shell_exec("/usr/bin/php7.4 " . getcwd() . "/index.php Task phenoPacketInsert ".$source_id . " > /dev/null 2>/dev/null &");
+        // Create thread to begin SQL insert in the background
+        $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsert ".$source_id);
 
         // Report to front end that the process has now begun
         echo json_encode("Green");
@@ -401,7 +430,7 @@ use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
     
     public function checkUploadJobs() {
 
-        $user_id = $_SESSION['user_id'];
+        $user_id = $_POST['user_id'];
         $return = ['Status' => '', 'Message' => []];
         if ($this->uploadModel->countUploadJobRecord($user_id)) {
             $return['Status'] = true;
@@ -622,7 +651,6 @@ use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
                 // if it failed to upload report error
                 // TODO: Make it return failure and reflect in JS for this eventuality
                 error_log($mime);
-                //error_log($this->upload->display_errors());
             }
         }
         echo json_encode("Green");
