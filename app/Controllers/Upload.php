@@ -12,6 +12,7 @@
 
 use App\Models\UIData;
 use App\Models\Source;
+use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use CodeIgniter\Config\Services;
 
 
@@ -34,7 +35,6 @@ use CodeIgniter\Config\Services;
         $this->uploadModel = new \App\Models\Upload($this->db);
     }
 
-
     /**
      * Json - render the upload json view
      *
@@ -50,6 +50,7 @@ use CodeIgniter\Config\Services;
         // data for hidden input for source
         $uidata = new UIData();
         $uidata->title = "Upload JSON (Bulk Import)";
+        $uidata->data['user_id'] = $this->session->get('user_id');
         $uidata->data['source_id'] = $source_id;
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
 
@@ -219,17 +220,15 @@ use CodeIgniter\Config\Services;
                 // if file upload was successful
                 // Update UploadDataStatus table with the new file    
                 $this->uploadModel->createUpload($_FILES['userfile']['name'][$i],$source_id);
-      
-                return true;
             }
-            //else
+            else
             {
                 // if it failed to upload report error
                 // TODO: Make it return failure and reflect in JS for this eventuality
-
+                return false;
             }
         }
-        return false;
+        return true;
         
     }
 
