@@ -12,7 +12,7 @@
  * It is mainly for CRUD operation of shared entities. 
  */
 
- use App\Models\Settings;
+use App\Models\Settings;
 
 class NetworkInterface
 {

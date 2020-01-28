@@ -258,7 +258,7 @@ class Query extends CafeVariome{
         return array($query_statement, $query_statement_for_display);
     }
 
-    public function search($json_string, string $network_key) {
+    public function search(string $json_string, string $network_key, int $user_id) {
         $session = \Config\Services::session();
         $sourceModel = new Source($this->db);
         $networkModel = new Network($this->db);
@@ -279,7 +279,7 @@ class Query extends CafeVariome{
 
         $installation_key = $this->setting->settingData['installation_key'];
 
-    	$user_id = $session->get('user_id');
+    	$user_id = ($session->get('user_id') != null) ? $session->get('user_id') : $user_id;
 
         // fetch sources for which the user has source display access       
         // Localised the function (Mehdi Mehtarizadeh 21/08/2019)
