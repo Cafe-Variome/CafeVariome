@@ -169,6 +169,7 @@
 </div>
 
 <input type="hidden" value="<?php echo $network_key;?>" id="network_key"/>
+<input type="hidden" value="<?php echo $user_id;?>" id="user_id"/>
 
 <div class="row" id="reset_buildQuery">
     <div class="col">

@@ -430,11 +430,11 @@ $(function() {
                 dataType: 'html',
                 delay: 200,
                 type: 'POST',
-                data: {'jsonAPI': jsonAPI},
+                data: {'jsonAPI': jsonAPI, 'user_id': $('#user_id').val()},
                 dataType: 'json',
                 success: function (data) {
                     $.each(data, function(key, val) {
-                        if(val != null) {
+                        if(val.length > 0) {
                             resp = $.parseJSON(val)
                             $.each(resp, function(key, val1) {
                                 //if($('#query_result tbody tr' + '#' + key).length == 0) {
