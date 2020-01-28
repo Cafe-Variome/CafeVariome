@@ -95,3 +95,5 @@ define('VENDOR','vendor/');
 
 define('PRECAN', false); // Set/Unset to enable/disable Precanned Queries feature in Query Builder
 define('PHENOTYPE_CATEGORIES', true); // Set/Unset to enable/disable categories wise split in phenotype attributes
+
+define('PHP_BIN_PATH', '/usr/bin/php7.4');
