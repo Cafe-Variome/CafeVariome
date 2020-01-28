@@ -34,7 +34,8 @@ if (!is_writable(FCPATH . 'upload/')) {
 
 
 <form enctype="multipart/form-data" method="post" id="fileinfo">
-<input type="hidden" id="source_id" name="source_id" value="<?php echo $source_id ?>">
+  <input type="hidden" id="source_id" name="source_id" value="<?php echo $source_id ?>">
+  <input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
 
 <div class="form-group">
   <div class="custom-control custom-radio">

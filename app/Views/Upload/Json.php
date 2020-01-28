@@ -26,6 +26,7 @@
 
 <div id="json_errors"></div>
 <form enctype="multipart/form-data" method="post" id="phenoinfo">
+    <input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
     <label>File/Files to submit:</label>
     <span class="btn btn-default btn-file" style="padding-top: 10px; line-height: normal;">
         <input type="file" name="userfile[]" id="jsonFile" multiple required/>

@@ -41,11 +41,7 @@
 					<?php
 					if ( isset($variant_counts[$source['source_id']]) ):
 						echo $variant_counts[$source['source_id']];
-					else:?>
-						<button data-toggle="modal" data-target="#addVariantsModal" data-id="<?= $source['source_id'] ?>" data-description="<?= $source['description'] ?>" data-content="Add records to this source" data-toggle="tooltip" data-placement="top" title="Import Records">
-							<i class="fa fa-plus"></i>
-						</button>
-					<?php endif; ?>
+				    endif; ?>
 				<?php else: ?>
 						<a href="#" rel="popover" data-content="You cannot edit or import records for a federated source. This must be done via the source installation." data-original-title="Import Records" ><i class="fa fa-minus"></i></a>
 				<?php endif; ?>
@@ -72,14 +68,18 @@
 			</td>
 			<td>
 			<?php if ( $source['type'] != "api" && $source['type'] != "central" ): ?>
-				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $source['source_id']; ?>" rel="popover" data-content="Modify curators, groups general information for this source" data-original-title="Edit Source">
-					<i class="fa fa-edit"></i>
+				<a data-toggle="modal" data-target="#addVariantsModal" data-id="<?= $source['source_id'] ?>" data-placement="top" title="Import Records" id="ImportRecordsBtn">
+					<i class="fa fa-plus text-success"></i>
+				</a>
+				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Source">
+					<i class="fa fa-edit text-warning"></i>
 				</a>
 			<?php endif; ?>
-				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] . "/" . $source['name']; ?>" rel="popover" data-content="Delete the source entry. N.B. records related to this source will not be deleted from the database." data-original-title="Delete Source">
-					<i class="fa fa-trash"></i></a>
-				<a href="<?php echo base_url($controllerName. '/Status'). "/" . $source['source_id']; ?>" rel="popover" data-content="View the the status of uploaded files to this source." data-original-title="Source File Status">
-					<i class="fa fa-info-circle"></i>
+				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] . "/" . $source['name']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Source">
+					<i class="fa fa-trash text-danger"></i>
+				</a>
+				<a href="<?php echo base_url($controllerName. '/Status'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Source File Status">
+					<i class="fa fa-info-circle text-primary"></i>
 				</a>
 			</td>
 			<td>
@@ -128,7 +128,7 @@
 				<div class="row">
 					<div class="col">
 						<a id="bulkImport" class="btn btn-small btn-primary">
-								<i class="fa fa-plus"></i> Bulk import records
+							<i class="fa fa-plus"></i> Bulk import records
 						</a>
 					</div>				
 				</div>
@@ -150,6 +150,20 @@
 					<div class="col">
 						<p>
 							<i>Use a bulk import tool to upload multiple PhenoPackets at once.</i>
+						</p>
+					</div>
+				</div>	
+				<div class="row">
+					<div class="col">
+						<a id="VCFImport" class="btn btn-small btn-primary">
+							<i class="fa fa-plus"></i> Import VCF
+						</a>
+					</div>		
+				</div>	
+				<div class="row">
+					<div class="col">
+						<p>
+							<i>Import VCF files</i>
 						</p>
 					</div>
 				</div>					
