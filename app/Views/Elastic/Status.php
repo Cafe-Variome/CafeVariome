@@ -36,6 +36,19 @@
     <?php foreach ($elastic_update as $row): ?> 
     <tr id="index_<?php echo $row['source_id']; ?>">
       <td><?php echo $host."_".$row['source_id']." (Source: ".$row['name'].")"; ?></td>
+      <?php if (!$isRunning): ?>
+          <td style="background-color: lightgray;">
+            Unknown
+          </td>
+          <td>
+            <a data-toggle="tooltip" data-placement="top" title="Unable to regenerate since Elastic Search is not running.">
+              <span class="fa fa-redo text-secondary"></span>
+            </a>
+            <a data-toggle="tooltip" data-placement="top" title="Unable to append newly-uploaded data to ElasticSearch since it not running.">
+              <span class="fa fa-sync text-secondary"></span>
+            </a>            
+          </td>
+      <?php else: ?>
         <?php if ($row['elastic_index'] == true): ?>
           <td style="background-color: lightgreen;">
             <i class="fa fa-check"></i>
@@ -48,15 +61,16 @@
             <!-- Update Possible -->
           </td>                                               
       <?php endif; ?>
+        <td>                                    
+          <a onclick="regenElastic('<?php echo $row['source_id']; ?>', false);" id="update_<?php echo $row['name']; ?>" data-toggle="tooltip" data-placement="top" title="Click to regenerate this ElasticSearch Index">
+            <span class="fa fa-redo text-info"></span>
+          </a>
+          <a onclick="regenElastic('<?php echo $row['source_id']; ?>',true);" data-toggle="tooltip" data-placement="top" title="Click to append newly-uploaded data to ElasticSearch (This does not affect data already present)">
+            <span class="fa fa-sync text-warning"></span>
+          </a>
+        </td>
+      <?php endif; ?>
 
-      <td>                                    
-        <a onclick="regenElastic('<?php echo $row['source_id']; ?>', false);" id="update_<?php echo $row['name']; ?>" data-toggle="tooltip" data-placement="top" title="Click to regenerate this ElasticSearch Index">
-          <span class="fa fa-redo text-info"></span>
-        </a>
-        <a onclick="regenElastic('<?php echo $row['source_id']; ?>',true);" data-toggle="tooltip" data-placement="top" title="Click to append newly-uploaded data to ElasticSearch (This does not affect data already present)">
-          <span class="fa fa-sync text-warning"></span>
-        </a>
-      </td>
       </tr>
     <?php endforeach; ?>
   </tbody>
