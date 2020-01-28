@@ -31,12 +31,13 @@ $(document).ready(function() {
 		  file_names.push($('#jsonFile')[0].files[i].name);
 		} 
 		file_names = JSON.stringify(file_names); 
+		user_id = $('#user_id').val();
 		id = $('#source_id').val();
 		param = "source_id="+id+"&size="+size;
 		console.log(param);
 		$.ajax({
       		type: "post",  
-      		url: baseurl+'upload/validateUpload',
+      		url: baseurl+'AjaxApi/validateUpload',
       		data: param,
       		dataType: "json", 
       		success: function(response)  {
@@ -54,7 +55,7 @@ $(document).ready(function() {
 					// console.log(file_names);
 					$.ajax({
 						type: "POST",  
-						url: baseurl+'upload/checkJsonPresence',
+						url: baseurl+'AjaxApi/checkJsonPresence',
 						data: {files:file_names,source_id:id},
       					dataType: "json",
 						success: function(response)  {
@@ -87,7 +88,7 @@ $(document).ready(function() {
 										flag = true;
 										$.ajax({
 											type: "POST",  
-											url: baseurl+'upload/jsonBatch',
+											url: baseurl+'AjaxApi/jsonBatch',
 											contentType: 'multipart/form-data',
 											data: formData,
 											cache: false,
@@ -106,17 +107,17 @@ $(document).ready(function() {
 								}
 								$.ajax({
 									type: "POST",  
-									url: baseurl+'upload/jsonBatch',
+									url: baseurl+'AjaxApi/jsonBatch',
 									contentType: 'multipart/form-data',
 									data: formData,
 									cache: false,
 									contentType: false,
 									processData: false,
 									success: function(response)  {
-										param = "source_id="+id;
+										param = "source_id="+id+"&user_id="+user_id;
 										$.ajax({
 											type: "POST",   
-								      		url: baseurl+'upload/jsonStart',
+								      		url: baseurl+'AjaxApi/jsonStart',
 								      		data: param,
 								      		dataType: "json", 
 											success: function(response)  {
@@ -162,7 +163,7 @@ $(document).ready(function() {
 		$cfile = $("#config")[0].files[0];
 		$.ajax({
       		type: "post",  
-      		url: baseurl+'upload/validateUpload',
+      		url: baseurl+'AjaxApi/validateUpload',
       		data: param,
       		dataType: "json", 
       		success: function(response)  {
@@ -185,7 +186,7 @@ $(document).ready(function() {
 					$.ajax({
 						//Send the form through to do_upload
 			      		type: "POST",  
-			      		url: baseurl+'upload/vcf_upload',
+			      		url: baseurl+'AjaxApi/vcf_upload',
 			      		contentType: 'multipart/form-data',
 			      		data: formData,
 			      		cache: false,
@@ -232,7 +233,7 @@ $(document).ready(function() {
 										flag = true;
 										$.ajax({
 											type: "POST",  
-											url: baseurl+'upload/vcfBatch',
+											url: baseurl+'AjaxApi/vcfBatch',
 											contentType: 'multipart/form-data',
 											data: formData,
 											cache: false,
@@ -247,7 +248,7 @@ $(document).ready(function() {
 								}
 								$.ajax({
 									type: "POST",  
-									url: baseurl+'upload/vcfBatch',
+									url: baseurl+'AjaxApi/vcfBatch',
 									contentType: 'multipart/form-data',
 									data: formData,
 									cache: false,
@@ -257,7 +258,7 @@ $(document).ready(function() {
 										param = "source_id="+id+"&uid="+data.uid;
 										$.ajax({
 											type: "POST",   
-								      		url: baseurl+'upload/vcfStart',
+								      		url: baseurl+'AjaxApi/vcfStart',
 								      		data: param,
 								      		dataType: "json", 
 											success: function(response)  {
@@ -317,7 +318,7 @@ $(document).ready(function() {
         param = "source_id="+id+"&size="+size;
         $.ajax({
             type: "post",  
-            url: baseurl+'upload/validateUpload',
+            url: baseurl+'AjaxApi/validateUpload',
             data: param,
             dataType: "json", 
             success: function(response)  {
@@ -337,7 +338,7 @@ $(document).ready(function() {
                     $.ajax({
                         //Send the form through to do_upload
                         type: "POST",  
-                        url: baseurl+'upload/bulk_upload',
+                        url: baseurl+'AjaxApi/bulk_upload',
                         contentType: 'multipart/form-data',
                         data: ajaxData,
                         cache: false,
@@ -356,7 +357,7 @@ $(document).ready(function() {
                                 if (confirm("This file has been uploaded before. Do you want to replace the file and all associated data?")) {
                                     $.ajax({
                                         type: "POST",  
-                                        url: baseurl+'upload/bulk_upload/true',
+                                        url: baseurl+'AjaxApi/bulk_upload/true',
                                         contentType: 'multipart/form-data',
                                         data: ajaxData,
                                         cache: false,
