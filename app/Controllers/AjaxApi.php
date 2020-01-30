@@ -39,7 +39,7 @@ use App\Libraries\CafeVariome\ShellHelper;
 		parent::initController($request, $response, $logger);
 		$this->db = \Config\Database::connect();
 
-        $this->setting =  Settings::getInstance($this->db);
+        $this->setting =  Settings::getInstance();
 
         $this->sourceModel = new Source($this->db);
         $this->uploadModel = new \App\Models\Upload($this->db);
@@ -352,54 +352,52 @@ use App\Libraries\CafeVariome\ShellHelper;
      */
     public function jsonBatch() {
         
-        $source_id = $_POST['source_id'];
+        $source_id = $this->request->getVar('source_id');
+        $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
         // Create the source upload directory if it doesnt exist
-        $source_path = FCPATH."upload/UploadData/".$source_id."/";
+        $source_path =  $source_id;
 
-        if (!file_exists($source_path)) {
-            error_log("trying to create path");
-            mkdir($source_path);
+        $fileMan = new FileMan($basePath);
+        if (!$fileMan->Exists($source_path)) {
+            $fileMan->CreateDirectory($source_path);
         }
-        // Create the json upload directory within the source directory if it doesnt exist
-        $source_path = FCPATH."upload/UploadData/".$source_id."/json";	
-        if (!file_exists($source_path)) {
-            mkdir($source_path);
-        }		
+
+        $source_path =  $source_id . DIRECTORY_SEPARATOR . UPLOAD_JSON;
+
+        if (!$fileMan->Exists($source_path)) {
+            $fileMan->CreateDirectory($source_path);
+        }
 
         // Check the number of files we are uploading
-        $filesCount = count($_FILES['userfile']['name']);
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $userFile = $this->request->getFiles();
+        $filesCount = $fileMan->countFiles(); //count($_FILES['userfile']['name']);
 
-        for($i = 0; $i < $filesCount; $i++){     
+        $files = $fileMan->getFiles();
 
+        foreach ($files as $file) {
+           
             // Check the mime and extension for the file we are currently uploading
-
-            $mime = finfo_file($finfo, $_FILES['userfile']['tmp_name'][$i]);
-
-            $file_parts = pathinfo($_FILES['userfile']['name'][$i]);
+            $mime = $file->getType();
 
             // if it doesnt conform to expectation
             // TODO: Make it return failure and reflect in JS for this eventuality
-            if ($mime != "text/plain" && $file_parts['extension'] == "json" ) {
+            if ($mime != "text/plain" && $file->getExtension() == "json" ) {
                 error_log("failure");
             }   
             
-            if($userFile['userfile'][$i]->move($source_path. "/", $_FILES['userfile']['name'][$i]))
+            if($fileMan->Save($file, $source_path))
             {     
                 // if file upload was successful
                 // Update UploadDataStatus table with the new file    
-                $this->uploadModel->createUpload($_FILES['userfile']['name'][$i],$source_id);
+                $this->uploadModel->createUpload($file->getName(),$source_id);
             }
             else
             {
                 // if it failed to upload report error
                 // TODO: Make it return failure and reflect in JS for this eventuality
                 return false;
-            }
+            } 
         }
         return true;
-        
     }
 
     
