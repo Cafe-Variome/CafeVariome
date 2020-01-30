@@ -90,7 +90,9 @@ defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // highest auto
 define('IMAGES','resources/images/');
 define('JS','resources/js/');
 define('CSS','resources/css/');
-define('UPLOAD','upload/');
+define('UPLOAD','upload' . DIRECTORY_SEPARATOR);
+define('UPLOAD_DATA','UploadData' . DIRECTORY_SEPARATOR);
+define('UPLOAD_JSON','json' . DIRECTORY_SEPARATOR);
 define('VENDOR','vendor/');
 
 define('PRECAN', false); // Set/Unset to enable/disable Precanned Queries feature in Query Builder
