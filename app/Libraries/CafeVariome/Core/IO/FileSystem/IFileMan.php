@@ -11,7 +11,7 @@
 
 interface IFileMan {
 
-    public function Save();
+    public function Save(File $file): bool;
 
     public function Exists(string $path): bool;
     public function Delete(string $path);
