@@ -16,42 +16,86 @@ class FileMan implements IFileMan
 
     private $removeDuplicateFileOnUpload = true;
 
-    private $baseUploadPath = UPLOAD;
+    private $basePath = UPLOAD; // As set in Constants.php
+    private $files;
 
-    private $uploadPath;
-
-    public function __construct(string $path) {
-        $this->uploadPath = $path;
+    public function __construct(string $basePath = null) {
+        if ($basePath == null) {
+            $this->basePath = UPLOAD; // As set in Constants.php
+        }
+        else{
+            $this->basePath = $basePath;
+        }
         $this->fileStack = $_FILES;
+        $this->files = [];
+        $this->loadFiles();
     }
 
-    private function getFullUploadPath()
+    public function loadFiles()
     {
-        return $this->baseUploadPath . DIRECTORY_SEPARATOR .  $this->uploadPath;
+        foreach ($this->fileStack as $fileSetKey => $fileSet) {
+            for ($i=0; $i < count($fileSet['name']); $i++) { 
+                $f = new File($fileSet['name'][$i], $fileSet['size'][$i], $fileSet['tmp_name'][$i], $fileSet['type'][$i], $fileSet['error'][$i]);
+                array_push($this->files, $f);
+            }
+        }
     }
 
-    public function Save()
+    private function getFullPath()
+    {
+        return $this->basePath;
+    }
+
+    public function Save(File $file, string $path = '') : bool
+    {
+        return move_uploaded_file($file->getTempPath(), $this->getFullPath() . $path . basename($file->getName()));
+    }
+
+    public function SaveAll()
     {
         foreach ($this->fileStack as $tempKey => $tempFile) {
             if ($tempFile['error'] == 0) {
                 $tmp_name = $tempFile['tmp_name'];
                 $name = basename($tempFile["name"]);
-                if ($this->Exists($this->getFullUploadPath() . DIRECTORY_SEPARATOR . $name)) {
-                    $this->Delete($this->getFullUploadPath() . DIRECTORY_SEPARATOR . $name);
+                if ($this->Exists($name)) {
+                    $this->Delete($name);
                 }
-                move_uploaded_file($tmp_name, $this->getFullUploadPath() . DIRECTORY_SEPARATOR . $name);
+                move_uploaded_file($tmp_name, $this->getFullPath() . $name);
             }
         }
     }
 
+    public function CreateDirectory(string $path, $mode = 777)
+    {
+        mkdir($this->getFullPath() . $path);
+    }
+
     public function Exists(string $path): bool
     {
-        return file_exists($path);
+        return file_exists($this->getFullPath() . $path);
     }
 
     public function Delete(string $path)
     {
-        unlink($path);
+        unlink($this->getFullPath() . $path);
+    }
+
+    public function countFiles(): int
+    {
+        if ($this->files != null) {
+            return count($this->files);
+        }
+        return NAN;
+    }
+
+    public function getFileStack()
+    {
+        return ($this->fileStack != null ? $this->fileStack : null);
+    }
+
+    public function getFiles()
+    {
+        return $this->files;
     }
 }
  
