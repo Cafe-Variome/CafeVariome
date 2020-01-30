@@ -34,10 +34,17 @@ class FileMan implements IFileMan
     public function loadFiles()
     {
         foreach ($this->fileStack as $fileSetKey => $fileSet) {
-            for ($i=0; $i < count($fileSet['name']); $i++) { 
-                $f = new File($fileSet['name'][$i], $fileSet['size'][$i], $fileSet['tmp_name'][$i], $fileSet['type'][$i], $fileSet['error'][$i]);
+            if (is_countable($fileSet['name'])) { // We have more than one file 
+                for ($i=0; $i < count($fileSet['name']); $i++) { 
+                    $f = new File($fileSet['name'][$i], $fileSet['size'][$i], $fileSet['tmp_name'][$i], $fileSet['type'][$i], $fileSet['error'][$i]);
+                    array_push($this->files, $f);
+                }
+            }
+            else { // We have one file
+                $f = new File($fileSet['name'], $fileSet['size'], $fileSet['tmp_name'], $fileSet['type'], $fileSet['error']);
                 array_push($this->files, $f);
             }
+
         }
     }
 
