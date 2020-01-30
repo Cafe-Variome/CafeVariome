@@ -691,50 +691,57 @@ use App\Libraries\CafeVariome\ShellHelper;
      * @return json_encoded array Success|Headers are not as expected|File is Duplicated
      */
     public function bulk_upload($force=false){   
-        error_log(print_r($_POST,1));
-        $tmp = $_FILES["userfile"]["tmp_name"];
-        $file_name = $_FILES["userfile"]["name"];
-        $source_id = $_POST['source_id'];
-        if (!$force) {
-            if ($this->uploadModel->isDuplicatePhysicalFile($source_id,$file_name, $tmp)) {
-                $response_array = array('status' => "Duplicate");
+
+        $source_id = $this->request->getVar('source_id');
+        $user_id = $this->request->getVar('user_id');
+
+        $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
+        $fileMan = new FileMan($basePath);
+
+        if ($fileMan->countFiles() == 1){ // Only 1 file is allowed to go through this uploader
+            $file = $fileMan->getFiles()[0];
+            $tmp = $file->getTempPath();
+            $file_name = $file->getName();
+            if (!$force) {
+                if ($this->uploadModel->isDuplicatePhysicalFile($source_id,$file_name, $tmp)) {
+                    $response_array = array('status' => "Duplicate");
+                    echo json_encode($response_array);
+                    return;
+                }
+            }
+
+            $source_path = $source_id . DIRECTORY_SEPARATOR;
+
+            $userFile = $this->request->getFiles();
+
+            if ($fileMan->Save($file, $source_path)) {
+                
+                $file_id = $this->uploadModel->createUpload($file_name, $source_id);
+
+                // Begin background insert to MySQL
+
+                $fAction = $this->request->getVar('fAction')[0]; // File Action 
+                if ($fAction == "overwrite") {
+                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_name 1 $source_id");
+                }
+                elseif ($fAction == "append") {
+                    $this->shellHelperInstance->run(getcwd() . "/index.php Task bulkUploadInsert $file_name 00 $source_id");
+                }
+                else {
+                    error_log("entered else");
+                    return;
+                }	
+                $uid = md5(uniqid(rand(),true));
+                $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
+                $response_array = array('status'  => "Green",
+                                        'message' => "",
+                                        'uid'     => $uid);
                 echo json_encode($response_array);
-                return;
             }
-        }
-        
-        $source_path = FCPATH."upload/UploadData/".$source_id;
-
-        
-        $userFile = $this->request->getFiles();
-
-        if ($userFile['userfile']->move($source_path. "/", $_FILES['userfile']['name'])){	
-            // File was uploaded successfully	
-            // Populate status table with initial details on uploaded file
-            $file_id = $this->uploadModel->createUpload($file_name, $source_id);
-            // Begin background insert to MySQL
-            if ($_POST['fAction'][0] == "overwrite") {
-                error_log("overwriting");
-                shell_exec("php " . getcwd() . "/index.php Task bulkUploadInsert ".$file_name." 1 ".$source_id);
-            }
-            elseif ($_POST['fAction'][0] == "append") {
-                error_log("appending");
-                shell_exec("php " . getcwd() . "/index.php Task bulkUploadInsert ".$file_name." 00 ".$source_id);
-            }
-            else {
+            else{
+                #shouldnt ever happen
                 error_log("entered else");
-                return;
-            }	
-            $uid = md5(uniqid(rand(),true));
-            $this->uploadModel->addUploadJobRecord($source_id,$uid,$this->session->get('user_id'));
-            $response_array = array('status'  => "Green",
-                                    'message' => "",
-                                    'uid'     => $uid);
-            echo json_encode($response_array);
-        }
-        else{
-            #shouldnt ever happen
-            error_log("entered else");
+            }
         }
     }
 
