@@ -50,7 +50,7 @@ use CodeIgniter\Config\Services;
         // data for hidden input for source
         $uidata = new UIData();
         $uidata->title = "Upload JSON (Bulk Import)";
-        $uidata->data['user_id'] = $this->session->get('user_id');
+        $uidata->data['user_id'] = $user_id;
         $uidata->data['source_id'] = $source_id;
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
 
@@ -96,7 +96,7 @@ use CodeIgniter\Config\Services;
         $user_id = $this->authAdapter->getUserID();
 
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
-
+        $uidata->data['user_id'] = $user_id;
         $uidata->data['source_id'] = $source_id;
 
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css', CSS.'sourcesv.css');
