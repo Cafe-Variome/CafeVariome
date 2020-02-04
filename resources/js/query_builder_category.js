@@ -72,34 +72,29 @@ $(function() {
             phen_data = jsonData[0];
 
             $.each( jsonData[0].chr, function( key, value ) {
-                //console.log(key + ":" + value);
                 $('#values_chr').append($('<option></option>').attr('value', value.toLowerCase()).text('Chr:' + value));
             });
 
             $.each( jsonData[0].alternatebases,function( key, value ){
-                //console.log(key + ":" + value);
-
                 $('select.values_altall').append($('<option></option>').attr('value', value.toLowerCase()).text(value))
             });
 
             $.each(jsonData[0].referencebases,function( key, value ) {
-                //console.log(key + ":" + value);
-
                 $('select.values_refall').append($('<option></option>').attr('value', key.toLowerCase()).text(value))
             });
 
             $.each(JSON.parse(jsonData[1]), (hpo, ancestry) => {
-                //console.log(hpo + ":" + ancestry);
-
                 $('select#values_phen_left').append($('<option></option>').attr('value', ancestry).text(hpo))
             })
 
-            $.each(attributes, function(k, v) {
-                //console.log(k + ":" + v);
-
-                $('select.keys_pat').append($('<option></option>').attr('value', v.toLowerCase()).text(k))
-            })
+            // $.each(attributes, function(k, v) {
+            //     $('select.keys_pat').append($('<option></option>').attr('value', v.toLowerCase()).text(k))
+            // })
             
+            $.each(phen_data, function(k, v) {
+                $('select.keys_pat').append($('<option></option>').attr('value', k).text(k))
+            })
+
             template['patient'] = $('.rule')[0].outerHTML
             template['genotype'] = $('.rule')[1].outerHTML
 
