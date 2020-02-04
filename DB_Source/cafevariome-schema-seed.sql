@@ -462,7 +462,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `email`, `activation_selector`, `activation_code`, `forgotten_password_selector`, `forgotten_password_code`, `forgotten_password_time`, `remember_selector`, `remember_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`, `is_admin`, `token`, `remote`) VALUES
-(1, '127.0.0.1', 'administrator', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@admin.com', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1578482551, 1, 'Admin', 'istrator', 'ADMIN3', '+447487558409', 1, NULL, 0);
+(1, '127.0.0.1', 'administrator', '$2y$10$rNhTvWEJMzn2ex5A65RWC.Ybbg5Ksij5kn70J.RshdJ6luhRCKfua', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1578482551, 1, 'Admin', 'istrator', 'ADMIN3', '+441111111', 1, NULL, 0);
 
 -- --------------------------------------------------------
 
