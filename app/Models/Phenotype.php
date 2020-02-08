@@ -54,11 +54,11 @@ use CodeIgniter\Database\ConnectionInterface;
 
             if(is_numeric($value)) {            
 				$sigs = 4;
-            	if(floatval($value)) {
+            	if(is_float($value) && floatval($value)) {
             		if($value < 0) {
-            			$value = $this->RoundSigDigs($value * -1, $sigs) * -1;
+                        $value = round($value * -1, $sigs) * -1;
             		} else {
-            			$value = $this->RoundSigDigs($value, $sigs);
+            			$value = round($value, $sigs);
             		}
             	}
             }
