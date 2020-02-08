@@ -8,8 +8,8 @@ use App\Models\Network;
 use App\Models\Elastic;
 use App\Models\EAV;
 use App\Libraries\ElasticSearch;
-
 use Elasticsearch\ClientBuilder;
+
 class Query extends CafeVariome{
 
     private $elasticClient;
@@ -552,54 +552,48 @@ class Query extends CafeVariome{
     }
     
     public function sim_query($lookup,$source, $count = TRUE){
-        // $lookup = $this->getVal($this->api, $pointer);
-        //var_dump($this->api);
         
         $neo4jUsername = $this->setting->settingData['neo4j_username'];
         $neo4jPassword = $this->setting->settingData['neo4j_password'];
         $neo4jAddress = $this->setting->settingData['neo4j_server'];
         $neo4jPort = $this->setting->settingData['neo4j_port'];
 
-         error_log("lookup is: ".print_r($lookup,1));
+        $baseNeo4jAddress = $neo4jAddress;
+        if (strpos($baseNeo4jAddress, 'http://') !== false) {
+            $baseNeo4jAddress = str_replace("http://","",$baseNeo4jAddress);
+        }
+        if (strpos($baseNeo4jAddress, 'https://') !== false) {
+            $baseNeo4jAddress = str_replace("https://","",$baseNeo4jAddress);
+        }
+
+        $neo4jClient =  \GraphAware\Neo4j\Client\ClientBuilder::create()
+        ->addConnection('default', 'http://'. $neo4jUsername . ':' .$neo4jPassword .'@'.$baseNeo4jAddress.':'.$neo4jPort)
+        ->setDefaultTimeout(60)
+        ->build();	
+
 		if (array_key_exists('r',$lookup)){
-            error_log("SIM QUERY");
-
 			$r = $lookup['r']; $s = $lookup['s']; $id_str = '';
-			foreach ($lookup['ids'] as $id) {$id_str .= 'n.hpoid = \"' . $id . '\" or '; }
+			foreach ($lookup['ids'] as $id) {$id_str .= "n.hpoid=\"" . $id . "\" or "; }
 			$id_str = trim($id_str, ' or ');
-			$neo_query = '{"statements":[{"statement":"MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel > ' . $r . ' and m.source = \\"' . $source . '\\" and (' . $id_str . ') with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, n.hpoid as hpoid with omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > ' . $s . ' return omimid, subjectid, summax ORDER BY summax DESC"}]}';
-			error_log($neo_query);
+			$neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel > $r and m.source = \"" . $source . "\" and (" . $id_str . " ) with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, n.hpoid as hpoid with omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > $s return omimid, subjectid, summax ORDER BY summax DESC";
+			//$neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel > $r and (" . $id_str . " ) with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, n.hpoid as hpoid with omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > $s return omimid, subjectid, summax ORDER BY summax DESC";
         
-            $url = $neo4jAddress.'/db/data/transaction/commit';
-            $ch = curl_init($url);
-            // $payload = $neo_query;
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $neo_query);
+            $result = $neo4jClient->run($neo_query);
 
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-            curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-            curl_setopt($ch, CURLOPT_USERPWD, $neo4jUsername.":".$neo4jPassword);
-
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            $resp = curl_exec($ch);
-            curl_close($ch);
-
-            error_log($source . " : " . $resp);
-            
-            $resp = json_decode($resp, 1);
+            $records = $result->getRecords();
 
             if($count === true) {
-                error_log($source . " : " . count($resp['results'][0]['data']));
-                return count($resp['results'][0]['data']);
+                return count($records);
             } else {
                 $pat_ids = [];
-                foreach ($resp['results'][0]['data'] as $d) {
-                    $pat_ids[] = substr($d['row'][1] . "_$source", 0, 20);
+                foreach ($records as $record) {
+                    //$pat_ids[] = substr($d['row'][1] . "_$source", 0, 20);
+                    $pat_ids[] = $record->value('subjectid');
                 }
-                // asort($pat_ids);
-                error_log($source . " : " . json_encode($pat_ids));
                 return $pat_ids;
             }
         }
+
 		// if (array_key_exists('r',$lookup)){	} // add code for jaccard	
 
 	}
@@ -609,8 +603,8 @@ class Query extends CafeVariome{
         $sourceModel = new Source($this->db);
 
 		error_log("SUBJECT VARIANT QUERY");
-		// $lookup = $this->getVal($this->api, $pointer);
-		$arr = [];
+
+        $arr = [];
 		foreach ($lookup as $key => $value) { // replace with actual parameters
 			$tmp = [];
 			$tmp[]['match'] = ['attribute' => $key];
@@ -629,8 +623,8 @@ class Query extends CafeVariome{
         $paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source . "_eav"; // for source
 		$paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
 		$paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
-		// error_log(json_encode($paramsnew));
-		$esquery = $this->client->search($paramsnew);
+
+        $esquery = $this->client->search($paramsnew);
 
 		if ($iscount) $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
 		else $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
