@@ -84,6 +84,7 @@ class CVUI_Controller extends Controller{
         $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
 		$data = Array();
 
+		$data["heading"] = $setting->settingData['site_title'];
 		$data["title"] = $uidata->title;
 		$data["description"] = $uidata->description;
 		$data["keywords"] = $uidata->keywords;
