@@ -72,14 +72,20 @@ class EAV extends Model{
         $this->builder->select('e.subject_id as subject, e.value as hpo,m.value as negated');
         $this->builder->join('eavs m', 'e.uid = m.uid', 'inner');
         $this->builder->like('e.value', 'HP', 'after');
-        $this->builder->where('m.attribute', "negated");
+        //$this->builder->where('m.attribute', "negated");
+        $this->builder->orWhere('m.attribute', "negated");
         $this->builder->where('e.elastic', 0);
         $this->builder->where('e.source', $source_id);
 
         $data = $this->builder->get()->getResultArray();
 
-        list($subject,$new_data,$t) = array("",[],0);
+        foreach ($data as &$drow) {
+            if ($drow['hpo'] == $drow['negated']) {
+                $drow['negated'] = null;
+            }
+        }
 
+        list($subject,$new_data,$t) = array("",[],0);
         
         for ($i=0; $i < count($data); $i++) { 
             if ($subject != $data[$i]['subject']) {
@@ -95,7 +101,7 @@ class EAV extends Model{
 
         $sourceModel = new Source($this->db);
         $source_name = $sourceModel->getSourceNameByID($source_id);
-        error_log("calling to_update neo4j");
+
         $neo4jModel->toUpdate($new_data, $source_name);
     }
 }
