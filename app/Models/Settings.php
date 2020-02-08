@@ -56,11 +56,11 @@ class Settings extends Model{
       }
     }
 
-    public static function getInstance(ConnectionInterface &$db)
+    public static function getInstance()
     {
       if (self::$_settings == null)
       {
-        self::$_settings = new Settings($db);
+        self::$_settings = new Settings();
       }
    
       return self::$_settings;
