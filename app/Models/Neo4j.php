@@ -58,9 +58,7 @@ class Neo4j extends Model{
         $tx = $client->transaction();
         error_log(print_r($data,1));
         foreach ($keys as $key) {
-
-            $out = preg_replace("/(-|_)*?icm-brice(-|_)*/", "", $key);
-            $query = 'MATCH (n:Subject{subjectid:"'.$out.'"}) RETURN n.subjectid as id';
+            $query = 'MATCH (n:Subject{subjectid:"'.$key.'"}) RETURN n.subjectid as id';
             $result = $client->run($query);
             $exists = false;
             foreach ($result->records() as $record) {
@@ -69,13 +67,13 @@ class Neo4j extends Model{
             // return;
             if (!$exists) {
                 error_log("it doesnt");
-                $tx->push("CREATE (n:Subject{ subjectid: '".$out."', source: '".$source_name."', batch: '".$batch."' })");
+                $tx->push("CREATE (n:Subject{ subjectid: '".$key."', source: '".$source_name."', batch: '".$batch."' })");
                 for ($i=0; $i < count($data[$key]); $i++) { 
                     if ($data[$key][$i]['negated']) {
-                        $tx->push("MATCH (a:Subject),(b:HPOterm) WHERE a.subjectid = '".$out."' AND b.hpoid = '".$data[$key][$i]['hpo']."' CREATE (a)<-[r:NOT_PHENOTYPE_OF]-(b)");
+                        $tx->push("MATCH (a:Subject),(b:HPOterm) WHERE a.subjectid = '".$key."' AND b.hpoid = '".$data[$key][$i]['hpo']."' CREATE (a)<-[r:NOT_PHENOTYPE_OF]-(b)");
                     }
                     else {
-                        $tx->push("MATCH (a:Subject),(b:HPOterm) WHERE a.subjectid = '".$out."' AND b.hpoid = '".$data[$key][$i]['hpo']."' CREATE (a)<-[r:PHENOTYPE_OF]-(b)");
+                        $tx->push("MATCH (a:Subject),(b:HPOterm) WHERE a.subjectid = '".$key."' AND b.hpoid = '".$data[$key][$i]['hpo']."' CREATE (a)<-[r:PHENOTYPE_OF]-(b)");
                     }
                 }
             }
