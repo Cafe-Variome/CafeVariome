@@ -557,11 +557,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             foreach ($eavdata as $attribute_array){
                 $attribute_array['attribute'] = preg_replace('/\s+/', '_', $attribute_array['attribute']);
                 $bulk['routing'] = $attribute_array['uid'];
-                //$bulk_body_head = ["index"=>["_index"=>$index_name]];
-                //$bulk_body_tail = ["subject_id"=>$attribute_array['subject_id'],"attribute"=>$attribute_array['attribute'],"value"=>strtolower($attribute_array['value']), "eav_rel"=>["name"=>"eav","parent"=>$attribute_array['uid']], "type"=>"eav", "source"=>$source_name."_eav"];
                 $bulk['body'][] = ["index"=>["_index"=>$index_name]];
                 $bulk['body'][] = ["subject_id"=>$attribute_array['subject_id'],"attribute"=>$attribute_array['attribute'],"value"=>strtolower($attribute_array['value']), "eav_rel"=>["name"=>"eav","parent"=>$attribute_array['uid']], "type"=>"eav", "source"=>$source_name."_eav"];
-                //$bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
                 $counta++;
                 // Every 500 documents bulk insert to ElasticSearch
                 if ($counta%500 == 0){
