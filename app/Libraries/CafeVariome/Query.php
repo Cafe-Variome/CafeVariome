@@ -572,12 +572,23 @@ class Query extends CafeVariome{
         ->build();	
 
 		if (array_key_exists('r',$lookup)){
-			$r = $lookup['r']; $s = $lookup['s']; $id_str = '';
+            $r = $lookup['r'];
+            $s = $lookup['s'];
+            $id_str = '';
 			foreach ($lookup['ids'] as $id) {$id_str .= "n.hpoid=\"" . $id . "\" or "; }
 			$id_str = trim($id_str, ' or ');
-			$neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel > $r and m.source = \"" . $source . "\" and (" . $id_str . " ) with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, n.hpoid as hpoid with omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > $s return omimid, subjectid, summax ORDER BY summax DESC";
-			//$neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel > $r and (" . $id_str . " ) with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, n.hpoid as hpoid with omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > $s return omimid, subjectid, summax ORDER BY summax DESC";
+            
+            //Do not remove the below line. It's the older way of retrieving similarity data from Neo4J
+            //$neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel > $r and m.source = \"" . $source . "\" and (" . $id_str . " ) with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, n.hpoid as hpoid with omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > $s return omimid, subjectid, summax ORDER BY summax DESC";
         
+            //The following way matches the new query builder UI
+            if ($r == 1) {
+                $neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where (" . $id_str . ") and m.source = \"" . $source . "\" with m.subjectid as subjectid, n.hpoid as hpoid with subjectid as subjectid, count(hpoid) as hpoid where hpoid >=  $s  return subjectid, hpoid";
+            }
+            else {
+                $neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel >  $r  and (" . $id_str . ") and m.source = \"" . $source . "\" with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, count(distinct(n.hpoid)) as hpoid where hpoid >=  $s with hpoid as hpoid, omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > 0 return omimid, subjectid, hpoid ORDER BY hpoid DESC";
+            }
+
             $result = $neo4jClient->run($neo_query);
 
             $records = $result->getRecords();
