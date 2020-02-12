@@ -624,11 +624,16 @@ class Query extends CafeVariome{
 		$paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
 		$paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
 
-        $esquery = $this->client->search($paramsnew);
+        $esquery = $this->elasticClient->search($paramsnew);
+        $json_query = json_encode($paramsnew);
+        if ($iscount){
+            $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
+        }
+        else{
+            $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
+        }
 
-		if ($iscount) $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
-		else $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
-
+        return $result;
     }
     
     public function makeLogic(&$api) {
