@@ -369,13 +369,17 @@ class Query extends CafeVariome{
 
 		error_log(print_r($element, 1));
 		error_log("getting IDs");
-		$outids = []; // final output of ids that match query, return count of this.
+        $outids = []; // final output of ids that match query, return count of this.
 		foreach ($element as $current) {
+            $noids = 0;
 			asort($current); //sort the counts in an or statement so only need to keep array of smallest number of ids
 		    if (reset($current) == 0) continue; // if smallest is 0 then no need to continue as answer is 0
 		    $andids=[]; //array of ids for current or statement
 
 			foreach ($current as $pointer => $val){
+                if ($noids == 1) {
+                    break;
+                }
 				$lookup = $this->getVal($this->api, $pointer);
 				$type = explode('/', $pointer)[2];
 
@@ -384,7 +388,10 @@ class Query extends CafeVariome{
 					$ids = $this->component_switch($type,$lookup,$source,FALSE);
 					
 					if (count($andids) > 0){
-						$andids = array_intersect($andids, $ids);					
+                        $andids = array_intersect($andids, $ids);
+                        if (count($andids) == 0){
+                            $noids = 1;
+                        }					
                     }
                     else{
 						$andids = $ids;
@@ -393,6 +400,9 @@ class Query extends CafeVariome{
 			}
 
 			foreach ($current as $pointer => $val){
+                if ($noids == 1) {
+                    break;
+                }
 				$type = explode('/', $pointer)[2];
 
 				$lookup = $this->getVal($this->api, $pointer);
@@ -401,7 +411,10 @@ class Query extends CafeVariome{
 					$ids = $this->component_switch($type,$lookup,$source,FALSE);
 
 					if (count($andids) > 0){
-						$andids = array_values(array_diff($andids, $ids));
+                        $andids = array_values(array_diff($andids, $ids));
+                        if (count($andids) == 0){
+                            $noids = 1;
+                        }
 					}else{
                         $eavModel = new EAV($this->db);
 
@@ -598,7 +611,6 @@ class Query extends CafeVariome{
             } else {
                 $pat_ids = [];
                 foreach ($records as $record) {
-                    //$pat_ids[] = substr($d['row'][1] . "_$source", 0, 20);
                     $pat_ids[] = $record->value('subjectid');
                 }
                 return $pat_ids;
