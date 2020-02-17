@@ -25,7 +25,7 @@
         "graphaware/neo4j-php-client": "^4.0",
         "components/jqueryui": "^1.12.1",
         "vakata/jstree": "^3.3.8"
-	},
+        },
     "require-dev": {
         "codeigniter4/codeigniter4-standard": "^1.0",		
         "mikey179/vfsstream": "1.6.*",
