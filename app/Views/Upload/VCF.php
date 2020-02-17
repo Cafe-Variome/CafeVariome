@@ -1,6 +1,5 @@
-<?= $this->extend('layout/master') ?>
+<?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
 
 <nav aria-label="breadcrumb">
   <ol class="breadcrumb">
