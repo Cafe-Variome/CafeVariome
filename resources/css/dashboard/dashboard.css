@@ -1,0 +1,23 @@
+form .form-group{
+    margin-left: 30px;
+    margin-right: 20px;
+    color:#000
+}
+h2{
+    color:#000
+}
+table tr td {
+    color:#000
+}
+table thead th{
+    color:#000 
+}
+footer{
+    height: 80px;
+    background-color: #cacaca;
+    color: rgb(83, 83, 83)
+    
+}
+footer .copyright span{
+    font-size:15px;
+}
