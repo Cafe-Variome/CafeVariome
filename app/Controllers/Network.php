@@ -53,7 +53,7 @@ class Network extends CVUI_Controller{
      * 
      */
 
-    public function Networks()
+    public function List()
     {
         $uidata = new UIData();
         $uidata->data['title'] = "Networks";
