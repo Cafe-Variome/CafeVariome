@@ -156,21 +156,22 @@ class Source extends CVUI_Controller{
         // Get all available groups for the networks this installation is a member of from auth central for multi select list
         $networkModel = new \App\Models\Network($this->db);
 
-        // Temporary section from network model
-        $network_groups_for_installation = array();
-		$installation_key = $this->setting->settingData['installation_key'];
-        $url = base_url();
+        $networkGroups = $networkModel->getNetworkGroupsForInstallation();
 
-		foreach ( $networkModel->getNetworkGroupsForInstallation() as $network_group ) {
-			$number_sources = $networkModel->countSourcesForNetworkGroup($network_group['id']);
-			$network_group['number_of_sources'] = $number_sources;
-			$network_groups_for_installation[] = $network_group;
+        $srcDisplayGroups = [];
+        $countDisplayGroups = [];
+
+		foreach ( $networkGroups as $ng ) {
+            if ($ng['group_type'] == 'source_display') {
+                $srcDisplayGroups[$ng['id'] . ',' . $ng['network_key']] = $ng['name'] . '(' . $ng['network_name'] . ')';
+            }
+            elseif ($ng['group_type'] == 'count_display') {
+                $countDisplayGroups[$ng['id'] . ',' . $ng['network_key']] = $ng['name'] . '(' . $ng['network_name'] . ')';
+            }
         }
-        
-        //End temporary section
-
-        $uidata->data['groups'] = json_decode(json_encode($network_groups_for_installation), TRUE);
-
+        $uidata->data['srcDSPGroups'] = $srcDisplayGroups;
+        $uidata->data['countDSPGroups'] = $countDisplayGroups;
+                
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             $name = strtolower(str_replace(' ', '_', $this->request->getVar('name'))); // Convert the source name to lowercase and replace whitespace with underscore
             $uri = $this->request->getVar('uri');
@@ -185,19 +186,21 @@ class Source extends CVUI_Controller{
             $insert_id = $this->sourceModel->createSource($source_data);
             $this->data['insert_id'] = $insert_id;
 
-            if ($this->request->getVar('groups')) {
-
+            if ($this->request->getVar('source_display')) {
                 $group_data_array = array();
-                foreach ($this->request->getVar('groups') as $group_data) {
+                foreach ($this->request->getVar('source_display') as $src_group_data) {
                     // Need to explode the group multi select to get the group_id and the network_key since the value is comma separated as I needed to pass both in the value
-                    $group_data_array[] = $group_data;
+                    $group_data_array[] = $src_group_data;
                 }
-                // Create the post string that will get sent
-                // Each group will be a comma separated variable (first the group ID and then the network_key)
-                // if multiple groups are selected then they'll be delimited by a | which will be exploded auth server side
+                $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
+            }
 
-                // Make API to auth central for the source for this installation for the network groups
-                $groups = $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
+            if ($this->request->getVar('count_display')) {
+                $group_data_array = array();
+                foreach ($this->request->getVar('count_display') as $count_group_data) {
+                    $group_data_array[] = $count_group_data;
+                }
+                $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
             }
 
             return redirect()->to(base_url($this->controllerName.'/Index'));
@@ -266,6 +269,10 @@ class Source extends CVUI_Controller{
                 'value' => set_value('type'),
             );
 
+            $uidata->data['selected_source_display'] = $this->request->getVar('source_display') ? $this->request->getVar('source_display') :[];
+            $uidata->data['selected_count_display'] = $this->request->getVar('count_display') ? $this->request->getVar('count_display') :[];
+            
+
             $uidata->javascript = array(JS.'cafevariome/components/transferbox.js', JS.'cafevariome/source.js');
 
             $data = $this->wrapData($uidata);
@@ -282,6 +289,22 @@ class Source extends CVUI_Controller{
         $uidata->data['title'] = "Edit Source";
 
         $networkModel = new \App\Models\Network($this->db);
+
+        $networkGroups = $networkModel->getNetworkGroupsForInstallation();
+
+        $srcDisplayGroups = [];
+        $countDisplayGroups = [];
+
+		foreach ( $networkGroups as $ng ) {
+            if ($ng['group_type'] == 'source_display') {
+                $srcDisplayGroups[$ng['id'] . ',' . $ng['network_key']] = $ng['name'] . '(' . $ng['network_name'] . ')';
+            }
+            elseif ($ng['group_type'] == 'count_display') {
+                $countDisplayGroups[$ng['id'] . ',' . $ng['network_key']] = $ng['name'] . '(' . $ng['network_name'] . ')';
+            }
+        }
+        $uidata->data['srcDSPGroups'] = $srcDisplayGroups;
+        $uidata->data['countDSPGroups'] = $countDisplayGroups;
 
         //validate form input
 
@@ -345,45 +368,48 @@ class Source extends CVUI_Controller{
 
             $this->sourceModel->updateSource($update_data, ["source_id"=>$this->request->getVar('source_id')]);
 
+            $group_data_array = array();
             // Check if there any groups selected
-            if ($this->request->getVar('groups')) {
-                $group_data_array = array();
-                foreach ($this->request->getVar('groups') as $group_data) {
+            if ($this->request->getVar('source_display')) {
+                foreach ($this->request->getVar('source_display') as $src_group_data) {
                     // Need to explode the group multi select to get the group_id and the network_key since the value is comma separated as I needed to pass both in the value
-                    $group_data_array[] = $group_data;
+                    $group_data_array[] = $src_group_data;
                 }
-                // Create the post string that will get sent
-                // Each group will be a comma separated variable (first the group ID and then the network_key)
-                // if multiple groups are selected then they'll be delimited by a | which will be exploded auth server side
-                $group_post_data = implode("|", $group_data_array);
-                // Make API to auth central for the source for this installation for the network groups
-                $groups = $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],$group_post_data);
-            } else {
-                // All groups were deselected so make API call to delete this source from all groups
-                 $groups = $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],null);
             }
-            if (file_exists("resources/elastic_search_status_complete"))
-                unlink("resources/elastic_search_status_complete");
-            file_put_contents("resources/elastic_search_status_incomplete", "");
+            if ($this->request->getVar('count_display')) {
+                foreach ($this->request->getVar('count_display') as $count_group_data) {
+                    $group_data_array[] = $count_group_data;
+                }
+            }
+            if (count($group_data_array) > 0) {           
+                $group_post_data = implode("|", $group_data_array);
+                $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],$group_post_data);
 
-			return redirect()->to(base_url('source/index'));
+            }
+            else {
+                $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],null);
+            }
+
+            return redirect()->to(base_url('source/index'));
         } else {
 
-            $groups = $networkModel->get_network_groups_for_installation();
-
-            $uidata->data['groups'] = json_decode(json_encode($groups), TRUE);
-
             // Get all the network groups that this source from this installation is currently in so that these can be pre selected in the multiselect list
-            $returned_groups = $networkModel->getCurrentNetworkGroupsForSourceInInstallation($source_id);
-            $tmp_selected_groups = json_decode(json_encode($returned_groups), TRUE);
-            $selected_groups = array();
-            if (!array_key_exists('error', $tmp_selected_groups)) {
-                foreach ($tmp_selected_groups as $tmp_group) {
-                    $selected_groups[$tmp_group['group_id']] = "group_description";
+            $networkGroups = $networkModel->getCurrentNetworkGroupsForSourceInInstallation($source_id);
+            $selected_source_display = [];
+            $selected_count_display = [];
+
+            foreach ($networkGroups as $ng) {
+                if ($ng['group_type'] == 'source_display') {
+                    $selected_source_display[] = $ng['id'] . ',' . $ng['network_key'];
+                }
+                elseif ($ng['group_type'] == 'count_display') {
+                    $selected_count_display[] = $ng['id'] . ',' . $ng['network_key'];
                 }
             }
-            $uidata->data['selected_groups'] = $selected_groups;
 
+            $uidata->data['selected_source_display'] = $selected_source_display ? $selected_source_display :[];
+            $uidata->data['selected_count_display'] = $selected_count_display ? $selected_count_display :[];
+            
             // Get all the data for this source
             $source_data = $this->sourceModel->getSource($source_id);
 
@@ -396,6 +422,13 @@ class Source extends CVUI_Controller{
                 'class' => 'form-control',
                 'readonly' => 'true', // Don't allow the user to edit the source name
                 'value' => set_value('name', $source_data['name']),
+            );
+            $uidata->data['owner_name'] = array(
+                'name' => 'owner_name',
+                'id' => 'owner_name',
+                'type' => 'text',
+                'class' => 'form-control',
+                'value' => set_value('owner_name', $source_data['owner_name']),
             );
             $uidata->data['uri'] = array(
                 'name' => 'uri',
@@ -441,7 +474,6 @@ class Source extends CVUI_Controller{
             );
 
             $uidata->javascript = array(JS.'cafevariome/components/transferbox.js',JS.'cafevariome/source.js');
-
 
             $data = $this->wrapData($uidata);
 

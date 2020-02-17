@@ -4,6 +4,7 @@ $(document).ready(function() {
         $('#sourcestable').DataTable();
     }
     $('#ImportRecordsBtn').tooltip(); //Tooltip for import records added as the data-toggle attribute is used to trigger the modal
+    $('select').select2({width:'100%'});
 } );
 
 // Select groups on submission of form

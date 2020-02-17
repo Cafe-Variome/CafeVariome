@@ -23,131 +23,61 @@
 <?php endif; ?>
 <?php echo form_open($controllerName . '/Create'); ?>
 
-<div class="form-group">
-<?php echo form_label('Source Name', 'name'); ?>
-	<?php echo form_input($name); ?>
-	<small class="form-text text-muted">
-		(no spaces allowed but underscores and dashes are accepted, <br />uppercase characters will be converted to lowercase)
-	</small>
-</div>
-<div class="form-group">
-	<?php echo form_label('Owner Name', 'owner_name'); ?>
-	<?php echo form_input($owner_name); ?>
-</div>
-<div class="form-group">
-	<?php echo form_label('Owner Email', 'email'); ?>
-	<?php echo form_input($email); ?>
-</div>
-<div class="form-group">
-	<?php echo form_label('Source URI', 'uri'); ?>
-	<?php echo form_input($uri); ?>
-</div>
-<div class="form-group">
-	<?php echo form_label('Source Description', 'desc'); ?>
-	<?php echo form_input($desc); ?>
-</div>
-<div class="form-group">
-	<?php echo form_label('Long Source Description', 'long_description'); ?>
-	<?php echo form_textarea($long_description); ?>
-</div>
-<div class="form-group">
-	<?php echo form_label('Status', 'status'); ?>
-
-	<?php
-	$style = [
-        'class' => 'form-control'
-	];
-	$options = array(
-		'online' => 'Online',
-		'offline' => 'Offline',
-	);
-	echo form_dropdown('status', $options, 'mysql', $style);
-	?>
-</div>
-<?php if (array_key_exists('error', $groups)): ?>
-<div class="row">
-	<div class="col">
-		There are no network groups available to this installation.
+<div class="form-group row">
+	<div class=col-6>
+		<?php echo form_label('Source Name', 'name'); ?>
+		<?php echo form_input($name); ?>
+		<small class="form-text text-muted">
+		(no spaces allowed but underscores and dashes are accepted, uppercase characters will be converted to lowercase)
+		</small>
 	</div>
-</div>
-<?php else: ?>
-
-<div class="row">
-	<div class="col">
-		<h4>Source Display Groups</h4>
-	</div>
-</div>
-<div class="row">
-	<div class="col">
-		Select groups that can access restrictedAccess variants in this source (control click to select multiple):
+	<div class=col-6>
+		<?php echo form_label('Owner Name', 'owner_name'); ?>
+		<?php echo form_input($owner_name); ?>
 	</div>
 </div>
 <div class="form-group row">
-	<div class="col">
-		<select size="10" multiple id="sdg_left" class="form-control">
-    	</select>	
+	<div class=col-6>
+		<?php echo form_label('Owner Email', 'email'); ?>
+		<?php echo form_input($email); ?>
 	</div>
-	<div class="col">
-		<input type="button" onclick="moveItem(event);" class="form-control btn btn-success btn-lg btn-block" value="Add &gt;&gt;"/>
-        <input type="button" onclick="removeItem(event);" class="form-control btn btn-danger btn-lg btn-block" value="&lt;&lt; Remove"/>
-	</div>
-	<div class="col">
-		<select size="10" multiple id="sdg_right" name="groups[]" class="groupsSelected form-control">
-		</select>	
-	</div>
-</div>
-<div class="row">
-	<div class="col">
-		Count Display Groups
+	<div class="col-6">
+		<?php echo form_label('Source URI', 'uri'); ?>
+		<?php echo form_input($uri); ?>		
 	</div>
 </div>
 <div class="form-group row">
-	<div class="col">
-		<select size="10" multiple id="cdg_left" class="form-control">
-        </select>
+	<div class=col-6>
+		<?php echo form_label('Source Description', 'desc'); ?>
+		<?php echo form_input($desc); ?>
 	</div>
-	<div class="col">
-		<input type="button" onclick="moveItem(event);" class="form-control btn btn-success btn-lg btn-block" value="Add &gt;&gt;"/>
-        <input type="button" onclick="removeItem(event);" class="form-control btn btn-danger btn-lg btn-block" value="&lt;&lt; Remove"/>
-	</div>
-	<div class="col">
-		<select size="10" multiple id="cdg_right" name="groups[]" class="groupsSelected form-control">
-        </select>
+	<div class=col-6>
+		<?php echo form_label('Status', 'status'); ?>
+		<?php
+		$options = array(
+			'online' => 'Online',
+			'offline' => 'Offline',
+		);
+		echo form_dropdown('status', $options, 'mysql', ['class' => 'form-control']);
+		?>
 	</div>
 </div>
-
-<?php foreach ($groups as $group ):
-		if ($group['group_type'] === "source_display"):
-			if(isset($selected_groups) && array_key_exists($group['id'], $selected_groups)): ?>
-				<script type="text/javascript">
-					$("#sdg_right").append($("<option></option>")
-					.attr("value",'<?php echo $group['id'] . "," . $group['network_key'] . ""; ?>')
-					.text('<?php echo $group['description'] . " (Network:" . $group['network_name'] . ")"; ?>')); 
-				</script>
-			<?php else: ?>
-				<script type="text/javascript">
-					$("#sdg_left").append($("<option></option>")
-					.attr("value",'<?php echo $group['id'] . "," . $group['network_key'] . ""; ?>')
-					.text('<?php echo $group['description'] . " (Network:" . $group['network_name'] . ")"; ?>')); 
-				</script>
-			<?php endif;
-		elseif ($group['group_type'] === "count_display"):
-			if(isset($selected_groups) && array_key_exists($group['id'], $selected_groups)): ?>
-				<script type="text/javascript">
-					$("#cdg_right").append($("<option></option>")
-					.attr("value",'<?php echo $group['id'] . "," . $group['network_key'] . ""; ?>')
-					.text('<?php echo $group['description'] . " (Network:" . $group['network_name'] . ")"; ?>')); 
-				</script>
-			<?php else: ?>
-				<script type="text/javascript">
-					$("#cdg_left").append($("<option></option>")
-					.attr("value",'<?php echo $group['id'] . "," . $group['network_key'] . ""; ?>')
-					.text('<?php echo $group['description'] . " (Network:" . $group['network_name'] . ")"; ?>')); 
-				</script>
-			<?php endif;
-		endif;
-	endforeach; ?>
-<?php endif; ?>
+<div class="form-group row">
+	<div class=col-12>
+		<?php echo form_label('Long Source Description', 'long_description'); ?>
+			<?php echo form_textarea($long_description); ?>	
+		</div>
+</div>
+<div class="form-group row">
+	<div class=col-6>
+		<?php echo form_label('Source Display Access Group', 'source_display'); ?>
+		<?php echo form_multiselect('source_display[]', $srcDSPGroups , $selected_source_display, ['class' => 'form-control']); ?>
+	</div>
+	<div class=col-6>
+		<?php echo form_label('Count Display Access Group', 'count_display'); ?>
+		<?php echo form_multiselect('count_display[]', $countDSPGroups , $selected_count_display, ['class' => 'form-control']); ?>
+	</div>
+</div>
 
 <div class="form-group row">
 	<div class="col">
@@ -161,10 +91,4 @@
 </div>
 
 <?php echo form_close(); ?>
-
-<?php 
-if (isset($result)) {
-	echo "<p>Source was successfully added</p>";
-}
-?>
 <?= $this->endSection() ?>
