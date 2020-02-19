@@ -46,7 +46,7 @@ class Network extends CVUI_Controller{
     }
 
     public function index(){
-        return redirect()->to(base_url($this->controllerName.'/Networks'));
+        return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
     /**
