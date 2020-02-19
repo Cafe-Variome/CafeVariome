@@ -42,7 +42,7 @@ class Elastic extends CVUI_Controller{
         $uidata = new UIData();
         $uidata->title = "Index Status";
 
-        $elasticSearch = new ElasticSearch((array)$this->setting->settingData['elastic_url']);
+        $elasticSearch = new ElasticSearch((array)$this->setting->getElasticSearchUri());
         $elasticModel = new \App\Models\Elastic($this->db);
         $sourceModel = new Source($this->db);
         $sources = $sourceModel->getSources('source_id, name, elastic_status');
