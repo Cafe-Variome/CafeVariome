@@ -24,7 +24,8 @@
         "box/spout": "2.7.3",
         "graphaware/neo4j-php-client": "^4.0",
         "components/jqueryui": "^1.12.1",
-        "vakata/jstree": "^3.3.8"
+        "vakata/jstree": "^3.3.8",
+        "tinymce/tinymce": "^5.2.0"
         },
     "require-dev": {
         "codeigniter4/codeigniter4-standard": "^1.0",		
