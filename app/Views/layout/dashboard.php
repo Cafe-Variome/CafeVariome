@@ -61,7 +61,7 @@
             <hr class="sidebar-divider my-0">
 
             <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
+            <li class="nav-item  <?= $uriSegments->methodName == 'index' ? 'active' : ''?>">
                 <a class="nav-link" href="<?= base_url('Admin/Index') ?>">
                 <i class="fas fa-fw fa-tachometer-alt"></i>
                 <span>Dashboard</span></a>
@@ -85,12 +85,12 @@
                 Data
             </div>
 
-            <li class="nav-item">
+            <li class="nav-item <?= $controllerName == 'Source' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSource" aria-expanded="true" aria-controls="collapseSource">
                 <i class="fas fa-fw fa-database"></i>
                 <span>Sources</span>
                 </a>
-                <div id="collapseSource" class="collapse" aria-labelledby="headingSource" data-parent="#accordionSidebar">
+                <div id="collapseSource" class="collapse <?= $controllerName == 'Source' ? 'show' : ''?>" aria-labelledby="headingSource" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="<?= base_url('Source/Create') ?>">Create a Source</a>
                         <a class="collapse-item" href="<?= base_url('Source/List') ?>">View Sources</a>
@@ -98,12 +98,12 @@
                 </div>
             </li>
 
-            <li class="nav-item">
+            <li class="nav-item <?= $controllerName == 'Elastic' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseElastic" aria-expanded="true" aria-controls="collapseElastic">
                 <i class="fas fa-fw fa-search"></i>
                 <span>Elastic Search</span>
                 </a>
-                <div id="collapseElastic" class="collapse" aria-labelledby="headingElastic" data-parent="#accordionSidebar">
+                <div id="collapseElastic" class="collapse  <?= $controllerName == 'Elastic' ? 'show' : ''?>" aria-labelledby="headingElastic" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="<?= base_url('Elastic/Status') ?>">Status</a>
                     </div>
@@ -118,27 +118,27 @@
                 Network
             </div>
 
-            <li class="nav-item">
+            <li class="nav-item <?= $controllerName == 'Network' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseNet" aria-expanded="true" aria-controls="collapseNet">
                 <i class="fas fa-fw fa-network-wired"></i>
                     <span>Networks</span>
                 </a>
-                <div id="collapseNet" class="collapse" aria-labelledby="headingNet" data-parent="#accordionSidebar">
+                <div id="collapseNet" class="collapse <?= $controllerName == 'Network' ? 'show' : ''?>" aria-labelledby="headingNet" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="<?= base_url('Network/Create') ?>">Create a Network</a>
                         <a class="collapse-item" href="<?= base_url('Network/Join') ?>">Join a Network</a>
                         <a class="collapse-item" href="<?= base_url('Network/List') ?>">View Networks</a>
-                        <a class="collapse-item" href="<?= base_url('Network/List') ?>">View Network Requests</a>
+                        <a class="collapse-item" href="<?= base_url('NetworkRequest/List') ?>">View Network Requests</a>
                     </div>
                 </div>
             </li>
 
-            <li class="nav-item">
+            <li class="nav-item <?= $controllerName == 'NetworkGroup' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseNetGroup" aria-expanded="true" aria-controls="collapseNetGroup">
                 <i class="fas fa-fw fa-user-friends"></i>
                     <span>Network Groups</span>
                 </a>
-                <div id="collapseNetGroup" class="collapse" aria-labelledby="headingNetGroup" data-parent="#accordionSidebar">
+                <div id="collapseNetGroup" class="collapse <?= $controllerName == 'NetworkGroup' ? 'show' : ''?>" aria-labelledby="headingNetGroup" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="<?= base_url('NetworkGroup/Create') ?>">Create a Network Group</a>
                         <a class="collapse-item" href="<?= base_url('NetworkGroup/List') ?>">View Network Groups</a>
@@ -151,12 +151,12 @@
                 Access Control
             </div>
 
-            <li class="nav-item">
+            <li class="nav-item <?= $controllerName == 'User' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUser" aria-expanded="true" aria-controls="collapseUser">
                 <i class="fas fa-fw fa-user"></i>
                     <span>Users</span>
                 </a>
-                <div id="collapseUser" class="collapse" aria-labelledby="headingUser" data-parent="#accordionSidebar">
+                <div id="collapseUser" class="collapse <?= $controllerName == 'User' ? 'show' : ''?>" aria-labelledby="headingUser" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="<?= base_url('User/Create') ?>">Create a User</a>
                         <a class="collapse-item" href="<?= base_url('User/List') ?>">View Users</a>
@@ -169,42 +169,16 @@
                 System
             </div>
 
-            <li class="nav-item">
+            <li class="nav-item <?= $uriSegments->methodName == 'settings' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSet" aria-expanded="true" aria-controls="collapseSet">
                 <i class="fas fa-fw fa-user"></i>
                     <span>Settings</span>
                 </a>
-                <div id="collapseSet" class="collapse" aria-labelledby="headingSet" data-parent="#accordionSidebar">
+                <div id="collapseSet" class="collapse <?= $uriSegments->methodName == 'settings' ? 'show' : ''?>" aria-labelledby="headingSet" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                         <a class="collapse-item" href="<?= base_url('Admin/Settings') ?>">System Settings</a>
                     </div>
                 </div>
-            </li>
-
-            <li class="nav-item active">
-                <a class="nav-link" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="true" aria-controls="collapsePages">
-                <i class="fas fa-fw fa-folder"></i>
-                <span>Pages</span>
-                </a>
-                <div id="collapsePages" class="collapse show" aria-labelledby="headingPages" data-parent="#accordionSidebar">
-                <div class="bg-white py-2 collapse-inner rounded">
-                    <h6 class="collapse-header">Login Screens:</h6>
-                    <a class="collapse-item" href="login.html">Login</a>
-                    <a class="collapse-item" href="register.html">Register</a>
-                    <a class="collapse-item" href="forgot-password.html">Forgot Password</a>
-                    <div class="collapse-divider"></div>
-                    <h6 class="collapse-header">Other Pages:</h6>
-                    <a class="collapse-item" href="404.html">404 Page</a>
-                    <a class="collapse-item active" href="blank.html">Blank Page</a>
-                </div>
-                </div>
-            </li>
-
-            <!-- Nav Item - Tables -->
-            <li class="nav-item">
-                <a class="nav-link" href="tables.html">
-                <i class="fas fa-fw fa-table"></i>
-                <span>Tables</span></a>
             </li>
 
             <!-- Divider -->
@@ -249,14 +223,6 @@
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     Profile
                     </a>
-                    <a class="dropdown-item" href="#">
-                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Settings
-                    </a>
-                    <a class="dropdown-item" href="#">
-                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Activity Log
-                    </a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -271,7 +237,9 @@
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
-            <?= $this->renderSection('content') ?>
+            <div class="content">
+                <?= $this->renderSection('content') ?>
+            </div>
         </div>
         <!-- /.container-fluid -->
 
@@ -302,15 +270,17 @@
         <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">×</span>
-            </button>
+                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
             </div>
             <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
             <div class="modal-footer">
-            <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-            <a class="btn btn-primary" href="login.html">Logout</a>
+                <button class="btn btn-secondary bg-gradient-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <a class="btn btn-warning bg-gradient-warning" href="<?= base_url('auth/logout') ?>">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw"></i> Logout
+                </a>
             </div>
         </div>
         </div>
