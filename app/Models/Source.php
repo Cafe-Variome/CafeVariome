@@ -20,9 +20,13 @@ use CodeIgniter\Database\ConnectionInterface;
 
     protected $primaryKey = 'source_id';
 
-    public function __construct(ConnectionInterface &$db){
-
-        $this->db =& $db;
+    public function __construct(ConnectionInterface &$db = null){
+        if ($db != null) {
+            $this->db =& $db;
+        }
+        else {
+            $this->db = \Config\Database::connect();
+        }
     }
 
     /**
