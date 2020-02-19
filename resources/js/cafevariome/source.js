@@ -3,8 +3,16 @@ $(document).ready(function() {
     if ($('#sourcestable').length) {
         $('#sourcestable').DataTable();
     }
+
     $('#ImportRecordsBtn').tooltip(); //Tooltip for import records added as the data-toggle attribute is used to trigger the modal
-    $('select').select2({width:'100%'});
+    
+    if ($('#count_display').length) {
+        $('#count_display').select2({width:'100%'});
+    }
+
+    if ($('#source_display').length) {
+        $('#source_display').select2({width:'100%'});
+    }
 } );
 
 // Select groups on submission of form
