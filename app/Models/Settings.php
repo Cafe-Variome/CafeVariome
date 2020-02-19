@@ -94,4 +94,35 @@ class Settings extends Model{
       $this->builder->update($data);
   }
 
+  public function getInstallationKey()
+  {
+     return $this->settingData['installation_key'];
+  }
+
+  public function getElasticSearchUri()
+  { 
+      return $this->settingData['elastic_url'];
+  }
+
+  public function getNeo4JUserName()
+  {
+      return $this->settingData['neo4j_username'];
+  }
+
+  public function getNeo4JPassword()
+  {
+      return $this->settingData['neo4j_password'];
+  }
+
+  public function getNeo4JUri()
+  {
+      return $this->settingData['neo4j_server'];
+  }
+
+  public function getNeo4JPort()
+  {
+      return $this->settingData['neo4j_port'];
+  }
+
+
 }
