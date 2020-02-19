@@ -7,7 +7,6 @@
 	</div>	
 </div>
 <hr>
-
 <table class="table table-bordered table-striped table-hover" id="sourcestable">
 	<thead>
 		<tr>
@@ -35,7 +34,9 @@
 					<?php
 					if ( isset($variant_counts[$source['source_id']]) ):
 						echo $variant_counts[$source['source_id']];
-				    endif; ?>
+					else:
+						echo '0';
+					endif; ?>
 				<?php else: ?>
 						<a href="#" rel="popover" data-content="You cannot edit or import records for a federated source. This must be done via the source installation." data-original-title="Import Records" ><i class="fa fa-minus"></i></a>
 				<?php endif; ?>
@@ -100,11 +101,8 @@
 
 <div class="row">
 	<div class="col">
-		<a href="<?php echo base_url($controllerName.'/Create') ?>" class="btn btn-primary btn-medium" rel="popover" data-content="Fill in a form to add a new source to your installation." data-original-title="Add Source">
+		<a href="<?php echo base_url($controllerName.'/Create') ?>" class="btn btn-primary bg-gradient-primary">
 			<i class="fa fa-file"></i>  Create source
-		</a>
-		<a href="<?php echo base_url('Admin/Index');?>" class="btn btn-secondary" >
-			<i class="fa fa-home"></i> Admin Dashboard
 		</a>
 	</div>
 </div>

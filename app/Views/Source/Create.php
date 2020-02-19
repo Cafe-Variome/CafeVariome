@@ -71,17 +71,17 @@
 <div class="form-group row">
 	<div class=col-6>
 		<?php echo form_label('Source Display Access Group', 'source_display'); ?>
-		<?php echo form_multiselect('source_display[]', $srcDSPGroups , $selected_source_display, ['class' => 'form-control']); ?>
+		<?php echo form_multiselect('source_display[]', $srcDSPGroups , $selected_source_display, ['id'=> 'source_display', 'class' => 'form-control']); ?>
 	</div>
 	<div class=col-6>
 		<?php echo form_label('Count Display Access Group', 'count_display'); ?>
-		<?php echo form_multiselect('count_display[]', $countDSPGroups , $selected_count_display, ['class' => 'form-control']); ?>
+		<?php echo form_multiselect('count_display[]', $countDSPGroups , $selected_count_display, ['id'=> 'count_display','class' => 'form-control']); ?>
 	</div>
 </div>
 
 <div class="form-group row">
 	<div class="col">
-		<button type="submit" onclick="select_groups()" name="submit" class="btn btn-primary">
+		<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
 			<i class="fa fa-file"></i>  Create Source
 		</button>
 		<a href="<?php echo base_url('Admin/Index'); ?>" class="btn btn-secondary" >
