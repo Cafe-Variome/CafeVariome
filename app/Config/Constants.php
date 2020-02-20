@@ -99,3 +99,9 @@ define('PRECAN', false); // Set/Unset to enable/disable Precanned Queries featur
 define('PHENOTYPE_CATEGORIES', true); // Set/Unset to enable/disable categories wise split in phenotype attributes
 
 define('PHP_BIN_PATH', '/usr/bin/php7.4');
+
+// UI status message types
+define('STATUS_SUCCESS', 1);
+define('STATUS_ERROR', 0);
+define('STATUS_INFO', 2);
+define('STATUS_WARNING', 3);
