@@ -13,7 +13,7 @@ $(document).ready(function() {
     if ($('#source_display').length) {
         $('#source_display').select2({width:'100%'});
     }
-} );
+});
 
 // Select groups on submission of form
 function select_groups() {
