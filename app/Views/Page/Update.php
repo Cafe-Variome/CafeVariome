@@ -16,7 +16,7 @@
 	</div>
 <?php endif; ?>
 
-<?php echo form_open($controllerName.'/Create'); ?>
+<?php echo form_open($controllerName.'/Update/'. $page_id); ?>
 
 <div class="form-group row">
     <div class="col-8">
@@ -39,7 +39,7 @@
     </div>
 </div>
 
-<div class="form-group row">
+<div class="row">
 	<div class="col">
         <button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
             <i class="fa fa-file"></i>  Create Page
@@ -47,9 +47,7 @@
 	</div>
 </div>
 
+
 <?php echo form_close(); ?>
-
-
-
 
 <?= $this->endSection() ?>
