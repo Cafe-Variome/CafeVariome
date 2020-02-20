@@ -94,6 +94,9 @@ class CVUI_Controller extends Controller{
 		$data["css"] = $uidata->css;
 		$data["stickyFooter"] = $uidata->stickyFooter;
 
+		$data['statusMessage'] = $this->getStatusMessage();
+		$data['statusMessageType'] = $this->getStatusMessageTypeAlertEquivalent();
+
 		$data["uriSegments"] = $this->getURISegments();
 
 		//Include additional data attributes specific to each view
@@ -104,11 +107,6 @@ class CVUI_Controller extends Controller{
 		$data["session"] = &$session;
 		$data["setting"] = &$setting;
 		$data["auth"] = &$authAdapter;
-		//Moved to CI4 by Mehdi Mehtarizadeh(mm876) on 18/06/2019 
-
-		//Get dynamic menus from CMS from database and pass to nav template
-		$cmsModel = new Cms_model($this->db);
-		$data['cmsModel'] = &$cmsModel;
 
 		$data['controllerName'] = $this->getClassName();
 
@@ -192,6 +190,45 @@ class CVUI_Controller extends Controller{
 			return $classNameArray[count($classNameArray) - 1];
 		} catch (\Throwable $th) {
 			return $className; 
+		}
+	}
+
+	protected function setStatusMessage(string $message, int $msgtype)
+	{
+		$this->session->setFlashData('StatusMessage', $message);
+		$this->session->setFlashData('StatusMessageType', $msgtype);
+	}
+
+	protected function getStatusMessage()
+	{
+		return $this->session->getFlashData('StatusMessage');
+	}
+
+	protected function getStatusMessageType()
+	{
+		return $this->session->getFlashData('StatusMessageType');
+	}
+
+	protected function getStatusMessageTypeAlertEquivalent()
+	{
+		$msgtype = $this->getStatusMessageType();
+
+		switch ($msgtype) {
+			case STATUS_SUCCESS:
+				return 'success';
+				break;
+			case STATUS_ERROR:
+				return 'danger';
+				break;
+			case STATUS_INFO:
+				return 'info';
+				break;
+			case STATUS_WARNING:
+				return 'warning';
+				break;
+			default:
+				return 'info';
+			break;
 		}
 	}
 }
