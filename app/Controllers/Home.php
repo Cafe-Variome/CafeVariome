@@ -1,22 +1,28 @@
 <?php namespace App\Controllers;
 
-use App\Models\UserModel;
 use App\Models\UIData;
-use App\Models\cms_model;
-use App\Models\Settings;
-use App\Helpers\AuthHelper;
+use App\Models\Page;
 
 class Home extends CVUI_Controller
 {
 
-	public function Index()
+	public function Index($page_id = 0)
 	{
-		$this->db = \Config\Database::connect();
+		$uidata = new UIData();
+		$uidata->title = 'Home';
 
-		$udata = new UIData();
-		$udata->title = "Home";
-		$data = $this->wrapData($udata);
+		$pageModel = new Page();
+		$uidata->data['pageContent'] = '';
+		if ($page_id && is_numeric($page_id) && $page_id > 0) {
+			$page = $pageModel->getPages(Null, ['id' => $page_id]);
 
+			if (count($page) == 1) {
+				$uidata->title = $page[0]['Title'];
+				$uidata->data['pageContent'] = $page[0]['Content'];
+			}
+		}
+
+		$data = $this->wrapData($uidata);
 		return view($this->viewDirectory. '/Index', $data);
 	}
 }
