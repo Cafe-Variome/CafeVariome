@@ -16,8 +16,6 @@ class UIData
     //Page info
     public $data = Array();
     public $pageName = FALSE;
-    public $template = "main";
-    public $hasNav = TRUE;
     
     //Page contents
     public $javascript = array();
@@ -29,7 +27,6 @@ class UIData
     public $description = FALSE;
     public $keywords = FALSE;
     public $author = FALSE;
-
 
     public $stickyFooter = true;
 
