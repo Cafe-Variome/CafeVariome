@@ -158,7 +158,13 @@
 								</span>
 								<span class="text">Stopped</span>
 							</a>
-							<?php endif ?>                                                                                                                                                                            <?php if($keycloakStatus): ?>
+							<?php endif ?> 
+						</div>
+					</div> 
+					<div class="row mb-1">
+						<div class="col-4">KeyCloak</div>
+						<div class="col-8">					                                                                                                                                                                          
+							<?php if($keycloakStatus): ?>
 							<a href="#" class="btn btn-success btn-icon-split">
 								<span class="icon text-white-50">
 								<i class="fas fa-check"></i>
@@ -172,7 +178,13 @@
 								</span>
 								<span class="text">Stopped</span>
 							</a>
-							<?php endif ?>                                                                                            </div>
+							<?php endif ?> 
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <script type="text/javascript">
