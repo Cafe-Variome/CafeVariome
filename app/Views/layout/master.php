@@ -21,47 +21,12 @@
 	
     <!-- Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh 11/6/2019 -->
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "twbs/bootstrap/dist/css/bootstrap.css");?>" />
+    <link rel="stylesheet" href="<?php echo base_url(CSS . "site.css");?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/fontawesome.css"); ?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/brands.css"); ?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/solid.css"); ?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "select2/select2/dist/css/select2.css");?>" />
-    <style>
-        main > .container {
-            padding: 80px 15px 0;
-        }
 
-        .footer {
-            <?php if($stickyFooter): ?>
-            position: fixed;
-            left: 0;
-            bottom: 0;
-            <?php endif; ?>
-
-            width: 100%;
-
-            background-color: #f5f5f5;
-        }
-
-        .footer > .container {
-            padding-right: 15px;
-            padding-left: 15px;
-        }
-
-        .bd-placeholder-img {
-            font-size: 1.125rem;
-            text-anchor: middle;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-
-        @media (min-width: 768px) {
-            .bd-placeholder-img-lg {
-                font-size: 3.5rem;
-            }
-        }
-    </style>
 
     <!-- extra CSS-->
     <?php foreach($css as $c):?>
@@ -93,7 +58,7 @@
         <?= $this->include('partial/nav') ?>
     </header>
     
-    <main role="main" class="flex-shrink-0">
+    <main role="main">
         <div class="container">
             <?= $this->renderSection('content') ?>
         </div>
