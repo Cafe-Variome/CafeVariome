@@ -36,9 +36,20 @@
 				<a target="_blank" href="<?php echo base_url('Home/Index'). "/" . $page['id']; ?>" data-toggle="tooltip" data-placement="top" title="Open Page">
 					<i class="fa fa-file text-primary"></i>
 				</a>
+				<?php if($page['Removable']): ?>
+					<?php if($page['Active']): ?>
+					<a href="<?php echo base_url($controllerName.'/Deactivate'). "/" . $page['id']; ?>" data-toggle="tooltip" data-placement="top" title="Deactivate Page">
+						<i class="fa fa-eye-slash text-info"></i>
+					</a>
+					<?php else: ?>
+						<a href="<?php echo base_url($controllerName.'/Activate'). "/" . $page['id']; ?>" data-toggle="tooltip" data-placement="top" title="Activate Page">
+						<i class="fa fa-eye text-success"></i>
+					</a>
+					<?php endif ?>				
 				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $page['id']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Page">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
+				<?php endif ?>
 			</td>
 		</tr>		
 		<?php endforeach; ?>

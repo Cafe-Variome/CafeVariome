@@ -64,4 +64,10 @@ class Page extends Model
         }
         $this->builder->update($data);
     }
+
+    public function deletePage(int $page_id)
+    {
+        $this->builder->where('id', $page_id);
+        $this->builder->delete();
+    }
 }

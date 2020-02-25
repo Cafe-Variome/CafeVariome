@@ -88,7 +88,7 @@ class Page extends CVUI_Controller
             $pageContent = $this->request->getVar('pcontent');
             $user_id = $this->authAdapter->getUserId();
 
-            $pageData = ['Title' => $pageTitle, 'Content' => $pageContent, 'Author' => $user_id];
+            $pageData = ['Title' => $pageTitle, 'Content' => $pageContent, 'Author' => $user_id, 'Removable' => 1, 'Active' => 1];
 
             $pageModel = new \App\Models\Page();
             try {
@@ -101,7 +101,6 @@ class Page extends CVUI_Controller
 
         }
         else {
-
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
             $uidata->data['ptitle'] = array(
@@ -209,5 +208,129 @@ class Page extends CVUI_Controller
 
     }
     
+    public function Activate(int $page_id)
+    {
+        $pageModel = new \App\Models\Page();
+        $page = $pageModel->getPages('Title, Active', ['id' => $page_id]);
+
+        if (count($page) == 1) {
+            $pageTitle = $page[0]['Title'];
+
+            if (!$page[0]['Active']) {
+                $updateData = ['Active' => 1];
+                try {
+                    $pageModel->updatePage($updateData, ['id' => $page_id]);
+                    $this->setStatusMessage("Page '$pageTitle' was activated.", STATUS_SUCCESS);
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem activating '$pageTitle'.", STATUS_ERROR);
+                }
+            }
+            else {
+                $this->setStatusMessage("Page '$pageTitle' is already active.", STATUS_INFO);
+            }
+        }
+        else {
+            $this->setStatusMessage("Page was not found.", STATUS_ERROR);
+        }
+        return redirect()->to(base_url($this->controllerName.'/List'));
+    }
+
+    public function Deactivate(int $page_id)
+    {
+        $pageModel = new \App\Models\Page();
+        $page = $pageModel->getPages('Title, Active', ['id' => $page_id]);
+
+        if (count($page) == 1) {
+            $pageTitle = $page[0]['Title'];
+            
+            if ($page[0]['Active']) {
+                $updateData = ['Active' => 0];
+                try {
+                    $pageModel->updatePage($updateData, ['id' => $page_id]);
+                    $this->setStatusMessage("Page '$pageTitle' was deactivated.", STATUS_SUCCESS);
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem deactivating '$pageTitle'.", STATUS_ERROR);
+                }
+            }
+            else {
+                $this->setStatusMessage("Page '$pageTitle' is already deactive.", STATUS_INFO);
+            }
+        }
+        else {
+            $this->setStatusMessage("Page was not found.", STATUS_ERROR);
+        }
+        return redirect()->to(base_url($this->controllerName.'/List'));
+    }
+
+    public function Delete(int $page_id)
+    {
+        $uidata = new UIData();
+        $uidata->title = "Delete Page";
+
+        $pageModel = new \App\Models\Page();
+
+        $this->validation->setRules([
+            'confirm' => [
+                'label'  => 'confirmation',
+                'rules'  => 'required',
+                'errors' => [
+                    'required' => '{field} is required.'
+                ]
+            ],
+            
+            'page_id' => [
+                'label'  => 'Page Id',
+                'rules'  => 'required|alpha_dash',
+                'errors' => [
+                    'required' => '{field} is required.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
+                ]
+            ]            
+        ]);
+
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {      
+            $pageId = $this->request->getVar('page_id');     
+            try {
+                $page = $pageModel->getPages('Title, Removable', ['id' => $page_id]);
+                if (count($page) == 1) {
+                    $pageTitle = $page[0]['Title'];
+                    if ($page[0]['Removable']) {
+                        $pageModel->deletePage($page_id);
+                        $this->setStatusMessage("Page '$pageTitle' was deleted.", STATUS_SUCCESS);
+                    }
+                    else {
+                        $this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
+                    }
+                }
+                else{
+                    $this->setStatusMessage("Page does not exist.", STATUS_ERROR);
+                }
+            } catch (\Exception $ex) {
+                $this->setStatusMessage("There was a problem deleting the page.", STATUS_ERROR);
+            }
+            return redirect()->to(base_url($this->controllerName.'/List'));
+        }
+        else {
+            $page = $pageModel->getPages('Title, Removable', ['id' => $page_id]);
+            if (count($page) == 1) {
+                $pageTitle = $page[0]['Title'];
+    
+                if (!$page[0]['Removable']) {
+                    $this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
+                    return redirect()->to(base_url($this->controllerName.'/List'));
+                }
+                else {
+                    $uidata->data['page_id'] = $page_id;
+                    $uidata->data['pageTitle'] = $pageTitle;
+                 }
+            }
+            else {
+                $this->setStatusMessage("Page was not found.", STATUS_ERROR);
+                return redirect()->to(base_url($this->controllerName.'/List'));
+            }
+            $data = $this->wrapData($uidata);
+            return view($this->viewDirectory.'/Delete', $data);
+        }
+    }
 }
  
