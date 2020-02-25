@@ -22,7 +22,7 @@
 			<div class="mug"></div>
 		</div>
 	</div>	
-	<a class="navbar-brand ml-3" href="<?php echo base_url() . (( ! $setting->settingData['cafevariome_central'] ) ? "home" : ''); ?>">
+	<a class="navbar-brand text-dark ml-3" href="<?php echo base_url() . (( ! $setting->settingData['cafevariome_central'] ) ? "home" : ''); ?>">
 		<?= $heading ?>
 	</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,46 +39,39 @@
 			</li>
 		<?php else: ?>
 			<li class="nav-item">
-				<span class="nav-link">Hello <?= $auth->getName() ?>!</span>
+				<span class="nav-link-top">Hello <?= $auth->getName() ?>!</span>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link-top"<?= ($uriSegments->controllerName == 'discover') ? " active": "" ?>" href="<?= base_url("discover/index") ?>">
+				<a class="nav-link-top<?= ($uriSegments->controllerName == 'discover') ? " active": "" ?>" href="<?= base_url("discover/index") ?>">
 					Discover
 				</a> 
 			</li>
 			<?php if($auth->isAdmin()): ?>
 			<li class="nav-item">
-				<a class="nav-link<?= ($uriSegments->controllerName == 'admin') ? " active": "" ?>" href="<?= base_url("admin/index") ?>">
+				<a class="nav-link-top<?= ($uriSegments->controllerName == 'admin') ? " active": "" ?>" href="<?= base_url("admin/index") ?>">
 					Admin Dashboard
 				</a> 
 			</li>
 			<?php else: ?>
 			<li class="nav-item">
-				<a class="nav-link<?= ($uriSegments->controllerName == 'auth') ? " active": "" ?>" href="<?= base_url("auth/index") ?>">
+				<a class="nav-link-top<?= ($uriSegments->controllerName == 'auth') ? " active": "" ?>" href="<?= base_url("auth/index") ?>">
 					Dashboard
-				</a> 
-			</li>
-			<?php endif; ?>
-			<?php if ($setting->settingData['messaging']): ?>
-			<li class="nav-item">
-				<a class="nav-link" href="<?= base_url("messages") ?>">
-					Messages
 				</a> 
 			</li>
 			<?php endif; ?>
 			<li class="nav-item">
 				<?php if ($auth->getAuthEngineName() === "app\libraries\keycloak"): ?>
-				<a class="nav-link" href="<?= $setting->settingData['key_cloak_uri'] . "/realms/". $setting->settingData['key_cloak_realm'] ."/account/" ?>">
+				<a class="nav-link-top" href="<?= $setting->settingData['key_cloak_uri'] . "/realms/". $setting->settingData['key_cloak_realm'] ."/account/" ?>">
 					Profile
 				</a> 
 				<?php else : ?>
-				<a class="nav-link<?= ($uriSegments->methodName == 'edit_user') ? " active": "" ?>" href="<?= base_url("auth/edit_user/".$auth->getUserId()) ?>">
+				<a class="nav-link-top<?= ($uriSegments->methodName == 'edit_user') ? " active": "" ?>" href="<?= base_url("auth/edit_user/".$auth->getUserId()) ?>">
 					Profile
 				</a> 
 				<?php endif ?>
 			</li>
 			<li class="nav-item">
-				<a class="nav-link" href="<?= base_url("auth/logout") ?>">Logout</a>	
+				<a class="nav-link-top" href="<?= base_url("auth/logout") ?>">Logout</a>	
 			</li>	
 		<?php endif; ?>
 		</ul>	  

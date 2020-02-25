@@ -14,17 +14,26 @@ body{
     /* background-image: linear-gradient(#6cc5d4, #81e6d8); */
     /* background-color: #e6e6e6fd */
 }
-
+.navbar-brand{
+  font-weight:bold;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 28px;
+}
 .nav-item{
-    margin-right: 5px;
+    margin-right: 8px;
     font-size:18px;
+
 }
 
+a.nav-link-top.active{
+  color: #8a272d;
+
+}
 a.nav-link-top{ 
     color: #6d6c6c;
 }
 a:hover.nav-link-top{ 
-    color: #949090;
+    color: #c1262c;
     text-decoration: none;
 }
 
