@@ -166,6 +166,24 @@
 
             <!-- Heading -->
             <div class="sidebar-heading">   
+                Content
+            </div>
+
+            <li class="nav-item <?= $controllerName == 'Page' ? 'active' : ''?>">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePage" aria-expanded="true" aria-controls="collapsePage">
+                <i class="fas fa-fw fa-file"></i>
+                    <span>Pages</span>
+                </a>
+                <div id="collapsePage" class="collapse <?= $controllerName == 'Page' ? 'show' : ''?>" aria-labelledby="headingPage" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="<?= base_url('Page/Create') ?>">Create a Page</a>
+                        <a class="collapse-item" href="<?= base_url('Page/List') ?>">View Pages</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Heading -->
+            <div class="sidebar-heading">   
                 System
             </div>
 
