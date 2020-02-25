@@ -45,7 +45,6 @@
         var baseurl = "<?php print base_url(); ?>";
         var authurl = "<?php print rtrim($setting->settingData['auth_server'],"/"); // remove trailing slash from the auth_server config variable ?>";
     </script>
-    <!--Initial step to upgrade to boostrap 4.3.1, jquery 3.4 by Mehdi Mehtarizadeh 11/6/2019 -->
     <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
 
 
@@ -70,7 +69,6 @@
         </div>
     </footer>
     
-    <!--Initial step to upgrade to boostrap 4.3.1, jquery 4 by Mehdi Mehtarizadeh 11/6/2019 -->
     <script src="<?php echo base_url(VENDOR."twbs/bootstrap/dist/js/bootstrap.bundle.js");?>"></script>
     <script src="<?php echo base_url(VENDOR."select2/select2/dist/js/select2.js");?>"></script>
 
