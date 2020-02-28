@@ -57,7 +57,7 @@
         <?= $this->include('partial/nav') ?>
     </header>
     
-    <main role="main">
+    <main role="main flex-shrink-0">
         <div class="container">
             <?= $this->renderSection('content') ?>
         </div>
