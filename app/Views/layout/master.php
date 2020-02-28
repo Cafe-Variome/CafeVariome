@@ -63,7 +63,7 @@
         </div>
     </div>
 
-    <footer id="footer" class="footer mt-auto py-3">
+    <footer id="footer" class="footer <?= ($stickyFooter) ? 'footer-sticky' : '' ?> mt-auto py-3">
         <div class="container">
             <span class="text-muted">Powered by CafeVariome</span>             
         </div>
@@ -78,9 +78,7 @@
     <?php endforeach;?>    
 
     <script type="text/javascript">
-        
-             $('[data-toggle="tooltip"]').tooltip();
-    
+        $('[data-toggle="tooltip"]').tooltip();
     </script>
 </body>
 </html>

@@ -24,19 +24,16 @@ a:hover.nav-link-top{
 main > .container {
     margin-top: 180px;
 }
-.footer {
-    position: fixed;
-    bottom: 0;
-    width:65% !important;
-    margin:0px auto;
-    left:0;
-    right:0;
-    background-color: #f3f3f3;
-}
 
 .footer > .container {
-    padding-right: 15px;
-    padding-left: 15px;
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+.footer-sticky{
+  position: fixed;
+  left: 0;
+  bottom: 0;
 }
 
 .bd-placeholder-img {
@@ -125,7 +122,12 @@ main > .container {
     box-shadow: 0 0 0 3px #7c7c7c;
     z-index: -1;
   }
-  
+
+  .footer {
+    width:100% !important;
+    margin:0px auto;
+    background-color: #f3f3f3;
+  }
 }
 @media (min-width: 576px) {
   .navbar{
@@ -197,6 +199,11 @@ main > .container {
     border-radius: 15px;
     box-shadow: 0 0 0 3px #7c7c7c;
     z-index: -1;
+  }
+  .footer {
+    width:100% !important;
+    margin:0px auto;
+    background-color: #f3f3f3;
   }
   
 }
@@ -274,6 +281,13 @@ main > .container {
     box-shadow: 0 0 0 3px #7c7c7c;
     z-index: -1;
   }
+  .footer {
+    width:auto !important;
+    margin:0px auto;
+    background-color: #f3f3f3;
+    margin-left: 10em;
+    margin-right: 10em;
+  }
 }
 @media (min-width: 922px) {
   .navbar{
@@ -295,6 +309,13 @@ main > .container {
     font-size: 23px;
     display:block;
 
+  }
+  .footer {
+    width:auto !important;
+    margin:0px auto;
+    background-color: #f3f3f3;
+    margin-left: 10em;
+    margin-right: 10em;
   }
 }
 
