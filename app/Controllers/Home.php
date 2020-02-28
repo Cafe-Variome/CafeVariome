@@ -13,7 +13,8 @@ class Home extends CVUI_Controller
 
 		$pageModel = new Page();
 		$uidata->data['pageContent'] = '';
-		if ($page_id && is_numeric($page_id) && $page_id > 0) {
+		if (is_numeric($page_id)) {
+			($page_id == 0) ? $page_id = 1 : $page_id = $page_id;
 			$page = $pageModel->getPages(Null, ['id' => $page_id]);
 
 			if (count($page) == 1) {
