@@ -1,9 +1,9 @@
-<nav class="navbar navbar-expand-md fixed-top">
+<nav class="navbar navbar-expand-md navbar-light fixed-top">
 	<!-- <img src="<?php echo base_url() . "resources/images/logos/" . $setting->settingData['logo'];?>"> -->
 	<div class="cv-logo-square">
 		<div class="mug-coffee">
 			<div class="smoke-container">
-			<svg width="60px" height="30px" viewbox="0 0 60 30">
+			<svg viewbox="0 0 60 30">
 				<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
 				<g class="smokes" transform="translate(2.000000, 2.000000)" stroke="#BEBEBE" stroke-width="3">
 					<g class="smoke-1">
@@ -26,7 +26,7 @@
 		<?= $heading ?>
 	</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+    	<span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarCollapse">
 		<div class="mt-2 mt-md-0 mr-auto">
