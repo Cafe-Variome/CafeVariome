@@ -9,8 +9,8 @@
 <?php if($statusMessage): ?>
 	<div class="row">
 		<div class="col">
-        <div class="alert alert-<?= $statusMessageType ?>">
-			<?php echo $statusMessage ?>
+            <div class="alert alert-<?= $statusMessageType ?>">
+			    <?php echo $statusMessage ?>
 			</div>
 		</div>
 	</div>
@@ -39,10 +39,10 @@
     </div>
 </div>
 
-<div class="row">
+<div class="form-group row">
 	<div class="col">
         <button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
-            <i class="fa fa-file"></i>  Create Page
+            <i class="fa fa-file"></i>  Update Page
         </button>
 	</div>
 </div>

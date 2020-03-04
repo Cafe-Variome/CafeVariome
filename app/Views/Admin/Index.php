@@ -13,7 +13,7 @@
 	<div class="card-body">
 	  <div class="row no-gutters align-items-center">
 		<div class="col mr-2">
-		  <div class="text-s font-weight-bold text-primary text-uppercase mb-1">Sourecs</div>
+		  <div class="text-s font-weight-bold text-primary text-uppercase mb-1">Sources</div>
 		  <div class="h4 mb-0 font-weight-bold text-gray-800"><?= $sourceCount ?></div>
 		</div>
 		<div class="col-auto">
