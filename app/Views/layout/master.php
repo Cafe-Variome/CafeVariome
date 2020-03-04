@@ -61,7 +61,7 @@
         <div class="container">
             <?= $this->renderSection('content') ?>
         </div>
-    </div>
+    </main>
 
     <footer id="footer" class="footer <?= ($stickyFooter) ? 'footer-sticky' : '' ?> mt-auto py-3">
         <div class="container">
