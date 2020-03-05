@@ -1,5 +1,6 @@
 <?php
 namespace App\Libraries;
+use App\Libraries\CafeVariome\Email\EmailFactory;
 
 /**
  * Name:    Ion Auth
@@ -208,7 +209,7 @@ class IonAuth
 	 *                               if the operation failed.
 	 * @author Mathew
 	 */
-	public function register(string $identity, string $password, string $email, array $additionalData = [], array $groupIds = [])
+	public function register(string $identity, string $email, string $password, array $additionalData = [], array $groupIds = [])
 	{
 		$this->ionAuthModel->triggerEvents('pre_account_creation');
 
@@ -222,6 +223,14 @@ class IonAuth
 			{
 				$this->setMessage('IonAuth.account_creation_successful');
 				$this->ionAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful']);
+
+				//Send email confirmation
+				$emailAdapter = \Config\Services::email();
+
+				$credEmailInstance = EmailFactory::createCredentialsEmail($emailAdapter);
+				$credEmailInstance->setCredentials($email, $password);
+				$credEmailInstance->send();
+
 				return $id;
 			}
 			else

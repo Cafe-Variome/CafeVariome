@@ -65,13 +65,12 @@ class AuthAdapter{
         $password = uniqid();
         //Add special character, uppercase, lowercase and number to meet requirements imposed by Keycloak API
         $password .= "!Kc1";
-        //Temporarily log the password, development only
-        error_log("password is: ".$password);
+        
         return $this->authEngine->register($email, $username, $password, $additionaldata, $groups);
     }
 
     public function update(int $user_id, array $additionaldata, array $groups = []){
-        if(get_class($this->authEngine) == 'IonAuth'){
+        if(get_class($this->authEngine) == 'App\Libraries\IonAuth'){
             return (new \App\Models\IonAuthModel())->update($user_id, $additionaldata);
         }
         else{

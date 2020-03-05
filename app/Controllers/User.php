@@ -93,7 +93,8 @@ class User extends CVUI_Controller{
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
 
             $email    = $this->request->getVar('email');
-            $groups = ($this->request->getVar('groups') != null) ? $this->request->getVar('groups') : [];
+            //$groups = ($this->request->getVar('groups') != null) ? $this->request->getVar('groups') : [];
+            $groups = ($this->request->getVar('isadmin') != null) ? [1] : [0];
             $installation_key = $this->request->getVar('installation_key');
             $is_admin = ($this->request->getVar('isadmin') != null) ? 1 : 0;
             $remote = ($this->request->getVar('isremote') != null) ? 1 : 0;

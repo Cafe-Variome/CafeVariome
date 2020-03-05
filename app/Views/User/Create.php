@@ -36,14 +36,14 @@
         <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="right" title="Press and hold Ctrl key to select multiple items.">
             <i class="fa fa-question"></i>
         </button>   
-        <?php if (array_key_exists('error', $groups)): ?>
+    <?php if (array_key_exists('error', $groups)): ?>
         <div class="alert alert-info">
             There are no network groups available to this installation.
             A user will not be able to log in until they been assigned to at least one group.
         </div>  
     <?php else: ?>
         <?php $count = count($groups) + 1; $additional = 'size="' . $count . '"'; ?>
-        <select size="<?php echo $count; ?>" name="groups[]"  multiple="multiple" class="form-control">
+        <select size="<?php echo $count; ?>" name="groups[]"  multiple="multiple" class="form-control" style="display:none;">
             <?php foreach ($groups as $group): ?>
                 <option value="<?php echo $group['id'] . "," . $group['network_key']; ?>" ><?php echo $group['description'] . " (Network:" . $group['network_name'] . ")"; ?></option>
             <?php endforeach; ?>
