@@ -20,7 +20,10 @@ a:hover.nav-link-top{
     color: #c1262c;
     text-decoration: none;
 }
+main{
+  width: 100%;
 
+}
 main > .container {
     margin-top: 180px;
 }
