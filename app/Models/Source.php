@@ -283,7 +283,7 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->update($data);
     }
 
-    function getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo(int $user_id, string $installation_key, $accesstype) {
+    function getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo(int $user_id, string $installation_key, int $network_key, $accesstype) {
         $this->builder = $this->db->table('users_groups_networks');
 
         $this->builder->select('ngs.source_id');
@@ -292,7 +292,8 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->where(array(
                             'users_groups_networks.user_id' => $user_id,
                             'ngs.installation_key' => $installation_key,
-                            'ng.group_type' => $accesstype
+                            'ng.group_type' => $accesstype,
+                            'ngs.network_key' => $network_key
                 ));
         $query = $this->builder->get()->getResultArray();
         return $query;

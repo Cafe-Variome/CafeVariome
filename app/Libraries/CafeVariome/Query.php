@@ -283,7 +283,7 @@ class Query extends CafeVariome{
 
         // fetch sources for which the user has source display access       
         // Localised the function (Mehdi Mehtarizadeh 21/08/2019)
-        $sdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, 'source_display');
+        $sdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, (int)$network_key, 'source_display');
 
         $sdg_ids = [];
 		if(!array_key_exists('error', $sdg_arr)) {
@@ -294,7 +294,7 @@ class Query extends CafeVariome{
         
         // fetch sources for which the user has data display access (count display group)
         //Localised the function (Mehdi Mehtarizadeh 21/08/2019)
-        $cdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, 'count_display');
+        $cdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, (int)$network_key, 'count_display');
         $cdg_ids = [];
 		if(!array_key_exists('error', $cdg_arr)) {
 			foreach ($cdg_arr as $s) {
