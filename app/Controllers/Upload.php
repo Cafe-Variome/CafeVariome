@@ -99,8 +99,8 @@ use CodeIgniter\Config\Services;
         $uidata->data['user_id'] = $user_id;
         $uidata->data['source_id'] = $source_id;
 
-        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css', CSS.'sourcesv.css');
-        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
+        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
+        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/upload_bulk.js',JS.'cafevariome/status.js'];
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/Bulk', $data);

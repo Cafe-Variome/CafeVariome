@@ -1,13 +1,11 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
 <div class="row">
 	<div class="col">
 		<h2><?= $title ?></h2>	
 	</div>	
 </div>
 <hr>
-<div id="load"></div>
 <div class="row">
 	<div class="col">
 		<h4>Import records for <?php echo $source_name; ?></h3>
@@ -16,40 +14,65 @@
 
 	</div>
 </div>
-<?php
-if (! is_writable(FCPATH . 'upload/'))
-{
-	echo '<div class="alert alert-danger">';
-	 echo 'WARNING: Your upload directory is currently not writable by the webserver. In order to import records you must make this directory writable. Please change the permissions of the following directory:';
-	 echo '<br /><br />' . FCPATH . 'upload/' . '<br /><br />Please contact admin@cafevariome.org if you require help.';
-	 echo '</div><hr>';
-}
-?>
+
+<?php if (!is_writable(FCPATH . UPLOAD)):?>
+<div class="alert alert-danger alert-dismissible fade show">
+	<div class="row">
+		<div class="col-9">
+			WARNING: Your upload directory is currently not writable by the webserver. In order to import records you must make this directory writable.
+			<br />Please change the permissions of the following directory:
+			<br /><strong><?= FCPATH . UPLOAD ?></strong>
+			<br /><br />Please contact admin@cafevariome.org if you require help.
+		</div>
+		<div class="col-2 mt-3"><span class="fa fa-exclamation-triangle fa-5x"></span></div>
+		<div class="col-1">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+				<span aria-hidden="true">&times;</span>
+			</button>
+		</div>
+	</div>
+</div>
+<?php endif ?>
 
 
-<form enctype="multipart/form-data" method="post" id="fileinfo">
+<form enctype="multipart/form-data" method="post" id="uploadBulk">
   <input type="hidden" id="source_id" name="source_id" value="<?php echo $source_id ?>">
   <input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
 
-<div class="form-group">
-  <div class="custom-control custom-radio">
-	<input type="radio" id="fActionAppend" name="fAction[]" value="append" class="custom-control-input">
-	<label class="custom-control-label" for="fActionAppend" data-toggle="tooltip" data-placement="right" title="By selecting this option you will not impact any prior data already within the source.">Append</label>
-  </div>
-  <div class="custom-control custom-radio">
-	<input type="radio" id="fActionOverwrite" name="fAction[]" value="overwrite" class="custom-control-input">
-	<label class="custom-control-label" for="fActionOverwrite" data-toggle="tooltip" data-placement="right" title="By selecting this option you will delete all data currently in this source.">Overwrite</label>
-  </div>
-</div>
-<div class="form-group">
-  <div class="custom-file">
-	<input type="file" class="custom-file-input" name='userfile' id="dataFile" required>
-	<label class="custom-file-label" for="customFile">Choose file</label>
-  </div>
-</div>
-<div class="row">
+<div class="form-group row">
+	<div class="col-6">
+		<div class="custom-file">
+			<input type="file" class="custom-file-input" name='userfile' id="dataFile" aria-describedby="dataFile" required>
+			<label class="custom-file-label" for="dataFile">Choose file</label>
+		</div>
+	</div>
+	<div class="col-2">
+		<div class="custom-control custom-radio">
+			<input type="radio" id="fActionOverwrite" name="fAction[]" value="overwrite" class="custom-control-input">
+			<label class="custom-control-label" for="fActionOverwrite" data-toggle="tooltip" data-placement="right" title="By selecting this option you will delete all data currently in this source.">Overwrite</label>
+		</div>
+		<div class="custom-control custom-radio">
+			<input type="radio" id="fActionAppend" name="fAction[]" value="append" class="custom-control-input">
+			<label class="custom-control-label" for="fActionAppend" data-toggle="tooltip" data-placement="right" title="By selecting this option you will not impact any prior data already within the source.">Append</label>
+		</div>
+	</div>
+
+	<div class="col-2">
+		<button class="btn btn-large btn-primary bg-gradient-primary" id="uploadBtn" type="submit">
+			<span class="fa fa-upload"></span> Upload File
+		</button>
+	</div>
+	<div class="col-2">
+		<div class="spinner-border text-warning" id="uploadSpinner" role="status" style="display:none;">
+			<span class="sr-only">Loading...</span>
+		</div>
+	</div>
+
+
+
+
+
   <div class="col">
-	<button class="btn btn-large btn-primary" type="submit">Upload File</button>
   </div>
 </div>
 </form>
