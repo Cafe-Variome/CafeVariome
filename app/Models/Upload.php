@@ -20,12 +20,9 @@ use CodeIgniter\Database\ConnectionInterface;
 
     protected $primaryKey = 'id';
 
-    protected $session; 
-
     public function __construct(ConnectionInterface &$db){
 
         $this->db =& $db;
-        $this->session = \Config\Services::session();
         helper('filesystem');
 
 
@@ -39,7 +36,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param string $source  - The source the file was added to
      * @return int $insert_id - The ID of updated/inserted row
      */
-    public function createUpload($file, $source_id, $tissue=false,$patient=false) {
+    public function createUpload(string $file, int $source_id, int $user_id, $tissue=false,$patient=false) {
         // Get table
         $this->builder = $this->db->table($this->table);
 
@@ -50,7 +47,7 @@ use CodeIgniter\Database\ConnectionInterface;
             // If it has all we need to do is to update a current row with some of the 
             // information which is current
             $data = array(
-            'user_id' => $this->session->get('user_id'),
+            'user_id' => $user_id,
             'uploadStart' => $now,
             'uploadEnd' => null,
             'tissue' => $tissue,
@@ -70,7 +67,7 @@ use CodeIgniter\Database\ConnectionInterface;
             // We havent seen this file/source combination before. Add whole row
             $data = array(
                 'source_id' => $source_id,
-                'user_id' => $this->session->get('user_id'),
+                'user_id' => $user_id,
                 'FileName' => $file,
                 'uploadStart' => $now,
                 'uploadEnd' => null,
@@ -91,7 +88,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param int $file_id - The File ID we are trying to find name for
      * @return string File Name
      */
-    public function getFileName($file_id) {
+    public function getFileName(int $file_id) {
 
         $this->builder = $this->db->table($this->table);
 
@@ -107,7 +104,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param int $user_id - The user id this job is linked to
      * @return int $count  - The number of jobs currently occuring for the given user
      */
-    public function countUploadJobRecord($user_id) {
+    public function countUploadJobRecord(int $user_id) {
 
         $this->builder = $this->db->table('upload_jobs');
 
@@ -130,8 +127,11 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->select('ID');
         $this->builder->where('FileName', $file);
         $this->builder->where('source_id', $source_id);
-        $query = $this->builder->get()->getResultArray();;
-        return ($query) ? $query[0] : null;
+        $query = $this->builder->get()->getResultArray();
+        if (count($query) == 1) {
+            return $query[0]['ID'];
+        }
+        return null;
     }
     /**
      * Check Upload Job Record - Check if any jobs have been completed
@@ -492,7 +492,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param string $patient - The Subject ID this VCF data is sample from
      * @return N/A
      */
-    public function vcfStart($file, $source_id, $tissue, $patient) {
+    public function vcfStart(string $file, int $source_id, int $user_id, $tissue, $patient) {
 
         error_log("file: ".$file." source: ".$source_id. " tissue: ".$tissue." patient: ".$patient);
 
@@ -506,7 +506,7 @@ use CodeIgniter\Database\ConnectionInterface;
             // If it has all we need to do is to update a current row with some of the 
             // information which is current
             $data = array(
-                'user_id' => $this->session->get('user_id'),
+                'user_id' => $user_id,
                 'uploadstart' => $now,
                 'uploadend' => null,
                 'Status' => 'Pending');
@@ -518,7 +518,7 @@ use CodeIgniter\Database\ConnectionInterface;
             // We havent seen this file/source combination before. Add whole row
             $data = array(
                 'source_id' => $source_id,
-                'user_id' => $this->session->get('user_id'),
+                'user_id' => $user_id,
                 'filename' => $file,
                 'uploadstart' => $now,
                 'uploadend' => null,

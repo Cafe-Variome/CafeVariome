@@ -353,6 +353,8 @@ use App\Libraries\CafeVariome\ShellHelper;
     public function jsonBatch() {
         
         $source_id = $this->request->getVar('source_id');
+        $user_id = $this->request->getVar('user_id');
+
         $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
         // Create the source upload directory if it doesnt exist
         $source_path =  $source_id;
@@ -388,7 +390,7 @@ use App\Libraries\CafeVariome\ShellHelper;
             {     
                 // if file upload was successful
                 // Update UploadDataStatus table with the new file    
-                $this->uploadModel->createUpload($file->getName(),$source_id);
+                $this->uploadModel->createUpload($file->getName(),$source_id, $user_id);
             }
             else
             {
@@ -643,7 +645,7 @@ use App\Libraries\CafeVariome\ShellHelper;
             {   
                 // 13/08/2019 POTENTIAL BUG 
                 // The value for patient must be specified as it is always set to 0 (false)
-                $this->uploadModel->createUpload($_FILES['userfile']['name'][$i], $source_id,$pairings[$_FILES['userfile']['name'][$i]][0],$pairings[$_FILES['userfile']['name'][$i]][1]);
+                $this->uploadModel->createUpload($_FILES['userfile']['name'][$i], $source_id, $user_id, $pairings[$_FILES['userfile']['name'][$i]][0],$pairings[$_FILES['userfile']['name'][$i]][1]);
             }
             else {
                 // if it failed to upload report error
@@ -655,7 +657,9 @@ use App\Libraries\CafeVariome\ShellHelper;
     }
 
     public function vcfStart() {
-        $source_id = $_POST['source_id'];
+        $source_id = $this->request->getVar('source_id');
+        $user_id = $this->request->getVar('user_id');
+
         $uid = $_POST['uid'];
 
         // Get ID for source and lock it so further updates and uploads cannot occur
@@ -663,7 +667,7 @@ use App\Libraries\CafeVariome\ShellHelper;
 
         $this->sourceModel->toggleSourceLock($source_id);
         $uid = md5(uniqid(rand(),true));
-        $this->uploadModel->addUploadJobRecord($source_id,$uid,$this->session->get('user_id'));
+        $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
         $path = FCPATH."upload/pairings/".$uid.".json";
         try {
             if( $this->delete_file($path) === true ) {
@@ -694,7 +698,7 @@ use App\Libraries\CafeVariome\ShellHelper;
 
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
-
+        $ff = $_FILES;
         $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
         $fileMan = new FileMan($basePath);
 
@@ -703,7 +707,7 @@ use App\Libraries\CafeVariome\ShellHelper;
             $tmp = $file->getTempPath();
             $file_name = $file->getName();
             if (!$force) {
-                if ($this->uploadModel->isDuplicatePhysicalFile($source_id,$file_name, $tmp)) {
+                if($fileMan->Exists($source_id . DIRECTORY_SEPARATOR . $file_name)){
                     $response_array = array('status' => "Duplicate");
                     echo json_encode($response_array);
                     return;
@@ -711,21 +715,21 @@ use App\Libraries\CafeVariome\ShellHelper;
             }
 
             $source_path = $source_id . DIRECTORY_SEPARATOR;
-
-            $userFile = $this->request->getFiles();
-
+            if (!$fileMan->Exists($source_id)) {
+                $fileMan->CreateDirectory($source_id);
+            }
             if ($fileMan->Save($file, $source_path)) {
                 
-                $file_id = $this->uploadModel->createUpload($file_name, $source_id);
+                $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id);
 
                 // Begin background insert to MySQL
 
-                $fAction = $this->request->getVar('fAction')[0]; // File Action 
+                $fAction = $this->request->getVar('fAction'); // File Action 
                 if ($fAction == "overwrite") {
                     $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_name 1 $source_id");
                 }
                 elseif ($fAction == "append") {
-                    $this->shellHelperInstance->run(getcwd() . "/index.php Task bulkUploadInsert $file_name 00 $source_id");
+                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_name 00 $source_id");
                 }
                 else {
                     error_log("entered else");
