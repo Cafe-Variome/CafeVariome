@@ -278,7 +278,7 @@ class Elastic extends Model{
             $hpo_terms = $phenotypeModel->getHPOTerms($sourcelist);
 
             error_log("HPO Term Numbers: " . count($hpo_terms));
-
+            $hpo = [];
             foreach ($hpo_terms as $term){
                 $query = "MATCH (c:HPOterm{hpoid:\"".$term."\"})-[:IS_A]->(p:HPOterm) RETURN c.termname as termname, p.hpoid as ph";
                 $result = $neo4jClient->run($query);
@@ -319,15 +319,15 @@ class Elastic extends Model{
                     $hpo[$term] = $parents;
                 }
             }
-            foreach($hpo as $term => $ancestory) {
-                $hpo[$term] = implode('||', $ancestory);
-            }
-            //Check the length of the data array, if it is empty, don't append it to the file.
-            if (count($hpo) > 0) {
-                //Data must be written to the file in every iteration, in case the file is overwritten, some data is lost.
-                file_put_contents("resources/phenotype_lookup_data/" . $network . "_hpo_ancestry.json", json_encode($hpo), FILE_APPEND);
-            }
-        }
+            //if (count($hpo) > 0) {           
+                foreach($hpo as $term => $ancestory) {
+                    $hpo[$term] = implode('||', $ancestory);
+                
+                    //Data must be written to the file in every iteration, in case the file is overwritten, some data is lost.
+                    file_put_contents("resources/phenotype_lookup_data/" . $network . "_hpo_ancestry.json", json_encode($hpo), FILE_APPEND);
+                }
+            
+        }   
 
         return;
     }
