@@ -82,8 +82,6 @@ class Discover extends CVUI_Controller{
         $uidata->data['user_id'] = $user_id;
         $uidata->data['network_key'] = $network_key;
         
-        error_log("User: " . $this->session->get('email') . " has chosen network: $network_key || " . date("Y-m-d H:i:s"));
-
         $token = $this->session->get('Token');
 
         //$installation_urls = json_decode(AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key'], 'network_key' => $network_key), $this->setting->settingData['auth_server'] . "network/get_all_installation_ips_for_network"), true);
@@ -109,12 +107,13 @@ class Discover extends CVUI_Controller{
             $uidata->data["message"] = "The query builder interface is currently not accessible as Elasticsearch is not running. Please get an administrator to start Elasticsearch and then try again.";
         }
 
+
         $uidata->title = "Discover - Query Builder";
-        $uidata->css = array(VENDOR.'vakata/jstree/dist/themes/default/style.css', CSS.'jquery.querybuilder.css');  
+        $uidata->css = array(VENDOR.'vakata/jstree/dist/themes/default/style.css', VENDOR.'components/jqueryui/themes/base/jquery-ui.css', CSS.'jquery.querybuilder.css');  
 
         $uidata->stickyFooter = false;
 
-        $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js',JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
+        $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js',JS.'bootstrap-notify.js', JS.'typeaheadjs/dist/typeahead.bundle.min.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder.js');
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Query_Builder', $data);
     }

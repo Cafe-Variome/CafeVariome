@@ -22,6 +22,8 @@ use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 use App\Models\Source;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use App\Libraries\CafeVariome\ShellHelper;
+use App\Libraries\ElasticSearch;
+use Elasticsearch\ClientBuilder;
 
  class AjaxApi extends Controller{
 
@@ -761,4 +763,52 @@ use App\Libraries\CafeVariome\ShellHelper;
         }   
         return true;
     }
+
+    /**
+     * Just for HDR Sprint
+     * 
+     */
+    public function searchonindex($network_key,$attribute,$val=null) {
+        $hosts = array($this->setting->settingData['elastic_url']);
+        $this->elasticClient =  ClientBuilder::create()->setHosts($hosts)->build();
+
+		$index_name = "greg_complete_".$network_key;
+		$attribute = urldecode($attribute);
+    	if ($val) {
+    		$paramsnew = ['index' => $index_name, 'size' => 20];
+			$paramsnew['body']['query']['bool']['must'][0]['has_parent']['type'] = "att"; 
+	    	$paramsnew['body']['query']['bool']['must'][0]['has_parent']['query']['bool']['must'][0]['match']['attribute.raw'] = $attribute;
+    	 	$paramsnew['body']['query']['bool']['must'][1]['match']['type_of_doc'] = "overall";
+			$hits = $this->elasticClient->search($paramsnew);
+			if (!empty($hits['hits']['hits'])) {
+				echo json_encode($hits['hits']['hits'][0]['_source']['value']);
+				return;
+			}
+			$paramsnew = [];
+			$paramsnew = ['index' => $index_name];
+			$paramsnew['body']['query']['bool']['must'][0]['has_parent']['type'] = "att"; 
+	    	$paramsnew['body']['query']['bool']['must'][0]['has_parent']['query']['bool']['must'][0]['match']['attribute.raw'] = $attribute;
+	    	$paramsnew['body']['aggs']['attributes']['terms']['field'] = "value";
+	    	$paramsnew['body']['aggs']['attributes']['terms']['size'] = "200";
+	    	$hits = $this->elasticClient->search($paramsnew);
+	    	$resp = [];
+	    	foreach ($hits['aggregations']['attributes']['buckets'] as $hit) {
+	    		$resp[] = $hit['key'];
+	    	}
+	    	echo json_encode($resp);
+    	}
+    	else {
+    		$paramsnew = ['index' => $index_name, 'size' => 10];
+	    	$paramsnew['body']['query']['match']['attribute']['query'] = $attribute;
+	    	$paramsnew['body']['query']['match']['attribute']['operator'] = "and";
+	    	$hits = $this->elasticClient->search($paramsnew);
+	    	// error_log(print_r($hits,1));
+	    	$resp = [];
+	    	foreach ($hits['hits']['hits'] as $key => $value) {
+	    		$resp[] = $value['_source']['attribute']; 
+	    	}
+	    	echo json_encode($resp);
+    	}
+	
+	}
  }
