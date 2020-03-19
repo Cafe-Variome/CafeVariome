@@ -155,10 +155,12 @@ class Elastic extends CVUI_Controller{
         }
         
         // rebuild the json list for interface
-        $elasticModel->regenerateFederatedPhenotypeAttributeValueList($source_id);
-        
+        //$r = $elasticModel->regenerateFederatedPhenotypeAttributeValueList($source_id);
+        $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateFederatedPhenotypeAttributeValueList $source_id $add");
+        //$task = New Task();
+        //$res = $task->regenerateElasticsearchIndex($source_id, $add);
         // Call in background the regenerate function
-        $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchIndex $source_id $add");
+        //$this->shellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchIndex $source_id $add");
     }
 
     /**
