@@ -575,8 +575,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             $responses = $elasticClient->bulk($bulk);
         }        
         // The update is now complete. Perform post processing reporting  
-        $eavModel->retrieveUpdateNeo4j($source_id); 
-        $eavModel->updateEAVs(["elastic"=>1], ['source'=> $source_id]) ;     
+        //$eavModel->retrieveUpdateNeo4j($source_id); 
+        $eavModel->updateEAVs(["elastic"=>1], ['source_id'=> $source_id]) ;     
 
         $sourceModel->toggleSourceLock($source_id);	
 
