@@ -512,7 +512,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         $sourceModel->updateSource(["elastic_status"=>0], ["source_id" => $source_id]);
 
         // Get all the unique subject ids for this source
-        $unique_ids = $eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>0], true);
+        $unique_ids = $eavModel->getEAVs('uid,subject_id', ["source_id"=>$source_id, "elastic"=>0], true);
 
         $bulk = [];
         $counta = 0;
@@ -544,14 +544,14 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             unset ($responses);
         }
         // Figure out how many documents we need to index
-        $eavsize = count($eavModel->getEAVs('uid,subject_id', ["source"=>$source_id, "elastic"=>0]));
+        $eavsize = count($eavModel->getEAVs('uid,subject_id', ["source_id"=>$source_id, "elastic"=>0]));
 
         $bulk=[];
         // We are looping through with the use of limit to increase speed of writing
         $offset = 0;
         while ($offset < $eavsize){
             // Get our current limit chunk of data
-            $eavdata = $eavModel->getEAVs(null, ["source"=>$source_id, "elastic"=>0], false, 1000, $offset);
+            $eavdata = $eavModel->getEAVs(null, ["source_id"=>$source_id, "elastic"=>0], false, 1000, $offset);
 
             // Loop through our limit chunk
             foreach ($eavdata as $attribute_array){
@@ -580,8 +580,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
         $sourceModel->toggleSourceLock($source_id);	
 
-        if(file_exists("resources/elastic_search_status_incomplete"))
-                rename("resources/elastic_search_status_incomplete", "resources/elastic_search_status_complete");
+        // if(file_exists("resources/elastic_search_status_incomplete"))
+        //         rename("resources/elastic_search_status_incomplete", "resources/elastic_search_status_complete");
 
         error_log("Completed ES5 $index_name");   
         // Determine how long it took
@@ -983,6 +983,20 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         }
         return $pos;
         // error_log(print_r($output,1));
+    }
+
+    public function regenerateFederatedPhenotypeAttributeValueList(int $source_id, $add)
+    {
+        try {
+            $elasticModel = new Elastic($this->db);
+            $elasticModel->regenerateFederatedPhenotypeAttributeValueList($source_id);
+    
+            $this->regenerateElasticsearchIndex($source_id, $add);
+        } catch (\Excdeption $ex) {
+            file_put_contents("resources/phenotype_lookup_data/log.txt", $ex->getMessage());
+        }
+
+
     }
 
     /**
