@@ -20,10 +20,14 @@ use App\Models\Settings;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 use App\Models\Source;
+use App\Models\Network;
+use App\Models\Elastic;
+use App\Models\Deliver;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use App\Libraries\CafeVariome\ShellHelper;
 use App\Libraries\ElasticSearch;
 use Elasticsearch\ClientBuilder;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\DataStream;
 
  class AjaxApi extends Controller{
 
@@ -53,12 +57,24 @@ use Elasticsearch\ClientBuilder;
         $networkInterface = new NetworkInterface();
 
         $queryString = json_encode($this->request->getVar('jsonAPI'));
+        $query_id = $this->getQID();
+
+        $primQueryObj = json_decode($queryString)[1];
+        $primQueryObj->meta->components->queryIdentification->queryID = $query_id;
+        $primQuery = json_encode($primQueryObj);
+
+
         $user_id = $this->request->getVar('user_id');
 
         $results = [];
+
+        $this->prepare_to_send(json_encode($primQueryObj), $this->setting->settingData['installation_key'], $query_id);
+
+
         $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
-        $loaclResults = $cafeVariomeQuery->search($queryString, $network_key, $user_id); // Execute locally
-        array_push($results, $loaclResults);
+        $loaclResults = $cafeVariomeQuery->search($primQuery, $network_key, $user_id); // Execute locally
+        
+        //array_push($results, $loaclResults);
 
         $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
         $installations = [];
@@ -68,17 +84,46 @@ use Elasticsearch\ClientBuilder;
 
             foreach ($installations as $installation) {
                 if ($installation->installation_key != $this->setting->settingData['installation_key']) {
+                    $secQueryObj = json_decode($queryString)[0];
+                    $secQueryObj->meta->components->queryIdentification->queryID = $query_id;
+                    $secQuery = json_encode($secQueryObj);
+                    
+                    $this->prepare_to_send($secQuery, $installation->installation_key, $query_id);
                     // Send the query
                     $queryNetInterface = new QueryNetworkInterface($installation->base_url);
-                    $queryResponse = $queryNetInterface->query($queryString, (int) $network_key, $user_id);
-                    if ($queryResponse->status) {
-                        array_push($results, $queryResponse->data);
-                    }
+                    $queryResponse = $queryNetInterface->query($secQuery, (int) $network_key, $user_id);
+                    //if ($queryResponse->status) {
+                        //array_push($results, $queryResponse->data);
+                    //}
                 }
             }
         }
 
         return json_encode($results);
+    }
+
+    private function prepare_to_send($query,$installation_key,$query_id) {
+		
+		/// we need to record what the current query we are going to poll
+		// then we need to know whether it has been fulfilled or not and whether we need to keep polling.
+
+        $file_name = md5(uniqid(rand(),true));
+        $data_path = FCPATH . "upload/query/";
+        if (!file_exists($data_path)) {
+            mkdir($data_path);
+        }
+        $data_path = $data_path . $file_name.".json";
+        file_put_contents($data_path, json_encode($query));
+        $deliverModel = new Deliver();
+        $deliverModel->addQueryRecord($query_id,$installation_key,$file_name);
+
+
+		//Here we loop through sending the actual query to all installations in the network
+    }
+
+    private function getQID()
+    {
+        return md5(uniqid(rand(),true));
     }
 
     function hpo_query($id = ''){
@@ -158,7 +203,8 @@ use Elasticsearch\ClientBuilder;
      * 
      */
     function getPhenotypeAttributes(string $network_key) {
-        if ($this->request->isAJAX()) {
+        //if ($this->request->isAJAX())
+         {
             $networkInterface = new NetworkInterface();
             $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key);
 
@@ -246,9 +292,74 @@ use Elasticsearch\ClientBuilder;
             }
     
             $phen_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . ".json"), 1);
-            $hpo_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json"), 1);
+            $hpo_data = [];//json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json"), 1);
             return json_encode([$phen_data, $hpo_data]);
         }
+    }
+
+    function getPhenotypeAttributesHDRSprint(int $network_key) {
+        
+        $networkModel = new Network();
+
+        $networkInterface = new NetworkInterface();
+        $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key);
+
+        $installations = [];
+
+        if ($response->status) {
+            $installations = $response->data;
+        }
+
+        $installations_keys = [];
+        foreach ($installations as $installation) {
+            array_push($installations_keys, $installation-> installation_key);
+        }
+        $networkModel->removeInstallations($installations_keys, $network_key);
+        $networkModel->addInstallations($installations_keys, $network_key);
+
+        $check_sums = $networkModel->getOldChecksums($network_key);
+
+        $dataStream = new DataStream();
+        
+        foreach ($installations as $installation) {
+            $i_url = $installation->base_url;
+            $i_key = $installation->installation_key;
+            $sum = $check_sums[$i_key];
+
+            $queryNetInterface = new QueryNetworkInterface($installation->base_url);
+            $chksumResp = $queryNetInterface->getJSONDataModificationTime((int) $network_key, $sum, false, true);
+            $data = [];
+            if ($chksumResp->status) {
+                $data = $chksumResp->data;
+            }
+
+            if ($data->checksum) {
+                $networkModel->updateChecksum($data->checksum, $network_key, $i_key);
+                $dataStream->regenerateElasticSearchIndex($network_key, $i_key, $data->file);
+            }
+        }
+
+        $hpo_sums = $networkModel->getOldHPOSums($network_key);
+        foreach ($installations as $installation) {
+            $i_url = $installation->base_url;
+            $i_key = $installation->installation_key;
+            $sum = $hpo_sums[$i_key];
+
+            $queryNetInterface = new QueryNetworkInterface($installation->base_url);
+            $chksumResp = $queryNetInterface->getJSONDataModificationTime((int) $network_key, $sum, false, false);
+            $data = [];
+            if ($chksumResp->status) {
+                $data = $chksumResp->data;
+            }
+
+            if ($data->checksum) {
+                $dataStream->pre_hpo_complete($installations, $network_key);
+                break;
+            }
+        }
+        $hpo_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json"), 1);
+        $phen_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . $network_key . ".json"), 1);
+        echo json_encode([$phen_data,$hpo_data]);
     }
 
     function get_json_for_phenotype_lookup() {
@@ -766,31 +877,41 @@ use Elasticsearch\ClientBuilder;
 
     /**
      * Just for HDR Sprint
+     * @author Gregory Warren
      * 
      */
-    public function searchonindex($network_key,$attribute,$val=null) {
+    public function searchonindex(int $network_key, $attribute, $val=null) {
         $hosts = array($this->setting->settingData['elastic_url']);
         $this->elasticClient =  ClientBuilder::create()->setHosts($hosts)->build();
 
-		$index_name = "greg_complete_".$network_key;
+        $elasticModel = new Elastic();
+
+        $title = $elasticModel->getTitlePrefix();
+        
+        $index_name = $title . "_autocomplete_" . $network_key;
+        
 		$attribute = urldecode($attribute);
     	if ($val) {
     		$paramsnew = ['index' => $index_name, 'size' => 20];
-			$paramsnew['body']['query']['bool']['must'][0]['has_parent']['type'] = "att"; 
+			$paramsnew['body']['query']['bool']['must'][0]['has_parent']['parent_type'] = "att"; 
 	    	$paramsnew['body']['query']['bool']['must'][0]['has_parent']['query']['bool']['must'][0]['match']['attribute.raw'] = $attribute;
     	 	$paramsnew['body']['query']['bool']['must'][1]['match']['type_of_doc'] = "overall";
-			$hits = $this->elasticClient->search($paramsnew);
+            
+            $jp = json_encode($paramsnew);
+             $hits = $this->elasticClient->search($paramsnew);
 			if (!empty($hits['hits']['hits'])) {
 				echo json_encode($hits['hits']['hits'][0]['_source']['value']);
 				return;
 			}
 			$paramsnew = [];
 			$paramsnew = ['index' => $index_name];
-			$paramsnew['body']['query']['bool']['must'][0]['has_parent']['type'] = "att"; 
+			$paramsnew['body']['query']['bool']['must'][0]['has_parent']['parent_type'] = "att"; 
 	    	$paramsnew['body']['query']['bool']['must'][0]['has_parent']['query']['bool']['must'][0]['match']['attribute.raw'] = $attribute;
 	    	$paramsnew['body']['aggs']['attributes']['terms']['field'] = "value";
 	    	$paramsnew['body']['aggs']['attributes']['terms']['size'] = "200";
-	    	$hits = $this->elasticClient->search($paramsnew);
+            $jp = json_encode($paramsnew);
+
+            $hits = $this->elasticClient->search($paramsnew);
 	    	$resp = [];
 	    	foreach ($hits['aggregations']['attributes']['buckets'] as $hit) {
 	    		$resp[] = $hit['key'];
