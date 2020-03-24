@@ -92,6 +92,8 @@ use CodeIgniter\Database\ConnectionInterface;
         foreach ($tempLocalPhenotypes as $tlp) {
             $attr = $tlp['phenotype_attribute'];
             $value = $tlp['phenotype_values'];
+            $value = str_replace("'", "''", $value);
+
             $sql = "INSERT INTO `local_phenotypes_lookup`(`network_key`, `phenotype_attribute`, `phenotype_values`) VALUES ('$network_key', '$attr', '$value')";
             $this->db->query($sql);
         }
@@ -120,7 +122,7 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder = $this->db->table('eavs');
         $this->builder->select('value');
         $this->builder->distinct();
-        $this->builder->whereIn('source', $source_ids);
+        $this->builder->whereIn('source_id', $source_ids);
         $this->builder->like('value', 'HP:', 'after');
 
         $terms = $this->builder->get()->getResultArray();
