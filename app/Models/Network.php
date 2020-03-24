@@ -22,9 +22,14 @@ class Network extends Model{
 
     protected $primaryKey = 'network_key';
 	
-	public function __construct(ConnectionInterface &$db){
+	public function __construct(ConnectionInterface &$db = Null){
 
-		$this->db =& $db;
+        if ($db != null) {
+            $this->db =& $db;
+        }
+        else {
+            $this->db = \Config\Database::connect();
+		}
 		$this->setting =  Settings::getInstance($this->db);
 
 	}
@@ -476,5 +481,73 @@ class Network extends Model{
 		$query = $this->builder->get()->getResultArray();
 		
 		return $query;
+	}
+
+	/**
+	 * New methods added for HDR Sprint 
+	 * @author Gregory Warren
+	 */
+
+	function removeInstallations(array $installation_keys, int $network_key) {
+		$this->builder = $this->db->table('installation_network_sums');
+
+    	$this->builder->where('network_key', $network_key);
+    	$this->builder->whereNotIn('installation_key', $installation_keys);
+		$this->builder->delete();
+    }
+
+    function addInstallations(array $installation_keys, int $network_key) {
+		$this->builder = $this->db->table('installation_network_sums');
+
+		$data = [];
+    	foreach ($installation_keys as $ikey) {
+			array_push($data, ['network_key' => $network_key, 'installation_key' => $ikey]);
+		}
+		//$this->builder->ignore(true);
+		$this->builder->insertBatch($data);
+	}
+
+	function getOldChecksums(int $network_key) {
+		$this->builder = $this->db->table('installation_network_sums');
+
+		$this->builder->select('installation_key,values_checksum');
+		$this->builder->where('network_key',$network_key);
+		$data = $this->builder->get()->getResultArray();
+		$output = [];
+		foreach ($data as $datum) {
+			$output[$datum['installation_key']] = $datum['values_checksum'];
+		}
+		return $output;
+	}
+
+	function getOldHPOSums(int $network_key) {
+		$this->builder = $this->db->table('installation_network_sums');
+
+		$this->builder->select('installation_key,hpo_checksum');
+		$this->builder->where('network_key', $network_key);
+		$data = $this->builder->get()->getResultArray();
+		$output = [];
+		foreach ($data as $datum) {
+			$output[$datum['installation_key']] = $datum['hpo_checksum'];
+		}
+		return $output;
+	}
+
+	function updateChecksum(string $checksum, int $network_key, string $installation_key, bool $hpo = false) {
+		$this->builder = $this->db->table('installation_network_sums');
+
+		if ($hpo) {
+			$data = array(
+		        'hpo_checksum' => $checksum
+			);
+		}
+		else {
+			$data = array(
+		        'values_checksum' => $checksum
+			);
+		}
+		$this->builder->where('network_key', $network_key);
+		$this->builder->where('installation_key', $installation_key);
+		$this->builder->update($data);
 	}
 }
