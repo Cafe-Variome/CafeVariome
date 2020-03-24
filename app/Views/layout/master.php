@@ -51,7 +51,6 @@
 
 </head>
 
-<!-- TODO: Body to be moved and adapted. -->
 <body class="d-flex flex-column h-100">
     <header>
         <?= $this->include('partial/nav') ?>
