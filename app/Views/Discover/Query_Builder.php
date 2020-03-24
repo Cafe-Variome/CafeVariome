@@ -15,46 +15,11 @@
 		</div>
 	</div>
 <?php endif; ?>
+<!-- Patient Characteristics -->
 <div class="row mb-2">
     <div class="col">
         <div class="card">
-            <h5 class="card-header">DEMOGRAPHIC</h5>
-            <div class="card-body" id="demographicBox">
-                <div class="row mb-1">
-                    <div class="col-4">Gender:</div>
-                    <div class="col-6">
-                        <span>
-                        <label for="genmale">Male</label>
-                        <input type="radio" name="gender" id="genmale" value="genmale">
-                        </span>
-                        <span>
-                        <label for="genfemale">Female</label>
-                        <input type="radio" name="gender" id="genfemale"  value="genfemale">
-                        </span>
-                        <span>
-                        <label for="genany">Any</label>
-                        <input type="radio" name="gender" id="genany" checked>
-                        </span>
-                    </div>
-                    <div class="col-2"></div>
-                </div>
-                <div class="row mb-1">
-                    <div class="col">
-
-                    </div>
-                    <div class="col">
-                    </div>
-                </div>                
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Primary Care -->
-<div class="row mb-2">
-    <div class="col">
-        <div class="card">
-            <h5 class="card-header">Primary Care</h5>
+            <h5 class="card-header">PATIENT CHARACTERISTICS</h5>
             <div class="card-body" id="pat_container">
                 <div class="row rule mb-1">
                     <div class="col">
@@ -79,7 +44,9 @@
                         </select>
                     </div>
                     <div class="col">
-                        <input class="typeahead" id="values_med" type="text">
+                        <select class="form-control value values_pat" style="margin-bottom:15px" tabindex="-1">
+                            <option></option>
+                        </select>
                     </div>
                     <div class="col">
                         <button data-rule="patient" class="btn btn-mini btn-success btn-add"><i class="fa fa-plus"></i></button>
@@ -91,48 +58,6 @@
     </div>
 </div>
 
-<!-- Secondary Care -->
-<div class="row mb-2">
-    <div class="col">
-        <div class="card">
-            <h5 class="card-header">Secondary Care</h5>
-            <div class="card-body" id="secatend_container">
-                <div class="row rule mb-1">
-                    <div class="col">
-                        <select class="form-control attribute secattendances" style="margin-bottom:15px" tabindex="-1">
-                            <option></option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <select class="form-control conditions" tabindex="-1">
-                            <option></option>
-                            <option value="is">IS</option>
-                            <option value="is like">IS LIKE</option>
-                            <option value="is not">IS NOT</option>
-                            <option value="is not like">IS NOT LIKE</option>
-                            <option value="---------------" disabled="">---------------</option>
-                            <option value="=">=</option>
-                            <option value="!=">≠</option>
-                            <option value="<">&lt;</option>
-                            <option value=">">&gt;</option>
-                            <option value="<=">&lt;=</option>
-                            <option value=">=">&gt;=</option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <select class="input-large value values_pat" style="margin-bottom:15px" tabindex="-1">
-                            <option></option>
-                        </select>
-                    </div>
-                    <div class="col">
-                        <button data-rule="patient" class="btn btn-mini btn-success btn-add"><i class="fa fa-plus"></i></button>
-                        <button data-rule="patient" class="btn btn-mini btn-danger btn-remove" style="display:none;"><i class="fa fa-minus"></i></button>
-                    </div>
-                </div>
-            </div>
-        </div>    
-    </div>
-</div>
 <!-- VARIANT -->
 <div class="row mb-2">
     <div class="col">

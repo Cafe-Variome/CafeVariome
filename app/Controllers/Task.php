@@ -993,7 +993,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     
             $this->regenerateElasticsearchIndex($source_id, $add);
         } catch (\Excdeption $ex) {
-            file_put_contents("resources/phenotype_lookup_data/log.txt", $ex->getMessage());
+            error_log($ex->getMessage());
         }
 
 
