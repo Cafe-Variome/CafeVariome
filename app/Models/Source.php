@@ -191,12 +191,12 @@ use CodeIgniter\Database\ConnectionInterface;
      */
     function countSourceEntries() {
         $this->builder = $this->db->table('eavs');
-        $this->builder->select('COUNT(distinct(subject_id)) as total, source');
-        $this->builder->groupBy('source');
+        $this->builder->select('COUNT(distinct(subject_id)) as total, source_id');
+        $this->builder->groupBy('source_id');
         $query = $this->builder->get()->getResultArray();
         $source_counts = array();
         foreach ($query as $r) {
-            $source_counts[$r["source"]] = $r["total"];
+            $source_counts[$r["source_id"]] = $r["total"];
         }
         return $source_counts;
     }
@@ -206,7 +206,7 @@ use CodeIgniter\Database\ConnectionInterface;
      */
     public function deleteSourceFromEAVs($source_id) {
         $this->builder = $this->db->table('eavs');
-        $this->builder->delete(['source' => $source_id]);
+        $this->builder->delete(['source_id' => $source_id]);
     }
 
     /**
