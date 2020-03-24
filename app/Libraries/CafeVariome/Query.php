@@ -337,10 +337,63 @@ class Query extends CafeVariome{
                     // add code to return data or link for sources where user has access
                 }
             }
-		}
+        }
+        
+        $outputres = [];
+		foreach ($es5_counts as $re) {
+			foreach ($re as $ree) {
+				if(!in_array($ree, $outputres)){
 
-		return json_encode($es5_counts);
+					array_push($outputres, $ree);
+				}
+			}
+		}
+		$this->send_to_nifi($this->api['meta']['components']['queryIdentification']['queryID'], $outputres, $network_key);
+
+		return json_encode(0);
     }
+
+
+
+    private function send_to_nifi($query_id, $subject_ids, $network_key) {
+		$query = $query_id;//md5(uniqid(rand(),true));
+		$installation = $this->setting->settingData['installation_key'];
+		// The id's we have got from the query
+		error_log('subject ids:');
+		error_log(print_r($subject_ids,1));
+		//return;
+		$ids = $subject_ids;//['id1','id2'];
+		for ($i=0; $i < count($ids); $i++) { 
+			$output[$i]['query_id'] = $query;
+			$output[$i]['installation_key'] = $installation;			
+			$output[$i]['ids'] = $subject_ids[$i];
+			$output[$i]['network_key'] = $network_key;
+		}
+		// record the query id we have fulfilled and what our installation is
+		//$example = ["query_id" => $query, "installation" => $installation];
+		//$example['ids'] = $ids;
+		$send = json_encode($output);
+		// error_log($send);
+		//return;
+		$ch = curl_init();
+
+		curl_setopt($ch, CURLOPT_URL, 'http://mhv-ukhdrlv-i1.rcs.le.ac.uk:7001/contentListener');
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $send);
+
+		$headers = array();
+		$headers[] = 'Content-Type: application/json';
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+		$result = curl_exec($ch);
+		error_log('Results from nifi: ' . print_r($result, 1));
+		if (curl_errno($ch)) {
+			error_log('Error from nifi: ' . print_r(curl_error($ch), 1));
+
+		}
+		curl_close($ch);
+	}
 
     public function process_query($source, $pointer_array) {
         $sourceModel = new Source($this->db);
@@ -418,7 +471,7 @@ class Query extends CafeVariome{
 					}else{
                         $eavModel = new EAV($this->db);
 
-                        $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source'=> $sourceId, 'elastic' => 1], true);	
+                        $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $sourceId, 'elastic' => 1], true);	
                         $uniqueSubjectIds = [];
                         foreach ($uniqueSubjectIdsArray as $uid) {
                             array_push($uniqueSubjectIds, $uid['subject_id']);
@@ -478,8 +531,10 @@ class Query extends CafeVariome{
 		$arr['has_child']['type'] = 'eav';
 		$arr['has_child']['query']['bool']['must'] = $tmp;	
 		$paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
-		$paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
-
+        $paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
+        
+        $jp = json_encode($paramsnew);
+        
 		$esquery = $this->elasticClient->search($paramsnew);
 
         if ($iscount){
