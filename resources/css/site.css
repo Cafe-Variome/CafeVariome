@@ -3,12 +3,6 @@ body{
 
 }
 
-.nav-item{
-    margin-right: 8px;
-    font-size:18px;
-
-}
-
 a.nav-link-top.active{
   color: #8a272d;
 
