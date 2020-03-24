@@ -100,15 +100,16 @@ $(function() {
     })
 
     function initSelect2() {
+
         $('select.keys').select2({ allowClear: true, theme: 'classic', placeholder: 'Select an attribute', dropdownAutoWidth: 'true' });
-        $('select.conditions').select2({ allowClear: true, theme: 'classic', placeholder: 'Select operator', dropdownAutoWidth: 'true' });
+        $('select.conditions').select2({ allowClear: true, placeholder: 'Select operator', dropdownAutoWidth: 'true', width: '100%' });
         $('select.keys_altaf').select2({theme: 'classic', placeholder: 'Select an attribute', dropdownAutoWidth: 'true' });
-        $('select.attribute').select2({theme: 'classic', placeholder: 'Select an attribute', dropdownAutoWidth: 'true' });
+        $('select.attribute').select2({placeholder: 'Select an attribute', dropdownAutoWidth: 'true', width: '100%' });
         $('select.values_altall').select2({allowClear: true, theme: 'classic', placeholder: 'ALT', dropdownAutoWidth: 'true' });
         $('select.values_refall').select2({allowClear: true, theme: 'classic', placeholder: 'REF', dropdownAutoWidth: 'true' });
 
         $('select.values').select2({ allowClear: true, theme: 'classic', placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
-        $('select.values_pat').select2({ allowClear: true, theme: 'classic', placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
+        $('select.values_pat').select2({ allowClear: true, placeholder: 'Select/Input value', dropdownAutoWidth: 'true',  width: '100%' });
         $('select.values_patAuto').select2({ allowClear: true, theme: 'classic', placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
         $('select.values_pos').select2({ allowClear: true, theme: 'classic', placeholder: 'Select/Input position', dropdownAutoWidth: 'true' });
         $('select.values_altaf').select2({ allowClear: true, theme: 'classic', placeholder: 'Select/Input value'});
@@ -119,7 +120,7 @@ $(function() {
         $val = $(this).closest('.rule').find('select.values_pat');
         $val.empty()
 
-        $.getJSON(baseurl + 'AjaxApi/search_on_index/' + $('#network_key').val() + "/" + $(this).val() + "/true" , (data) => {
+        $.getJSON(baseurl + 'AjaxApi/searchonindex/' + $('#network_key').val() + "/" + $(this).val() + "/true" , (data) => {
             data.forEach(function(v) {
                 $val.append($('<option></option>').attr('value', v).text(v))
             })
@@ -136,7 +137,7 @@ $(function() {
 
             this.query.trim().split(' ').forEach((term) => {
                     if(term.length > 1) {
-                        item = item.replace(new RegExp( '(' + term + ')', 'gi' ), "<b class='custom-bold'>$1</b>" )    
+                        item = item.replace(new RegExp( '(' + term + ')', 'gi' ), "<div style='background:gray;'><b class='custom-bold'>$1</b></div>" )    
                     }
                 })
                 return item;
@@ -239,24 +240,27 @@ $(function() {
             var eavSec = []
 
             // Gender
-            
-            if($('.val_sex.active').data('val') === 'any') {
+            if($('#genany').prop('checked')){
                 logic_gender = []
-                eav.push({'attribute' : "gender", 'operator': "is", 'value': "m"})
+                eav.push({'attribute' : "Gender", 'operator': "is", 'value': "m"})
                 logic_gender.push("/query/components/eav/" + (eav.length-1))
-                eav.push({'attribute' : "gender", 'operator': "is", 'value': "f"})
+                eav.push({'attribute' : "Gender", 'operator': "is", 'value': "f"})
                 logic_gender.push("/query/components/eav/" + (eav.length-1))
                 logic['-AND'].push({'-OR': logic_gender})
-            } else {
-                eav.push({'attribute' : "gender", 'operator': "is", 'value': $('.val_sex.active').data('val')})
+            }
+            if ($('#genmale').prop('checked')) {
+                logic_eav(['Gender', 'is', 'm'], eav, logic);
                 logic['-AND'].push("/query/components/eav/" + (eav.length-1))    
             }
-            
+            else if($('#genfemale').prop('checked')){
+                logic_eav(['Gender', 'is', 'f'], eav, logic);
+                logic['-AND'].push("/query/components/eav/" + (eav.length-1))    
+            }
 
             $('#pat_container .rule').each(function() {
                 var attr = $('select.attribute.medication', this).val().toLowerCase();
                 var opr = $('select.conditions', this).val();
-                var val = $('input.values_med', this).val().toLowerCase();
+                var val = $('input#values_med', this).val().toLowerCase();
 
                 if(val != '') {
                     //var regExp = /\(([^)]+)\)/;
@@ -296,7 +300,7 @@ $(function() {
 			*/
             //Secondary Box
             
-            if ($('#AENum').val() != '' && $('select.conditions.ae', this).val() != '') {
+            if ($('#AENum').val() != '' && $('select.conditions.ae').val() != '') {
 
                 var val = $('#AENum').val();
                 var opr = $('select.conditions.ae', this).val();
@@ -430,59 +434,47 @@ $(function() {
             var jsonQuery = [];
             jsonQuery.push(secondaryQuery)
             jsonQuery.push(primaryQuery)
-            $.ajax({url: baseurl + 'discover/query3/' + $('#network_key').val(),
+            $.ajax({url: baseurl + 'AjaxApi/query/' + $('#network_key').val(),
                 dataType: 'html',
                 delay: 200,
                 type: 'POST',
-                data: {'jsonAPI': jsonQuery, 'user_id' : $('#user_id').val(), 'installation_key': $('#installation_key').val()},
+                data: {'jsonAPI': primaryQuery, 'user_id' : $('#user_id').val(), 'installation_key': $('#installation_key').val()},
                 dataType: 'json', 
                 success: function (data) {
 
-
-                    if(typeof(EventSource) !== "undefined") {
-                        $('#query_result')[0].innerText = "";
-                        source = new EventSource(baseurl + 'deliver/poll_pooler/' + data);//$('#query_id').val());
-                        source.onmessage = function(event) {
-                            //document.getElementById("result").innerHTML += event.data + "<br>";
-                            
-                            if(event.data !== 'false') {
-                                $('#query_result')[0].innerText = "Count: " + event.data;
-                                source.close();
-                            }
-                            else{
-                                $('#query_result')[0].innerText = "Waiting for results...";
-                            }
-                        }
-                    }
-                    
-                    else {
-                        document.getElementById("query_result").innerHTML = "Sorry, your browser does not support server-side events...";
-                    }                    
-                    /*
-                    $.each(data, function(key, val) {
-                        if(val != null) {
-                            try{
+                        $.each(data, function(key, val) {
+                            if(val.length > 0) {
                                 resp = $.parseJSON(val)
                                 $.each(resp, function(key, val1) {
-                                    if(key !== 'site_title') {
-                                        if($('#query_result tbody tr' + '#' + val.id + '_' + key).length == 0) {
-                                            $('#query_result tbody').append("<tr id = " + val.id + '_' + key + ">" +
-                                                "<td>" + key.titleCase() + "</a></td>" +
-                                                "<td>" + (val1 > 0 ? "<a href='' class='hover_test'>" + val1 + "</a>" : "0")  + "</td>" +
-                                                // "<td>" + (val1.length > 0 ? "<a href='' class='hover_test'>" + val1.length + "</a>" : "0")  + "</td>" +
-                                            "</tr>")
-                                        }
-                                    }
-                                })
+                                    //if($('#query_result tbody tr' + '#' + key).length == 0) {
+                                        trow = "<tr id = " + key + "><td>" + key.titleCase() + "</a></td><td>" + ((val1 != "Access Denied") ? (val1.length > 0 ? val1.length  : "0") : val1) + "</td></tr>";
+                                        $('#query_result tbody').append(trow);
+                                    //}
+                                })    
                             }
-                            catch{
+                        })
+                    
 
-                            }
+                    // if(typeof(EventSource) !== "undefined") {
+                    //     $('#query_result')[0].innerText = "";
+                    //     source = new EventSource(baseurl + 'deliver/poll_pooler/' + data);//$('#query_id').val());
+                    //     source.onmessage = function(event) {
+                    //         //document.getElementById("result").innerHTML += event.data + "<br>";
+                            
+                    //         if(event.data !== 'false') {
+                    //             $('#query_result')[0].innerText = "Count: " + event.data;
+                    //             source.close();
+                    //         }
+                    //         else{
+                    //             $('#query_result')[0].innerText = "Waiting for results...";
+                    //         }
+                    //     }
+                    // }
+                    
+                    // else {
+                    //     document.getElementById("query_result").innerHTML = "Sorry, your browser does not support server-side events...";
+                    // }                    
 
-
-                        }
-                    })
-                */
                },
                 'complete': function(data) {
                     $('#query_result').removeClass('hide');
@@ -531,21 +523,19 @@ $(function() {
     });
 
     $(document).on('click', ".btn-add", function () {
-        var $rule = $(template[$(this).attr('data-rule')])
-        $rule.find('.btn-remove').removeClass('hide')
-        $(this).closest('.rule').find('.btn-add').addClass('hide')
-        $(this).closest('.rule').find('.btn-remove').removeClass('hide')
-        $('select.attribute').select2('destroy')
-        $('select.conditions').select2('destroy')
-        $('select.value').select2('destroy')
-        if($(this).attr('data-rule') === 'secattendances') {
-            $('#secatend_container').append($rule)
-        } else if($(this).attr('data-rule') === 'patient') {
-            $('#pat_container').append($rule)
+        var $rule = $(template[$(this).attr('data-rule')]);
+        $rule.find('.btn-remove').show();
+        $(this).closest('.rule').find('.btn-add').hide();
+        $(this).closest('.rule').find('.btn-remove').show();
+        $('select.attribute').select2('destroy');
+        $('select.operator').select2('destroy');
+        $('select.value').select2('destroy');
+        if($(this).attr('data-rule') === 'patient') {
+            $('#pat_container').append($rule);
         } else if($(this).attr('data-rule') === 'genotype') {
-            $('#gen_container').append($rule)
+            $('#sec_container').append($rule);
         }
-        initSelect2()
+        initSelect2();
     })
 
     $(document).on('click', ".btn-remove", function () {
@@ -554,11 +544,11 @@ $(function() {
         if($rule.is(':first-child')) {} 
         else { 
             if($rule.is(':last-child')) { 
-                $rule.prev().find('.btn-add').toggleClass('hide') 
+                $rule.prev().find('.btn-add').show() ;
             } 
         }
         if($rule.siblings().length === 1) { 
-            $rule.siblings().find('.btn-remove').toggleClass('hide') 
+            $rule.siblings().find('.btn-remove').hide();
         }
         $rule.remove()
     })
