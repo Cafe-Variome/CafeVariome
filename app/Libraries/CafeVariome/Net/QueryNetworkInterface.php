@@ -35,6 +35,13 @@ class QueryNetworkInterface
         return $this->processResponse($response);
     }
 
+    public function getJSONDataModificationTime(int $network_key, string $checksum = Null, bool $isHPO = false, bool $loadfile = false)
+    {
+        $this->adapterw('QueryApi/getJSONDataModificationTime', ['network_key' => $network_key, 'checksum' => $checksum, 'ishpo' => $isHPO, 'loadfile' => $loadfile]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
     public function adapterw(string $uriTail, array $data)
     {
         $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
