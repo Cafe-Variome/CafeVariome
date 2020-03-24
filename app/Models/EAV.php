@@ -29,7 +29,7 @@ class EAV extends Model{
     public function getEAVsForSource(int $source_id){
         $this->builder = $this->db->table($this->table);
         $this->builder->select('attribute,value');
-        $this->builder->where('source', $source_id);
+        $this->builder->where('source_id', $source_id);
         $query = $this->builder->get()->getResultArray();
 
         return $query;
@@ -75,7 +75,7 @@ class EAV extends Model{
         //$this->builder->where('m.attribute', "negated");
         $this->builder->orWhere('m.attribute', "negated");
         $this->builder->where('e.elastic', 0);
-        $this->builder->where('e.source', $source_id);
+        $this->builder->where('e.source_id', $source_id);
 
         $data = $this->builder->get()->getResultArray();
 
