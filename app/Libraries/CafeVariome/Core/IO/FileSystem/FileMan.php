@@ -92,7 +92,7 @@ class FileMan implements IFileMan
         if ($this->files != null) {
             return count($this->files);
         }
-        return NAN;
+        return 0;
     }
 
     public function getFileStack()
