@@ -55,14 +55,14 @@
     <div class="col">
         <div class="card">
             <h5 class="card-header">Primary Care</h5>
-            <div class="card-body">
-                <div id="pat_container">
+            <div class="card-body" id="pat_container">
                 <div class="row rule mb-1">
-                    <div class="col-3">
-                        <select class="input-large attribute medication" tabindex="-1">
+                    <div class="col">
+                        <select class="form-control attribute keys_pat" style="margin-bottom:15px" tabindex="-1">
+                            <option></option>
                         </select>
                     </div>
-                    <div class="col-3">
+                    <div class="col">
                         <select class="form-control conditions" tabindex="-1">
                             <option></option>
                             <option value="is">IS</option>
@@ -78,95 +78,14 @@
                             <option value=">=">&gt;=</option>
                         </select>
                     </div>
-                    <div class="col-3">
+                    <div class="col">
                         <input class="typeahead" id="values_med" type="text">
                     </div>
-                    <div class="col-2">
+                    <div class="col">
                         <button data-rule="patient" class="btn btn-mini btn-success btn-add"><i class="fa fa-plus"></i></button>
                         <button data-rule="patient" class="btn btn-mini btn-danger btn-remove" style="display:none;"><i class="fa fa-minus"></i></button>
                     </div>
                 </div>
-                </div>
-                <hr/>
-                <div class="row mb-3">
-                    <div class="col text-center">
-                        <span class="font-weight-bolder">
-                        SNOMED CT Terms / Read Codes [CTV3]
-                        </span>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                            <div class="input-group-text"><i class="fa fa-search"></i></div>
-                            </div>
-                            <input class="form-control" id="search_filterAuto" type="text" placeholder="filter by keyword" style="text-align: center;" />
-                        </div>  
-                        <select id='values_phen_leftAuto' class="form-control" size="10"></select>
-                        <button class="btnAddAuto btn btn-secondary btn-block">Add</button>
-                    </div>
-                    <div class="col">
-                        <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                            <div class="input-group-text"><i class="fa fa-search"></i></div>
-                            </div>
-                            <input class="form-control" id="search_filter2Auto" type="text" placeholder="filter by keyword" style="text-align: center;">
-                        </div> 
-                        <select id="values_phen_rightAuto" class="form-control" size="10"></select>
-                        <button class="btnRemoveAuto btn btn-secondary btn-block">Remove</button>
-                    </div>
-                </div>
-                <hr/>
-                <div class="row">
-                    <div class="col">Number of Visits: </div>
-                    <div class="col">
-                        <select class="input-large conditions" tabindex="-1">
-                            <option></option>
-                            <option value="=">=</option>
-                            <option value="!=">≠</option>
-                            <option value="<">&lt;</option>
-                            <option value=">">&gt;</option>
-                            <option value="<=">&lt;=</option>
-                            <option value=">=">&gt;=</option>
-                        </select>                    
-                    </div>
-                    <div class="col">
-                        <input type="text" style="width:60%;">
-                    </div>
-                    <div class="col">
-                        <select class="input-large">
-                            <option value="1">In the Past Month</option>
-                            <option value="6">In the Past 6 Months</option>
-                            <option value="12">In the Past 12 Months</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col">Number of Episodes: </div>
-                    <div class="col">
-                        <select class="input-large conditions episode" tabindex="-1">
-                            <option></option>
-                            <option value="=">=</option>
-                            <option value="!=">≠</option>
-                            <option value="<">&lt;</option>
-                            <option value=">">&gt;</option>
-                            <option value="<=">&lt;=</option>
-                            <option value=">=">&gt;=</option>
-                        </select>                    
-                    </div>
-                    <div class="col">
-                        <input type="text" id="EpisodeNum" style="width:60%;">
-                    </div>
-                    <div class="col">
-                        <select class="input-large episodedate">
-                            <option value="1">In the Past Month</option>
-                            <option value="6">In the Past 6 Months</option>
-                            <option value="12">In the Past 12 Months</option>
-                        </select>                        
-                    </div>
-                </div>   
-
             </div>
         </div>    
     </div>
@@ -178,122 +97,44 @@
         <div class="card">
             <h5 class="card-header">Secondary Care</h5>
             <div class="card-body" id="secatend_container">
-                <div id ="sec_container">
-                    <div class="row rule mb-1">
-                        <div class="col-3">
-                            <select class="form-control attribute secattendances" style="margin-bottom:15px" tabindex="-1">
-                                <option></option>
-                            </select>
-                        </div>
-                        <div class="col-3">
-                            <select class="form-control conditions" tabindex="-1">
-                                <option></option>
-                                <option value="is">IS</option>
-                                <option value="is like">IS LIKE</option>
-                                <option value="is not">IS NOT</option>
-                                <option value="is not like">IS NOT LIKE</option>
-                                <option value="---------------" disabled="">---------------</option>
-                                <option value="=">=</option>
-                                <option value="!=">≠</option>
-                                <option value="<">&lt;</option>
-                                <option value=">">&gt;</option>
-                                <option value="<=">&lt;=</option>
-                                <option value=">=">&gt;=</option>
-                            </select>
-                        </div>
-                        <div class="col-3">
-                            <select class="input-large value values_pat" style="margin-bottom:15px" tabindex="-1">
-                                <option></option>
-                            </select>
-                        </div>
-                        <div class="col-3">
-                            <button data-rule="genotype" class="btn btn-mini btn-success btn-add"><i class="fa fa-plus"></i></button>
-                            <button data-rule="genotype" class="btn btn-mini btn-danger btn-remove" style="display:none;"><i class="fa fa-minus"></i></button>
-                        </div>
-                    </div>
-                </div>
-                <hr/>
-                <div class="row">  
-                    <div class="col">A+E Admissions: </div>
+                <div class="row rule mb-1">
                     <div class="col">
-                        <select class="input-large conditions ae" tabindex="-1">
+                        <select class="form-control attribute secattendances" style="margin-bottom:15px" tabindex="-1">
+                            <option></option>
+                        </select>
+                    </div>
+                    <div class="col">
+                        <select class="form-control conditions" tabindex="-1">
                             <option></option>
                             <option value="is">IS</option>
+                            <option value="is like">IS LIKE</option>
                             <option value="is not">IS NOT</option>
-
+                            <option value="is not like">IS NOT LIKE</option>
+                            <option value="---------------" disabled="">---------------</option>
                             <option value="=">=</option>
                             <option value="!=">≠</option>
                             <option value="<">&lt;</option>
                             <option value=">">&gt;</option>
                             <option value="<=">&lt;=</option>
                             <option value=">=">&gt;=</option>
-                        </select>                    
+                        </select>
                     </div>
                     <div class="col">
-                        <input type="text" id="AENum" style="width:60%;">
-                    </div>
-                    <div class="col">
-                        <select class="input-large aedate">
-                            <option value="1">In the Past Month</option>
-                            <option value="6">In the Past 6 Months</option>
-                            <option value="12">In the Past 12 Months</option>
-                        </select>  
-                    </div>
-                </div>  
-                <div class="row">  
-                    <div class="col">Outpatient Admissions: </div>
-                    <div class="col">
-                        <select class="input-large conditions outp" tabindex="-1">
+                        <select class="input-large value values_pat" style="margin-bottom:15px" tabindex="-1">
                             <option></option>
-                            <option value="=">=</option>
-                            <option value="!=">≠</option>
-                            <option value="<">&lt;</option>
-                            <option value=">">&gt;</option>
-                            <option value="<=">&lt;=</option>
-                            <option value=">=">&gt;=</option>
-                        </select>                    
+                        </select>
                     </div>
                     <div class="col">
-                        <input type="text" id="OutPNum" style="width:60%;">
+                        <button data-rule="patient" class="btn btn-mini btn-success btn-add"><i class="fa fa-plus"></i></button>
+                        <button data-rule="patient" class="btn btn-mini btn-danger btn-remove" style="display:none;"><i class="fa fa-minus"></i></button>
                     </div>
-                    <div class="col">
-                        <select class="input-large outpdate">
-                            <option value="1">In the Past Month</option>
-                            <option value="6">In the Past 6 Months</option>
-                            <option value="12">In the Past 12 Months</option>
-                        </select>  
-                    </div>                        
                 </div>
-                <div class="row">  
-                    <div class="col">Inpatient Admissions: </div>
-                    <div class="col">
-                        <select class="input-large conditions inp" tabindex="-1">
-                            <option></option>
-                            <option value="=">=</option>
-                            <option value="!=">≠</option>
-                            <option value="<">&lt;</option>
-                            <option value=">">&gt;</option>
-                            <option value="<=">&lt;=</option>
-                            <option value=">=">&gt;=</option>
-                        </select>                    
-                    </div>
-                    <div class="col">
-                        <input type="text" id="InPNum" style="width:60%;">
-                    </div>
-                    <div class="col">
-                        <select class="input-large inpdate">
-                            <option value="1">In the Past Month</option>
-                            <option value="6">In the Past 6 Months</option>
-                            <option value="12">In the Past 12 Months</option>
-                        </select>  
-                    </div>                        
-                </div>                   
             </div>
         </div>    
     </div>
 </div>
 <!-- VARIANT -->
-<div class="row mb-2" style="display:none">
+<div class="row mb-2">
     <div class="col">
         <div class="card">
             <h5 class="card-header">VARIANT</h5>
@@ -328,8 +169,8 @@
                         </select>
                     </div>
                     <div class="col">
-                        <button class="btn btn-mini btn-success btn-add"><i class="fa fa-plus"></i></button>
-                        <button class="btn btn-mini btn-danger btn-remove" style="display:none;"><i class="fa fa-minus"></i></button>
+                        <button data-rule="genotype" class="btn btn-mini btn-success btn-add"><i class="fa fa-plus"></i></button>
+                        <button data-rule="genotype" class="btn btn-mini btn-danger btn-remove" style="display:none;"><i class="fa fa-minus"></i></button>
                     </div>
                 </div>
             </div>
@@ -337,12 +178,34 @@
     </div>
 </div>
 <!-- Phenotype and HPO Tree -->
-<div class="row mb-2" style="display:none">
+<div class="row mb-2">
     <div class="col">
         <div class="card">
             <h5 class="card-header">Phenotype</h5>
             <div class="card-body" id="phen_container">
-
+                <div class="row rule">
+                    <div class="col">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fa fa-search"></i></div>
+                            </div>
+                            <input class="form-control" id="search_filter_phen_left" type="text" placeholder="filter by keyword" style="text-align: center;" />
+                        </div>  
+                        <select id='values_phen_left' class="form-control" size="10"></select>
+                        <button class="btnAdd btn btn-secondary btn-block">Add</button>
+                    </div>
+                    <div class="col">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fa fa-search"></i></div>
+                            </div>
+                            <input class="form-control" id="search_filter_phen_right" type="text" placeholder="filter by keyword" style="text-align: center;">
+                        </div> 
+                        <select id="values_phen_right" class="form-control" size="10"></select>
+                        <button class="btnRemove btn btn-secondary btn-block">Remove</button>
+                    </div>
+                </div>
+                <hr/>
                 <div class="row rule">
                     <div class="col-10">
                         <h4 style="font-weight: bold; text-align: center;">HPO Tree </h4>
@@ -392,7 +255,7 @@
 </div>
 
 <!-- Result Table -->
-<table id="query_result" class="table table-hover table-bordered table-striped">
+<table id="query_result" class="table table-hover table-bordered table-striped" style="display:none;">
     <thead>
         <tr>
             <th>Source</th>
@@ -424,16 +287,4 @@
     </div>
   </div>
 </div>
-
-
-<script type="text/javascript">
-    $('#reset_query').click(function() {
-        location.reload();
-    });
-    $( function() {
-    $( "[type=radio]" ).checkboxradio({
-      icon: false
-    });
-    });
-</script>
 <?= $this->endSection() ?>
