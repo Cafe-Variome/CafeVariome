@@ -20,8 +20,13 @@ class Elastic extends Model{
     protected $db;
     protected $builder;
 
-    public function  __construct(ConnectionInterface &$db){
-        $this->db =& $db;
+    public function  __construct(ConnectionInterface &$db = Null){
+        if ($db != null) {
+            $this->db =& $db;
+        }
+        else {
+            $this->db = \Config\Database::connect();
+        }
         $this->setting =  Settings::getInstance($this->db);
         helper('filesystem');
     }
@@ -176,7 +181,7 @@ class Elastic extends Model{
     function getEAVsCountForSource(int $source_id): int{
         $this->builder = $this->db->table('eavs');
 
-        $this->builder->where('source',$source_id);
+        $this->builder->where('source_id',$source_id);
         $this->builder->where('elastic',0);
 
         $count = $this->builder->countAllResults();
@@ -196,7 +201,7 @@ class Elastic extends Model{
         $data = array(
                 'elastic' => 0
         );
-        $this->builder->where('source', $source_id);
+        $this->builder->where('source_id', $source_id);
         $this->builder->update($data);
     }
 
@@ -241,7 +246,7 @@ class Elastic extends Model{
             //Check the length of the data array, if it is empty, don't append it to the file.
             if (count($json_data) > 0) {
                 //Data must be written to the file in every iteration, in case the file is overwritten, some data is lost.
-                file_put_contents("resources/phenotype_lookup_data/" . $row['network_key'] . ".json", json_encode($json_data), FILE_APPEND);
+                file_put_contents("resources/phenotype_lookup_data/" . $row['network_key'] . ".json", json_encode($json_data));
             }
         }
 
