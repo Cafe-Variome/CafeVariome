@@ -46,9 +46,42 @@ class QueryApi extends ResourceController
         $networkRequestModel = new NetworkRequest();
         $resp = [];
         try {
-            $resp = $cafeVariomeQuery->search($queryString, $network_key);
+            $resp = $cafeVariomeQuery->search($queryString, $network_key, $user_id);
             $apiResponseBundle->initiateResponse(1, $resp);
             
+        } catch (\Exception $ex) {
+            error_log($ex->getMessage());
+            $apiResponseBundle->initiateResponse(0);
+            $apiResponseBundle->setResponseMessage($ex->getMessage());
+        }
+
+        return $this->respond($apiResponseBundle->getResponseJSON());
+    }
+
+    public function getJSONDataModificationTime()
+    {
+        $network_key = $this->request->getVar('network_key');
+        $checksum = $this->request->getVar('checksum');
+        $ishpo = (bool)$this->request->getVar('ishpo');
+        $loadFile = (bool)$this->request->getVar('loadfile');
+
+        $apiResponseBundle = new APIResponseBundle();
+
+        try {
+            $resp = [];
+            $file = FCPATH. DIRECTORY_SEPARATOR . JSON_DATA_DIR . $network_key . (($ishpo) ? '_hpo_ancestry.json' : ".json");
+            $resp['checksum'] = '';
+            if (file_exists($file)) {
+                $new_checksum = sha1_file($file);
+                if ($new_checksum != $checksum) {
+                    $resp['checksum'] = $new_checksum;
+                    if ($loadFile) {
+                        $resp['file'] = file_get_contents($file);
+                    }
+                }
+            }                  
+            $apiResponseBundle->initiateResponse(1, $resp);
+
         } catch (\Exception $ex) {
             error_log($ex->getMessage());
             $apiResponseBundle->initiateResponse(0);
