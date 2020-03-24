@@ -234,7 +234,7 @@ use CodeIgniter\Database\ConnectionInterface;
 
         $this->builder = $this->db->table('eavs');
 
-        $this->builder->where('source', $source_id);
+        $this->builder->where('source_id', $source_id);
         $this->builder->where('fileName', $file);
         $this->builder->delete();
     }
@@ -337,7 +337,7 @@ use CodeIgniter\Database\ConnectionInterface;
 
         $data = array(
             'uid'        =>  $uid,
-            'source'     => $source,
+            'source_id'     => $source,
             'fileName'   => $file,
             'subject_id' => $id,
             'type'       => "attribute",
@@ -394,7 +394,7 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder = $this->db->table('eavs');
 
         $this->builder->select("attribute, value, count(*) AS count");
-        $this->builder->where("source", $source);
+        $this->builder->where("source_id", $source);
         $this->builder->where("fileName",$file);
         $this->builder->groupBy(["attribute","value"]);
 
