@@ -202,7 +202,16 @@ $(document).ready(function(){
 			data: [<?= $sourceCounts ?>]
 		}]
 	},
-	options: {}
+	options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+
+	}
 	});
 
 	var chart = new Chart(dchart, {
