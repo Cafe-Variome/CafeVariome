@@ -26,7 +26,7 @@ $("#uploadBulk").submit(function(event) {
         } 
         id = $('#source_id').val();
         name = $('#dataFile')[0].files[0].name;
-        param = "source_id="+id+"&size="+size;
+        param = id;
 
         $('#uploadBtn').prop('disabled', 'disabled');
         $('#uploadSpinner').show()
