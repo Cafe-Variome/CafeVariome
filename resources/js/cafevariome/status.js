@@ -12,7 +12,7 @@ function reloadTable(param,first) {
     }
 	$.ajax({
         type: "POST",
-        url: baseurl+'source/getSourceStatus/'+param,
+        url: baseurl+'AjaxApi/getSourceStatus/' + param,
         dataType: "json",
         success: function(response) {
             currentscroll = $(window).scrollTop();
