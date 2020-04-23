@@ -87,8 +87,11 @@
 	  <h6 class="m-0 font-weight-bold text-primary">Record Count per Source </h6>
 	</div>
 	<div class="card-body">
-	  <div class="chart-container">
-		<canvas id="recordsrc_chart"></canvas>
+	  <div class="chart-container text-center">
+		<canvas id="recordsrc_chart" style="display:none;"></canvas>
+		<div class="spinner-grow text-info" role="status" style="width: 5rem; height: 5rem;" id="records_spinner">
+			<span class="sr-only">Loading...</span>
+		</div>
 	  </div>
 	</div>
   </div>
@@ -188,30 +191,38 @@
 </div>
 
 <script type="text/javascript">
-var rchart = document.getElementById('recordsrc_chart').getContext('2d');
+var rchart = document.getElementById('recordsrc_chart');
 var dchart = document.getElementById('disk_chart').getContext('2d');
-$(document).ready(function(){
-	var recordChart = new Chart(rchart, {
-	type: 'bar',
-	data: {
-		labels: [<?= $sourceNames ?>],
-		datasets: [{
-			label: 'Records',
-			backgroundColor: '#36a2eb',
-			borderColor: 'rgb(255, 99, 132)',
-			data: [<?= $sourceCounts ?>]
-		}]
-	},
-	options: {
-        scales: {
-            yAxes: [{
-                ticks: {
-                    beginAtZero: true
-                }
-            }]
-        }
 
-	}
+$(document).ready(function(){
+
+	$.ajax({url: baseurl + "AjaxApi/getSourceCounts",
+		
+		success: function(result){
+			var recordChart = new Chart(rchart.getContext('2d'), {
+			type: 'bar',
+			data: {
+				labels: [<?= $sourceNames ?>],
+				datasets: [{
+					label: 'Records',
+					backgroundColor: '#36a2eb',
+					borderColor: 'rgb(255, 99, 132)',
+					data: [result]
+				}]
+			},
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							beginAtZero: true
+						}
+					}]
+				}
+			}
+			});
+		rchart.style.display = 'block';
+		document.getElementById('records_spinner').style.display = 'none';
+		}
 	});
 
 	var chart = new Chart(dchart, {
