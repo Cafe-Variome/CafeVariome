@@ -186,10 +186,11 @@ use CodeIgniter\Database\ConnectionInterface;
         $query = $this->builder->get()->getResultArray();
         return $query ? $query[0]['elastic_lock'] : false;
     }
+    
     /**
-     * 
+     * Counts entries per source.
      */
-    function countSourceEntries() {
+    function countSourceEntries(): array {
         $this->builder = $this->db->table('eavs');
         $this->builder->select('COUNT(distinct(subject_id)) as total, source_id');
         $this->builder->groupBy('source_id');
