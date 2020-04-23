@@ -66,7 +66,6 @@ class Admin extends CVUI_Controller{
         $keyCloak = new KeyCloak();
 
         $sourceList = $sourceModel->getSources('source_id, name', ['status'=>'online']);
-        $sourceRecordount = $sourceModel->countSourceEntries();
 
         $sc = 0;
         $maxSourcesToDisplay = 12;
@@ -83,18 +82,13 @@ class Admin extends CVUI_Controller{
                 $sourceNameLabels .= "'" . $source['name']. "',";
             }
 
-            if (isset($sourceRecordount[$source['source_id']])){
-                $sourceCountList[$source['name']] = $sourceRecordount[$source['source_id']];
-            }
-            else{
-                $sourceCountList[$source['name']] = 0;
-            }
+            $sourceCountList[$source['name']] = 0;
+            
             $sc++;
         }
 
         $uidata->data['sourceCount'] = count($sourceList);
         $uidata->data['sourceNames'] = $sourceNameLabels;
-        $uidata->data['sourceCounts'] = implode(',', $sourceCountList);
 
         $networks = $networkInterface->GetNetworksByInstallationKey($this->setting->getInstallationKey());
         if ($networks->status) {
