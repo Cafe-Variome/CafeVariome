@@ -55,24 +55,12 @@ use App\Libraries\CafeVariome\ShellHelper;
         $networkInterface = new NetworkInterface();
 
         $queryString = json_encode($this->request->getVar('jsonAPI'));
-        $query_id = $this->getQID();
-
-        $primQueryObj = json_decode($queryString)[1];
-        $primQueryObj->meta->components->queryIdentification->queryID = $query_id;
-        $primQuery = json_encode($primQueryObj);
-
-
         $user_id = $this->request->getVar('user_id');
 
         $results = [];
-
-        $this->prepare_to_send(json_encode($primQueryObj), $this->setting->settingData['installation_key'], $query_id);
-
-
         $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
-        $loaclResults = $cafeVariomeQuery->search($primQuery, $network_key, $user_id); // Execute locally
-        
-        //array_push($results, $loaclResults);
+        $loaclResults = $cafeVariomeQuery->search($queryString, $network_key, $user_id); // Execute locally
+        array_push($results, $loaclResults);
 
         $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
         $installations = [];
@@ -81,47 +69,18 @@ use App\Libraries\CafeVariome\ShellHelper;
             $installations = $response->data;
 
             foreach ($installations as $installation) {
-                if ($installation->installation_key != $this->setting->settingData['installation_key']) {
-                    $secQueryObj = json_decode($queryString)[0];
-                    $secQueryObj->meta->components->queryIdentification->queryID = $query_id;
-                    $secQuery = json_encode($secQueryObj);
-                    
-                    $this->prepare_to_send($secQuery, $installation->installation_key, $query_id);
+                if ($installation->installation_key != $this->setting->getInstallationKey()) {
                     // Send the query
                     $queryNetInterface = new QueryNetworkInterface($installation->base_url);
-                    $queryResponse = $queryNetInterface->query($secQuery, (int) $network_key, $user_id);
-                    //if ($queryResponse->status) {
-                        //array_push($results, $queryResponse->data);
-                    //}
+                    $queryResponse = $queryNetInterface->query($queryString, (int) $network_key, $user_id);
+                    if ($queryResponse->status) {
+                        array_push($results, $queryResponse->data);
+                    }
                 }
             }
         }
 
         return json_encode($results);
-    }
-
-    private function prepare_to_send($query,$installation_key,$query_id) {
-		
-		/// we need to record what the current query we are going to poll
-		// then we need to know whether it has been fulfilled or not and whether we need to keep polling.
-
-        $file_name = md5(uniqid(rand(),true));
-        $data_path = FCPATH . "upload/query/";
-        if (!file_exists($data_path)) {
-            mkdir($data_path);
-        }
-        $data_path = $data_path . $file_name.".json";
-        file_put_contents($data_path, json_encode($query));
-        $deliverModel = new Deliver();
-        $deliverModel->addQueryRecord($query_id,$installation_key,$file_name);
-
-
-		//Here we loop through sending the actual query to all installations in the network
-    }
-
-    private function getQID()
-    {
-        return md5(uniqid(rand(),true));
     }
 
     function hpo_query($id = ''){
@@ -860,6 +819,40 @@ use App\Libraries\CafeVariome\ShellHelper;
         }
     }
 
+
+    public function getSourceCounts()
+    {
+        $sourceModel = new Source();
+
+        $sourceList = $sourceModel->getSources('source_id, name', ['status'=>'online']);
+        $sourceRecordount = $sourceModel->countSourceEntries();
+
+        $sc = 0;
+        $maxSourcesToDisplay = 12;
+        $sourceCountList = [];
+        $sourceNameLabels = '';
+        foreach ($sourceList as $source) {
+            if ($sc > $maxSourcesToDisplay) {
+                break;
+            }
+            if ($sc == count($sourceList) - 1 || $sc == $maxSourcesToDisplay) {
+                $sourceNameLabels .= "'" . $source['name']. "'";
+            }
+            else{
+                $sourceNameLabels .= "'" . $source['name']. "',";
+            }
+
+            if (isset($sourceRecordount[$source['source_id']])){
+                $sourceCountList[$source['name']] = $sourceRecordount[$source['source_id']];
+            }
+            else{
+                $sourceCountList[$source['name']] = 0;
+            }
+            $sc++;
+        }
+
+        return implode(',', $sourceCountList);
+    }
 
     function delete_file($pFilename) {
         if ( file_exists($pFilename) ) {
