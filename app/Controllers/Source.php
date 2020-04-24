@@ -12,6 +12,7 @@
 
 use App\Models\UIData;
 use App\Models\Neo4j;
+use \App\Models\Elastic;
 use CodeIgniter\Config\Services;
 
 class Source extends CVUI_Controller{
@@ -183,27 +184,34 @@ class Source extends CVUI_Controller{
             $type = $this->request->getVar('type');
 
             $source_data = array("name" => $name, "owner_name" => $owner_name, "email" => $email, "uri" => $uri, "description" => $description, "long_description" => $long_description, "type" => "mysql", "status" => $status);
-            $insert_id = $this->sourceModel->createSource($source_data);
-            $this->data['insert_id'] = $insert_id;
+            try {
+                $insert_id = $this->sourceModel->createSource($source_data);
 
-            if ($this->request->getVar('source_display')) {
-                $group_data_array = array();
-                foreach ($this->request->getVar('source_display') as $src_group_data) {
-                    // Need to explode the group multi select to get the group_id and the network_key since the value is comma separated as I needed to pass both in the value
-                    $group_data_array[] = $src_group_data;
+                if ($this->request->getVar('source_display')) {
+                    $group_data_array = array();
+                    foreach ($this->request->getVar('source_display') as $src_group_data) {
+                        // Need to explode the group multi select to get the group_id and the network_key since the value is comma separated as I needed to pass both in the value
+                        $group_data_array[] = $src_group_data;
+                    }
+                    $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
                 }
-                $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
+    
+                if ($this->request->getVar('count_display')) {
+                    $group_data_array = array();
+                    foreach ($this->request->getVar('count_display') as $count_group_data) {
+                        $group_data_array[] = $count_group_data;
+                    }
+                    $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
+                }
+
+                $this->setStatusMessage("Source '$name' was created successfully.", STATUS_SUCCESS);
+
+            } catch (\Exception $ex) {
+                $this->setStatusMessage("There was a problem creating '$name'.", STATUS_ERROR);
             }
 
-            if ($this->request->getVar('count_display')) {
-                $group_data_array = array();
-                foreach ($this->request->getVar('count_display') as $count_group_data) {
-                    $group_data_array[] = $count_group_data;
-                }
-                $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
-            }
+            return redirect()->to(base_url($this->controllerName.'/List'));
 
-            return redirect()->to(base_url($this->controllerName.'/Index'));
         } else {
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
@@ -272,7 +280,6 @@ class Source extends CVUI_Controller{
             $uidata->data['selected_source_display'] = $this->request->getVar('source_display') ? $this->request->getVar('source_display') :[];
             $uidata->data['selected_count_display'] = $this->request->getVar('count_display') ? $this->request->getVar('count_display') :[];
             
-
             $uidata->javascript = array(JS.'cafevariome/components/transferbox.js', JS.'cafevariome/source.js');
 
             $data = $this->wrapData($uidata);
@@ -356,9 +363,9 @@ class Source extends CVUI_Controller{
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             //check to see if we are creating the user
             //redirect them back to the admin page
-            
+            $source_name = $this->request->getVar('name');
             $update_data['source_id'] = $this->request->getVar('source_id');
-            $update_data['name'] = $this->request->getVar('name');
+            $update_data['name'] = $source_name;
             $update_data['email'] = $this->request->getVar('email');
             $update_data['uri'] = $this->request->getVar('uri');
             $update_data['description'] = $this->request->getVar('desc');
@@ -366,31 +373,38 @@ class Source extends CVUI_Controller{
             $update_data['type'] = $this->request->getVar('type');
             $update_data['status'] = $this->request->getVar('status');
 
-            $this->sourceModel->updateSource($update_data, ["source_id"=>$this->request->getVar('source_id')]);
+            try {
+                $this->sourceModel->updateSource($update_data, ["source_id"=>$this->request->getVar('source_id')]);
 
-            $group_data_array = array();
-            // Check if there any groups selected
-            if ($this->request->getVar('source_display')) {
-                foreach ($this->request->getVar('source_display') as $src_group_data) {
-                    // Need to explode the group multi select to get the group_id and the network_key since the value is comma separated as I needed to pass both in the value
-                    $group_data_array[] = $src_group_data;
+                $group_data_array = array();
+                // Check if there any groups selected
+                if ($this->request->getVar('source_display')) {
+                    foreach ($this->request->getVar('source_display') as $src_group_data) {
+                        // Need to explode the group multi select to get the group_id and the network_key since the value is comma separated as I needed to pass both in the value
+                        $group_data_array[] = $src_group_data;
+                    }
                 }
-            }
-            if ($this->request->getVar('count_display')) {
-                foreach ($this->request->getVar('count_display') as $count_group_data) {
-                    $group_data_array[] = $count_group_data;
+                if ($this->request->getVar('count_display')) {
+                    foreach ($this->request->getVar('count_display') as $count_group_data) {
+                        $group_data_array[] = $count_group_data;
+                    }
                 }
-            }
-            if (count($group_data_array) > 0) {           
-                $group_post_data = implode("|", $group_data_array);
-                $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],$group_post_data);
+                if (count($group_data_array) > 0) {           
+                    $group_post_data = implode("|", $group_data_array);
+                    $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],$group_post_data);
+    
+                }
+                else {
+                    $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],null);
+                }
+                $this->setStatusMessage("Source '$source_name' was updated.", STATUS_SUCCESS);
 
-            }
-            else {
-                $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],null);
+            } catch (\Exception $ex) {
+                $this->setStatusMessage("There was a problem updating '$source_name'.", STATUS_ERROR);
             }
 
-            return redirect()->to(base_url('source/index'));
+            return redirect()->to(base_url($this->controllerName.'/List'));
+            
         } else {
 
             // Get all the network groups that this source from this installation is currently in so that these can be pre selected in the multiselect list
@@ -413,83 +427,87 @@ class Source extends CVUI_Controller{
             // Get all the data for this source
             $source_data = $this->sourceModel->getSource($source_id);
 
-            $uidata->data['source_data'] = $source_data;
-            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-            $uidata->data['name'] = array(
-                'name' => 'name',
-                'id' => 'name',
-                'type' => 'text',
-                'class' => 'form-control',
-                'readonly' => 'true', // Don't allow the user to edit the source name
-                'value' => set_value('name', $source_data['name']),
-            );
-            $uidata->data['owner_name'] = array(
-                'name' => 'owner_name',
-                'id' => 'owner_name',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' => set_value('owner_name', $source_data['owner_name']),
-            );
-            $uidata->data['uri'] = array(
-                'name' => 'uri',
-                'id' => 'uri',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' => set_value('uri', $source_data['uri']),
-            );
-            $uidata->data['desc'] = array(
-                'name' => 'desc',
-                'id' => 'desc',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' => set_value('desc', $source_data['description']),
-            );
-            $uidata->data['long_description'] = array(
-                'name' => 'long_description',
-                'id' => 'long_description',
-                'type' => 'text',
-                'class' => 'form-control',
-                'rows' => '5',
-                'cols' => '3',
-                'value' => set_value('long_description', $source_data['long_description']),
-            );
-            $uidata->data['email'] = array(
-                'name' => 'email',
-                'id' => 'email',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' => set_value('email', $source_data['email']),
-            );
-            $uidata->data['status'] = array(
-                'name' => 'status',
-                'id' => 'status',
-                'type' => 'select',
-                'value' => set_value('status'),
-            );
-            $uidata->data['type'] = array(
-                'name' => 'type',
-                'id' => 'type',
-                'type' => 'dropdown',
-                'value' => set_value('type', $source_data['type']),
-            );
+            if ($source_data != Null) {
+                $uidata->data['source_data'] = $source_data;
+                $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+                $uidata->data['name'] = array(
+                    'name' => 'name',
+                    'id' => 'name',
+                    'type' => 'text',
+                    'class' => 'form-control',
+                    'readonly' => 'true', // Don't allow the user to edit the source name
+                    'value' => set_value('name', $source_data['name']),
+                );
+                $uidata->data['owner_name'] = array(
+                    'name' => 'owner_name',
+                    'id' => 'owner_name',
+                    'type' => 'text',
+                    'class' => 'form-control',
+                    'value' => set_value('owner_name', $source_data['owner_name']),
+                );
+                $uidata->data['uri'] = array(
+                    'name' => 'uri',
+                    'id' => 'uri',
+                    'type' => 'text',
+                    'class' => 'form-control',
+                    'value' => set_value('uri', $source_data['uri']),
+                );
+                $uidata->data['desc'] = array(
+                    'name' => 'desc',
+                    'id' => 'desc',
+                    'type' => 'text',
+                    'class' => 'form-control',
+                    'value' => set_value('desc', $source_data['description']),
+                );
+                $uidata->data['long_description'] = array(
+                    'name' => 'long_description',
+                    'id' => 'long_description',
+                    'type' => 'text',
+                    'class' => 'form-control',
+                    'rows' => '5',
+                    'cols' => '3',
+                    'value' => set_value('long_description', $source_data['long_description']),
+                );
+                $uidata->data['email'] = array(
+                    'name' => 'email',
+                    'id' => 'email',
+                    'type' => 'text',
+                    'class' => 'form-control',
+                    'value' => set_value('email', $source_data['email']),
+                );
+                $uidata->data['status'] = array(
+                    'name' => 'status',
+                    'id' => 'status',
+                    'type' => 'select',
+                    'value' => set_value('status'),
+                );
+                $uidata->data['type'] = array(
+                    'name' => 'type',
+                    'id' => 'type',
+                    'type' => 'dropdown',
+                    'value' => set_value('type', $source_data['type']),
+                );
 
-            $uidata->javascript = array(JS.'cafevariome/components/transferbox.js',JS.'cafevariome/source.js');
+                $uidata->javascript = array(JS.'cafevariome/components/transferbox.js',JS.'cafevariome/source.js');
 
-            $data = $this->wrapData($uidata);
+                $data = $this->wrapData($uidata);
 
-            return view($this->viewDirectory.'/Update', $data);
+                return view($this->viewDirectory.'/Update', $data);
+            }
+            else {
+                $this->setStatusMessage("Source was not found.", STATUS_WARNING);
+                return redirect()->to(base_url($this->controllerName.'/List'));
+            }   
         }
     }
 
-    public function Delete($source_id = NULL, $source = NULL) {
-        if (!$source) {
+    public function Delete(int $source_id = Null) {
+        if ($source_id == Null) {
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
 
         $uidata = new UIData();
         $uidata->title = "Delete Source";
-
-        $elasticModel = new \App\Models\Elastic($this->db);
 
         $this->validation->setRules([
             'confirm' => [
@@ -510,67 +528,91 @@ class Source extends CVUI_Controller{
                 ]            
             ]);
 
+        
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-
-            $neo4jModel = new Neo4j($this->db);
-           // do we really want to delete?
+            $error_flag = false;
             if ($this->request->getVar('confirm') == 'yes') {
-                // do we have a valid request?
-                if ($source != $this->request->getVar('source')) {
-                        show_error('This form post did not pass our security checks.');
+                if ($source_id != $this->request->getVar('source_id')) {
+                    $this->setStatusMessage("No source selected to delete.", STATUS_ERROR);
+                    return redirect()->to(base_url($this->controllerName.'/List'));
                 }
 
-                $source_id = $_POST['source_id'];
-
-                //delete associated records from EAV table
-                $this->sourceModel->deleteSourceFromEAVs($source);
-                
-
-                $this->sourceModel->deleteSource($source_id);
-                $dirPath = FCPATH."upload/UploadData/".$source_id;
-                if (file_exists($dirPath)) {
-                    delete_files($dirPath, true);
+                $source_id = $this->request->getVar('source_id');
+                $source = $this->sourceModel->getSourceNameByID($source_id);
+                if ($source == Null) {
+                    $this->setStatusMessage("Source was not found.", STATUS_ERROR);
+                    return redirect()->to(base_url($this->controllerName.'/List'));
                 }
-
                 //delete Elasticsearch index associated with the source
-                $elasticModel->deleteElasticIndex($source_id);
+                try {
+                    $elasticModel = new Elastic();
+                    $elasticModel->deleteIndex($source_id);
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was an error in deleting Elasticsearch index.", STATUS_ERROR);
+                    $error_flag = true;
+                }
                 
                 //delete the associated node from neo4j database
-                $neo4jModel->deleteSource($source_id);
+                try {
+                    $neo4jModel = new Neo4j();
+                    $neo4jModel->deleteSource($source_id);
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was an error in deleting Neo4J data of the source.", STATUS_ERROR, true);
+                    $error_flag = true;
+                }
 
-                
-                if (file_exists("resources/elastic_search_status_complete"))
-                    unlink("resources/elastic_search_status_complete");
-                file_put_contents("resources/elastic_search_status_incomplete", "");
+                //delete files on system
+                try {
+                    $dirPath = FCPATH . UPLOAD . UPLOAD_DATA . $source_id;
+                    if (file_exists($dirPath)) {
+                        delete_files($dirPath, true);
+                    }
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was an error in deleting files of the source.", STATUS_ERROR, true);
+                    $error_flag = true;
+                }
 
+                if (!$error_flag) {
+                    //delete rest of the data in database
+                    try {
+                        $this->sourceModel->deleteSourceFromEAVs($source_id);
+                        $this->sourceModel->deleteSource($source_id);
+                        $this->setStatusMessage("Source '$source' was deleted.", STATUS_SUCCESS, true);
+                    } catch (\Exception $ex) {
+                        $this->setStatusMessage("There was an error in deleting source records from database.", STATUS_ERROR, true);
+                        $error_flag = true;
+                    }
+                }
             }
         }   
         else
         {
-            // insert csrf check
-            $uidata->data['source_id'] = $source_id;
-            $uidata->data['source'] = $source;
-            $data = [
-                'name'    => 'newsletter',
-                'id'      => 'newsletter',
-                'value'   => 'accept',
-                'checked' => TRUE,
-                'style'   => 'margin:10px'
-            ];
-            $uidata->data['confirm'] = array(
-                'name' => 'confirm',
-                'type' => 'radio',
-                'class' => 'form-control',
-            );
+            $source = $this->sourceModel->getSource($source_id);
+            if ($source) {       
+                $uidata->data['source_id'] = $source_id;
+                $uidata->data['source_name'] = $source['name'];
+                $data = [
+                    'name'    => 'newsletter',
+                    'id'      => 'newsletter',
+                    'value'   => 'accept',
+                    'checked' => TRUE,
+                    'style'   => 'margin:10px'
+                ];
+                $uidata->data['confirm'] = array(
+                    'name' => 'confirm',
+                    'type' => 'radio',
+                    'class' => 'form-control',
+                );
 
-            $data = $this->wrapData($uidata);
-            return view($this->viewDirectory.'/Delete', $data);
+                $data = $this->wrapData($uidata);
+                return view($this->viewDirectory.'/Delete', $data);
             }
-            //redirect them back to the auth page
-            return redirect()->to(base_url($this->controllerName.'/List'));
         }
 
-    public function Status($source_id = null) {  
+        return redirect()->to(base_url($this->controllerName.'/List'));
+    }
+
+    public function Status(int $source_id = null) {  
         if (!$source_id) {
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
@@ -585,20 +627,6 @@ class Source extends CVUI_Controller{
         return view($this->viewDirectory.'/Status', $data);
     }
 
-    public function getSourceStatus($source_id){
 
-        $output = ['Files' => [], 'Error' => []];
-        if ($source_id== 'all') {
-            $output['Files'] = $this->sourceModel->getSourceStatus('all');
-            //$output['Error'] = $this->upload_data_model->getErrorForSource('all');
-        }
-        else {
-          //source_id = $this->upload_data_model->getSourceId($_POST['source']);  
-          $output['Files'] = $this->sourceModel->getSourceStatus($source_id);
-          $output['Error'] = $this->sourceModel->getErrorForSource($source_id);
-        }       
-        
-        return json_encode($output);   
-    }
 
 }
