@@ -99,6 +99,11 @@ class Settings extends Model{
      return $this->settingData['installation_key'];
   }
 
+  public function getAuthServerUrl()
+  {
+     return $this->settingData['auth_server'];
+  }
+
   public function getElasticSearchUri()
   { 
       return $this->settingData['elastic_url'];
