@@ -99,7 +99,7 @@ use CodeIgniter\Database\ConnectionInterface;
     /**
      * 
      */
-    public function getSource($source_id) {
+    public function getSource(int $source_id) {
 
         $this->builder = $this->db->table($this->table);
         $query = $this->builder->where('source_id', $source_id);
@@ -205,7 +205,7 @@ use CodeIgniter\Database\ConnectionInterface;
     /**
      * 
      */
-    public function deleteSourceFromEAVs($source_id) {
+    public function deleteSourceFromEAVs(int $source_id) {
         $this->builder = $this->db->table('eavs');
         $this->builder->delete(['source_id' => $source_id]);
     }
