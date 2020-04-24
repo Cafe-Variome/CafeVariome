@@ -28,10 +28,15 @@ class Neo4j extends Model{
     private $neo4jAddress;
     private $neo4jPort;
 
-    public function __construct(ConnectionInterface &$db){
+	public function __construct(ConnectionInterface &$db = Null){
 
-        $this->db =& $db;
-        $this->setting =  Settings::getInstance($this->db);
+        if ($db != null) {
+            $this->db =& $db;
+        }
+        else {
+            $this->db = \Config\Database::connect();
+		}
+        $this->setting =  Settings::getInstance();
 
         $this->neo4jUsername = $this->setting->settingData['neo4j_username'];
         $this->neo4jPassword = $this->setting->settingData['neo4j_password'];
@@ -85,7 +90,7 @@ class Neo4j extends Model{
     }
 
     
-    function deleteSource($source_id) {
+    function deleteSource(int $source_id) {
 
         $baseNeo4jAddress = $this->neo4jAddress;
         if (strpos($baseNeo4jAddress, 'http://') !== false) {
