@@ -53,8 +53,7 @@ class ElasticSearch{
         try {
             $response = $this->client->indices()->getSettings($params);
             return $response;
-        } catch (\Throwable $th) {
-            $this->errorFlag = true;
+        } catch (\Exception $ex) {
             return null;
         }
     }
@@ -72,8 +71,26 @@ class ElasticSearch{
         try {
             $response = $this->client->indices()->getSettings($params);
             return $response;
-        } catch (\Throwable $th) {
-            $this->errorFlag = true;
+        } catch (\Exception $ex) {
+            return null;
+        }
+    }
+
+    /**
+     * deleteIndex()
+     * 
+     * Deletes an index in Elasticsearch.
+     * 
+     * @return array|null
+     */
+    public function deleteIndex(string $name)
+    {
+        $params = ['index' => $name];
+
+        try {
+            $response = $this->client->indices()->delete($params);
+            return $response;
+        } catch (\Exception $ex) {
             return null;
         }
     }
