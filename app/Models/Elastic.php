@@ -10,7 +10,7 @@
  */
 
  use App\Models\Settings;
- 
+ use App\Libraries\ElasticSearch;
  use CodeIgniter\Model;
  use CodeIgniter\Database\ConnectionInterface;
  use GraphAware\Neo4j\Client\ClientBuilder;
@@ -20,6 +20,8 @@ class Elastic extends Model{
     protected $db;
     protected $builder;
 
+    private $elasticInstance;
+
     public function  __construct(ConnectionInterface &$db = Null){
         if ($db != null) {
             $this->db =& $db;
@@ -28,6 +30,11 @@ class Elastic extends Model{
             $this->db = \Config\Database::connect();
         }
         $this->setting =  Settings::getInstance($this->db);
+
+        $this->elasticInstance = new ElasticSearch([$this->setting->getElasticSearchUri()]);
+        if (!$this->elasticInstance->ping()) {
+            throw new \Exception('Elasticsearch is not running.');
+        }
         helper('filesystem');
     }
 
@@ -37,21 +44,16 @@ class Elastic extends Model{
      * @param int $source_id - The Id of the Source
      * @return N/A
      */
-    function deleteElasticIndex($source_id) {
+    function deleteIndex(int $source_id) {
 
         $params = [];
 
-        $title = $this->getTitlePrefix();
+        $prefix = $this->getTitlePrefix();
+        $index_name = $prefix."_".$source_id."*";	    
 
-        $index_name = $title."_".$source_id."*";	    
-        $uri = $this->setting->settingData['elastic_url']."/".$index_name;
-
-        try {
-            $this->buildCurlCommand($uri);
-        }	  
-        catch (\Exception $e) {
-            error_log("No Indices exist for source: ". $source_id);
-        }      	 
+        if($this->elasticInstance->indexExists($index_name)){
+            $this->elasticInstance->deleteIndex($index_name);
+        }
     }
 
     function buildCurlCommand($uri){
