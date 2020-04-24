@@ -193,8 +193,14 @@ class CVUI_Controller extends Controller{
 		}
 	}
 
-	protected function setStatusMessage(string $message, int $msgtype)
+	protected function setStatusMessage(string $message, int $msgtype, bool $appendmsg = false)
 	{
+		if ($appendmsg) {
+			$msg = $this->session->getFlashData('StatusMessage');
+			if ($msg) {
+				$message = $msg . '<br/>' . $message;
+			}
+		}
 		$this->session->setFlashData('StatusMessage', $message);
 		$this->session->setFlashData('StatusMessageType', $msgtype);
 	}
