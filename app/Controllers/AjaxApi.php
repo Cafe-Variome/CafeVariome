@@ -823,35 +823,37 @@ use App\Libraries\CafeVariome\ShellHelper;
     public function getSourceCounts()
     {
         $sourceModel = new Source();
-
-        $sourceList = $sourceModel->getSources('source_id, name', ['status'=>'online']);
         $sourceRecordount = $sourceModel->countSourceEntries();
 
         $sc = 0;
         $maxSourcesToDisplay = 12;
         $sourceCountList = [];
-        $sourceNameLabels = '';
-        foreach ($sourceList as $source) {
+        foreach ($sourceRecordount as $srCount) {
             if ($sc > $maxSourcesToDisplay) {
                 break;
             }
-            if ($sc == count($sourceList) - 1 || $sc == $maxSourcesToDisplay) {
-                $sourceNameLabels .= "'" . $source['name']. "'";
-            }
-            else{
-                $sourceNameLabels .= "'" . $source['name']. "',";
-            }
-
-            if (isset($sourceRecordount[$source['source_id']])){
-                $sourceCountList[$source['name']] = $sourceRecordount[$source['source_id']];
-            }
-            else{
-                $sourceCountList[$source['name']] = 0;
-            }
+            array_push($sourceCountList, $srCount);
             $sc++;
         }
 
-        return implode(',', $sourceCountList);
+        return json_encode($sourceCountList);
+    }
+
+    public function getSourceStatus(int $source_id){
+
+        $sourceModel = new Source();
+        $output = ['Files' => [], 'Error' => []];
+        if ($source_id== 'all') {
+            $output['Files'] = $sourceModel->getSourceStatus('all');
+            //$output['Error'] = $this->upload_data_model->getErrorForSource('all');
+        }
+        else {
+          //source_id = $this->upload_data_model->getSourceId($_POST['source']);  
+          $output['Files'] = $sourceModel->getSourceStatus($source_id);
+          $output['Error'] = $sourceModel->getErrorForSource($source_id);
+        }       
+        
+        return json_encode($output);   
     }
 
     function delete_file($pFilename) {
