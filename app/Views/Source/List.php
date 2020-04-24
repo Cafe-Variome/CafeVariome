@@ -7,6 +7,15 @@
 	</div>	
 </div>
 <hr>
+<?php if($statusMessage): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-<?= $statusMessageType ?>">
+			<?php echo $statusMessage ?>
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
 <table class="table table-bordered table-striped table-hover" id="sourcestable">
 	<thead>
 		<tr>
