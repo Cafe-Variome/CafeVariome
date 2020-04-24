@@ -93,16 +93,31 @@ class Admin extends CVUI_Controller{
         $networks = $networkInterface->GetNetworksByInstallationKey($this->setting->getInstallationKey());
         if ($networks->status) {
             $uidata->data['networksCount'] = count($networks->data);
+            $uidata->data['networkMsg'] = Null;
         }
         else{
-            $uidata->data['networksCount'] = 0;
+            //Problem contacting network server
+            $uidata->data['networksCount'] = "-";
+            $uidata->data['networkMsg'] = "There was a problem in communicating with network software. Please fix it as the system is unable to function correctly.";
         }
 
         $uidata->data['usersCount'] = count($userModel->getUsers('id'));
         $uidata->data['networkRequestCount'] = count($networkRequestModel->getNetworkRequests('id', ['status' => 0]));
 
-        $uidata->data['elasticStatus'] = $elasticSearch->ping();
-        $uidata->data['neo4jStatus'] = $neo4j->ping();
+        $elasticStatus = $elasticSearch->ping();
+        $uidata->data['elasticStatus'] = $elasticStatus;
+        $uidata->data['elasticMsg'] = Null;
+        if (!$elasticStatus) {
+            $uidata->data['elasticMsg'] = "Elasticsearch is not running. The query interface is not accessible. Please ask the server administrator to start it.";
+        }
+
+        $neo4jStatus = $neo4j->ping(); 
+        $uidata->data['neo4jStatus'] = $neo4jStatus;
+        $uidata->data['neo4jMsg'] = Null;
+        if (!$neo4jStatus) {
+            $uidata->data['neo4jMsg'] = "Neo4J is not running. Some capabilities of the system are disabled because of this. Please ask the server administrator to start it.";
+        }
+
         $uidata->data['keycloakStatus'] = $keyCloak->checkKeyCloakServer();
         
         $data = $this->wrapData($uidata);
