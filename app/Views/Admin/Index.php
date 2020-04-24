@@ -207,7 +207,7 @@ $(document).ready(function(){
 					label: 'Records',
 					backgroundColor: '#36a2eb',
 					borderColor: 'rgb(255, 99, 132)',
-					data: [result]
+					data: JSON.parse(result)
 				}]
 			},
 			options: {
