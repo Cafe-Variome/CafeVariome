@@ -6,8 +6,51 @@
 	</div>	
 </div>
 <hr>
+<?php if($networkMsg): ?>
 <div class="row">
+	<div class="col">
+		<div class="alert alert-danger">
+			<div class="row">
+				<div class="col-9">
+					<?php echo $networkMsg ?>
+				</div>
+				<div class="col-3">
+					<span class="fa fa-exclamation-triangle fa-5x"></span>
+				</div>			
+			</div>
+		</div>
+	</div>
+</div>
+<?php endif; ?>
 
+<?php if($elasticMsg): ?>
+<div class="row">
+	<div class="col">
+		<div class="alert alert-warning">
+			<div class="row">
+				<div class="col">
+					<?php echo $elasticMsg ?>
+				</div>		
+			</div>
+		</div>
+	</div>
+</div>
+<?php endif; ?>
+
+<?php if($neo4jMsg): ?>
+<div class="row">
+	<div class="col">
+		<div class="alert alert-warning">
+			<div class="row">
+				<div class="col">
+					<?php echo $neo4jMsg ?>
+				</div>		
+			</div>
+		</div>
+	</div>
+</div>
+<?php endif; ?>
+<div class="row">
 <div class="col-xl-3 col-md-6 mb-4">
   <div class="card border-left-primary shadow h-100 py-2">
 	<div class="card-body">
