@@ -8,11 +8,11 @@
 </div>
 <hr>
 
-<?php echo form_open($controllerName."/Delete/" . $source_id . "/" . $source); ?>
-<?php echo form_hidden(array('source' => $source)); ?>
+<?php echo form_open($controllerName."/Delete/" . $source_id . "/" . $source_name); ?>
+<?php echo form_hidden(array('source' => $source_name)); ?>
 <?php echo form_hidden(array('source_id' => $source_id)); ?>
 <div class="form-group">
-<span class="text-danger">Warning: Are you sure you want to delete the source '<?php echo $source; ?>' ?</span>
+<span class="text-danger">Warning: Are you sure you want to delete the source '<?php echo $source_name; ?>' ?</span>
 </div>
 <div class="form-group">
 	<div class="form-check form-check-inline">
