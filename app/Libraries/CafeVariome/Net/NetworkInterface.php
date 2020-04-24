@@ -25,10 +25,10 @@ class NetworkInterface
     private $installation_key;
 
     public function __construct() {
-        $this->setting = new Settings();
-        $this->installation_key = $this->setting->settingData['installation_key'];
+        $this->setting = Settings::getInstance();
+        $this->installation_key = $this->setting->getInstallationKey();
 
-        $this->serverURI = $this->setting->settingData['auth_server'];
+        $this->serverURI = $this->setting->getAuthServerUrl();
         $curlOptions = [CURLOPT_RETURNTRANSFER => TRUE];
 
         $this->networkAdapter = new cURLAdapter(null, $curlOptions);
@@ -129,6 +129,12 @@ class NetworkInterface
     private function processResponse($response)
     {
         $responseObj = json_decode($response);
+
+        if ($responseObj == Null || !property_exists($responseObj, 'status')) {
+            $responseObj = new \StdClass();
+            $responseObj->status = false;
+        }
+
         return $responseObj;
     }
 
