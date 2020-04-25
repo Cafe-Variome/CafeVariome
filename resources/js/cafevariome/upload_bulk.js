@@ -27,14 +27,14 @@ $("#uploadBulk").submit(function(event) {
         id = $('#source_id').val();
         name = $('#dataFile')[0].files[0].name;
         param = id;
-
+        validateParams = 'source_id=' + id + '&size=' + size;
         $('#uploadBtn').prop('disabled', 'disabled');
         $('#uploadSpinner').show()
 
         $.ajax({
             type: "post",  
             url: baseurl+'AjaxApi/validateUpload',
-            data: param,
+            data: validateParams,
             dataType: "json", 
             success: function(response)  {
                 //get the data put onto the form
@@ -64,6 +64,8 @@ $("#uploadBulk").submit(function(event) {
                         processData: false,       
                         success: function(response)  {
                             $('#uploadSpinner').hide();
+                            $('#uploadBtn').prop('disabled', false);
+                            $("#uploadBulk")[0].reset();
                             console.log(response);
                             data = $.parseJSON(response);
                             //if the data has the wrong headers warn the user
@@ -121,3 +123,9 @@ $("#uploadBulk").submit(function(event) {
 
 
 });
+
+$('#dataFile').on('change',function(){
+    var fullFileName = $(this).val();
+    var fileName = fullFileName.split('\\')[fullFileName.split('\\').length - 1];
+    $(this).next('.custom-file-label').html(fileName);
+})
