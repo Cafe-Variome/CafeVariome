@@ -358,8 +358,8 @@ use App\Libraries\CafeVariome\ShellHelper;
 
     public function validateUpload() {
         // Source we are checking against
-        $source_id = $_POST['source_id'];
-        
+        $source_id = $this->request->getVar('source_id');
+        $space_needed = $this->request->getVar('size');
         // check if it exists
         
         $sourceExists = $this->sourceModel->getSource($source_id);
@@ -369,7 +369,6 @@ use App\Libraries\CafeVariome\ShellHelper;
             if (!$isLocked) {					
                 // if its not locked check if we have enough space on the server
                 $free = diskfreespace(FCPATH);
-                $space_needed = $_POST['size'];		     
                 if ($space_needed > $free) {
                     // There is not enough space on server
                     return json_encode("Yellow");
