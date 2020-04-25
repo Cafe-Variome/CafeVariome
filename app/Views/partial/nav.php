@@ -22,7 +22,7 @@
 			<div class="mug"></div>
 		</div>
 	</div>	
-	<a class="navbar-brand text-dark ml-3" href="<?php echo base_url() . (( ! $setting->settingData['cafevariome_central'] ) ? "home" : ''); ?>">
+	<a class="navbar-brand text-dark ml-3" href="<?php echo base_url("home"); ?>">
 		<?= $heading ?>
 	</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
