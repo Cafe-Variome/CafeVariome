@@ -24,9 +24,14 @@ class NetworkGroup extends Model{
     protected $primaryKey = 'id';
 
 
-    function __construct(ConnectionInterface &$db){
-		$this->db =& $db;
-        $this->setting =  Settings::getInstance($this->db);
+    function __construct(ConnectionInterface &$db = Null){
+        if ($db != null) {
+            $this->db =& $db;
+        }
+        else {
+            $this->db = \Config\Database::connect();
+        }
+        $this->setting =  Settings::getInstance();
         $this->builder = $this->db->table($this->table);
     }
 
@@ -75,6 +80,7 @@ class NetworkGroup extends Model{
     }
     
     function deleteNetworkGroup(int $id){
+        $this->builder = $this->db->table($this->table); // Do not remove this line! @see hasSource(int $group_id)
         $this->builder->where('id', $id);
         $this->builder->delete();
     }
