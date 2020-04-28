@@ -58,7 +58,7 @@
 				</a>
 			<?php endif; ?>
 				<a href="<?php echo base_url($controllerName.'/Leave' . '/' . $network->network_key . '/' . $network->network_name); ?>" data-toggle="tooltip" data-placement="top" title="Leave Network">
-					<i class="fa fa-trash text-danger"></i>
+					<i class="fa fa-door-open text-danger"></i>
 				</a>
 			</td>
 		</tr>
