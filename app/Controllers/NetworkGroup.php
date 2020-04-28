@@ -24,7 +24,6 @@ class NetworkGroup extends CVUI_Controller{
 	 * Validation list template.
 	 *
 	 * @var string
-	 * @see https://bcit-ci.github.io/CodeIgniter4/libraries/validation.html#configuration
 	 */
 	protected $validationListTemplate = 'list';
 	
@@ -43,7 +42,7 @@ class NetworkGroup extends CVUI_Controller{
 		
 		$this->validation = Services::validation();
 		$this->networkModel = new Network($this->db);
-		$this->networkGroupModel = new \App\Models\NetworkGroup($this->db);
+		$this->networkGroupModel = new \App\Models\NetworkGroup();
 
 	}
 	
@@ -114,6 +113,7 @@ class NetworkGroup extends CVUI_Controller{
 		
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
 			// Create the new group
+			$name =  $this->request->getVar('group_name');
 			$data = array ( 'name' => $this->request->getVar('group_name'),
 							'description' =>$this->request->getVar('desc'),
 							'group_type' => $this->request->getVar('group_type'),
@@ -121,19 +121,14 @@ class NetworkGroup extends CVUI_Controller{
 							'url' => base_url()
 			);
 			
-			$network_group_id = $this->networkGroupModel->createNetworkGroup($data);
-			if ( $network_group_id ) {
-				$this->session->setFlashdata('message', 'Network group created successfully.');
-                return redirect()->to(base_url($this->controllerName . '/index'));            
+			try {
+				$this->networkGroupModel->createNetworkGroup($data);
+				$this->setStatusMessage("Network group '$name' was created.", STATUS_SUCCESS);
+			} catch (\Exception $ex) {
+				$this->setStatusMessage("There was a problem creating '$name'.", STATUS_ERROR);
 			}
-			else {
-				$uidata->data['group_name'] = "";
-				$uidata->data['desc'] = "";
-                $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-                
-                $data = $this->wrapData($uidata);
-				return view($this->viewDirectory.'/Create', $data);
-			}
+			return redirect()->to(base_url($this->controllerName . '/List'));   
+
 		}
 		else {
 			$response = $networkInterface->GetNetworksByInstallationKey($this->setting->settingData['installation_key']);
@@ -146,7 +141,7 @@ class NetworkGroup extends CVUI_Controller{
 				$uidata->data['networks'] = $networks;
 			}
 
-            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+            $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 			$uidata->data['group_name'] = array(
 				'name'  => 'group_name',
 				'id'    => 'group_name',
@@ -189,7 +184,7 @@ class NetworkGroup extends CVUI_Controller{
 		$uidata->data['group_id'] = $id;
 		$uidata->data['csrf'] = $this->_get_csrf_nonce();
 
-		$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+		$uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
 		$this->validation->setRules([
             'confirm' => [
@@ -214,24 +209,26 @@ class NetworkGroup extends CVUI_Controller{
 			// do we really want to delete?
 			if ($this->request->getVar('confirm') == 'yes')
 			{
-				// do we have a valid request?
-				if ($id != $this->request->getVar('id'))
-				{
-					show_error('This form post did not pass our security checks.');
-				}
-				// do we have the right userlevel?
-				$has_got_network_sources_assigned = $this->networkGroupModel->hasSource($id);
-				if (!$has_got_network_sources_assigned) {
-					$this->networkGroupModel->deleteNetworkGroup($id);		
-					return redirect()->to(base_url($this->controllerName.'/index'));            	
-				}
-				else {
-					$this->session->setFlashdata('message', "Unable to delete network group as sources from another installation are present in the group.");
+				try {
+					// do we have the right userlevel?
+					$has_got_network_sources_assigned = $this->networkGroupModel->hasSource($id);
+					if (!$has_got_network_sources_assigned) {
+						$f = $this->networkGroupModel->deleteNetworkGroup($id);
+						$this->setStatusMessage("Network group was removed.", STATUS_SUCCESS);
+
+						return redirect()->to(base_url($this->controllerName.'/List'));            	
+					}
+					else {
+						$this->setStatusMessage("Unable to delete network group as sources from another installation are present in the group.", STATUS_ERROR);					}
+				} catch (\Exception $ex) {
+					$this->setStatusMessage("There was a problem removing network group.", STATUS_ERROR);
 				}
 			}
-			return redirect()->to(base_url($this->controllerName.'/index'));            	
+			return redirect()->to(base_url($this->controllerName.'/List'));            	
 		}
+
 		$data = $this->wrapData($uidata);
+
 		return view($this->viewDirectory.'/Delete', $data);
 		
 	}

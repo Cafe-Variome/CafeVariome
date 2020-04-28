@@ -12,11 +12,11 @@
 		<p>Please enter the network group information below.</p>
 	</div>
 </div>	
-<?php if($message): ?>
+<?php if($statusMessage): ?>
 	<div class="row">
 		<div class="col">
 			<div class="alert alert-info">
-			<?php echo $message ?>
+			<?php echo $statusMessage ?>
 			</div>
 		</div>
 	</div>
