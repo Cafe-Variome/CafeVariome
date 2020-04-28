@@ -37,22 +37,22 @@
             <?php $isMaster = $group['group_type'] == "master"; ?>
             <?php if($isMaster): ?>
                 <a data-toggle="tooltip" data-placement="top" title="Assign sources to network group" href="<?php echo base_url('Network/Update_Users'). "/" . $group['id'] . '/1'; ?>" >
-                    <i class="fa fa-database"></i>
+                    <i class="fa fa-database text-warning"></i>
                 </a> 
             <?php else: ?>
                 <a data-toggle="tooltip" data-placement="top" title="Assign sources to network group" href="<?php echo base_url('Network/Update_Users'). "/" . $group['id']; ?>" >
-                    <i class="fa fa-database"></i>
+                    <i class="fa fa-database text-warning"></i>
                 </a>             
             <?php endif; ?>          
             <?php if ( $group['group_type'] == "master" ): ?>
                 <i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Unable to delete master network group"></i>
                 <!-- Unable to delete master network group -->
             <?php elseif ( $group['number_of_sources'] > 0 ): ?>
-                <i class="fa fa-trash"data-toggle="tooltip" data-placement="top" title="Unable to delete group with sources assigned"></i>
+                <i class="fa fa-trash text-danger" data-toggle="tooltip" data-placement="top" title="Unable to delete group with sources assigned"></i>
                 <!-- Unable to delete group with sources assigned -->
             <?php else: ?>
                 <a data-toggle="tooltip" data-placement="top" title="Remove network group" href="<?php echo base_url($controllerName.'/Delete'). "/" . $group['id']; ?>" >
-                    <i class="fa fa-trash"></i>
+                    <i class="fa fa-trash text-danger"></i>
                 </a>
             <?php endif; ?>
             </td>
