@@ -112,10 +112,9 @@ class Network extends CVUI_Controller{
 
             $networkInterface = new NetworkInterface();
             $response = $networkInterface->CreateNetwork(['network_name' => $name, 'network_type' => 1, 'network_threshold' => 0, 'network_status' => 1]);
-            if ($response->status == 0) {
+            if (!$response->status) {
                 //something failed
-                $this->session->set('message', $response->message);
-                $this->session->markAsFlashdata('message');
+                $this->setStatusMessage("There was a problem communicating with the network software.", STATUS_ERROR);
             }
             else {
                 //operation successful
@@ -127,30 +126,41 @@ class Network extends CVUI_Controller{
 
                 //create local replication of network
 
-                if ($addInstallationResponse->status == 0) {
-                    $this->session->set('message', $response->message);
-                    $this->session->markAsFlashdata('message');
+                if (!$addInstallationResponse->status) {
+                    $this->setStatusMessage("There was a problem adding this installation to '$name'.", STATUS_ERROR);
                 }
                 else {
-                    $this->networkModel->createNetwork(array ('network_name' => $name,
-                        'network_key' => $response->data->network_key,
-                        'network_type' => 1
-                    ));
+                    try {
+                        $this->networkModel->createNetwork(array ('network_name' => $name,
+                            'network_key' => $response->data->network_key,
+                            'network_type' => 1
+                        ));
 
-                    $network_master_group_data = array ('name' => $name,
-                                'description' => $name,
-                                'network_key' => $response->data->network_key,
-                                'group_type' => "master",
-                                'url' => $this->setting->settingData['installation_key']
-                                );
-                    $network_group_id = $networkGroupModel->createNetworkGroup($network_master_group_data);
+                        try {
+                            $network_master_group_data = array ('name' => $name,
+                            'description' => $name,
+                            'network_key' => $response->data->network_key,
+                            'group_type' => "master",
+                            'url' => $this->setting->getInstallationKey()
+                            );
+                            $network_group_id = $networkGroupModel->createNetworkGroup($network_master_group_data);
 
-                    return redirect()->to(base_url($this->controllerName.'/index'));
+                            $this->setStatusMessage("Network '$name' was created successfully.", STATUS_SUCCESS);
+
+                        } catch (\Exception $ex) {
+                            $this->setStatusMessage("There was a problem creating a network group for '$name'.", STATUS_ERROR);
+                        }
+                    }
+                    catch (\Exception $ex) {
+                        $this->setStatusMessage("There was a problem creating local replica for '$name'.", STATUS_ERROR);
+                    }
+
+                    return redirect()->to(base_url($this->controllerName.'/List'));
                 }
             }
        } 
 
-        $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+        $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
         $uidata->data['name'] = array(
             'name' => 'name',
@@ -167,50 +177,81 @@ class Network extends CVUI_Controller{
         
     }
 
-    function Update_Users($id, $isMaster = false) {
+    function Update_Users(int $id, $isMaster = false) {
 
         $uidata = new UIData();
         $uidata->title = "Edit User Network Groups";
         $uidata->stickyFooter = false;
         if ($this->request->getPost()){
-            if ($this->request->getVar('groups')) {
+
+            $uidata->data['selectedUsers'] = $this->request->getVar('users') ? $this->request->getVar('users') :[];
+            $uidata->data['selectedSources'] = $this->request->getVar('sources') ? $this->request->getVar('sources') :[];
+            $name = $this->request->getVar('name');
+
+            if ($this->request->getVar('users')) {
 
                 $group_id = $this->request->getVar('id');
                 $installation_key = $this->request->getVar('installation_key');
 
-                $this->networkModel->deleteAllUsersFromNetworkGroup($group_id);
-                
-                $network_key = $this->networkModel->getNetworkKeybyGroupId($group_id);
-                foreach ($this->request->getVar('groups') as $user_id)
+                try {
+                    $this->networkModel->deleteAllUsersFromNetworkGroup($group_id);
+                    $network_key = $this->networkModel->getNetworkKeybyGroupId($group_id);
+    
+                    foreach ($this->request->getVar('users') as $user_id)
+                    {
                         $this->networkModel->addUserToNetworkGroup($user_id, $group_id, $installation_key, $network_key);
+                    }
+    
+                    $this->networkModel->deleteUserFromAllOtherNetworkGroups($network_key, $this->request->getVar('users'));
+                    $this->setStatusMessage("Granted users list was updated for '$name'.", STATUS_SUCCESS);
 
-                if($isMaster) 
-                    $this->networkModel->deleteUserFromAllOtherNetworkGroups($network_key,  $this->request->getVar('groups'));
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem updating granted users list for '$name'.", STATUS_ERROR);
+                }
             }
-            else { // No groups selected so remove the user from all network groups
-                    $group_id = $this->request->getVar('id');
-                    $isMaster = $this->request->getVar('isMaster');
-                    $installation_key =  $this->request->getVar('installation_key');
+            else {
+                // No groups selected so remove the user from all network groups
+                $group_id = $this->request->getVar('id');
+                $isMaster = $this->request->getVar('isMaster');
+                $installation_key =  $this->request->getVar('installation_key');
+                try {
                     $this->networkModel->deleteAllUsersFromNetworkGroup($group_id, $isMaster);
+                    $this->setStatusMessage("Granted users list was updated for '$name'.", STATUS_SUCCESS);
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem removing all users from the list of granted users for '$name'.", STATUS_ERROR);
+                }
             }
             if ($this->request->getVar('sources')) {
                 $group_id = $this->request->getVar('id');
                 $installation_key = $this->request->getVar('installation_key');
 
-                $this->networkModel->deleteAllSourcesFromNetworkGroup($group_id, $installation_key);
+                try {
+                    $this->networkModel->deleteAllSourcesFromNetworkGroup($group_id, $installation_key);
 
-                foreach ($this->request->getVar('sources') as $source_id)
-                {
-                    $this->networkModel->addSourceToNetworkGroup($source_id, $group_id, $installation_key);
+                    foreach ($this->request->getVar('sources') as $source_id)
+                    {
+                        $this->networkModel->addSourceToNetworkGroup($source_id, $group_id, $installation_key);
+                    }
+                    $this->setStatusMessage("Granted sources list was updated for '$name'.", STATUS_SUCCESS, true);
+
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem updating granted sources list for '$name'.", STATUS_ERROR, true);
                 }
             }
-            else { // No groups selected so remove the user from all network groups
-                    $group_id = $this->request->getVar('id');
-                    $installation_key = $this->request->getVar('installation_key');
+            else { 
+                // No groups selected so remove the user from all network groups
+                $group_id = $this->request->getVar('id');
+                $installation_key = $this->request->getVar('installation_key');
+                try {
                     $this->networkModel->deleteAllSourcesFromNetworkGroup($group_id, $installation_key);
+                    $this->setStatusMessage("Granted sources list was updated for '$name'.", STATUS_SUCCESS, true);
+
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem removing all sources from the list of granted sources for '$name'.", STATUS_ERROR, true);
+                }
             }
     
-			return redirect()->to(base_url($this->controllerName.'/index'));            
+			return redirect()->to(base_url($this->controllerName.'/List'));            
         }
         else{
 
@@ -219,75 +260,50 @@ class Network extends CVUI_Controller{
             $uidata->data['csrf'] = $this->_get_csrf_nonce();
     
             //set the flash data error message if there is one
-            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-            $users = json_decode(json_encode($this->userModel->getUsers(),1));
-            $group_users = $this->networkModel->getNetworkGroupUsers($id);
+            $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+            $users = $this->userModel->getUsers();
+            $selectedUsers = $this->networkModel->getNetworkGroupUsers($id);
             $group_details = $this->networkModel->getNetworkGroup($id);
             $uidata->data['name'] = $group_details['name'];   
             $uidata->data['group_type'] = $group_details['group_type']; 
     
-            $sourceModel = new Source($this->db);
+            $sourceModel = new Source();
     
-            if(!$isMaster) {
-                $sources = $sourceModel->getSources();
-                $group_sources = $sourceModel->getSourceId($id);
+            $sources = $sourceModel->getSources();
+            $selectedSources = $sourceModel->getSourceId($id);
 
-                $ids = [];
-                
-                if ($group_sources) {
-                    foreach ($group_sources as $key => $value)
-                    $ids[] = $value['source_id'];
-                }
+            $sourcesList = [];
+            $selectedSourcesList = [];
 
-                if($ids)
-                    $group_sources = $sourceModel->getSpecificSources($ids);
-    
-                $sources_left = []; 
-                $sources_right = [];
-    
-                foreach ($sources as $key => $value)
-                    $sources_left[$value['source_id']] = $value['name'];
-
-                if ($group_sources) {
-                    foreach ($group_sources as $key => $value)
-                        $sources_right[$value['source_id']] = $value['name'];
-                }
-
-                foreach ($sources_right as $key => $value) {
-                    if(array_key_exists($key, $sources_left))
-                        unset($sources_left[$key]);
-                }
-    
-                $uidata->data['sources_left'] = $sources_left;
-                $uidata->data['sources_right'] = $sources_right;
+            foreach ($sources as $source) {
+                $sourcesList[$source['source_id']] = $source['name'];
             }
-            if($isMaster) {
+
+            foreach ($selectedSources as $selectedSource) {
+                array_push($selectedSourcesList, $selectedSource['source_id']);
+            }
+
+            $uidata->data['sources'] = $sourcesList;
+            $uidata->data['selectedSources'] = $selectedSourcesList;
+            
+            $usersList = [];
+            $selectedUsersList = [];
+
+            foreach ($users as $user) {
+                $usersList[$user['id']] = $user['email'];
+            }
+
+            foreach ($selectedUsers as $user) {
                 for($i = 0; $i < count($users); $i++) {
-                    if($users[$i]->username == "admin@cafevariome") {
-                        unset($users[$i]);
-                        $users = array_values($users);
+                    if($user['id'] == $users[$i]['id']) {
+                        array_push($selectedUsersList, $user['id']);
                     }
                 }
             }
 
-            if (!array_key_exists('error', $group_users)) {
-                foreach ($group_users as $group_user) {
-
-                    for($i = 0; $i < count($users); $i++) {
-                        if($group_user['id'] == $users[$i]->id) {
-                            unset($users[$i]);
-                            $users = array_values($users);
-                        }
-                    }
-                }
-                $uidata->data['group_users'] = $group_users;   
-            }
-            if($isMaster)
-                $uidata->data['users'] = $users;
-            else {
-                if(!array_key_exists('error', $users))  $uidata->data['users'] = $users;
-            }
-    
+            $uidata->data['users'] = $usersList;
+            $uidata->data['selectedUsers'] = $selectedUsersList;   
+            
             $uidata->data['remote_user_email'] = array(
                 'name' => 'remote_user_email',
                 'id' => 'remote_user_email',
@@ -298,7 +314,7 @@ class Network extends CVUI_Controller{
             
             $uidata->data['isMaster'] = ($isMaster ? $isMaster : 0);
             $uidata->data['user_id'] = $id;
-            $uidata->data['installation_key'] = $this->setting->settingData['installation_key'];
+            $uidata->data['installation_key'] = $this->setting->getInstallationKey();
     
             $uidata->javascript = array(JS."cafevariome/network.js", JS."cafevariome/components/transferbox.js");
     
@@ -336,19 +352,24 @@ class Network extends CVUI_Controller{
             $network_key = $this->request->getVar('networks');
             $justification = $this->request->getVar('justification');
 
-            $user_id = $this->authAdapter->getUserId();
-            $userModel = new User($this->db);
-            $user = $userModel->getUserById($user_id);
+            $userModel = new User();
 
+            $user_id = $this->authAdapter->getUserId();
+            $user = $userModel->getUserById($user_id);
             $email = $user[0]->email;
 
             $join_response = $networkInterface->RequestToJoinNetwork($network_key, $email, $justification);
-
-            return redirect()->to(base_url($this->controllerName.'/index'));
+            if ($join_response->status) {
+                $this->setStatusMessage("Your request to join the network was sent successfully.", STATUS_SUCCESS);
+            }
+            else{
+                $this->setStatusMessage("There was a problem communicating with network software.", STATUS_ERROR);
+            }
+            return redirect()->to(base_url($this->controllerName.'/List'));
         }
         else {
 
-            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+            $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
             $uidata->data['justification'] = array(
                 'name' => 'justification',
@@ -369,7 +390,6 @@ class Network extends CVUI_Controller{
             }
 
             $uidata->data['networks'] = $networks;
-            
 
             $data = $this->wrapData($uidata);
 
@@ -406,7 +426,7 @@ class Network extends CVUI_Controller{
     }
 
     /**
-     * 
+     * @deprecated
      */
     function create_remote_user() {
 
@@ -494,8 +514,9 @@ class Network extends CVUI_Controller{
         $uidata = new UIData();
         $uidata->title = "Leave Network";
 
-        if ($networkResponse->status == 0 || $networkResponse->data == null) {
-            return redirect()->to(base_url($this->controllerName.'/index'));
+        if (!$networkResponse->status || $networkResponse->data == null) {
+            $this->setStatusMessage("There was a problem communicating with network software.", STATUS_ERROR);
+            return redirect()->to(base_url($this->controllerName.'/List'));
         }
         else {
 
@@ -511,15 +532,22 @@ class Network extends CVUI_Controller{
 
             if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
                 if ($this->request->getVar('confirm') == 'yes') {
+                    $name = $this->request->getVar('name');
                     $networkResponse = $networkInterface->LeaveNetwork($network_key);
-                    
-                    if ($networkResponse->status == 1) {
+                    $this->setStatusMessage("Your installation has successfully left '$name'.", STATUS_SUCCESS);
+
+                    if ($networkResponse->status) {
                         //Left the network.
                         //Now delete the local replica if it exists.
-                        $this->networkModel->deleteNetwork($network_key);
-                        return redirect()->to(base_url($this->controllerName.'/index'));
+                        try {
+                            $this->networkModel->deleteNetwork($network_key);
+                        } catch (\Exception $ex) {
+                            $this->setStatusMessage("There was a problem removing local replica for '$name'.", STATUS_ERROR, true);
+                        }     
+                        return redirect()->to(base_url($this->controllerName.'/List'));
                     }
                 }
+                return redirect()->to(base_url($this->controllerName.'/List'));
             }
 
             $uidata->data['confirm'] = array(

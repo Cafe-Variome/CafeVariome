@@ -9,6 +9,8 @@
 <hr>
 
 <?php echo form_open($controllerName."/Leave/$network_key"); ?>
+<?php echo form_hidden('name', $network_name); ?>                
+
 <div class="form-group">
   <span class="text-danger">Warning: Are you sure you want to leave <?= $network_name ?>?</span>
 </div>

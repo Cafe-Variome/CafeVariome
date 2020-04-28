@@ -7,11 +7,11 @@
     </div>
 </div>
 <hr>
-<?php if($message): ?>
+<?php if($statusMessage): ?>
 	<div class="row">
 		<div class="col">
 			<div class="alert alert-info">
-			<?php echo $message ?>
+			<?php echo $statusMessage ?>
 			</div>
 		</div>
 	</div>
@@ -47,11 +47,6 @@
 <?php else: ?>
 	<p>There was a problem finding available networks to join, please contact admin@cafevariome.org if the problem persists</p>
 <?php endif; ?>
-<?php
-if (isset($result))
-{
-	echo '<p>Network request received successfully.</p>';
-}
-?>
+
 
 <?= $this->endSection() ?>

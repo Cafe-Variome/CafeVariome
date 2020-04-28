@@ -15,6 +15,12 @@ $(document).ready(function() {
     if ($('#networkstable').length) {
         $('#networkstable').DataTable();
     }
+    if ($('#users').length) {
+        $('#users').select2({width:'100%'});
+    }
+    if ($('#sources').length) {
+        $('#sources').select2({width:'100%'});
+    }
 } );
 
 
