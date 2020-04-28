@@ -151,14 +151,39 @@ class Admin extends CVUI_Controller{
         */
         
         if ($this->request->getPost() /*&& $this->validation->withRequest($this->request)->run()*/) {
+            $errorFlag = false;
             foreach ($settings as $s) {
-                $settingModel->updateSettings(['value' => $this->request->getVar($s["setting_key"])], ['setting_key' =>  $s["setting_key"]]);
+                $settingName = $s['setting_name'];
+                $settingKey = $s["setting_key"];
+                $settingVal = $this->request->getVar($settingKey);
+                if ($settingVal != $this->setting->settingData[$s["setting_key"]]) {
+                    if ($settingKey == 'installation_key') {
+                        $settingVal = trim($settingVal);
+                    }
+                    if ($settingKey == 'auth_server') {
+                        $settingVal = trim($settingVal);
+                        $valLen = strlen($settingVal);
+                        if(substr($settingVal, $valLen-1, $valLen) != '/'){
+                            $settingVal = $settingVal . '/';
+                        }
+                    }
+                    try {
+                        $settingModel->updateSettings(['value' => $settingVal], ['setting_key' =>  $settingKey]);
+                    } catch (\Exception $ex) {
+                        $errorFlag = true;
+                        $this->setStatusMessage("There was a problem updating '$settingName'.", STATUS_ERROR);
+                    }
+                }
             }
+            if (!$errorFlag) {
+                $this->setStatusMessage("Settings were updated.", STATUS_SUCCESS);
+            }
+
             return redirect()->to(base_url($this->controllerName.'/Settings'));
         }
-        else{
-            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-        }
+        // else{
+        //     $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+        // }
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Settings', $data);

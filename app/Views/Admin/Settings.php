@@ -6,11 +6,15 @@
 	</div>	
 </div>
 <hr>
-<?php if($message): ?>
-<div class="alert alert-info">
-    <?php echo $message; ?>
-</div>
-<?php endif ?>
+<?php if($statusMessage): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-<?= $statusMessageType ?>">
+			<?php echo $statusMessage ?>
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
 <?php echo form_open($controllerName."/Settings"); ?>
 
 <?php foreach ($settings as $s): ?>
