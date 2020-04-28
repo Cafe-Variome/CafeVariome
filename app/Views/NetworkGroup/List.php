@@ -7,15 +7,15 @@
 	</div>	
 </div>
 <hr>
-<?php if (array_key_exists('error', $groups)): ?>
-<div class="row">
-    <div class="col">
-        <div class="alert alert-info">
-            <p>There are currently no groups for any of the networks you belong to, create a new group for a network below.</p>
-        </div>
-    </div>
-</div>
-<?php else: ?>
+<?php if($statusMessage): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-<?= $statusMessageType ?>">
+			<?php echo $statusMessage ?>
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
 <table class="table table-bordered table-striped table-hover" id="networkgroups_table">
     <thead>
         <tr>
@@ -60,7 +60,7 @@
     <?php endforeach; ?>
     </tbody>
 </table>
-<?php endif; ?>
+
 <div class="row">
     <div class="col">
         <a href="<?php echo base_url($controllerName) .'/Create';?>" class="btn btn-primary" >
@@ -68,8 +68,4 @@
         </a>
     </div>
 </div>
-	
-<div class="span10 offset1 pagination-centered"><br /><p>Network groups can be assigned to sources within you installation. Users who belong to those groups in your network are allowed access to restrictedAccess records in sources across the network.</p></div>
-
-
 <?= $this->endSection() ?>
