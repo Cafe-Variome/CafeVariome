@@ -94,8 +94,7 @@ class User extends CVUI_Controller{
 
             $email    = $this->request->getVar('email');
             //$groups = ($this->request->getVar('groups') != null) ? $this->request->getVar('groups') : [];
-            $groups = ($this->request->getVar('isadmin') != null) ? [1] : [0];
-            $installation_key = $this->request->getVar('installation_key');
+            $groups = ($this->request->getVar('isadmin') != null) ? [1] : [2];
             $is_admin = ($this->request->getVar('isadmin') != null) ? 1 : 0;
             $remote = ($this->request->getVar('isremote') != null) ? 1 : 0;
             $first_name = $this->request->getVar('first_name');
@@ -103,7 +102,7 @@ class User extends CVUI_Controller{
             $company = $this->request->getVar('company');
 
             $data = [
-                    "installation_key" => $installation_key,
+                    "installation_key" => $this->setting->getInstallationKey(),
                     "first_name" => $first_name,
                     "last_name" => $last_name,
                     "company" => $company,
@@ -111,8 +110,14 @@ class User extends CVUI_Controller{
                     "remote" => $remote
             ];
 
-            $userModel = new \App\Models\User($this->db);
-            $userModel->createUser($email, $email, $groups, $data, $this->authAdapter);
+            $userModel = new \App\Models\User();
+
+            try {
+                $userModel->createUser($email, $email, $groups, $data, $this->authAdapter);
+                $this->setStatusMessage("User '$email' was created.", STATUS_SUCCESS);
+            } catch (\Exception $ex) {
+                $this->setStatusMessage("There was a problem creating '$email'.", STATUS_ERROR);
+            }
             return redirect()->to(base_url($this->controllerName.'/List'));
 
         }
@@ -120,7 +125,7 @@ class User extends CVUI_Controller{
             $uidata->data['groups'] = $groups;
             //display the create user form
             //set the flash data error message if there is one
-            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+            $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
             $uidata->data['first_name'] = array(
                     'name'  => 'first_name',
@@ -212,11 +217,12 @@ class User extends CVUI_Controller{
         $uidata->title = "Edit User";
         $uidata->stickyFooter = false;
 
-        $userModel = new \App\Models\User($this->db);
-        $networkModel = new Network($this->db);
+        $userModel = new \App\Models\User();
+        $networkModel = new Network();
 
         $user = $userModel->getUsers(null, ["id" => $id]);
         if (count($user) != 1) {
+            $this->setStatusMessage("User was not found.", STATUS_WARNING);
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
         else {
@@ -251,9 +257,8 @@ class User extends CVUI_Controller{
     
             if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
     
-                //$email    = $this->request->getVar('email');
-                $groups = ($this->request->getVar('groups') != null) ? $this->request->getVar('groups') : [];
-                //$installation_key = $this->request->getVar('installation_key');
+                $email    = $this->request->getVar('uemail');
+                $groups = ($this->request->getVar('isadmin') != null) ? [1] : [0];
                 $is_admin = ($this->request->getVar('isadmin') != null) ? 1 : 0;
                 $remote = ($this->request->getVar('isremote') != null) ? 1 : 0;
                 $first_name = $this->request->getVar('first_name');
@@ -270,8 +275,13 @@ class User extends CVUI_Controller{
                         "active" => $active
                 ];
     
-                $userModel = new \App\Models\User($this->db);
-                $userModel->updateUser($id, $groups, $data, $this->authAdapter);
+                try {
+                    $userModel->updateUser($id, $groups, $data, $this->authAdapter);
+                    $this->setStatusMessage("User '$email' was updated.", STATUS_SUCCESS);
+
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem updating '$email'.", STATUS_WARNING);
+                }
                 return redirect()->to(base_url($this->controllerName.'/List'));
             }
             else { 
@@ -291,7 +301,7 @@ class User extends CVUI_Controller{
                 $uidata->data['selected_groups'] = $selected_groups;
                 //display the create user form
                 //set the flash data error message if there is one
-                $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+                $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
     
                 $uidata->data['first_name'] = array(
                         'name'  => 'first_name',
@@ -342,6 +352,8 @@ class User extends CVUI_Controller{
                     'value' => set_value('active', $user['active']),
                     'checked' => ($user['active'] == 1) ? true : false
                 );
+
+                $uidata->data['uemail'] = $user['email'];
             }
             $data = $this->wrapData($uidata);
             return view($this->viewDirectory. '/Update', $data);  
@@ -354,12 +366,14 @@ class User extends CVUI_Controller{
 
         $uidata->title = "Delete User";
 
-        $user = $userModel->getUsers('id, first_name, last_name', ["id" => $id]);
+        $user = $userModel->getUsers('id, email, first_name, last_name', ["id" => $id]);
         if (count($user) != 1) {
+            $this->setStatusMessage("User was not found.", STATUS_WARNING);
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
         else {
             $user = $user[0];
+            $email = $user['email'];
             $uidata->data['id'] = $user['id'];
             $uidata->data['first_name'] = $user['first_name']; 
             $uidata->data['last_name'] = $user['last_name']; 
@@ -375,13 +389,16 @@ class User extends CVUI_Controller{
             ]);
             if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
                 if ($this->request->getVar('confirm') == 'yes') {
-                    //delete user
-                    $userModel->deleteUser((int)$user['id'], $this->authAdapter);
-                    return redirect()->to(base_url($this->controllerName.'/List'));
+                    try {
+                        //delete user
+                        $userModel->deleteUser((int)$user['id'], $this->authAdapter);
+                        $this->setStatusMessage("User '$email' was removed.", STATUS_SUCCESS);
+
+                    } catch (\Exception $ex) {
+                        $this->setStatusMessage("There was a problem removing '$email'.", STATUS_ERROR);
+                    }
                 }
-                else {
-                    return redirect()->to(base_url($this->controllerName.'/List'));
-                }
+                return redirect()->to(base_url($this->controllerName.'/List'));
             }
             $data = $this->wrapData($uidata);
             return view($this->viewDirectory. '/Delete', $data);

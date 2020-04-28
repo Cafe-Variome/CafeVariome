@@ -7,14 +7,17 @@
 	</div>	
 </div>
 <hr>
-<?php if($message): ?>
-<div class="alert alert-info">
-    <?php echo $message; ?>
-</div>
-<?php endif ?>
-
+<?php if($statusMessage): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-<?= $statusMessageType ?>">
+			<?php echo $statusMessage ?>
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
 <?php echo form_open($controllerName."/Update/". $user_id); ?>
-    <?php echo form_hidden(array('installation_key' => $setting->settingData['installation_key'])); ?>	
+<?php echo form_hidden('uemail', $uemail); ?>
     <div class="form-group">
         <?php echo form_label('Email as Username: (*)', 'email'); ?>
         <?php echo form_input($email, '', ['disabled' => 'disabled']); ?>
@@ -32,32 +35,9 @@
         <?php echo form_input($company); ?>
     </div>
     <div class="form-group">
-        <?php echo form_label('Add to Group (control click to select multiple):', 'groups'); ?>
-        <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" data-placement="right" title="Press and hold Ctrl key to select multiple items.">
-            <i class="fa fa-question"></i>
-        </button>   
-        <?php if (array_key_exists('error', $groups)): ?>
-        <div class="alert alert-info">
-            There are no network groups available to this installation.
-            A user will not be able to log in until they been assigned to at least one group.
-        </div>  
-    <?php else: ?>
-        <?php $count = count($groups) + 1; $additional = 'size="' . $count . '"'; ?>
-        <select size="<?php echo $count; ?>" name="groups[]"  multiple="multiple" class="form-control">
-            <?php foreach ($groups as $group): ?>
-            <?php if (array_search($group['id'], $selected_groups) !== false): ?>
-                <option value="<?php echo $group['id'] . "," . $group['network_key']; ?>" selected><?php echo $group['description'] . " (Network:" . $group['network_name'] . ")"; ?></option>
-            <?php else: ?>
-                <option value="<?php echo $group['id'] . "," . $group['network_key']; ?>"><?php echo $group['description'] . " (Network:" . $group['network_name'] . ")"; ?></option>
-            <?php endif ?>
-            <?php endforeach; ?>
-        </select>
-    <?php endif; ?>
-    </div>
-    <div class="form-group">
         <div class="custom-control custom-checkbox">
             <?php echo form_checkbox($active); ?>
-            <?php echo form_label('User status', 'active', array("class"=>"custom-control-label")); ?>
+            <?php echo form_label('Active', 'active', array("class"=>"custom-control-label")); ?>
         </div>
     </div>
     <div class="form-group">

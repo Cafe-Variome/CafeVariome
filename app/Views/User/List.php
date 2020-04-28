@@ -7,12 +7,15 @@
 	</div>	
 </div>
 <hr>
-<?php if($message): ?>
-<div class="alert alert-info">
-    <?php echo $message; ?>
-</div>
-<?php endif ?>
-
+<?php if($statusMessage): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-<?= $statusMessageType ?>">
+			<?php echo $statusMessage ?>
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
 <table class="table table-bordered table-striped table-hover" id="userstable">
     <thead>
         <tr>
@@ -50,10 +53,10 @@
             <td><?php if ($user['remote']) { echo 'Remote User'; } else { echo 'Local User'; } ?></td>
             <td>
                 <a data-toggle="tooltip" data-placement="top" title="Edit User" href="<?php echo base_url($controllerName.'/Update'). "/" . $user['id']; ?>" >
-                    <i class="fa fa-edit"></i>
+                    <i class="fa fa-edit text-warning"></i>
                 </a>
                 <a data-toggle="tooltip" data-placement="top" title="Delete User" href="<?php echo base_url($controllerName.'/Delete'). "/" . $user['id']; ?>" >
-                    <i class="fa fa-trash"></i>
+                    <i class="fa fa-trash text-danger"></i>
                 </a>
         </tr>
         <?php endforeach; ?>
@@ -64,8 +67,6 @@
     <div class="col">
         <a href="<?php echo base_url($controllerName. '/Create');?>" class="btn btn-primary" >
             <i class="icon-user icon-white"></i> Create new user</a>
-        <a href="<?php echo base_url('Admin/Index');?>" class="btn btn-secondary" >
-            <i class="fa fa-home"></i> Admin Dashboard</a>
     </div>
 </div>
 
