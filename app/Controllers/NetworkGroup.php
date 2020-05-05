@@ -54,18 +54,27 @@ class NetworkGroup extends CVUI_Controller{
 		$uidata = new UIData();
 		$uidata->title = "Network Groups";
 
-		$networkGroups = $this->networkGroupModel->getNetworkGroups(null, null, array('name'), true);
-		foreach ( $networkGroups as $network_group ) {
+		$localNetworkGroups = $this->networkGroupModel->getNetworkGroups(null, null, array('name'), true); // Local network groups
+		$remoteNetworkGroups = $this->networkGroupModel->getRemoteNetworkGroups(); // Remote network groups
+
+		$network_groups_for_installation = [];
+		foreach ( $localNetworkGroups as $network_group ) {
 			$number_sources = $this->networkModel->countSourcesForNetworkGroup($network_group['id']);
 			$network_group['number_of_sources'] = $number_sources;
 			$network_groups_for_installation[] = $network_group;
 		}
-		if (!empty($network_groups_for_installation)) {
-			$uidata->data["groups"] = $network_groups_for_installation;
+
+		$networkInterface = new NetworkInterface();
+
+		foreach ( $remoteNetworkGroups as $network_group ) {
+			$number_sources = $this->networkModel->countSourcesForNetworkGroup($network_group['id']);
+			$network_group['number_of_sources'] = $number_sources;
+			$netResp = $networkInterface->GetNetwork($network_group['network_key']);
+			$network_group['network_name'] = $netResp->status ? $netResp->data->network_name : "-";
+			$network_groups_for_installation[] = $network_group;
 		}
-		else {
-			$uidata->data["groups"] = array("error" => "No network groups are available for this installation");
-		}
+
+		$uidata->data["groups"] = $network_groups_for_installation;
 
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = array(VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js', JS.'cafevariome/components/datatable.js',JS. 'cafevariome/networkgroup.js');
