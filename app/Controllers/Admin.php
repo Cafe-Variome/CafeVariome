@@ -102,7 +102,7 @@ class Admin extends CVUI_Controller{
         }
 
         $uidata->data['usersCount'] = count($userModel->getUsers('id'));
-        $uidata->data['networkRequestCount'] = count($networkRequestModel->getNetworkRequests('id', ['status' => 0]));
+        $uidata->data['networkRequestCount'] = count($networkRequestModel->getNetworkRequests('id', ['status' => -1]));
 
         $elasticStatus = $elasticSearch->ping();
         $uidata->data['elasticStatus'] = $elasticStatus;
