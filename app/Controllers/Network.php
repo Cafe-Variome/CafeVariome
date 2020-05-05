@@ -114,7 +114,11 @@ class Network extends CVUI_Controller{
             $response = $networkInterface->CreateNetwork(['network_name' => $name, 'network_type' => 1, 'network_threshold' => 0, 'network_status' => 1]);
             if (!$response->status) {
                 //something failed
-                $this->setStatusMessage("There was a problem communicating with the network software.", STATUS_ERROR);
+                if ($response->message != Null) {
+                    $this->setStatusMessage($response->message, STATUS_ERROR);
+                }else {
+                    $this->setStatusMessage("There was a problem communicating with the network software.", STATUS_ERROR);
+                }
             }
             else {
                 //operation successful
@@ -159,8 +163,9 @@ class Network extends CVUI_Controller{
                 }
             }
        } 
-
-        $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+       else {
+            $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+       }
 
         $uidata->data['name'] = array(
             'name' => 'name',
