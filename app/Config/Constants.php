@@ -102,7 +102,7 @@ define('JSON_DATA_DIR', RESOURCES_DIR . "phenotype_lookup_data" . DIRECTORY_SEPA
 define('PRECAN', false); // Set/Unset to enable/disable Precanned Queries feature in Query Builder
 define('PHENOTYPE_CATEGORIES', true); // Set/Unset to enable/disable categories wise split in phenotype attributes
 
-define('PHP_BIN_PATH', '/usr/bin/php7.4');
+define('PHP_BIN_PATH', '/usr/bin/php');
 
 // UI status message types
 define('STATUS_SUCCESS', 1);
