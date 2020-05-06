@@ -9,14 +9,13 @@
         "ext-curl": "*",
         "ext-intl": "*",
         "ext-json": "*",
-        "kint-php/kint": "^2.1",
+        "kint-php/kint": "3.3",
         "psr/log": "^1.1",
         "zendframework/zend-escaper": "^2.5",
         "stevenmaguire/oauth2-keycloak": "^2.1",
         "components/font-awesome": "^5.9.0",
         "codeigniter4/framework": "dev-master",
         "twbs/bootstrap": "^4.3",
-        "benedmunds/codeigniter-ion-auth": "4.x-dev",
 		"elasticsearch/elasticsearch": "^7.2",
         "select2/select2": "^4.0.7",
         "datatables/datatables": "^1.10.19",
@@ -35,14 +34,20 @@
     },
     "autoload": {
         "psr-4": {
-            "CodeIgniter\\": "system/"
+            "CodeIgniter\\": "system/",
+            "CafeVariomeSetup\\": "Install/"
         }
     },
     "scripts": {
         "post-update-cmd": [
             "@composer dump-autoload",
-            "CodeIgniter\\ComposerScripts::postUpdate",
-            "bash admin/setup.sh"
+            "CodeIgniter\\ComposerScripts::postUpdate"
+            
+        ],
+        "CVInstall": [
+            "@composer dump-autoload",
+            "bash Install/install.sh",
+            "CafeVariomeSetup\\CVInstaller::InstallDB"
         ]
     },
     "support": {
@@ -50,11 +55,5 @@
         "source": "https://github.com/codeigniter4/CodeIgniter4",
         "slack": "https://codeigniterchat.slack.com"
     },
-    "minimum-stability": "dev",
-    "repositories": {
-        "ionAuth": {
-            "type": "vcs",
-            "url": "git@github.com:benedmunds/CodeIgniter-Ion-Auth.git"
-        }
-    }
+    "minimum-stability": "dev"
 }
