@@ -172,6 +172,14 @@ CREATE TABLE `Pages` (
   `Removable` bit(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `Pages`
+--
+
+INSERT INTO `Pages` (`id`, `Title`, `Content`, `Author`, `Active`, `Removable`) VALUES
+(1, 'Home', '<div class=\"&quot;row\">\r\n<div class=\"col\">\r\n<table style=\"border-collapse: collapse; width: 100%;\" border=\"0\">\r\n<tbody>\r\n<tr>\r\n<td style=\"width: 50%;\">\r\n<h3>What is Cafe Variome?</h3>\r\n<p>Cafe Variome is a flexible web-based, data discovery tool that can be quickly installed by any biomedical data owner to enable the &ldquo;existence&rdquo; rather than the &ldquo;substance&rdquo; of the data to be discovered.</p>\r\n<h3>What data is Cafe Variome designed for?</h3>\r\n<p>Cafe Variome has been designed for use with all sensitive biomedical data, whether this be genomic variants or cohort data.</p>\r\n<p>For full details please look at the <a href=\"https://www.cafevariome.org/about#Data\"> data section</a>.</p>\r\n<h3>Who is cafe Variome designed for?</h3>\r\n<p>Cafe Variome is designed for owners of sensitive biomedical data who would like to make their data discoverable but don\'t want to risk exposing the content to the outside world. This is not limited to individual institutions, federated Cafe Variome networks can be setup by consortia.</p>\r\n</td>\r\n<td style=\"width: 50%;\">\r\n<h3>Want to explore a Cafe Variome installation to learn more?</h3>\r\n<a href=\"https://central.cafevariome.org\" target=\"_blank\" rel=\"noopener\"><img class=\"img-responsive center-block\" style=\"max-width: 300px;\" title=\"Cafe Variome Central\" src=\"https://www.cafevariome.org/assets/images/CVLogos/cvc_transparent.png\" alt=\"Cafe Variome Central\" data-toggle=\"tooltip\" /></a>\r\n<h3>Take a look through <a href=\"https://central.cafevariome.org\" target=\"_blank\" rel=\"noopener\"> Cafe Variome Central</a>, our installation created from publicly available datasets.</h3>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td style=\"width: 50%;\">&nbsp;</td>\r\n<td style=\"width: 50%;\">&nbsp;</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n</div>\r\n</div>', 1, b'1', b'0'),
+(2, 'Contact', '', 1, b'1', b'0');
+
 -- --------------------------------------------------------
 
 --
