@@ -97,4 +97,19 @@ class NetworkGroup extends Model{
 
         return ($this->builder->countAllResults() > 0)? true : false;
     }
+
+    public function getRemoteNetworkGroups()
+    {
+        $networkGroups = $this->getNetworkGroups(null, null, array('name'), false);
+        $localNetworkGroups = $this->getNetworkGroups(null, null, array('name'), true);
+        $lngIds = [];
+        foreach ($localNetworkGroups as $lng) {
+            array_push($lngIds, $lng['id']);
+        }
+
+        $this->builder->whereNotIn('id', $lngIds);
+        $query = $this->builder->get()->getResultArray();
+
+        return $query;
+    }
  }
