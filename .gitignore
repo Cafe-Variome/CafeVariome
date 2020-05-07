@@ -126,6 +126,7 @@ nb-configuration.xml
 /phpunit*.xml
 
 resources/phenotype_lookup_data/*
+!resources/phenotype_lookup_data/.htaccess
 !resources/phenotype_lookup_data/index.html
 
 upload/UploadData/*
