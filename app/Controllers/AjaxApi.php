@@ -249,7 +249,7 @@ use App\Libraries\CafeVariome\ShellHelper;
             }
     
             $phen_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . ".json"), 1);
-            $hpo_data = [];//json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json"), 1);
+            $hpo_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json"), 1);
             return json_encode([$phen_data, $hpo_data]);
         }
     }
