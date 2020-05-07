@@ -124,7 +124,12 @@ nb-configuration.xml
 
 /results/
 /phpunit*.xml
-resources/elastic_search_status_complete
-resources/elastic_search_status_incomplete
-resources/elastic_search_status_complete
-resources/phenotype_lookup_data/
+
+resources/phenotype_lookup_data/*
+!resources/phenotype_lookup_data/index.html
+
+upload/UploadData/*
+!upload/UploadData/index.html
+
+upload/pairings/*
+!upload/pairings/index.html
