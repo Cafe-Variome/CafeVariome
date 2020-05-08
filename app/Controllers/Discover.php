@@ -45,17 +45,31 @@ class Discover extends CVUI_Controller{
         $uidata = new UIData();   
         $uidata->title = "Select Network";
 
+        $networkInterface = new NetworkInterface();
         $networkModel = new Network($this->db);
         $sourceModel = new Source($this->db);
 
         $user_id = $this->session->get('user_id');
-        $networks = $networkModel->getNetworksUserMemberOf($user_id);
 
-        $uidata->data['networks'] = array();
+        $authorisedNetworks = [];
+        $instalattionNetworks = [];
 
-        foreach ($networks as $key => $value) {
-            $uidata->data['networks'] += array($value['name'] => $value['network_key']);
+        $userNetworks = $networkModel->getNetworksUserMemberOf($user_id);
+        $instalattionNtworksResp = $networkInterface->GetNetworksByInstallationKey($this->setting->getInstallationKey());
+        
+        if ($instalattionNtworksResp->status) {
+            $instalattionNetworks = $instalattionNtworksResp->data;
         }
+
+        foreach ($instalattionNetworks as $iNetwork) {
+            foreach ($userNetworks as $uNetwork) {
+                if ($iNetwork->network_key == $uNetwork['network_key']) {
+                    array_push($authorisedNetworks, $iNetwork);
+                }
+            }
+        }
+
+        $uidata->data['networks'] = $authorisedNetworks;
         
         $uidata->javascript = array(JS."cafevariome/discover.js");
 
