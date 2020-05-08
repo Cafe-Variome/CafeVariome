@@ -326,17 +326,12 @@ class Elastic extends Model{
                     $hpo[$term] = $parents;
                 }
             }
-            //if (count($hpo) > 0) {           
-                foreach($hpo as $term => $ancestory) {
-                    $hpo[$term] = implode('||', $ancestory);
-                
-                    //Data must be written to the file in every iteration, in case the file is overwritten, some data is lost.
-                    file_put_contents("resources/phenotype_lookup_data/" . $network . "_hpo_ancestry.json", json_encode($hpo), FILE_APPEND);
-                }
+            foreach($hpo as $term => $ancestory) {
+                $hpo[$term] = implode('||', $ancestory);
+            }
             
         }   
-
-        return;
+        file_put_contents("resources/phenotype_lookup_data/" . $network . "_hpo_ancestry.json", json_encode($hpo));
     }
 
     function collect_ids_neo4j($ancestor, $data) {
