@@ -106,10 +106,11 @@ class NetworkGroup extends Model{
         foreach ($localNetworkGroups as $lng) {
             array_push($lngIds, $lng['id']);
         }
+        if (count($lngIds) > 0) {
+            $this->builder->whereNotIn('id', $lngIds);
+        }
 
-        $this->builder->whereNotIn('id', $lngIds);
         $query = $this->builder->get()->getResultArray();
-
         return $query;
     }
  }

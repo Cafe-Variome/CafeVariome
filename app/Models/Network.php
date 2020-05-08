@@ -144,7 +144,9 @@ class Network extends Model{
 
 		$this->builder->select("network_key, source_id");
 		$this->builder->distinct();
-		$this->builder->whereIn("network_key", $net_keys);
+		if (count($net_keys) > 0) {
+			$this->builder->whereIn("network_key", $net_keys);
+		}
 		$query = $this->builder->get()->getResultArray();
 	   	return $query;
 	}
