@@ -48,11 +48,11 @@ class CVUI_Controller extends Controller{
 		$this->db = \Config\Database::connect();
         $this->setting =  Settings::getInstance();
 
+		$this->authAdapterConfig = config('AuthAdapter');
+		$this->authAdapter = new AuthAdapter($this->authAdapterConfig->authRoutine);
+		
         // If the controller needs authorisation, initiate AuthAdapater object accordingly.
 		if ($this->isProtected) {
-			$this->authAdapterConfig = config('AuthAdapter');
-			$this->authAdapter = new AuthAdapter($this->authAdapterConfig->authRoutine);
-
 			$this->checkAuthentication($this->isAdmin);
 		}
 

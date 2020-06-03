@@ -90,8 +90,6 @@ class Auth extends CVUI_Controller
 		$this->db = \Config\Database::connect();
 		$this->setting =  Settings::getInstance($this->db);
 		
-		$this->authAdapter = new AuthAdapter('KeyCloakFirst');
-
 	}
 
 	/**
@@ -138,8 +136,11 @@ class Auth extends CVUI_Controller
 	{	
 		if($this->authAdapter->loggedIn())
 		{
-			error_log("redirecting to auth index...");
-			return redirect()->to(base_url('auth/index'));
+			if ($this->authAdapter->isAdmin())
+			{
+				return redirect()->to(base_url('Admin/Index'));
+			}
+			return redirect()->to(base_url('home'));
 		}
 		else{
 			$this->authAdapter->login('', '', false);
@@ -227,7 +228,7 @@ class Auth extends CVUI_Controller
 				header('Location: '.base_url('admin/index'));
 				exit;	
 			}
-			header('Location: '.base_url('auth/index'));
+			header('Location: '.base_url('home'));
 			exit;
 		}
 		else{			

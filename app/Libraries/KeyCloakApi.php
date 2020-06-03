@@ -31,8 +31,8 @@
         }
         else{
             $access = "";
-            $url = '/realms/'.$this->keycloakConfig['realm'].'/protocol/openid-connect/token';
-            $post_fields = "client_id=admin-cli&username=".$this->keycloakConfig['admin_username']."&password=".$this->keycloakConfig['admin_password']."&grant_type=password";
+            $url = '/realms/' . $this->keycloakConfig['realm'] . '/protocol/openid-connect/token';
+            $post_fields = "client_id=" . $this->keycloakConfig['client_id'] . "&username=" . $this->keycloakConfig['admin_username'] . "&password=" . $this->keycloakConfig['admin_password'] . "&grant_type=password";
             $headers = array();
             $headers[] = 'Content-Type: application/x-www-form-urlencoded';
             $result = json_decode($this->curlCall($url,false,$post_fields,$headers),1);
