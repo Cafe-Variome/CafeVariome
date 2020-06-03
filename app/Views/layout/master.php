@@ -73,7 +73,7 @@
 
     <!-- extra Java Script-->
     <?php foreach($javascript as $js):?>
-    <script src="<?php echo base_url().$js?>"></script>
+    <script src="<?php echo (substr($js, 0, 4) != 'http' ? base_url().$js : $js)?>"></script>
     <?php endforeach;?>    
 
     <script type="text/javascript">
