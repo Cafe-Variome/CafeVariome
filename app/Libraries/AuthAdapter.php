@@ -105,6 +105,35 @@ class AuthAdapter{
         $id ? $id : $id = $this->getUserId();
         return $userModel->getName($id, $fullName);
     }
+    
+    /**
+     * getToken()
+     * Retrieves Keycloak Token
+     * Only valid when Keycloak is enabled.
+     */
+    public function getToken()
+    {
+       return ($this->getAuthEngineName() == "app\libraries\keycloak") ? $this->authEngine->getToken() : null;
+    }
+
+    /**
+     * geyUserIdByToken()
+     * Retrieves Keycloak Token
+     * Only valid when Keycloak is enabled.
+     * @param League\OAuth2\Client\Token\AccessToken $token 
+     * @return int
+     */
+    public function getUserIdByToken(\League\OAuth2\Client\Token\AccessToken $token): int
+    {
+        if ($this->getAuthEngineName() == "app\libraries\keycloak"){
+            $user = $this->authEngine->getUser($token);
+
+            if($user != null){
+                $email = $user->getEmail();
+                return $this->authEngine->getUserIdByEmail($email);
+            }
+        }
+    }
 
     public function getAuthEngineName(bool $lower_case = true): string{
         return ($lower_case) ? strtolower(get_class($this->authEngine)) : get_class($this->authEngine);

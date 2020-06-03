@@ -13,6 +13,7 @@
  */
 
 use App\Models\Settings;
+use League\OAuth2\Client\Token\AccessToken;
 
 class QueryNetworkInterface
 {
@@ -28,9 +29,9 @@ class QueryNetworkInterface
         $this->networkAdapter = new cURLAdapter(null, $curlOptions);
     }
 
-    public function query(string $query, int $network_key, int $user_id)
+    public function query(string $query, int $network_key, AccessToken $token = null)
     {
-        $this->adapterw('QueryApi/Query', ['query' => $query, 'network_key' => $network_key, 'user_id' => $user_id]);
+        $this->adapterw('QueryApi/Query', ['query' => $query, 'network_key' => $network_key, 'token' => json_encode($token)]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }

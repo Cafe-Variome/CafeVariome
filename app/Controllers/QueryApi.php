@@ -19,6 +19,9 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 use App\Libraries\CafeVariome\Core\APIResponseBundle;
+use App\Libraries\AuthAdapter;
+use CodeIgniter\Config\Services;
+
 
 class QueryApi extends ResourceController
 {
@@ -38,23 +41,36 @@ class QueryApi extends ResourceController
     {
         $network_key = $this->request->getVar('network_key');
         $queryString = $this->request->getVar('query');
-        $user_id = $this->request->getVar('user_id');
+        //$user_id = $this->request->getVar('user_id');
+        $token = json_decode($this->request->getVar('token'), true);
 
-        $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
+        if ($token != null) {
 
-        $apiResponseBundle = new APIResponseBundle();
-        $networkRequestModel = new NetworkRequest();
-        $resp = [];
-        try {
-            $resp = $cafeVariomeQuery->search($queryString, $network_key, $user_id);
-            $apiResponseBundle->initiateResponse(1, $resp);
-            
-        } catch (\Exception $ex) {
-            error_log($ex->getMessage());
-            $apiResponseBundle->initiateResponse(0);
-            $apiResponseBundle->setResponseMessage($ex->getMessage());
+            $token = new \League\OAuth2\Client\Token\AccessToken($token);
+            $authAdapterConfig = config('AuthAdapter');
+            $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
+            $user_id = $authAdapter->getUserIdByToken($token);
+
+            $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
+
+            $apiResponseBundle = new APIResponseBundle();
+            $networkRequestModel = new NetworkRequest();
+            $resp = [];
+            try {
+                $resp = $cafeVariomeQuery->search($queryString, $network_key, $user_id);
+                $apiResponseBundle->initiateResponse(1, json_decode($resp, true));
+                
+            } catch (\Exception $ex) {
+                error_log($ex->getMessage());
+                $apiResponseBundle->initiateResponse(0);
+                $apiResponseBundle->setResponseMessage($ex->getMessage());
+            }
         }
-
+        else{
+            //No token present with query, unauthorised
+            $apiResponseBundle->initiateResponse(0);
+            $apiResponseBundle->setResponseMessage('Token not found. Unauthorised query.');
+        }
         return $this->respond($apiResponseBundle->getResponseJSON());
     }
 

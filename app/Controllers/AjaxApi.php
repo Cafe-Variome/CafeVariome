@@ -25,7 +25,8 @@ use App\Models\Elastic;
 use App\Models\Deliver;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use App\Libraries\CafeVariome\ShellHelper;
-
+use App\Libraries\AuthAdapter;
+use CodeIgniter\Config\Services;
 
  class AjaxApi extends Controller{
 
@@ -53,8 +54,12 @@ use App\Libraries\CafeVariome\ShellHelper;
 
     function query($network_key = '') {
         $networkInterface = new NetworkInterface();
-
+        
+		$authAdapterConfig = config('AuthAdapter');
+        $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
+        
         $queryString = json_encode($this->request->getVar('jsonAPI'));
+        $token = $authAdapter->getToken();
         $user_id = $this->request->getVar('user_id');
 
         $results = [];
@@ -72,7 +77,7 @@ use App\Libraries\CafeVariome\ShellHelper;
                 if ($installation->installation_key != $this->setting->getInstallationKey()) {
                     // Send the query
                     $queryNetInterface = new QueryNetworkInterface($installation->base_url);
-                    $queryResponse = $queryNetInterface->query($queryString, (int) $network_key, $user_id);
+                    $queryResponse = $queryNetInterface->query($queryString, (int) $network_key, $token);
                     if ($queryResponse->status) {
                         array_push($results, $queryResponse->data);
                     }
@@ -252,71 +257,6 @@ use App\Libraries\CafeVariome\ShellHelper;
             $hpo_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json"), 1);
             return json_encode([$phen_data, $hpo_data]);
         }
-    }
-
-    function getPhenotypeAttributesHDRSprint(int $network_key) {
-        
-        $networkModel = new Network();
-
-        $networkInterface = new NetworkInterface();
-        $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key);
-
-        $installations = [];
-
-        if ($response->status) {
-            $installations = $response->data;
-        }
-
-        $installations_keys = [];
-        foreach ($installations as $installation) {
-            array_push($installations_keys, $installation-> installation_key);
-        }
-        $networkModel->removeInstallations($installations_keys, $network_key);
-        $networkModel->addInstallations($installations_keys, $network_key);
-
-        $check_sums = $networkModel->getOldChecksums($network_key);
-
-        $dataStream = new DataStream();
-        
-        foreach ($installations as $installation) {
-            $i_url = $installation->base_url;
-            $i_key = $installation->installation_key;
-            $sum = $check_sums[$i_key];
-
-            $queryNetInterface = new QueryNetworkInterface($installation->base_url);
-            $chksumResp = $queryNetInterface->getJSONDataModificationTime((int) $network_key, $sum, false, true);
-            $data = [];
-            if ($chksumResp->status) {
-                $data = $chksumResp->data;
-            }
-
-            if ($data->checksum) {
-                $networkModel->updateChecksum($data->checksum, $network_key, $i_key);
-                $dataStream->regenerateElasticSearchIndex($network_key, $i_key, $data->file);
-            }
-        }
-
-        $hpo_sums = $networkModel->getOldHPOSums($network_key);
-        foreach ($installations as $installation) {
-            $i_url = $installation->base_url;
-            $i_key = $installation->installation_key;
-            $sum = $hpo_sums[$i_key];
-
-            $queryNetInterface = new QueryNetworkInterface($installation->base_url);
-            $chksumResp = $queryNetInterface->getJSONDataModificationTime((int) $network_key, $sum, false, false);
-            $data = [];
-            if ($chksumResp->status) {
-                $data = $chksumResp->data;
-            }
-
-            if ($data->checksum) {
-                $dataStream->pre_hpo_complete($installations, $network_key);
-                break;
-            }
-        }
-        $hpo_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json"), 1);
-        $phen_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . $network_key . ".json"), 1);
-        echo json_encode([$phen_data,$hpo_data]);
     }
 
     function get_json_for_phenotype_lookup() {
