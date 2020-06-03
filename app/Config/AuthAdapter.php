@@ -13,5 +13,12 @@ namespace Config;
 class AuthAdapter extends \CodeIgniter\Config\BaseConfig
 {
 
+    /**
+     * Valid values:
+     *  1. KeyCloakFirst : If keycloak URI is configured properly and an endpoint exists,
+     *  Keycloak is used as authentication engine. Otherwise, IonAuth is used.
+     *  2. KeyCloakOnly
+     *  3. IonAuthOnly
+     */
     public $authRoutine = 'KeyCloakFirst';
 }
