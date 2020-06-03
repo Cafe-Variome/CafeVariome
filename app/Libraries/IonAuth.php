@@ -389,6 +389,11 @@ class IonAuth
 		return $this->ionAuthModel->inGroup($adminGroup, $id);
 	}
 
+	public function getToken()
+	{
+		
+	}
+
 	/**
 	 * Check the compatibility with the server
 	 *
