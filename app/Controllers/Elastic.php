@@ -83,15 +83,15 @@ class Elastic extends CVUI_Controller{
      */
     public function elastic_check() {	   
             
-        $elasticModel = new \App\Models\Elastic($this->db); 
+        $elasticModel = new \App\Models\Elastic(); 
 
-        $data = json_decode($_POST['u_data']);
+        $data = json_decode($this->request->getVar('u_data'));
         $force = $data->force;
         $source_id = $data->id;
         $add = $data->add;
 
         $unprocessedFilesCount = $elasticModel->getUnprocessedFilesForSource($source_id);
-        error_log($unprocessedFilesCount);
+
         if (!$unprocessedFilesCount) {
             $result = ['Status' => 'Empty'];
             echo json_encode($result);
@@ -99,8 +99,6 @@ class Elastic extends CVUI_Controller{
         }
         if ($add) {
             $unaddedEAVsCount = $elasticModel->getUnaddedEAVs($source_id);
-            error_log("add");
-            error_log($unaddedEAVsCount);
             if (!$unaddedEAVsCount) {
                 $result = ['Status' => 'Fully Updated'];
                 echo json_encode($result);
@@ -155,12 +153,7 @@ class Elastic extends CVUI_Controller{
         }
         
         // rebuild the json list for interface
-        //$r = $elasticModel->regenerateFederatedPhenotypeAttributeValueList($source_id);
         $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateFederatedPhenotypeAttributeValueList $source_id $add");
-        //$task = New Task();
-        //$res = $task->regenerateElasticsearchIndex($source_id, $add);
-        // Call in background the regenerate function
-        //$this->shellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchIndex $source_id $add");
     }
 
     /**
