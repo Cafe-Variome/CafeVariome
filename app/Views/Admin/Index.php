@@ -56,7 +56,9 @@
 	<div class="card-body">
 	  <div class="row no-gutters align-items-center">
 		<div class="col mr-2">
-		  <div class="text-s font-weight-bold text-primary text-uppercase mb-1">Sources</div>
+		  <div class="text-s font-weight-bold text-primary text-uppercase mb-1">
+		  	<a href="<?= base_url('Source/List') ?>">Sources</a>
+		  </div>
 		  <div class="h4 mb-0 font-weight-bold text-gray-800"><?= $sourceCount ?></div>
 		</div>
 		<div class="col-auto">
@@ -72,7 +74,9 @@
 	<div class="card-body">
 	  <div class="row no-gutters align-items-center">
 		<div class="col mr-2">
-		  <div class="text-s font-weight-bold text-success text-uppercase mb-1">Networks You Are In</div>
+		  <div class="text-s font-weight-bold text-success text-uppercase mb-1">
+		  	<a class="text-success" href="<?= base_url('Network/List') ?>">Networks You Are In</a>
+		  </div>
 		  <div class="h4 mb-0 font-weight-bold text-gray-800"><?= $networksCount ?></div>
 		</div>
 		<div class="col-auto">
@@ -88,7 +92,9 @@
 	<div class="card-body">
 	  <div class="row no-gutters align-items-center">
 		<div class="col mr-2">
-		  <div class="text-s font-weight-bold text-info text-uppercase mb-1">Users</div>
+		  <div class="text-s font-weight-bold text-info text-uppercase mb-1">
+		  <a class="text-info" href="<?= base_url('User/List') ?>">Users</a>
+		  </div>
 		  <div class="row no-gutters align-items-center">
 			<div class="col-auto">
 			  <div class="h4 mb-0 mr-3 font-weight-bold text-gray-800"><?= $usersCount ?></div>
@@ -110,7 +116,9 @@
 	<div class="card-body">
 	  <div class="row no-gutters align-items-center">
 		<div class="col mr-2">
-		  <div class="text-s font-weight-bold text-warning text-uppercase mb-1">Pending Network Requests</div>
+		  <div class="text-s font-weight-bold text-warning text-uppercase mb-1">
+		  	<a class="text-warning" href="<?= base_url('NetworkRequest/List') ?>">Pending Network Requests</a>
+		  </div>
 		  <div class="h4 mb-0 font-weight-bold text-gray-800"><?= $networkRequestCount?></div>
 		</div>
 		<div class="col-auto">
@@ -232,7 +240,7 @@
 		</div>
 	</div>
 </div>
-
+</div>
 <script type="text/javascript">
 var rchart = document.getElementById('recordsrc_chart');
 var dchart = document.getElementById('disk_chart').getContext('2d');

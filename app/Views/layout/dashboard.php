@@ -45,16 +45,15 @@
 
     <!-- Page Wrapper -->
     <div id="wrapper">
-
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-secondary sidebar sidebar-dark accordion" id="accordionSidebar">
 
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?= base_url('Admin/Index') ?>">
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?= base_url('Home/Index') ?>">
                 <div class="sidebar-brand-icon rotate-n-15">
                 <img src="<?= base_url(IMAGES . "cafevariome/cafevariome_icon.png") ?>" />
                 </div>
-                <div class="sidebar-brand-text mx-2 text-gray-900">Café Variome<sup>2</sup></div>
+                <div class="sidebar-brand-text mx-2 text-gray-900"><?= $heading ?></div>
             </a>
 
             <!-- Divider -->
@@ -77,7 +76,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="<?= base_url('Discover/Index') ?>">
                 <i class="fas fa-fw fa-chart-area"></i>
-                <span>Query Interface</span></a>
+                <span>Discover</span></a>
             </li>
 
             <!-- Heading -->
@@ -268,7 +267,7 @@
         <footer class="sticky-footer">
             <div class="container my-auto">
                 <div class="copyright text-center my-auto">
-                    <span>Powered by Café Variome <br> Copyright &copy; <?= date("Y") . ', ' . $heading; ?> </span>
+                    <span>Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a> <br> Copyright &copy; <?= date("Y") . ', University of Leicester' ?> </span>
                 </div>
             </div>
         </footer>
