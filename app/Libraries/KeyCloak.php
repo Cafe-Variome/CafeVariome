@@ -261,18 +261,23 @@ class KeyCloak{
             return FALSE;
         }	
         $this->session->set($session_data);
-
-        error_log("User: " . $this->session->get('email') . " has logged in || " . date("Y-m-d H:i:s"));  	
-        //header('Location: '.base_url('auth/index'));
         return true;
     }
 
     public function logout():bool
     {
-    	// Destroy the session
-		$this->session->destroy();
+        $this->provider = new \Stevenmaguire\OAuth2\Client\Provider\Keycloak([
+            'authServerUrl'         => $this->serverURI,
+            'realm'                 => $this->realm,
+            'clientId'              => $this->clientId,
+            'clientSecret'          => $this->clientSecret,
+            'redirectUri'           => base_url()
+        ]);
+        $logoutUrl = $this->provider->getLogoutUrl();
 
-        header('Location: '.base_url());
+        $this->session->destroy();
+
+        header('Location: '.$logoutUrl);
         exit;
     }
 
@@ -388,7 +393,7 @@ class KeyCloak{
             ]);
             $logoutUrl = $this->provider->getLogoutUrl();
             header('Location: '.$logoutUrl);
-        }  
+    }  
     
     /**
 	 * Returns true if the user is logged in.
