@@ -69,6 +69,10 @@ class Discover extends CVUI_Controller{
             }
         }
 
+        if (count($authorisedNetworks) == 1) {
+            return redirect()->to(base_url($this->controllerName. '/query_builder/' . $authorisedNetworks[0]->network_key));
+        }
+
         $uidata->data['networks'] = $authorisedNetworks;
         
         $uidata->javascript = array(JS."cafevariome/discover.js");
@@ -97,24 +101,13 @@ class Discover extends CVUI_Controller{
         $uidata->data['network_key'] = $network_key;
         
         error_log("User: " . $this->session->get('email') . " has chosen network: $network_key || " . date("Y-m-d H:i:s"));
-
-        $token = $this->session->get('Token');
-
-        //$installation_urls = json_decode(AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key'], 'network_key' => $network_key), $this->setting->settingData['auth_server'] . "network/get_all_installation_ips_for_network"), true);
-        //$data = AuthHelper::authPostRequest(array('installation_key' => $this->setting->settingData['installation_key']), $this->setting->settingData['auth_server'] . "network/get_all_installations_for_network");
-        
+                
         $installations = [];
         $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key);
 
         if($response->status){
             $installations = $response->data;
         }
-        //$data = stripslashes($data);
-        //$data = json_decode($data, 1);
-
-        // Set the federated installs in the session so they can be used by variantcount
-        //$this->session->set(array('federated_installs' => $installations['installation_urls']));
-        //$this->session->set(array('network_threshold' => $installations['network_threshold']));
 
         $uidata->data["elasticSearchEnabled"] = true;
         $uidata->data["message"] = null;
@@ -124,11 +117,14 @@ class Discover extends CVUI_Controller{
         }
 
         $uidata->title = "Discover - Query Builder";
-        $uidata->css = array(VENDOR.'vakata/jstree/dist/themes/default/style.css', CSS.'jquery.querybuilder.css');  
+        $uidata->css = array(VENDOR.'vakata/jstree/dist/themes/default/style.css', VENDOR.'components/jqueryui/themes/base/jquery-ui.css', CSS.'jquery.querybuilder.css', VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css', VENDOR. 'drmonty/datatables-buttons/css/buttons.dataTables.min.css');  
 
         $uidata->stickyFooter = false;
 
-        $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js', VENDOR.'components/jqueryui/jquery-ui.js',JS.'bootstrap-notify.js', JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
+        $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js',
+                                    VENDOR.'components/jqueryui/jquery-ui.js',
+                                    JS.'bootstrap-notify.js',
+                                    JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Query_Builder', $data);
     }
