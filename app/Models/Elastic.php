@@ -225,7 +225,17 @@ class Elastic extends Model{
 
         $phenotypeModel->deleteAllLocalPhenotypesLookup();
 
-        delete_files("resources/phenotype_lookup_data/");
+        $jsonIndexPath = getcwd() . DIRECTORY_SEPARATOR.  JSON_DATA_DIR;
+        $files = scandir($jsonIndexPath);
+        foreach ($files as $file) {
+            if (strpos($file, '.')) {
+                $fArr = explode('.', $file);
+                $fExt = $fArr[count($fArr) - 1];
+                if (strtolower($fExt) !== 'html' && strtolower($fExt) !== 'htaccess'){
+                    unlink($jsonIndexPath . $file);
+                }
+            }
+        }
 
         if(isset($result['error'])) return;
 
