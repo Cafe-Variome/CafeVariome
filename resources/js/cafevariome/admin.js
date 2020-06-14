@@ -1,5 +1,5 @@
 $(document).ready(function() {
     if ($('#userstable').length) {
-        $('#userstable').DataTable();
+        $('#userstable').DataTable({"scrollX": true });
     }
 } );
