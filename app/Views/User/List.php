@@ -16,7 +16,7 @@
 		</div>
 	</div>
 <?php endif; ?>
-<table class="table table-bordered table-striped table-hover" id="userstable">
+<table class="table table-bordered table-striped table-hover" id="userstable" style="width:100%;">
     <thead>
         <tr>
             <th>ID</th>
