@@ -241,8 +241,6 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                                         if ($counter % $chunkSize == 0) {      
                                             error_log($counter);          	
                                             $responses = $elasticClient->bulk($bulk);
-                                            var_dump($responses);		  
-
                                             $bulk=[];
                                             unset ($responses);
                                         }
@@ -300,18 +298,20 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * @param string $source      - The name of the source we are uploading to
      * @return array $return_data - Basic information on the status of the upload
      */
-    public function bulkUploadInsert($file, $delete, $source_id) {
+    public function bulkUploadInsert(int $fileId, $delete, int $source_id) {
 
-        $uploadModel = new Upload($this->db);
-        $sourceModel = new Source($this->db);
+        $uploadModel = new Upload();
+        $sourceModel = new Source();
 
         $error = array('subject_id' => 'No subject_id column.',
         'wrong_type' => 'File did not conform to allowed types.',
          'insert_fail' => 'Data Failed to insert. Please double check file for sanity.',
          'variant_invalid' => 'Variant is not valid, as according to VariantValidator. https://variantvalidator.org/',
         );
-        $fileId = $uploadModel->getFileId($source_id, $file);
+        //$fileId = $uploadModel->getFileId($source_id, $file);
+        $file =  $uploadModel->getFileName($fileId);
         $uploadModel->clearErrorForFile($fileId);
+        
         if ($delete == 1) {		
             $sourceModel->deleteSourceFromEAVs($source_id);
         }
