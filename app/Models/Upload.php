@@ -20,12 +20,15 @@ use CodeIgniter\Database\ConnectionInterface;
 
     protected $primaryKey = 'id';
 
-    public function __construct(ConnectionInterface &$db){
+    public function __construct(ConnectionInterface &$db = null){
 
-        $this->db =& $db;
+        if ($db != null) {
+            $this->db =& $db;
+        }
+        else {
+            $this->db = \Config\Database::connect();
+        }
         helper('filesystem');
-
-
     }
 
 
