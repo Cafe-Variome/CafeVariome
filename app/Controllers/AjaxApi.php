@@ -735,10 +735,10 @@ use CodeIgniter\Config\Services;
 
                 $fAction = $this->request->getVar('fAction'); // File Action 
                 if ($fAction == "overwrite") {
-                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_name 1 $source_id");
+                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 1 $source_id");
                 }
                 elseif ($fAction == "append") {
-                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_name 00 $source_id");
+                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00 $source_id");
                 }
                 else {
                     error_log("entered else");
