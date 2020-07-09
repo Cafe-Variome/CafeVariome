@@ -436,8 +436,8 @@ class Logger implements LoggerInterface
 		}
 
 		// Add special placeholders
-		$replace['{post_vars}'] = '$_POST: ' . print_r($_POST, true);
-		$replace['{get_vars}']  = '$_GET: ' . print_r($_GET, true);
+		$replace['{post_vars}'] = '$_POST: ' . print_r(htmlEntities($_POST, ENT_QUOTES), true);
+		$replace['{get_vars}']  = '$_GET: ' . print_r(htmlEntities($_GET, ENT_QUOTES), true);
 		$replace['{env}']       = ENVIRONMENT;
 
 		// Allow us to log the file/line that we are logging from
