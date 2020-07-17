@@ -707,7 +707,7 @@ use CodeIgniter\Config\Services;
 
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
-        $ff = $_FILES;
+
         $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
         $fileMan = new FileMan($basePath);
 
