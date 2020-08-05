@@ -21,6 +21,7 @@ use App\Models\Elastic;
 use App\Models\Settings;
 use App\Models\EAV;
 use App\Models\Neo4j;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\DataStream;
 use CodeIgniter\Config;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
@@ -442,6 +443,9 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      *
      * 08/2019 Removal of mapping types 
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html
+     * 
+     * @deprecated 
+     * @see regenerateFederatedPhenotypeAttributeValueList
      * 
      * @param int $source_id - The source we are updating ElasticSearch for
      * @param int $add            - Whether we are adding data without fully remaking the index 
@@ -988,15 +992,14 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     public function regenerateFederatedPhenotypeAttributeValueList(int $source_id, $add)
     {
         try {
-            $elasticModel = new Elastic($this->db);
-            $elasticModel->regenerateFederatedPhenotypeAttributeValueList($source_id);
-    
-            $this->regenerateElasticsearchIndex($source_id, $add);
+            $dataStream = new DataStream();
+            $dataStream->generateAttributeValueIndex($source_id);
+            $dataStream->generateHPOIndex($source_id);
+            $dataStream->generateElasticSearchIndex($source_id, $add);
+            $dataStream->Neo4JInsert($source_id);
         } catch (\Excdeption $ex) {
             error_log($ex->getMessage());
         }
-
-
     }
 
     /**

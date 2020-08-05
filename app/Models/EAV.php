@@ -21,12 +21,18 @@ class EAV extends Model{
 
     protected $primaryKey = 'id';
 
-    public function __construct(ConnectionInterface &$db){
-
-        $this->db =& $db;
+    public function __construct(ConnectionInterface &$db = null)
+    {
+        if ($db != null) {
+            $this->db =& $db;
+        }
+        else {
+            $this->db = \Config\Database::connect();
+        }
     }
 
-    public function getEAVsForSource(int $source_id){
+    public function getEAVsForSource(int $source_id)
+    {
         $this->builder = $this->db->table($this->table);
         $this->builder->select('attribute,value');
         $this->builder->where('source_id', $source_id);
@@ -35,7 +41,8 @@ class EAV extends Model{
         return $query;
     }
 
-    public function getEAVs($cols, array $conds = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
+    public function getEAVs($cols, array $conds = null, bool $isDistinct = false, int $limit = -1, int $offset = -1)
+    {
         $this->builder = $this->db->table($this->table);
         if ($cols) {
             $this->builder->select($cols);
@@ -57,7 +64,8 @@ class EAV extends Model{
         return $query; 
     }
 
-    public function updateEAVs(array $data, array $conds = null){
+    public function updateEAVs(array $data, array $conds = null)
+    {
         $this->builder = $this->db->table($this->table);
         if ($conds) {
             $this->builder->where($conds);
@@ -65,8 +73,8 @@ class EAV extends Model{
         $this->builder->update($data);
     }
 
-    public function retrieveUpdateNeo4j($source_id) {
-
+    public function getHPOTerms(int $source_id) 
+    {
         $this->builder = $this->db->table('eavs e');
 
         $this->builder->select('e.subject_id as subject, e.value as hpo,m.value as negated');
@@ -97,11 +105,30 @@ class EAV extends Model{
             $new_data[$subject][$t]['negated'] = $data[$i]['negated'];
             $t++;
         }
-        $neo4jModel = new Neo4j($this->db);
 
-        $sourceModel = new Source($this->db);
-        $source_name = $sourceModel->getSourceNameByID($source_id);
+        return $new_data;
+    }
 
-        $neo4jModel->toUpdate($new_data, $source_name);
+    public function getORPHATerms(int $source_id)
+    {
+        $this->builder = $this->db->table('eavs');
+        $this->builder->select('subject_id, attribute, value');
+        $this->builder->where('attribute', "Phenotype_ORPHA");
+        $this->builder->where('source_id', $source_id);
+        //$this->builder->where('elastic', 0);
+
+        $query = $this->builder->get()->getResultArray();
+        $data = [];
+        foreach ($query as $record) {
+            $orpha_terms = [];
+            if (array_key_exists($record['subject_id'], $data)) {
+                $data[$record['subject_id']][] = ['orpha' => $record['value']];
+            }
+            else {
+                $data[$record['subject_id']] = [['orpha' => $record['value']]];
+            }
+        }
+
+        return $data;
     }
 }

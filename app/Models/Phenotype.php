@@ -20,9 +20,14 @@ use CodeIgniter\Database\ConnectionInterface;
     protected $db;
     protected $builder;
 
-    public function __construct(ConnectionInterface &$db){
-
-        $this->db =& $db;
+    public function __construct(ConnectionInterface &$db = null)
+    {
+        if ($db != null) {
+            $this->db =& $db;
+        }
+        else {
+            $this->db = \Config\Database::connect();
+        }
     }
 
     function deleteAllLocalPhenotypesLookup() {
