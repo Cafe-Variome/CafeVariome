@@ -161,7 +161,7 @@ use CodeIgniter\Config\Services;
     public function checkJsonPresence() {
 
         $source_id = filter_var($_POST['source_id'], FILTER_VALIDATE_INT);
-        $files = json_decode(htmlEntities($_POST['files'], ENT_QUOTES));
+        $files = htmlentities(json_decode($_POST['files']), ENT_QUOTES);
         // Check if there are duplicates
         $duplicates = $this->uploadModel->checkJsonFiles($files,$source_id);
         if ($duplicates) {
@@ -523,7 +523,7 @@ use CodeIgniter\Config\Services;
      * @return json_encoded array Success|Headers are not as expected|File is Duplicated
      */
     public function bulk_upload($force=false){   
-        error_log(print_r(htmlEntities($_POST, ENT_QUOTES),1));
+        error_log(htmlentities(print_r($_POST,1), ENT_QUOTES));
         $tmp = $_FILES["userfile"]["tmp_name"];
         $file_name = $_FILES["userfile"]["name"];
         $source_id = $_POST['source_id'];
