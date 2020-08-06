@@ -340,7 +340,7 @@ use CodeIgniter\Config\Services;
     public function checkJsonPresence() {
 
         $source_id = filter_var($_POST['source_id'], FILTER_VALIDATE_INT);
-        $files = json_decode(htmlEntities($_POST['files'], ENT_QUOTES));
+        $files = htmlentities(json_decode($_POST['files']), ENT_QUOTES);
         // Check if there are duplicates
         $duplicates = $this->uploadModel->checkJsonFiles($files,$source_id);
         if ($duplicates) {
