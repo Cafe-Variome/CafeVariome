@@ -16,7 +16,7 @@ class Filters extends BaseConfig
 	public $globals = [
 		'before' => [
 			//'honeypot'
-		    'csrf' => ['except' => ['QueryApi/Query']]
+		    'csrf' => ['except' => ['QueryApi/Query', 'AjaxApi/*', 'NetworkApi/*']]
 		],
 		'after'  => [
 			//'toolbar',
