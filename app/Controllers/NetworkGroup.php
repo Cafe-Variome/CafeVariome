@@ -54,7 +54,7 @@ class NetworkGroup extends CVUI_Controller{
 		$uidata = new UIData();
 		$uidata->title = "Network Groups";
 
-		$localNetworkGroups = $this->networkGroupModel->getNetworkGroups(null, null, array('name'), true); // Local network groups
+		$localNetworkGroups = $this->networkGroupModel->getNetworkGroups(null, null, ['name', 'id'], true); // Local network groups
 		$remoteNetworkGroups = $this->networkGroupModel->getRemoteNetworkGroups(); // Remote network groups
 
 		$network_groups_for_installation = [];

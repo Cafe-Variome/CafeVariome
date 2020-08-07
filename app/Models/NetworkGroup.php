@@ -100,8 +100,8 @@ class NetworkGroup extends Model{
 
     public function getRemoteNetworkGroups()
     {
-        $networkGroups = $this->getNetworkGroups(null, null, array('name'), false);
-        $localNetworkGroups = $this->getNetworkGroups(null, null, array('name'), true);
+        $networkGroups = $this->getNetworkGroups(null, null, ['name', 'id'], false);
+        $localNetworkGroups = $this->getNetworkGroups(null, null, ['name', 'id'], true);
         $lngIds = [];
         foreach ($localNetworkGroups as $lng) {
             array_push($lngIds, $lng['id']);

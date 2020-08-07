@@ -155,7 +155,7 @@ class Network extends Model{
 		$this->builder = $this->db->table('network_groups');
 		$this->builder->join('networks', 'network_groups.network_key = networks.network_key');
 
-		$this->builder->groupBy('network_groups.name');
+		$this->builder->groupBy('network_groups.name, network_groups.id');
 		$query = $this->builder->get()->getResultArray();
 		return $query;
 	}
