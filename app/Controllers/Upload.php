@@ -160,7 +160,7 @@ use CodeIgniter\Config\Services;
      */
     public function checkJsonPresence() {
 
-        $source_id = filter_var($_POST['source_id'], FILTER_VALIDATE_INT);
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
         $files = htmlentities(json_decode($_POST['files']), ENT_QUOTES);
         // Check if there are duplicates
         $duplicates = $this->uploadModel->checkJsonFiles($files,$source_id);
@@ -526,7 +526,7 @@ use CodeIgniter\Config\Services;
         error_log(htmlentities(print_r($_POST,1), ENT_QUOTES));
         $tmp = $_FILES["userfile"]["tmp_name"];
         $file_name = $_FILES["userfile"]["name"];
-        $source_id = $_POST['source_id'];
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
         if (!$force) {
             if ($this->uploadModel->isDuplicatePhysicalFile($source_id,$file_name, $tmp)) {
                 $response_array = array('status' => "Duplicate");
