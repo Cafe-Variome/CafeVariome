@@ -37,12 +37,24 @@ Options All -Indexes
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 </IfModule>
 
+# Extra Security Headers
+<IfModule mod_headers.c>
+    # Protect against page-framing and click-jacking
+	Header always append X-Frame-Options SAMEORIGIN
+	# Protect against XSS attacks
+	Header set X-XSS-Protection "1; mode=block"
+	# Protect against content-sniffing
+	Header set X-Content-Type-Options nosniff
+</IfModule>
+
 <IfModule !mod_rewrite.c>
 
     # If we don't have mod_rewrite installed, all 404's
     # can be sent to index.php, and everything works as normal.
     ErrorDocument 404 index.php
 </IfModule>
+
+
 
 # Disable server signature start
     ServerSignature Off
