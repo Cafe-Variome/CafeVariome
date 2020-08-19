@@ -134,3 +134,6 @@ upload/UploadData/*
 
 upload/pairings/*
 !upload/pairings/index.html
+
+app/Config/App.php
+app/Config/Database.php
