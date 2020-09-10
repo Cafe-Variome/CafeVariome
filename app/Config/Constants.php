@@ -109,3 +109,8 @@ define('STATUS_SUCCESS', 1);
 define('STATUS_ERROR', 0);
 define('STATUS_INFO', 2);
 define('STATUS_WARNING', 3);
+
+// PHP INI Values
+
+ini_set('memory_limit', "1G");
+
