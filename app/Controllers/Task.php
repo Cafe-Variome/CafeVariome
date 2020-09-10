@@ -22,6 +22,7 @@ use App\Models\Settings;
 use App\Models\EAV;
 use App\Models\Neo4j;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\DataStream;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Input\EAVDataInput;
 use CodeIgniter\Config;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
@@ -41,8 +42,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * @return N/A
      */
     public function phenoPacketInsert($source_id) {
-        error_log("PhenoPacket");
-        
+              
         $uploadModel = new Upload($this->db);
         $sourceModel = new Source($this->db);
 
@@ -295,146 +295,24 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * bulkUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
      *
      * @param string $file        - The File We are uploading
-     * @param int $delete         - 0: We do not need to delete data from eavs | 1: We do need to 
+     * @param int $overwrite         - 0: We do not need to delete data from eavs | 1: We do need to 
      * @param string $source      - The name of the source we are uploading to
      * @return array $return_data - Basic information on the status of the upload
      */
-    public function bulkUploadInsert(int $fileId, $delete, int $source_id) {
-
+    public function bulkUploadInsert(int $fileId, int $overwrite) {
         $uploadModel = new Upload();
-        $sourceModel = new Source();
+        $fileRec = $uploadModel->getFiles('ID, source_id', ['ID' => $fileId]);
 
-        $error = array('subject_id' => 'No subject_id column.',
-        'wrong_type' => 'File did not conform to allowed types.',
-         'insert_fail' => 'Data Failed to insert. Please double check file for sanity.',
-         'variant_invalid' => 'Variant is not valid, as according to VariantValidator. https://variantvalidator.org/',
-        );
-        //$fileId = $uploadModel->getFileId($source_id, $file);
-        $file =  $uploadModel->getFileName($fileId);
-        $uploadModel->clearErrorForFile($fileId);
-        
-        if ($delete == 1) {		
-            $sourceModel->deleteSourceFromEAVs($source_id);
+        if (count($fileRec) == 1) {
+            $sourceId = $fileRec[0]['source_id'];
+
+            $inputPipeLine = new EAVDataInput($sourceId, $overwrite);
+            $inputPipeLine->absorb($fileId);
+            $inputPipeLine->save($fileId);
         }
-        list( $true, $linerow, $counter, $groupnumber, $filePath ) = array( true, 1, 0, 0, FCPATH."upload/UploadData/".$source_id."/".$file);
-        
-        
-        $return_data = array('result_flag' => 1);   
-        $attgroups = [];
-        if (preg_match("/\.csv$|\.tsv$/", $file)) {
-            $line = fgets(fopen($filePath, 'r'));
-            if (!preg_match("/^subject_id(.)/", $line, $matches)) {
-                $return_data['result_flag'] = 0;
-                $return_data['error'] = $error['subject_id'];
-                $message = $error['subject_id'];
-                $error_code = 1;
-                $uploadModel->errorInsert($fileId,$source_id,$message,$error_code,true);
-                return $return_data;
-            }
-            else {
-                $delimiter = $matches[1];
-            }
-            $reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::CSV);
-            $reader->setFieldDelimiter($delimiter);
-        }     
-        elseif (preg_match("/\.xlsx$/", $file)) {
-
-            $reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::XLSX);
-        } 
-        elseif (preg_match("/\.ods$/", $file)) {
-            $reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::ODS);
+        else{
+            error_log('File not found.');
         }
-        else {
-            $return_data['result_flag'] = 0;
-            $return_data['error'] = "File did not conform to allowed types";   
-            $message = "File did not conform to allowed types.";
-            $error_code = 2;
-            $uploadModel->errorInsert($fileId,$message,$error_code,true);         
-            return $return_data;
-        }
-
-        $sourceModel->toggleSourceLock($source_id);	
-        $reader->open($filePath);
-        foreach ($reader->getSheetIterator() as $sheet) {
-            foreach ($sheet->getRowIterator() as $row) {
-                if ($true) {			 
-                    for ($i=0; $i < count($row); $i++) { 	
-                        if ($i === 0) {
-                            if ($row[$i] != "subject_id"){
-                                $return_data['result_flag'] = 0;
-                                $return_data['error'] = "No subject_id column.";
-                                $message = "No subject_id column.";
-                                $error_code = 1;
-                                $uploadModel->errorInsert($fileId,$source_id,$message,$error_code,true);
-                                $sourceModel->toggleSourceLock($source_id);
-                                return $return_data;
-                            }
-                            continue;
-                        }                    
-                        if ($row[$i] == "<group_end>"){
-                            if (!empty($temphash)){
-                                $attgroups[$groupnumber] = $temphash;
-                                $temphash = [];
-                                $groupnumber++;
-                            }
-                        } 
-                        else {
-                            $temphash[$row[$i]] = $i;
-                        }                      
-                        if (!empty($temphash)){
-                            $attgroups[$groupnumber] = $temphash;
-                        }	
-                    }
-                    $true = false;
-                    $this->db->transStart();			
-                }
-                else {
-                    $subject_id = $row[0];
-                    if ($subject_id == ""){
-                        $point = $row;
-                        $return_data['result_flag'] = 0;
-                        $return_data['status'] = "error";
-                        $return_data['error'] = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
-                        $message = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
-                        $error_code = 3;
-                        $uploadModel->errorInsert($fileId,$source_id,$message,$error_code,true);
-                        $sourceModel->toggleSourceLock($source_id);
-                        return $return_data;
-                    }
-                    foreach ($attgroups as $group){
-                        $uid = md5(uniqid(rand(),true));                           
-                        foreach ($group as $att => $val){                          
-                            $value = $row[$val];
-                            if ($value == "") continue;     
-                            if (is_a($value, 'DateTime')) $value = $value->format('Y-m-d H:i:s');
-                            $uploadModel->jsonInsert($uid,$source_id,$fileId,$subject_id,$att,$value);
-                            $counter++;                            
-                            if ($counter % 800 == 0) {
-                                $error = $this->sendBatch();   
-                                error_log($counter);                          
-                                if ($error) {                             
-                                    error_log("failed on insert");
-                                    $return_data['result_flag'] = 0;
-                                    $return_data['error'] = "MySQL insert was unsuccessful";
-
-                                    $sourceModel->toggleSourceLock($source_id);
-                                    return $return_data;
-                                }
-                            }                         
-                        }
-                    }
-                }
-            }
-            $linerow++;
-        }
-        $reader->close();
-
-        $this->db->transComplete();
-        $uploadModel->insertStatistics($fileId, $source_id);
-        $uploadModel->bigInsertWrap($fileId, $source_id);
-        $uploadModel->clearErrorForFile($fileId);
-        $sourceModel->toggleSourceLock($source_id);	
-        return $return_data;
     }
 
     
@@ -1095,6 +973,9 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     }
 
     /**
+     * @deprecated as of 9/2020
+     * @see sendBatch in EAVDataInput.php
+     * 
      * Send Batch - Fill in the status table on the success of the upload
      *
      * @param N/A
