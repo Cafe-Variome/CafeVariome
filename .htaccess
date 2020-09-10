@@ -47,3 +47,8 @@ Options All -Indexes
 # Disable server signature start
     ServerSignature Off
 # Disable server signature end
+
+#Setting Max Upload File start
+	php_value upload_max_filesize 16M
+	php_value post_max_size 16M
+#Setting Max Upload File end
