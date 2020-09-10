@@ -12,7 +12,6 @@
 
 use App\Models\UIData;
 use App\Models\Source;
-use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use CodeIgniter\Config\Services;
 
 
@@ -86,7 +85,7 @@ use CodeIgniter\Config\Services;
         return view($this->viewDirectory . '/VCF', $data);
     }
 
-    function Bulk($source_id = null) {
+    function Bulk(int $source_id) {
         // Check whether the user is either an admin or a curator that has the required permissions to do this action
 
         $uidata = new UIData();
@@ -515,6 +514,8 @@ use CodeIgniter\Config\Services;
     }
 
     /**
+     * @deprecated as of 9/2020 and made private
+     * @see bulk_upload at AjaxApi.php
      * bulk_upload - Perform Upload for CSV/XLS/XLSX files
      * TODO: Create a link to page from sources admin. Replace with stand alone vcf page
      *
@@ -522,7 +523,7 @@ use CodeIgniter\Config\Services;
      * @param array $_FILES           - The file we are uploading
      * @return json_encoded array Success|Headers are not as expected|File is Duplicated
      */
-    public function bulk_upload($force=false){   
+    private function bulk_upload($force=false){   
         error_log(htmlentities(print_r($_POST,1), ENT_QUOTES));
         $tmp = $_FILES["userfile"]["tmp_name"];
         $file_name = $_FILES["userfile"]["name"];
