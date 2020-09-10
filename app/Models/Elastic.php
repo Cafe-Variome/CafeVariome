@@ -32,9 +32,7 @@ class Elastic extends Model{
         $this->setting =  Settings::getInstance($this->db);
 
         $this->elasticInstance = new ElasticSearch([$this->setting->getElasticSearchUri()]);
-        if (!$this->elasticInstance->ping()) {
-            throw new \Exception('Elasticsearch is not running.');
-        }
+
         helper('filesystem');
     }
 
@@ -215,17 +213,22 @@ class Elastic extends Model{
      */
     public function regenerateFederatedPhenotypeAttributeValueList($source_id) {
         // Load Models
-        $sourceModel = new Source($this->db);
-        $networkModel = new Network($this->db);
-        $phenotypeModel = new Phenotype($this->db);
+        $sourceModel = new Source();
+        $networkModel = new Network();
+        $phenotypeModel = new Phenotype();
         
+        $jsonIndexPath = getcwd() . DIRECTORY_SEPARATOR.  JSON_DATA_DIR;
+
+        if (!file_exists($jsonIndexPath)) {
+            mkdir($jsonIndexPath, 777, true);
+        }
+
         $sourceModel->toggleSourceLock($source_id);	
         //$result = $networkModel->getNetworkAndTheirSourcesForThisInstallation();
         $result = $networkModel->getNetworkSourcesForCurrentInstallation();
 
         $phenotypeModel->deleteAllLocalPhenotypesLookup();
 
-        $jsonIndexPath = getcwd() . DIRECTORY_SEPARATOR.  JSON_DATA_DIR;
         $files = scandir($jsonIndexPath);
         foreach ($files as $file) {
             if (strpos($file, '.')) {
@@ -240,21 +243,13 @@ class Elastic extends Model{
         if(isset($result['error'])) return;
 
         foreach ($result as $row) {
-            try {
-                $data = $phenotypeModel->localPhenotypesLookupValues($row['source_id'], $row['network_key']);
-            } catch (\Exception $ex) {
-                var_dump($ex);
-                exit;
-            }
 
-            $json_data = array();
+            $data = $phenotypeModel->localPhenotypesLookupValues($row['source_id'], $row['network_key']);
+            $json_data = [];
             foreach ($data as $d) {
                 $json_data[] = array("attribute" => $d['phenotype_attribute'], "value" => rtrim($d['phenotype_values'], "|"));
             }
             
-            if (!file_exists('resources/phenotype_lookup_data/')) {
-                mkdir('resources/phenotype_lookup_data/', 777, true);
-            }
             //Check the length of the data array, if it is empty, don't append it to the file.
             if (count($json_data) > 0) {
                 //Data must be written to the file in every iteration, in case the file is overwritten, some data is lost.
