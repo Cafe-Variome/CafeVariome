@@ -1,4 +1,4 @@
-<?php namespace App\Libraries\CafeVariome\Core\DataPipeLine\Stream;
+<?php namespace App\Libraries\CafeVariome\Core\DataPipeLine\Input;
 
 /**
  * Name DataInput.php
@@ -9,7 +9,57 @@
  * 
  */
 
-class DataInput
+use CodeIgniter\Controller;
+use CodeIgniter\CLI\CLI;
+use App\Models\Upload;
+use App\Models\Source;
+use App\Models\Elastic;
+use App\Models\Settings;
+use App\Models\EAV;
+use App\Models\Neo4j;
+use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
+use CodeIgniter\Config;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+
+abstract class DataInput
 {
+
+    protected $sourceId;
     
+    protected $basePath;
+    protected $db;
+    protected $fileMan;
+    protected $uploadModel;
+    protected $sourceModel;
+    protected $elasticModel;
+    protected $eavModel;
+    protected $neo4jModel;
+
+    protected $reader;
+
+    public function __construct(int $source_id)
+    {
+        $this->sourceId = $source_id;
+
+        $this->basePath = FCPATH . UPLOAD . UPLOAD_DATA . $this->sourceId . DIRECTORY_SEPARATOR;
+        $this->db = \Config\Database::connect();
+
+        $this->uploadModel = new Upload();
+        $this->sourceModel = new Source();
+        $this->fileMan = new FileMan($this->basePath);
+    }
+
+    abstract public function absorb(int $fileId);
+    abstract public function save(int $fileId);
+
+    protected function getSourceFiles(int $fileId = -1)
+    {
+        if ($fileId != -1) {
+            return $this->uploadModel->getFiles('FileName', ['id' => $fileId]);
+        }
+        else{
+            return $this->uploadModel->getFiles('', ['source_id' => $this->sourceId]);
+        }
+    }
+
 }
