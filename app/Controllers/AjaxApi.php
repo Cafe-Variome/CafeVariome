@@ -23,7 +23,7 @@ use App\Models\Source;
 use App\Models\Network;
 use App\Models\Elastic;
 use App\Models\Deliver;
-use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
+use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\ShellHelper;
 use App\Libraries\AuthAdapter;
 use CodeIgniter\Config\Services;
@@ -368,7 +368,7 @@ use CodeIgniter\Config\Services;
         // Create the source upload directory if it doesnt exist
         $source_path =  $source_id;
 
-        $fileMan = new FileMan($basePath);
+        $fileMan = new UploadFileMan($basePath);
         if (!$fileMan->Exists($source_path)) {
             $fileMan->CreateDirectory($source_path);
         }
@@ -709,7 +709,7 @@ use CodeIgniter\Config\Services;
         $user_id = $this->request->getVar('user_id');
 
         $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
-        $fileMan = new FileMan($basePath);
+        $fileMan = new UploadFileMan($basePath);
 
         if ($fileMan->countFiles() == 1){ // Only 1 file is allowed to go through this uploader
             $file = $fileMan->getFiles()[0];
@@ -752,10 +752,27 @@ use CodeIgniter\Config\Services;
                 echo json_encode($response_array);
             }
             else{
-                #shouldnt ever happen
-                error_log("entered else");
+                $response_array = array('status'  => "Red",
+                'message' => "Unknown error.");
+
+                echo json_encode($response_array);
             }
         }
+    }
+
+    public function processFile()
+    {
+        $fileId = $this->request->getVar('fileId');
+        $overwrite = $this->request->getVar('overwrite');
+
+        if ($overwrite) {
+            $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $fileId 1");
+        }
+        else{
+            $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $fileId 00"); //Don't change 00 to 0 as it won't be detected on Windows machines.
+        }
+
+        return json_encode(0);
     }
 
 
