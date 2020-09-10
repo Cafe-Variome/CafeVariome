@@ -31,6 +31,38 @@ use CodeIgniter\Database\ConnectionInterface;
         helper('filesystem');
     }
 
+    /**
+	 * getFiles
+     * 
+	 * General function to get fetch data from uploaddatastatus table.
+     * 
+     * @author Mehdi Mehtarizadeh
+	 */
+	function getFiles(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
+		$this->builder = $this->db->table($this->table);
+		
+		if ($cols) {
+            $this->builder->select($cols);
+        }
+        if ($conds) {
+            $this->builder->where($conds);
+        }
+        if ($groupby) {
+            $this->builder->groupBy($groupby);
+        }
+        if ($isDistinct) {
+            $this->builder->distinct();
+        }
+        if ($limit > 0) {
+            if ($offset > 0) {
+                $this->builder->limit($limit, $offset);
+            }
+            $this->builder->limit($limit);
+        }
+
+        $query = $this->builder->get()->getResultArray();
+        return $query; 
+    }
 
     /**
      * createUpload - Perform Initial insert into UploadDataStatus table
@@ -124,7 +156,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param string $file - The File name we are searching for
      * @return int File_ID|null
      */
-    public function getFileId($source_id, $file) {
+    public function getFileId(int $source_id, string $file) {
         $this->builder = $this->db->table($this->table);
 
         $this->builder->select('ID');
@@ -206,7 +238,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param int $source_id - The source_id we are checking
      * @return array empty if no files | with elements of file names
      */
-    public function phenoPacketFiles($source_id) {
+    public function phenoPacketFiles(int $source_id) {
 
         $this->builder = $this->db->table($this->table);
 
