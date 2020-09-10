@@ -191,9 +191,11 @@ use CodeIgniter\Database\ConnectionInterface;
      * Counts entries per source.
      */
     function countSourceEntries(): array {
+
         $this->builder = $this->db->table('eavs');
-        $this->builder->select('COUNT(distinct(subject_id)) as total, source_id');
-        $this->builder->groupBy('source_id');
+        $this->builder->select('COUNT(distinct(eavs.subject_id)) as total, sources.source_id');
+        $this->builder->join('sources', 'sources.source_id = eavs.source_id', 'right');
+        $this->builder->groupBy('sources.source_id');
         $query = $this->builder->get()->getResultArray();
         $source_counts = array();
         foreach ($query as $r) {
