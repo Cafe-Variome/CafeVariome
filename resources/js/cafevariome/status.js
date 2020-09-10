@@ -1,9 +1,13 @@
+var tooltipObj;
+
 $(document).ready(function() {
     param = $('#source_id').val();
     reloadTable(param,true);
 	refreshId = setInterval(function() {
       reloadTable(param,false);
     }, 5000)
+
+
 })
 
 function reloadTable(param,first) {
@@ -18,7 +22,6 @@ function reloadTable(param,first) {
             currentscroll = $(window).scrollTop();
         	if (!first) {
                 $('#file_table').dataTable().fnDestroy();
-                
         	}
         	$("#file_grid").empty();
         	for (var i = 0; i < response.Files.length; i++) {
@@ -38,8 +41,9 @@ function reloadTable(param,first) {
                 	$("#file_" + response.Files[i].ID +"_errors").append('No errors');
                 }
                 $('#file_' + response.Files[i].ID).append('<td>' + response.Files[i].Status + '</td>');
-        	}   
-        	filesDt();  
+                $('#file_' + response.Files[i].ID).append("<td><a href='#' data-toggle='tooltip' data-placement='top' title='Remove Records and Re-process File' onclick='processFile(" + response.Files[i].ID + ", 1)'><i class='fa fa-redo-alt text-info'></i></a> <a href='#' data-toggle='tooltip' data-placement='top' title='Re-process File and Append Records' onclick='processFile(" + response.Files[i].ID + ", 0)'><i class='fa fa-sync-alt text-warning'></i></a></td>");
+            }  
+            filesDt();  
             $(window).scrollTop(currentscroll);  
         }
     });

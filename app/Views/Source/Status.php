@@ -24,6 +24,7 @@
 			<th>Upload End</th>
 			<th>Errors</th>
 			<th>Status</th>
+			<th>Action</th>
 		</tr>
 	</thead>
 	<tbody id="file_grid">

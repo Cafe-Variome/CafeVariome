@@ -67,13 +67,6 @@
 			<span class="sr-only">Loading...</span>
 		</div>
 	</div>
-
-
-
-
-
-  <div class="col">
-  </div>
 </div>
 </form>
 
@@ -94,6 +87,7 @@
 		<th>Upload End</th>
 		<th>Errors</th>
 		<th>Status</th>
+		<th>Action</th>
 	</tr>
   </thead>
   <tbody id="file_grid">

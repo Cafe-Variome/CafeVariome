@@ -619,7 +619,7 @@ class Source extends CVUI_Controller{
         $uidata = new UIData();
         $uidata->title = "Status";
         $uidata->data['source_id'] = $source_id;
-        $uidata->javascript = array(JS.'cafevariome/status.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+        $uidata->javascript = array(JS. 'bootstrap-notify.js', JS.'cafevariome/upload_bulk.js', JS.'cafevariome/status.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
 
         $data = $this->wrapData($uidata);

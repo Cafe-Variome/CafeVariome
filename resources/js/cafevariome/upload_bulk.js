@@ -99,6 +99,15 @@ $("#uploadBulk").submit(function(event) {
                                     });
                                 }
                             }
+                            else if(data.status == "Red"){
+                                $.notify({
+                                    // options
+                                    message: 'Unknown error.'
+                                  },{
+                                    // settings
+                                    timer: 200
+                                });
+                            }
                             else {
                             	  $.notify({
 								        // options
@@ -111,7 +120,7 @@ $("#uploadBulk").submit(function(event) {
                             }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
-                            
+
                         }
                     });
                 }
@@ -129,3 +138,37 @@ $('#dataFile').on('change',function(){
     var fileName = fullFileName.split('\\')[fullFileName.split('\\').length - 1];
     $(this).next('.custom-file-label').html(fileName);
 })
+
+function processFile(fileId, overwrite) {
+
+    var fileData = new FormData();
+    fileData.append('fileId', fileId.toString());
+    fileData.append('overwrite', overwrite.toString());
+
+    $.ajax({
+        type: "POST",  
+        url: baseurl+'AjaxApi/processFile',
+        data: fileData,
+        dataType: "json", 
+        contentType: false,
+        processData: false,   
+        success: function(response)  {
+            $.notify({
+                // options
+                message: 'Task started.'
+              },{
+                // settings
+                timer: 200
+            });
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $.notify({
+                // options
+                message: 'There was an error.'
+              },{
+                // settings
+                timer: 200
+            });
+        }
+    });
+}
