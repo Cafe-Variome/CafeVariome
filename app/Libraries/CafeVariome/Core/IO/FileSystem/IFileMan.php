@@ -11,10 +11,9 @@
 
 interface IFileMan {
 
-    public function Save(File $file): bool;
-
-    public function Exists(string $path): bool;
+    public function countFiles(): int;
+    public function CreateDirectory(string $path);
     public function Delete(string $path);
-
+    public function Exists(string $path): bool;
 
 }
