@@ -58,34 +58,43 @@ use CodeIgniter\Config\Services;
 		$authAdapterConfig = config('AuthAdapter');
         $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
         
+        //Check to see if user is logged in
+        if (!$authAdapter->loggedIn()) {
+            return json_encode(['timeout' => 'Your session has timed out. You need to login again.']);
+        }
+
         $queryString = json_encode($this->request->getVar('jsonAPI'));
         $token = $authAdapter->getToken();
         $user_id = $this->request->getVar('user_id');
 
-        $results = [];
-        $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
-        $loaclResults = $cafeVariomeQuery->search($queryString, $network_key, $user_id); // Execute locally
-        array_push($results, $loaclResults);
-
-        $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
-        $installations = [];
-
-        if ($response->status) {
-            $installations = $response->data;
-
-            foreach ($installations as $installation) {
-                if ($installation->installation_key != $this->setting->getInstallationKey()) {
-                    // Send the query
-                    $queryNetInterface = new QueryNetworkInterface($installation->base_url);
-                    $queryResponse = $queryNetInterface->query($queryString, (int) $network_key, $token);
-                    if ($queryResponse->status) {
-                        array_push($results, $queryResponse->data);
+        try {
+            $results = [];
+            $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
+            $loaclResults = $cafeVariomeQuery->search($queryString, $network_key, $user_id); // Execute locally
+            array_push($results, $loaclResults);
+    
+            $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
+            $installations = [];
+    
+            if ($response->status) {
+                $installations = $response->data;
+    
+                foreach ($installations as $installation) {
+                    if ($installation->installation_key != $this->setting->getInstallationKey()) {
+                        // Send the query
+                        $queryNetInterface = new QueryNetworkInterface($installation->base_url);
+                        $queryResponse = $queryNetInterface->query($queryString, (int) $network_key, $token);
+                        if ($queryResponse->status) {
+                            array_push($results, json_encode($queryResponse->data));
+                        }
                     }
                 }
             }
+    
+            return json_encode($results);
+        } catch (\Exception $ex) {
+            return json_encode(['error' => 'There was a problem executing the query. Please try again with a different query.']);
         }
-
-        return json_encode($results);
     }
 
     function hpo_query($id = ''){
