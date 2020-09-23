@@ -138,7 +138,7 @@ class Auth extends CVUI_Controller
 		{
 			if ($this->authAdapter->isAdmin())
 			{
-				return redirect()->to(base_url('Admin/Index'));
+				return redirect()->to(base_url('Home/Index'));
 			}
 			return redirect()->to(base_url('home'));
 		}
@@ -213,7 +213,7 @@ class Auth extends CVUI_Controller
 				exit;
 			}
 			else if($this->authAdapter->isAdmin()){
-				header('Location: '.base_url('admin/index'));
+				header('Location: '.base_url('Home/index'));
 				exit;	
 			}
 			header('Location: '.base_url('home'));
