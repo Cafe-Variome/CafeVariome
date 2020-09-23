@@ -45,27 +45,41 @@ use CodeIgniter\Database\ConnectionInterface;
      * @return array localPhenoTypes
      */
     function localPhenotypesLookupValues(int $source_id, string $network_key) {
-        $eavModel = new EAV($this->db);
 
-        $data = $eavModel->getEAVsForSource($source_id);
-
+        $eavModel = new EAV();
+        $eavCount = $eavModel->getEAVs('count(*) as totalEAVs', ['source_id' => $source_id]);
+        $data = [];
         $tempLocalPhenotypes = [];
 
+        for ($i=0; $i < $eavCount[0]['totalEAVs']; $i+=10000) { 
+            $data = $eavModel->getEAVsForSource($source_id, 10000, $i);
+            $this->swapLocalPhenotypes($data, $tempLocalPhenotypes, $network_key);
+        }
+
+        $data = $eavModel->getEAVsForSource($source_id, $i - $eavCount[0]['totalEAVs'], $i - 10000);
+        $this->swapLocalPhenotypes($data, $tempLocalPhenotypes, $network_key);
+
+        return $tempLocalPhenotypes;
+    }
+
+    private function swapLocalPhenotypes(array $data, & $tempLocalPhenotypes, int $network_key)
+    {
         foreach ($data as $d) {
+
             $attr = $d['attribute'];
             $value = $d['value'];
             
             if(strlen($value) > 229) continue;
 
             if(is_numeric($value)) {            
-				$sigs = 4;
-            	if(is_float($value) && floatval($value)) {
-            		if($value < 0) {
+                $sigs = 4;
+                if(is_float($value) && floatval($value)) {
+                    if($value < 0) {
                         $value = round($value * -1, $sigs) * -1;
-            		} else {
-            			$value = round($value, $sigs);
-            		}
-            	}
+                    } else {
+                        $value = round($value, $sigs);
+                    }
+                }
             }
 
             $value = (string)$value;      
@@ -92,17 +106,7 @@ use CodeIgniter\Database\ConnectionInterface;
 
                 $tempLocalPhenotypes[$attr] = ["network_key" => $network_key, "phenotype_attribute" => $attr, "phenotype_values" => $value];
             }
-            
         }
-        foreach ($tempLocalPhenotypes as $tlp) {
-            $attr = $tlp['phenotype_attribute'];
-            $value = $tlp['phenotype_values'];
-            $value = str_replace("'", "''", $value);
-
-            $sql = "INSERT INTO `local_phenotypes_lookup`(`network_key`, `phenotype_attribute`, `phenotype_values`) VALUES ('$network_key', '$attr', '$value')";
-            $this->db->query($sql);
-        }
-        return $tempLocalPhenotypes;
     }
 
     function updateLocalPhenoTypes(array $updateData,array $conds){

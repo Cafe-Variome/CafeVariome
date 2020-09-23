@@ -31,11 +31,11 @@ class EAV extends Model{
         }
     }
 
-    public function getEAVsForSource(int $source_id)
-    {
+    public function getEAVsForSource(int $source_id, int $limit, int $offset){
         $this->builder = $this->db->table($this->table);
         $this->builder->select('attribute,value');
         $this->builder->where('source_id', $source_id);
+        $this->builder->limit($limit, $offset);
         $query = $this->builder->get()->getResultArray();
 
         return $query;
@@ -113,7 +113,7 @@ class EAV extends Model{
     {
         $this->builder = $this->db->table('eavs');
         $this->builder->select('subject_id, attribute, value');
-        $this->builder->where('attribute', "Phenotype_ORPHA");
+        $this->builder->where('attribute', "Phenotype_ORPHA"); //Diagnosis
         $this->builder->where('source_id', $source_id);
         //$this->builder->where('elastic', 0);
 
