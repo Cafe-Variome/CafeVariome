@@ -55,13 +55,19 @@
             <!-- Update Possible -->
           </td>                                               
       <?php endif; ?>
-        <td>                                    
-          <a onclick="regenElastic('<?php echo $row['source_id']; ?>', false);" id="update_<?php echo $row['name']; ?>" data-toggle="tooltip" data-placement="top" title="Click to regenerate this ElasticSearch Index">
-            <span class="fa fa-redo text-info"></span>
-          </a>
-          <a onclick="regenElastic('<?php echo $row['source_id']; ?>',true);" data-toggle="tooltip" data-placement="top" title="Click to append newly-uploaded data to ElasticSearch (This does not affect data already present)">
-            <span class="fa fa-sync text-warning"></span>
-          </a>
+        <td>   
+          <?php if ($row['network_assigned']): ?>                                 
+            <a onclick="regenElastic('<?php echo $row['source_id']; ?>', false);" id="update_<?php echo $row['name']; ?>" data-toggle="tooltip" data-placement="top" title="Click to regenerate this ElasticSearch Index">
+              <span class="fa fa-redo text-info"></span>
+            </a>
+            <a onclick="regenElastic('<?php echo $row['source_id']; ?>',true);" data-toggle="tooltip" data-placement="top" title="Click to append newly-uploaded data to ElasticSearch (This does not affect data already present)">
+              <span class="fa fa-sync text-warning"></span>
+            </a>
+          <?php else: ?>
+            <a data-toggle="tooltip" data-placement="top" title="Source is not assigned to a network. Please assign it to a network in network groups.">
+              <span class="fa fa-exclamation-triangle text-warning"></span>
+            </a>
+          <?php endif; ?>
         </td>
       <?php endif; ?>
 

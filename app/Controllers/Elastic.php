@@ -14,6 +14,7 @@
 use App\Models\UIData;
 use App\Models\Settings;
 use App\Models\Source;
+use App\Models\Network;
 use App\Libraries\ElasticSearch;
 use App\Libraries\CafeVariome\ShellHelper;
 use CodeIgniter\Config\Services;
@@ -39,6 +40,9 @@ class Elastic extends CVUI_Controller{
     }
 
     public function Status(){
+
+        $networkModel = new Network();
+
         $uidata = new UIData();
         $uidata->title = "Index Status";
 
@@ -46,17 +50,29 @@ class Elastic extends CVUI_Controller{
         $elasticModel = new \App\Models\Elastic($this->db);
         $sourceModel = new Source($this->db);
         $sources = $sourceModel->getSources('source_id, name, elastic_status');
+
+        $networkAssignedSources = $networkModel->getNetworkSourcesForCurrentInstallation();
+
         //ping elasticsearch
         $uidata->data['isRunning'] = $elasticSearch->ping();
 
         $title_prefix = $elasticModel->getTitlePrefix();
         
         for ($i=0; $i < count($sources); $i++) { 
+
             if($elasticSearch->indexExists($title_prefix . "_" .$sources[$i]['source_id']) != null){
                 $sources[$i]['elastic_index'] = true;
             }
             else {
                 $sources[$i]['elastic_index'] = false;
+            }
+
+            foreach ($networkAssignedSources as $networkSourcePair) {
+                if ($networkSourcePair['source_id'] == $sources[$i]['source_id']) {
+                    $sources[$i]['network_assigned'] = true;
+                    break;
+                }
+                $sources[$i]['network_assigned'] = false;
             }
         }
 
@@ -153,7 +169,9 @@ class Elastic extends CVUI_Controller{
         }
         
         // rebuild the json list for interface
-        $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateFederatedPhenotypeAttributeValueList $source_id $add");
+        //$this->shellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateFederatedPhenotypeAttributeValueList $source_id $add");
+        $tc = new Task();
+        $r = $tc->regenerateFederatedPhenotypeAttributeValueList($source_id, $add);
     }
 
     /**
