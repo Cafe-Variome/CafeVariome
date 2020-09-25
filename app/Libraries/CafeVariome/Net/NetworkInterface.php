@@ -24,6 +24,8 @@ class NetworkInterface
 
     private $installation_key;
 
+    private $networkAdapterConfig;
+
     public function __construct() {
         $this->setting = Settings::getInstance();
         $this->installation_key = $this->setting->getInstallationKey();
@@ -31,7 +33,25 @@ class NetworkInterface
         $this->serverURI = $this->setting->getAuthServerUrl();
         $curlOptions = [CURLOPT_RETURNTRANSFER => TRUE];
 
+        $this->networkAdapterConfig = config('NetworkAdapter');
         $this->networkAdapter = new cURLAdapter(null, $curlOptions);
+
+        if ($this->networkAdapterConfig->useProxy) {
+            $proxyDetails = $this->networkAdapterConfig->proxyDetails;
+            $this->configureProxy($proxyDetails);
+        }
+    }
+
+    private function configureProxy(array $proxyConfig)
+    {
+        $this->networkAdapter->setOption(CURLOPT_FOLLOWLOCATION, true);
+        $this->networkAdapter->setOption(CURLOPT_HTTPPROXYTUNNEL, 1);
+        $this->networkAdapter->setOption(CURLOPT_PROXY, $proxyConfig['hostname']);
+        $this->networkAdapter->setOption(CURLOPT_PROXYPORT, $proxyConfig['port']);
+
+        if ($proxyConfig['username'] != '' && $proxyConfig['password'] != '') {
+            $this->networkAdapter->setOption(CURLOPT_PROXYUSERPWD, $proxyConfig['username'] . ':' . $proxyConfig['password']);
+        }
     }
 
     public function CreateNetwork(array $data)

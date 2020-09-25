@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Helpers\AuthHelper;
 use App\Models\Network;
 use App\Libraries\CafeVariome\Email\EmailFactory;
+use App\Libraries\CafeVariome\Net\cURLAdapter;
 
 class KeyCloak{
 
@@ -36,6 +37,8 @@ class KeyCloak{
 
     private $keyCloakSession;
 
+    private $networkAdapterConfig;
+
     public function __construct(){
 
         $this->db = \Config\Database::connect();
@@ -55,14 +58,32 @@ class KeyCloak{
         $this->loginURI = $this->setting->settingData["key_cloak_login_uri"];
         $this->logoutURI = $this->setting->settingData["key_cloak_logout_uri"];
 
+        $this->networkAdapterConfig = config('NetworkAdapter');
+        $proxyDetails = $this->networkAdapterConfig->proxyDetails;
+
         try {
-            $this->provider = new \Stevenmaguire\OAuth2\Client\Provider\Keycloak([
-                'authServerUrl'         => $this->serverURI,
-                'realm'                 => $this->realm,
-                'clientId'              => $this->clientId,
-                'clientSecret'          => $this->clientSecret,
-                'redirectUri'           => $this->loginURI,
-            ]);
+            if ($this->networkAdapterConfig->useProxy) {
+                $proxyUserPass = ($proxyDetails['username'] != '' && $proxyDetails['password'] != '') ? $proxyDetails['username'] . ':' . $proxyDetails['password'] . '@' : '';
+                $this->provider = new \Stevenmaguire\OAuth2\Client\Provider\Keycloak([
+                    'authServerUrl'         => $this->serverURI,
+                    'realm'                 => $this->realm,
+                    'clientId'              => $this->clientId,
+                    'clientSecret'          => $this->clientSecret,
+                    'redirectUri'           => $this->loginURI,
+                    'proxy'                   => $proxyUserPass . $proxyDetails['hostname'] . ':' . $proxyDetails['port'],
+                    'verify'                  => false
+                ]);
+            }
+            else {
+                $this->provider = new \Stevenmaguire\OAuth2\Client\Provider\Keycloak([
+                    'authServerUrl'         => $this->serverURI,
+                    'realm'                 => $this->realm,
+                    'clientId'              => $this->clientId,
+                    'clientSecret'          => $this->clientSecret,
+                    'redirectUri'           => $this->loginURI
+                ]);
+            }
+
         }
         catch (Exception $e) {
             error_log("failed");
@@ -459,12 +480,34 @@ class KeyCloak{
      * @return bool 
      */
     public function checkKeyCloakServer(){
-        if (strpos($this->serverURI, '/auth') !== false){
 
-            $uri = str_replace("/auth","",$this->serverURI);
-            return AuthHelper::checkServer($uri, $this->serverPort);
+        if (strpos($this->serverURI, '/auth') == false){
+            $this->serverURI .= '/auth/';
         }
-        return AuthHelper::checkServer($this->serverURI, $this->serverPort);  
+        if (substr($this->serverURI, strlen($this->serverURI) - 1, strlen($this->serverURI)) !== '/') {
+            $this->serverURI .= '/';
+        }
+        $curlOptions = [CURLOPT_NOBODY => true];
+        $netAdapterConfig = config('NetworkAdapter');
+
+        $cURLAdapter = new cURLAdapter($this->serverURI, $curlOptions);
+        if ($netAdapterConfig->useProxy) {
+            $proxyDetails = $netAdapterConfig->proxyDetails;
+
+            $cURLAdapter->setOption(CURLOPT_FOLLOWLOCATION, true);
+            $cURLAdapter->setOption(CURLOPT_HTTPPROXYTUNNEL, 1);
+            $cURLAdapter->setOption(CURLOPT_PROXY, $proxyDetails['hostname']);
+            $cURLAdapter->setOption(CURLOPT_PROXYPORT, $proxyDetails['port']);
+    
+            if ($proxyDetails['username'] != '' && $proxyDetails['password'] != '') {
+                $cURLAdapter->setOption(CURLOPT_PROXYUSERPWD, $proxyDetails['username'] . ':' . $proxyDetails['password']);
+            } 
+        }
+
+        $cURLAdapter->Send();
+        $httpStatus = $cURLAdapter->getInfo(CURLINFO_HTTP_CODE);
+
+        return $httpStatus == 200;
     }
 
     /**

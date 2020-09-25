@@ -48,6 +48,11 @@
         return curl_exec($this->adapterInstance);
     }
 
+    public function getInfo(int $opt = null)
+    {
+        return curl_getinfo($this->adapterInstance, $opt);
+    }
+
     private function curlEnabled(): bool
     {
         return function_exists('curl_version');
