@@ -51,11 +51,6 @@ class Network extends Model{
 		$this->builder->delete();
 	}
 
-	public function leaveNetwork(Type $var = null)
-	{
-		# code...
-	}
-
 	/**
 	 * Retrieve all network keys
 	 */
@@ -71,6 +66,7 @@ class Network extends Model{
 
 		return $network_keys;
 	}
+
 	/**
 	 * 
 	 */
@@ -94,6 +90,33 @@ class Network extends Model{
 		$this->builder->insert($data);
 		$insert_id = $this->db->insertID();
 		return $insert_id;
+	}
+
+	/**
+	 * getNetworksBySource(int $source_id)
+	 * 
+	 * Returns network keys a source is assigned to.
+	 * 
+	 * @author Mehdi
+	 * @param int $source_id
+	 * @return array network keys|empty
+	 */
+	public function getNetworksBySource(int $source_id): array
+	{
+		$this->builder = $this->db->table('network_groups_sources');
+		$this->builder->select('network_key');
+		$this->builder->distinct();
+		$this->builder->where('source_id', $source_id);
+
+		$data = $this->builder->get()->getResultArray();
+
+		$keys = [];
+
+		foreach ($data as $record) {
+			array_push($keys, $record['network_key']);
+		}
+
+		return $keys;
 	}
 
     /**
@@ -138,7 +161,7 @@ class Network extends Model{
 		return $query;
 	}
 
-	function getNetworkSourcesForCurrentInstallation() {
+	function getNetworkSourcesForCurrentInstallation(int $source_id = -1) {
 		$net_keys = $this->getNetworkKeys();
 		$this->builder = $this->db->table('network_groups_sources');
 
@@ -146,6 +169,9 @@ class Network extends Model{
 		$this->builder->distinct();
 		if (count($net_keys) > 0) {
 			$this->builder->whereIn("network_key", $net_keys);
+		}
+		if ($source_id != -1) {
+			$this->builder->where('source_id', $source_id);
 		}
 		$query = $this->builder->get()->getResultArray();
 	   	return $query;
