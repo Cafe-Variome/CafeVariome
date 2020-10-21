@@ -61,7 +61,7 @@
 			<?php endif; ?>
 			<li class="nav-item">
 				<?php if ($auth->getAuthEngineName() === "app\libraries\keycloak"): ?>
-				<a class="nav-link-top" href="<?= $setting->settingData['key_cloak_uri'] . "/realms/". $setting->settingData['key_cloak_realm'] ."/account/" ?>">
+				<a class="nav-link-top" href="<?= $setting->settingData['oidc_uri'] . "/realms/". $setting->settingData['oidc_realm'] ."/account/" ?>">
 					Profile
 				</a> 
 				<?php else : ?>
