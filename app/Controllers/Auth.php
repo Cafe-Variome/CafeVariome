@@ -8,6 +8,8 @@ namespace App\Controllers;
  * @package  CodeIgniter-Ion-Auth
  * @author   Ben Edmunds <ben.edmunds@gmail.com>
  * @author   Benoit VRIGNAUD <benoit.vrignaud@zaclys.net>
+ * @author   Mehdi Mehtarizadeh
+ * @author   Gregory Warren
  * @license  https://opensource.org/licenses/MIT	MIT License
  */
 
@@ -69,61 +71,41 @@ class Auth extends CVUI_Controller
 	 */
 	protected $viewsFolder = 'auth';
 
+
 	/**
 	 * Constructor
 	 *
-	 * @return void
 	 */
-	public function __construct()
-	{
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+        parent::setProtected(false);
+        parent::setIsAdmin(false);
+        parent::initController($request, $response, $logger);
+
 		$this->ionAuth    = new \App\Libraries\IonAuth();
 		$this->validation = \Config\Services::validation();
 		helper(['form', 'url']);
 		$this->configIonAuth = config('IonAuth');
-		$this->session       = \Config\Services::session();
 
 		if (! empty($this->configIonAuth->templates['errors']['list']))
 		{
 			$this->validationListTemplate = $this->configIonAuth->templates['errors']['list'];
-		}
-
-		$this->db = \Config\Database::connect();
-		$this->setting =  Settings::getInstance($this->db);
-		
-	}
+		}	
+    }
 
 	/**
 	 * Redirect if needed, otherwise display the user list
 	 *
-	 * @return string|\CodeIgniter\HTTP\RedirectResponse
+	 * @return \CodeIgniter\HTTP\RedirectResponse
 	 */
 	public function index()
 	{
-		if (! $this->authAdapter->loggedIn())
+		if (!$this->authAdapter->loggedIn())
 		{
-			// redirect them to the login page
-			return redirect()->to(base_url("auth/login"));
+			return redirect()->to(base_url("Auth/login"));
 		}
-		//else if (! $this->authAdapter->isAdmin()) // remove this elseif if you want to enable this for non-admins
-		//{
-			// redirect them to the home page because they must be an administrator to view this
-			//show_error('You must be an administrator to view this page.');
-		//	throw new \Exception('You must be an administrator to view this page.');
-		//}
 		else
 		{
-			$this->data['title'] = lang('Auth.index_heading');
-
-			// set the flash data error message if there is one
-			$this->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-			//list the users
-			$this->data['users'] = $this->ionAuth->users()->result();
-			foreach ($this->data['users'] as $k => $user)
-			{
-				$this->data['users'][$k]->groups = $this->ionAuth->getUsersGroups($user->id)->getResult();
-			}
-			//return $this->renderPage($this->viewsFolder . DIRECTORY_SEPARATOR . 'index', $this->data);
-			return view($this->viewsFolder . DIRECTORY_SEPARATOR . 'index', $this->data);
+			return redirect()->to(base_url("Home/index"));
 		}
 	}
 
@@ -136,14 +118,12 @@ class Auth extends CVUI_Controller
 	{	
 		if($this->authAdapter->loggedIn())
 		{
-			if ($this->authAdapter->isAdmin())
-			{
-				return redirect()->to(base_url('Home/Index'));
-			}
-			return redirect()->to(base_url('home'));
+			return redirect()->to(base_url('Home/index'));
 		}
 		else{
-			$this->authAdapter->login('', '', false);
+			if($this->authAdapter->login('', '', false)){
+				return redirect()->to(base_url('Home/index'));
+			}
 			$uidata = new UIData();
 			$uidata->data['message'] = "Authentication server is not available. Only local login is possible at the moment.";
 

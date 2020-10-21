@@ -19,6 +19,7 @@ class AuthAdapter extends \CodeIgniter\Config\BaseConfig
      *  Keycloak is used as authentication engine. Otherwise, IonAuth is used.
      *  2. KeyCloakOnly
      *  3. IonAuthOnly
+     *  4. OAuth
      */
     public $authRoutine = 'KeyCloakFirst';
 }

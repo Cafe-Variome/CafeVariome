@@ -118,7 +118,7 @@ class Admin extends CVUI_Controller{
             $uidata->data['neo4jMsg'] = "Neo4J is not running. Some capabilities of the system are disabled because of this. Please ask the server administrator to start it.";
         }
 
-        $uidata->data['keycloakStatus'] = $keyCloak->checkKeyCloakServer();
+        $uidata->data['keycloakStatus'] = $keyCloak->ping();
         
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Index', $data);
@@ -130,7 +130,7 @@ class Admin extends CVUI_Controller{
         $uidata->title = "Settings";
         $uidata->stickyFooter = false;
 
-        $settingModel = new Settings($this->db, true);
+        $settingModel = Settings::getInstance();
 
         $settings =  $settingModel->getSettings();
         $uidata->data['settings'] = $settings;

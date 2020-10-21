@@ -32,20 +32,23 @@ class AuthAdapter{
         switch($authRoutine){
             case 'KeyCloakFirst':
                 $this->authEngine = new KeyCloak();
-                if(!$this->authEngine->checkKeyCloakServer()){
+                if(!$this->authEngine->ping()){
                     //Keycloak Server not available
-                    //Switch to other 
+                    //Switch to Ion Auth 
                     $this->authEngine = new IonAuth();
                 }
             break;
             case 'KeyCloakOnly':
                 $this->authEngine = new KeyCloak();
-                if(!$this->authEngine->checkKeyCloakServer()){
+                if(!$this->authEngine->ping()){
                     //Keycloak Server not available
-                    //Switch to other 
+                    //Switch to Ion Auth 
                     throw new Exception('KeyCloak Server is not available.'); 
                 }
             break;
+            case 'OAuth':
+                $this->authEngine = new OAuth();
+                break;
             case 'IonAuthOnly':
                 $this->authEngine = new IonAuth();
             break;
@@ -113,7 +116,7 @@ class AuthAdapter{
      */
     public function getToken()
     {
-       return ($this->getAuthEngineName() == "app\libraries\keycloak") ? $this->authEngine->getToken() : null;
+       return $this->authEngine->getToken();
     }
 
     /**
@@ -125,7 +128,7 @@ class AuthAdapter{
      */
     public function getUserIdByToken(\League\OAuth2\Client\Token\AccessToken $token): int
     {
-        if ($this->getAuthEngineName() == "app\libraries\keycloak"){
+        if ($this->getAuthEngineName() != "app\libraries\ionauth"){
             $user = $this->authEngine->getUser($token);
 
             if($user != null){
