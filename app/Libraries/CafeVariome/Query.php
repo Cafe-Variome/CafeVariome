@@ -343,10 +343,11 @@ class Query extends CafeVariome{
     }
 
     public function process_query($source, $pointer_array) {
-        $sourceModel = new Source($this->db);
 
+        $sourceModel = new Source();
         $sourceId = $sourceModel->getSourceIDByName($source);
-
+        $countCache = [];
+        $idsCache = [];
         // $notop = "/value:-/"; //needed to detech a NOT query
 		$element = [];
     	$orarray = explode(") OR (", $pointer_array); //given that we convert all querys into a series of ors we can start by splitting them. (A and (B or c) = (A and B) or (A and C))
@@ -357,12 +358,20 @@ class Query extends CafeVariome{
     	foreach ($orarray as $and) { //each or element should be an and statement note that we are using brackets to distinguish elements that need to be queried together, i.e [chr:1 and pos:124]
 		    $andarray = explode("] AND [", $and); //create array of '[]' elements
 		    foreach ($andarray as $pointer) { // here we are going to query each '[]' and keep counts for each one.
-		    	// error_log("Pointer: $pointer");
-		        //remove any parantheses or brackets
+                // error_log("Pointer: $pointer");
+                //remove any parantheses or brackets
     		    $pointer = trim($pointer, "()[]/");
 				$type = explode('/', $pointer)[2];
-				$lookup = $this->getVal($this->api, $pointer);
-				$element[$numor]["$pointer"] = $this->component_switch($type,$lookup,$source,TRUE);
+                $lookup = $this->getVal($this->api, $pointer);
+
+                if (array_key_exists($pointer, $countCache)) {
+                    $element[$numor]["$pointer"] = $countCache[$pointer];
+                }
+                else{
+                    $qCount = $this->component_switch($type,$lookup,$source,TRUE);
+                    $element[$numor]["$pointer"] = $qCount;
+                    $countCache[$pointer] = $qCount;
+                }
 		    }
 		    $numor++;
 		}
@@ -384,9 +393,16 @@ class Query extends CafeVariome{
 				$type = explode('/', $pointer)[2];
 
 				if (array_key_exists('operator',$lookup) === FALSE || (substr($lookup['operator'],0,6) !== 'is not' && $lookup['operator'] !== '!=')){
-					error_log("IS");
-					$ids = $this->component_switch($type,$lookup,$source,FALSE);
-					
+                    // error_log("IS");
+                    if (array_key_exists($pointer, $idsCache)) {
+                        $ids = $idsCache[$pointer];
+                    }
+                    else{
+                        $ids = $this->component_switch($type,$lookup,$source,FALSE);
+                        $idsCache[$pointer] = $ids;
+                    }
+                    //$ids = $this->component_switch($type,$lookup,$source,FALSE);
+
 					if (count($andids) > 0){
                         $andids = array_intersect($andids, $ids);
                         if (count($andids) == 0){
@@ -477,7 +493,7 @@ class Query extends CafeVariome{
 		$arr = [];		
 		$arr['has_child']['type'] = 'eav';
 		$arr['has_child']['query']['bool']['must'] = $tmp;	
-		$paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
+        $paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
         $paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
         
         $jp = json_encode($paramsnew);
@@ -932,6 +948,63 @@ class Query extends CafeVariome{
 
         return $result;
     }
+
+    public function mutation_query($lookup, $source, $iscount = TRUE){
+        $elasticModel = new Elastic($this->db);
+        $sourceModel = new Source($this->db);
+    
+        $paramsnew = [];
+        $sourceId = $sourceModel->getSourceIDByName($source);
+        $es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;  
+    
+        $paramsnew = ['index' => $es_index];
+        $paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source . "_eav";
+    
+        $glist = $lookup['genes'];
+
+        if (!empty($glist)) {
+            $genearr = [];
+            foreach ($glist as $key => $value) {
+                $tmp = [];
+                $tmp[]['match'] = ['attribute' => $key];
+                $tmp[]['match'] = ['value.raw' => $value];
+                $arr_child['has_child']['query']['bool']['must'] = $tmp;
+                $arr_child['has_child']['type'] = 'eav';
+                $genearr[] = $arr_child;
+            }
+            $paramsnew['body']['query']['bool']['must'][1]['bool']['must'][]['bool']['should'] = $genearr;
+        }
+    
+        $mutlist = $lookup['mutation'];
+
+        if (!empty($mutlist)) {
+            $protaffarr = [];
+            foreach ($mutlist as $key => $value) {
+                $tmp = [];
+                $tmp[]['match'] = ['attribute' => $key];
+                $tmp[]['match'] = ['value.raw' => $value];
+                $arr_child['has_child']['query']['bool']['must'] = $tmp;
+                $arr_child['has_child']['type'] = 'eav';
+                $protaffarr[] = $arr_child;    
+            }
+            $paramsnew['body']['query']['bool']['must'][1]['bool']['must'][]['bool']['should'] = $protaffarr;
+        }
+        
+        $paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
+    
+        $jp = json_encode($paramsnew);
+    
+        $esquery = $this->elasticClient->search($paramsnew);
+    
+        if ($iscount){
+            $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
+        }
+        else{
+            $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
+        }
+        
+        return $result;
+    }
     
     public function makeLogic(&$api) {
 
@@ -1012,5 +1085,6 @@ class Query extends CafeVariome{
 		elseif ($type == "eav") return $this->eav_query($lookup, $source, $iscount);
         elseif ($type == "subjectVariant") return $this->sv_query($lookup, $source, $iscount);
         elseif ($type == "ordo") return $this->orpha_query($lookup, $source, $iscount);
+        elseif ($type == "mutation") return $this->mutation_query($lookup, $source, $iscount);
 	}
 }
