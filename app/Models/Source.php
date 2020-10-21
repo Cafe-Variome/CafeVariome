@@ -111,6 +111,38 @@ use CodeIgniter\Database\ConnectionInterface;
         return null;
     }
 
+    /**
+     * getSourcesByNetwork(int $network_key)
+     * 
+     * @return array 
+     */
+    public function getSourcesByNetwork(int $network_key)
+    {
+		$this->builder = $this->db->table('network_groups_sources');
+		$this->builder->select('source_id, network_key');
+		$this->builder->where('network_key', $network_key);
+
+        $data = $this->builder->get()->getResultArray();
+        
+        return $data;
+    }
+
+    /**
+     * getSourcesByNetworks(array $network_keys)
+     * 
+     * @return array 
+     */
+    public function getSourcesByNetworks(array $network_keys)
+    {
+		$this->builder = $this->db->table('network_groups_sources');
+        $this->builder->select('source_id, network_key');
+        $this->builder->distinct();
+		$this->builder->whereIn('network_key', $network_keys);
+
+        $data = $this->builder->get()->getResultArray();
+        
+        return $data;
+    }
 
     /**
      * @deprecated
@@ -192,8 +224,8 @@ use CodeIgniter\Database\ConnectionInterface;
      */
     function countSourceEntries(): array {
 
-        $this->builder = $this->db->table('eavs');
-        $this->builder->select('COUNT(distinct(eavs.subject_id)) as total, sources.source_id');
+        $this->builder = $this->db->table('eavs use index(subj_src)');
+        $this->builder->select('COUNT(distinct(subject_id)) as total, eavs.source_id');
         $this->builder->join('sources', 'sources.source_id = eavs.source_id', 'right');
         $this->builder->groupBy('sources.source_id');
         $query = $this->builder->get()->getResultArray();
