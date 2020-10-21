@@ -216,7 +216,7 @@
 						</div>
 					</div> 
 					<div class="row mb-1">
-						<div class="col-4">KeyCloak</div>
+						<div class="col-4">OpenID Provider</div>
 						<div class="col-8">					                                                                                                                                                                          
 							<?php if($keycloakStatus): ?>
 							<a href="#" class="btn btn-success btn-icon-split">
