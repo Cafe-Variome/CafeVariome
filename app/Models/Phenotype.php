@@ -111,7 +111,6 @@ use CodeIgniter\Database\ConnectionInterface;
 
     function updateLocalPhenoTypes(array $updateData,array $conds){
 
-        
         $this->builder = $this->db->table('local_phenotypes_lookup');
         if($updateData) {
             if($conds){
@@ -119,7 +118,6 @@ use CodeIgniter\Database\ConnectionInterface;
             }
             $this->builder->update($updateData);
         }
-        
     }
 
     function createLocalPhenoTypeLookup($data){

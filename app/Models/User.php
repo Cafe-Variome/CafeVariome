@@ -78,13 +78,13 @@ class User extends Model{
      * @param string uname User Username
      * @return object|null
      */
-    public function getUserByUsername($uname){
+    public function getUserByUsername(string $uname){
 
         $this->builder = $this->db->table($this->table);
         $this->builder->where('username', $uname);
         $query = $this->builder->get()->getResult();
 
-        return ($query) ? $query : null;
+        return ($query) ? $query[0] : null;
     }
     /**
 	 * getUsers
