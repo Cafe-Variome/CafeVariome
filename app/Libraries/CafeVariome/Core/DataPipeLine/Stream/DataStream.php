@@ -18,6 +18,8 @@ use App\Models\Source;
 use App\Models\EAV;
 use App\Models\Neo4j;
 use App\Models\Phenotype;
+use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
+
 
 class DataStream
 {
@@ -35,49 +37,69 @@ class DataStream
 
     public function generateAttributeValueIndex(int $source_id)
     {
+        $jsonIndexPath = getcwd() . DIRECTORY_SEPARATOR.  JSON_DATA_DIR;
+
         $sourceModel = new Source();
         $networkModel = new Network();
         $phenotypeModel = new Phenotype();
-        
+        $fileMan = new SysFileMan($jsonIndexPath);
+
         $sourceModel->toggleSourceLock($source_id);	
-        $result = $networkModel->getNetworkSourcesForCurrentInstallation();
+
+        //Get network(s) source is assigned to
+        $networks = $networkModel->getNetworksBySource($source_id);
+
+        //Get all sources that belong to the above network(s)
+        $networkAssignedSources = $sourceModel->getSourcesByNetworks($networks);
 
         $phenotypeModel->deleteAllLocalPhenotypesLookup();
 
-        $jsonIndexPath = getcwd() . DIRECTORY_SEPARATOR.  JSON_DATA_DIR;
-        $files = scandir($jsonIndexPath);
+        $files = $fileMan->getFiles();
+
         foreach ($files as $file) {
             if (strpos($file, '.')) {
                 $fArr = explode('.', $file);
                 $fExt = $fArr[count($fArr) - 1];
-                if (strtolower($fExt) !== 'html' && strtolower($fExt) !== 'htaccess'){
-                    unlink($jsonIndexPath . $file);
+                if (strtolower($fExt) == 'html' || strtolower($fExt) == 'htaccess') continue;
+                
+                foreach ($networks as $network_key) {
+                    $redundantFile = ($file == $network_key . '.json' ||
+                                     $file == $network_key . '_hpo_ancestry.json' ||
+                                     $file == 'local_' . $network_key . '.json' ||
+                                     $file == 'local_' . $network_key . '_hpo_ancestry.json');
+                    
+                    if ($redundantFile && $fileMan->Exists($file)){
+                        $fileMan->Delete($file);
+                    }
                 }
             }
         }
 
-        if(isset($result['error'])) return;
-
-        foreach ($result as $row) {
+        foreach ($networkAssignedSources as $networkSourcePair) {
             try {
-                $data = $phenotypeModel->localPhenotypesLookupValues($row['source_id'], $row['network_key']);
+                $sourceData = $phenotypeModel->localPhenotypesLookupValues($networkSourcePair['source_id'], $networkSourcePair['network_key']);
+
+                $json_data = [];
+                $existing_data = [];
+                foreach ($sourceData as $d) {
+                    $json_data[] = array("attribute" => $d['phenotype_attribute'], "value" => rtrim($d['phenotype_values'], "|"));
+                }
+
+                if ($fileMan->Exists($networkSourcePair['network_key'] . ".json")) {
+                    $existing_data_json = $fileMan->Read($networkSourcePair['network_key'] . ".json");
+                    $existing_data = json_decode($existing_data_json, true);
+                }
+
+                $json_data = array_merge($existing_data, $json_data);
+
+                //Check the length of the data array, if it is empty, don't append it to the file.
+                if (count($json_data) > 0) {
+                    //Data must be written to the file in every iteration, in case the file is overwritten, some data is lost.
+                    $fileMan->Write($networkSourcePair['network_key'] . ".json", json_encode($json_data));
+                }
             } catch (\Exception $ex) {
                 var_dump($ex);
                 exit;
-            }
-
-            $json_data = array();
-            foreach ($data as $d) {
-                $json_data[] = array("attribute" => $d['phenotype_attribute'], "value" => rtrim($d['phenotype_values'], "|"));
-            }
-            
-            if (!file_exists($jsonIndexPath)) {
-                mkdir($jsonIndexPath, 777, true);
-            }
-            //Check the length of the data array, if it is empty, don't append it to the file.
-            if (count($json_data) > 0) {
-                //Data must be written to the file in every iteration, in case the file is overwritten, some data is lost.
-                file_put_contents($jsonIndexPath . $row['network_key'] . ".json", json_encode($json_data));
             }
         }
     }
