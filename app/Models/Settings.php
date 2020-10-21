@@ -32,7 +32,7 @@ class Settings extends Model{
      * @return object
      */
 
-    public function __construct(ConnectionInterface &$db = null, bool $returnFull = false)
+    private function __construct(ConnectionInterface &$db = null, bool $returnFull = false)
     {
           if ($db != null) {
             $this->db =& $db;
@@ -92,42 +92,70 @@ class Settings extends Model{
           $this->builder->where($conds);
       }
       $this->builder->update($data);
-  }
+    }
 
-  public function getInstallationKey()
-  {
-     return $this->settingData['installation_key'];
-  }
+    public function getInstallationKey()
+    {
+        return $this->settingData['installation_key'];
+    }
 
-  public function getAuthServerUrl()
-  {
-     return $this->settingData['auth_server'];
-  }
+    public function getAuthServerUrl()
+    {
+        return $this->settingData['auth_server'];
+    }
 
-  public function getElasticSearchUri()
-  { 
-      return $this->settingData['elastic_url'];
-  }
+    public function getElasticSearchUri()
+    { 
+        return $this->settingData['elastic_url'];
+    }
 
-  public function getNeo4JUserName()
-  {
-      return $this->settingData['neo4j_username'];
-  }
+    public function getNeo4JUserName()
+    {
+        return $this->settingData['neo4j_username'];
+    }
 
-  public function getNeo4JPassword()
-  {
-      return $this->settingData['neo4j_password'];
-  }
+    public function getNeo4JPassword()
+    {
+        return $this->settingData['neo4j_password'];
+    }
 
-  public function getNeo4JUri()
-  {
-      return $this->settingData['neo4j_server'];
-  }
+    public function getNeo4JUri()
+    {
+        return $this->settingData['neo4j_server'];
+    }
 
-  public function getNeo4JPort()
-  {
-      return $this->settingData['neo4j_port'];
-  }
+    public function getNeo4JPort()
+    {
+        return $this->settingData['neo4j_port'];
+    }
 
+    public function getOpenIDEndpoint()
+    {
+        return $this->settingData["oidc_uri"];
+    }
 
+    public function getOpenIDPort()
+    {
+        return $this->settingData["oidc_port"];
+    }
+
+    public function getOpenIDRealm()
+    {
+        return $this->settingData["oidc_realm"];
+    }
+
+    public function getOpenIDClientId()
+    {
+        return $this->settingData["oidc_client_id"];
+    }
+
+    public function getOpenIDClientSecret()
+    {
+        return $this->settingData["oidc_client_secret"];
+    }
+
+    public function getOpenIDRedirectUri()
+    {
+        return $this->settingData["oidc_login_uri"];
+    }
 }
