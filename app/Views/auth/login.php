@@ -10,7 +10,15 @@
   </div>
 </div>
 <?php endif; ?>
-
+<?php if($statusMessage): ?>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-<?= $statusMessageType ?>">
+			<?php echo $statusMessage ?>
+			</div>
+		</div>
+	</div>
+<?php endif; ?>
 <div class="card border-primary">
   <div class="card-header bg-primary text-white">
     <h4><i class="fa fa-key mr-2"></i><?php echo lang('Auth.login_heading');?></h4>

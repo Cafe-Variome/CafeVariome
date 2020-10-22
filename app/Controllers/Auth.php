@@ -147,6 +147,7 @@ class Auth extends CVUI_Controller
 				}
 				else
 				{
+					$this->setStatusMessage("Email or password was incorrect.", STATUS_ERROR);
 					return redirect()->to(base_url('auth/login'));
 				}
 				$data = $this->wrapData($uidata);
