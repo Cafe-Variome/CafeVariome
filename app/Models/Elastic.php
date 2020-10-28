@@ -227,7 +227,7 @@ class Elastic extends Model{
         //$result = $networkModel->getNetworkAndTheirSourcesForThisInstallation();
         $result = $networkModel->getNetworkSourcesForCurrentInstallation();
 
-        $phenotypeModel->deleteAllLocalPhenotypesLookup();
+        //$phenotypeModel->deleteAllLocalPhenotypesLookup();
 
         $files = scandir($jsonIndexPath);
         foreach ($files as $file) {

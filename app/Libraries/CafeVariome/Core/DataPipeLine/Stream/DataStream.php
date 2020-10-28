@@ -52,7 +52,7 @@ class DataStream
         //Get all sources that belong to the above network(s)
         $networkAssignedSources = $sourceModel->getSourcesByNetworks($networks);
 
-        $phenotypeModel->deleteAllLocalPhenotypesLookup();
+        //$phenotypeModel->deleteAllLocalPhenotypesLookup();
 
         $files = $fileMan->getFiles();
 
