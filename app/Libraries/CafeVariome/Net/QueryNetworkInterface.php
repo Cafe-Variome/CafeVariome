@@ -15,16 +15,11 @@
 use App\Models\Settings;
 use League\OAuth2\Client\Token\AccessToken;
 
-class QueryNetworkInterface
+class QueryNetworkInterface extends AbstractNetworkInterface
 {
-    private $serverURI;
-    private $networkAdapter;
-    private $setting; 
-
     public function __construct(string $targetUri) {
-        $this->setting = new Settings();
+        parent::__construct($targetUri);
 
-        $this->serverURI = $targetUri;
         $curlOptions = [CURLOPT_RETURNTRANSFER => TRUE];
         $this->networkAdapter = new cURLAdapter(null, $curlOptions);
     }
@@ -43,19 +38,18 @@ class QueryNetworkInterface
         return $this->processResponse($response);
     }
 
-    public function adapterw(string $uriTail, array $data)
-    {
-        $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
-        $this->networkAdapter->setOption(CURLOPT_POST, true);
-        $this->networkAdapter->setOption(CURLOPT_POSTFIELDS, $data);
-    }
+    // protected function adapterw(string $uriTail, array $data)
+    // {
+    //     $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
+    //     $this->networkAdapter->setOption(CURLOPT_POST, true);
+    //     $this->networkAdapter->setOption(CURLOPT_POSTFIELDS, $data);
+    // }
 
-    private function processResponse($response)
-    {
-        $responseObj = json_decode($response);
-        return $responseObj;
-    }
-
+    // protected function processResponse($response)
+    // {
+    //     $responseObj = json_decode($response);
+    //     return $responseObj;
+    // }
 
 }
  

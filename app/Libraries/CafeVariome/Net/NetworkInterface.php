@@ -14,26 +14,18 @@
 
 use App\Models\Settings;
 
-class NetworkInterface
+class NetworkInterface extends AbstractNetworkInterface
 {
-    private $serverURI;
+    protected $installation_key;
 
-    private $networkAdapter;
+    public function __construct(string $targetUri = '') {
+        parent::__construct($targetUri);
 
-    private $setting; 
-
-    private $installation_key;
-
-    private $networkAdapterConfig;
-
-    public function __construct() {
-        $this->setting = Settings::getInstance();
         $this->installation_key = $this->setting->getInstallationKey();
 
         $this->serverURI = $this->setting->getAuthServerUrl();
         $curlOptions = [CURLOPT_RETURNTRANSFER => TRUE];
 
-        $this->networkAdapterConfig = config('NetworkAdapter');
         $this->networkAdapter = new cURLAdapter(null, $curlOptions);
 
         if ($this->networkAdapterConfig->useProxy) {
@@ -42,7 +34,7 @@ class NetworkInterface
         }
     }
 
-    private function configureProxy(array $proxyConfig)
+    protected function configureProxy(array $proxyConfig)
     {
         $this->networkAdapter->setOption(CURLOPT_FOLLOWLOCATION, true);
         $this->networkAdapter->setOption(CURLOPT_HTTPPROXYTUNNEL, 1);
@@ -138,7 +130,7 @@ class NetworkInterface
         return $this->processResponse($response);
     }
     
-    public function adapterw(string $uriTail, array $data)
+    protected function adapterw(string $uriTail, array $data)
     {
         $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
         $this->networkAdapter->setOption(CURLOPT_POST, true);
@@ -146,29 +138,29 @@ class NetworkInterface
         $this->networkAdapter->setOption(CURLOPT_POSTFIELDS, $data);
     }
 
-    private function processResponse($response)
-    {
-        $responseObj = json_decode($response);
+    // protected function processResponse($response)
+    // {
+    //     $responseObj = json_decode($response);
 
-        if ($responseObj == Null || !property_exists($responseObj, 'status')) {
-            $responseObj = new \StdClass();
-            $responseObj->status = false;
-        }
+    //     if ($responseObj == Null || !property_exists($responseObj, 'status')) {
+    //         $responseObj = new \StdClass();
+    //         $responseObj->status = false;
+    //     }
 
-        return $responseObj;
-    }
+    //     return $responseObj;
+    // }
 
     /**
      * Checks availability of the authentication server before sending requests.
      */
-    public function ping(): bool
-    {
-        $fp = @fsockopen($this->serverURI);
+    // public function ping(): bool
+    // {
+    //     $fp = @fsockopen($this->serverURI);
 
-        if ($fp) {
-        //server is available
-        return true;
-        }
-        return false;
-    }
+    //     if ($fp) {
+    //     //server is available
+    //     return true;
+    //     }
+    //     return false;
+    // }
 }

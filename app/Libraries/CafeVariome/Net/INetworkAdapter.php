@@ -10,4 +10,5 @@
 
 interface INetworkAdapter{
 
+    public function Send();
 }
