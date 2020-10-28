@@ -22,7 +22,6 @@ use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 use App\Models\Source;
 use App\Models\Network;
 use App\Models\Elastic;
-use App\Models\Deliver;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\ShellHelper;
 use App\Libraries\AuthAdapter;
