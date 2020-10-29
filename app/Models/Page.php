@@ -14,7 +14,7 @@ use CodeIgniter\Model;
 class Page extends Model 
 {
     protected $db;
-    protected $table      = 'Pages';
+    protected $table      = 'pages';
     protected $builder;
 
     protected $primaryKey = 'id';
