@@ -30,11 +30,6 @@ use CodeIgniter\Database\ConnectionInterface;
         }
     }
 
-    // function deleteAllLocalPhenotypesLookup() {
-    //     $this->builder = $this->db->table('local_phenotypes_lookup');
-    //     $this->builder->emptyTable();
-    // }
-
     /**
      * localPhenotypesLookupValues
      * Create Local Phenotype Lookup Values and insert them into database.
@@ -108,22 +103,6 @@ use CodeIgniter\Database\ConnectionInterface;
             }
         }
     }
-
-    // function updateLocalPhenoTypes(array $updateData,array $conds){
-
-    //     $this->builder = $this->db->table('local_phenotypes_lookup');
-    //     if($updateData) {
-    //         if($conds){
-    //             $this->builder->where($conds);
-    //         }
-    //         $this->builder->update($updateData);
-    //     }
-    // }
-
-    // function createLocalPhenoTypeLookup($data){
-    //     $this->builder = $this->db->table('local_phenotypes_lookup');
-    //     $this->builder->insert($data);
-    // }
 
     function getHPOTerms($source_ids) { //edited may13 2019 to remove match for phenotypes_id
         $this->builder = $this->db->table('eavs');
