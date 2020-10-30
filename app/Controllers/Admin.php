@@ -16,7 +16,7 @@ use App\Models\Source;
 use App\Models\User;
 use App\Libraries\ElasticSearch;
 use App\Libraries\Neo4J;
-use App\Libraries\KeyCloak;
+use App\Libraries\CafeVariome\Auth\KeyCloak;
 use App\Models\NetworkRequest;
 use App\Helpers\AuthHelper;
 use App\Libraries\CafeVariome\Net\NetworkInterface;

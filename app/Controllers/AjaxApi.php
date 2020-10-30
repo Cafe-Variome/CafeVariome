@@ -24,7 +24,7 @@ use App\Models\Network;
 use App\Models\Elastic;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\ShellHelper;
-use App\Libraries\AuthAdapter;
+use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use CodeIgniter\Config\Services;
 
  class AjaxApi extends Controller{

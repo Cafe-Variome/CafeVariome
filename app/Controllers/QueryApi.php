@@ -19,7 +19,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 
 use App\Libraries\CafeVariome\Core\APIResponseBundle;
-use App\Libraries\AuthAdapter;
+use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use CodeIgniter\Config\Services;
 
 

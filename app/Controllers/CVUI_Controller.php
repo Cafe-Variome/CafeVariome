@@ -12,7 +12,7 @@ use App\Models\UIData;
 use App\Models\cms_model;
 use App\Models\Settings;
 use App\Models\URISegment;
-use App\Libraries\AuthAdapter;
+use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use CodeIgniter\Config\Services;
 
 class CVUI_Controller extends Controller{

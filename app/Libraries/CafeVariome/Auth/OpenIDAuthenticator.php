@@ -1,5 +1,5 @@
 <?php
-namespace App\Libraries;
+namespace App\Libraries\CafeVariome\Auth;
 
 /**
  * Name: OpenIDAuthenticator.php

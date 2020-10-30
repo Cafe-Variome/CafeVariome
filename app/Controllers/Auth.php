@@ -16,7 +16,7 @@ namespace App\Controllers;
 use App\Models\UIData;
 use App\Models\Settings;
 use App\Helpers\AuthHelper;
-use App\Libraries\AuthAdapter;
+use App\Libraries\CafeVariome\Auth\AuthAdapter;
 class Auth extends CVUI_Controller
 {
 	public $provider;
@@ -81,7 +81,7 @@ class Auth extends CVUI_Controller
         parent::setIsAdmin(false);
         parent::initController($request, $response, $logger);
 
-		$this->ionAuth    = new \App\Libraries\IonAuth();
+		$this->ionAuth    = new \App\Libraries\CafeVariome\Auth\IonAuth();
 		$this->validation = \Config\Services::validation();
 		helper(['form', 'url']);
 		$this->configIonAuth = config('IonAuth');

@@ -1,5 +1,5 @@
 <?php
-namespace App\Libraries;
+namespace App\Libraries\CafeVariome\Auth;
 
 /**
  * Name: AuthAdapter.php
@@ -56,7 +56,7 @@ class AuthAdapter{
     }
 
     public function login($username = '', $password = '', $remember = ''){
-        if(get_class($this->authEngine) == 'App\Libraries\IonAuth'){
+        if(get_class($this->authEngine) == 'App\Libraries\CafeVariome\Auth\IonAuth'){
             return $this->authEngine->login($username, $password, $remember);
         }
         else{
@@ -73,7 +73,7 @@ class AuthAdapter{
     }
 
     public function update(int $user_id, array $additionaldata, array $groups = []){
-        if(get_class($this->authEngine) == 'App\Libraries\IonAuth'){
+        if(get_class($this->authEngine) == 'App\Libraries\CafeVariome\Auth\IonAuth'){
             return (new \App\Models\IonAuthModel())->update($user_id, $additionaldata);
         }
         else{

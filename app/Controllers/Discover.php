@@ -13,7 +13,7 @@ use App\Models\UIData;
 use App\Models\Settings;
 use App\Models\Source;
 use App\Models\Network;
-use App\Libraries\KeyCloak;
+use App\Libraries\CafeVariome\Auth\KeyCloak;
 use App\Libraries\CafeVariome;
 use App\Libraries\CafeVariome\Query;
 use App\Helpers\AuthHelper;

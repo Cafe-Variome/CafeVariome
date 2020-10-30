@@ -232,7 +232,7 @@
                 </a>
                 <!-- Dropdown - User Information -->
                 <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                    <?php if ($auth->getAuthEngineName() === "app\libraries\keycloak"): ?>
+                    <?php if ($auth->getAuthEngineName() === "app\libraries\cafevariome\auth\keycloak"): ?>
                     <a class="dropdown-item" href="<?= $setting->settingData['oidc_uri'] . "/realms/". $setting->settingData['oidc_realm'] ."/account/" ?>">
                     <?php else : ?>
                     <a class="dropdown-item" href="<?= base_url('Auth/Edit_User/'. $auth->getUserId()) ?>">
