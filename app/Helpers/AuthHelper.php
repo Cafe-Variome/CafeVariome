@@ -10,6 +10,9 @@
 
 use App\Models\Settings;
 
+/**
+ * @deprecated 
+ */
 class AuthHelper
 {
   static function authPostRequest($data, $uri) {
