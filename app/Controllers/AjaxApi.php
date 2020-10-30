@@ -64,7 +64,8 @@ use CodeIgniter\Config\Services;
 
         $queryString = json_encode($this->request->getVar('jsonAPI'));
         $token = $authAdapter->getToken();
-        $user_id = $this->request->getVar('user_id');
+
+        $user_id = $authAdapter->getUserIdByToken($token);
 
         try {
             $results = [];
