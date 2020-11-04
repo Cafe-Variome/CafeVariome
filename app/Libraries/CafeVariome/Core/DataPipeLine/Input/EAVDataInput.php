@@ -9,17 +9,9 @@
  * 
  */
 
-use CodeIgniter\Controller;
-use CodeIgniter\CLI\CLI;
 use App\Models\Upload;
 use App\Models\Source;
-use App\Models\Elastic;
-use App\Models\Settings;
 use App\Models\EAV;
-use App\Models\Neo4j;
-use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
-use CodeIgniter\Config;
-use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
 class EAVDataInput extends DataInput
 {

@@ -71,7 +71,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param string $source  - The source the file was added to
      * @return int $insert_id - The ID of updated/inserted row
      */
-    public function createUpload(string $file, int $source_id, int $user_id, $tissue=false,$patient=false) {
+    public function createUpload(string $file, int $source_id, int $user_id, $tissue=false, $patient=false, $settingFile = null) {
         // Get table
         $this->builder = $this->db->table($this->table);
 
@@ -87,6 +87,7 @@ use CodeIgniter\Database\ConnectionInterface;
             'uploadEnd' => null,
             'tissue' => $tissue,
             'patient' => $patient,
+            'setting_file' => $settingFile,
             'Status' => 'Pending');
             $this->builder->where('source_id', $source_id);
             $this->builder->where('FileName', $file);
@@ -108,6 +109,7 @@ use CodeIgniter\Database\ConnectionInterface;
                 'uploadEnd' => null,
                 'Status' => 'Pending',
                 'patient' => $patient,
+                'setting_file' => $settingFile,
                 'tissue' => $tissue);		
             $this->builder->insert($data);
             $insert_id = $this->db->insertID();

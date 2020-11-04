@@ -34,5 +34,6 @@ $('#addVariantsModal').on('show.bs.modal', function (event) {
     modal.find('#bulkImport').attr('href', baseurl + "Upload/Bulk/" + sourceId);
     modal.find('#phenoPacketsImport').attr('href', baseurl + "Upload/Json/" + sourceId);
     modal.find('#VCFImport').attr('href', baseurl + "Upload/VCF/" + sourceId);
+    modal.find('#UniversalImport').attr('href', baseurl + "Upload/Universal/" + sourceId);
   })
 

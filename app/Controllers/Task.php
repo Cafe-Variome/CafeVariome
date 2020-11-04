@@ -23,6 +23,7 @@ use App\Models\EAV;
 use App\Models\Neo4j;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\DataStream;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\EAVDataInput;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Input\UniversalDataInput;
 use CodeIgniter\Config;
 
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
@@ -878,6 +879,33 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         } catch (\Excdeption $ex) {
             error_log($ex->getMessage());
         }
+    }
+
+    /**
+     * univUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
+     *
+     * @param string $file        - The File We are uploading
+     * @param int $delete         - 0: We do not need to delete data from eavs | 1: We do need to 
+     * @param string $source      - The name of the source we are uploading to
+     * @param string $settingsFile
+     * @return array $return_data - Basic information on the status of the upload
+     */
+    public function univUploadInsert(int $fileId, int $overWrite) {
+        $uploadModel = new Upload();
+        $fileRec = $uploadModel->getFiles('ID, source_id, setting_file', ['ID' => $fileId]);
+
+        if (count($fileRec) == 1) {
+            $sourceId = $fileRec[0]['source_id'];
+            $settingFile = $fileRec[0]['setting_file'];
+
+            $inputPipeLine = new UniversalDataInput($sourceId, $overWrite, $settingFile);
+            $inputPipeLine->absorb($fileId);
+            $inputPipeLine->save($fileId);
+        }
+        else{
+            error_log('File not found.');
+        }
+
     }
 
     /**
