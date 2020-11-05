@@ -105,6 +105,30 @@ use CodeIgniter\Config\Services;
         return view($this->viewDirectory . '/Bulk', $data);
     }
 
+    public function Universal(int $source_id) {
+
+        $uidata = new UIData();
+        $uidata->title = "Universal Upload";
+        // Since this is a shared function for curators and admin check that the curator is a curator for this source
+        $user_id = $this->authAdapter->getUserId();
+
+        $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
+        $uidata->data['user_id'] = $user_id;
+        $uidata->data['source_id'] = $source_id;
+
+        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
+
+        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/univ.js',JS.'cafevariome/status.js'];
+
+
+        $uidata->data['configs'] = array_diff(scandir(FCPATH. UPLOAD . "/settings/"), array('..', '.'));;
+
+        $data = $this->wrapData($uidata);
+        return view($this->viewDirectory . '/Universal', $data);
+    }
+
+
+
     /**
      * validateUpload - Ensure the source we are wanting to upload to is an actual source
      * Users can change the parameter on url to what they wish

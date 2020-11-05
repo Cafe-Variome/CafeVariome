@@ -21,26 +21,42 @@ class ShellHelper
         return PHP_BINDIR . '/php';
     }
 
-    public function run(string $cmd)
+    public function run(string $cmd, bool $isPHP = true)
     {
         if(!$cmd){
             throw new Exception("No command to run!");
         }
 
-        return shell_exec($this->getPHPPath(). " ".$cmd);        
+        $cmdToRun = '';
+        if ($isPHP) {
+            $cmdToRun = $this->getPHPPath(). " ".$cmd;
+        }
+        else {
+            $cmdToRun = $cmd;
+        }
+
+        return shell_exec($cmdToRun);        
     }
 
-    public function runAsync(string $cmd)
+    public function runAsync(string $cmd, bool $isPHP = true)
     {
         if(!$cmd){
             throw new Exception("No command to run!");
+        }
+
+        $cmdToRun = '';
+        if ($isPHP) {
+            $cmdToRun = $this->getPHPPath(). " ".$cmd;
+        }
+        else {
+            $cmdToRun = $cmd;
         }
 
         if ($this->isWindows()) {
-            shell_exec($this->getPHPPath() . " " .$cmd." > NUL");
+            shell_exec($cmdToRun . " > NUL");
         }
         else {
-            shell_exec($this->getPHPPath(). " ".$cmd." >/dev/null 2>&1 &");
+            shell_exec($cmdToRun . " >/dev/null 2>&1 &");
         }
     }
 

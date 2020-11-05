@@ -167,7 +167,21 @@
 							<i>Import VCF files</i>
 						</p>
 					</div>
-				</div>					
+				</div>
+				<div class="row">
+					<div class="col">
+						<a id="UniversalImport" class="btn btn-small btn-primary">
+							<i class="fa fa-plus"></i> Universal Import
+						</a>
+					</div>		
+				</div>	
+				<div class="row">
+					<div class="col">
+						<p>
+							<i>Import any files</i>
+						</p>
+					</div>
+				</div>	
 			</div>
 			<div class="modal-footer">
 			<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

@@ -419,8 +419,7 @@ use CodeIgniter\Config\Services;
         }
         return true;
     }
-
-    
+ 
     /**
      * Json Start - At this point all files have been uploaded. Lock the source and begin 
      * Insert into MySQL
@@ -445,7 +444,6 @@ use CodeIgniter\Config\Services;
         echo json_encode("Green");
     }
 
-    
     public function checkUploadJobs() {
 
         $user_id = $_POST['user_id'];
@@ -467,7 +465,6 @@ use CodeIgniter\Config\Services;
         echo json_encode($return);
     }
     
-
     public function vcf_upload() {
 
         $spreadsheet =  \PhpOffice\PhpSpreadsheet\IOFactory::load($_FILES['config']['tmp_name']);
@@ -769,6 +766,72 @@ use CodeIgniter\Config\Services;
         }
     }
 
+    /**
+     * univ_upload - Perform Upload for CSV/XLS/XLSX files
+     *
+     * @param string $_POST['source'] - The source name we will be uploading to
+     * @param string $_POST['config'] - The settings file uesd for import
+     * @param array $_FILES           - The file we are uploading
+     * @return json_encoded array Success|Headers are not as expected|File is Duplicated
+     */
+    public function univ_upload($force=false){   
+
+        $source_id = $this->request->getVar('source_id');
+        $user_id = $this->request->getVar('user_id');
+        $setting_file = $this->request->getVar('config');
+
+        $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
+        $fileMan = new UploadFileMan($basePath);
+
+        if ($fileMan->countFiles() == 1){ // Only 1 file is allowed to go through this uploader
+            $file = $fileMan->getFiles()[0];
+            $tmp = $file->getTempPath();
+            $file_name = $file->getName();
+            if (!$force) {
+                if($fileMan->Exists($source_id . DIRECTORY_SEPARATOR . $file_name)){
+                    $response_array = array('status' => "Duplicate");
+                    echo json_encode($response_array);
+                    return;
+                }
+            }
+
+            $source_path = $source_id . DIRECTORY_SEPARATOR;
+            if (!$fileMan->Exists($source_id)) {
+                $fileMan->CreateDirectory($source_id);
+            }
+            if ($fileMan->Save($file, $source_path)) {
+
+                $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, $setting_file);
+
+                // Begin background insert to MySQL
+
+                $fAction = $this->request->getVar('fAction'); // File Action 
+                if ($fAction == "overwrite") {
+                    $t = new Task();
+                    $t->univUploadInsert($file_id, 1);
+                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 1 $source_id $setting_file");
+                }
+                elseif ($fAction == "append") {
+                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 00 $source_id $setting_file");
+                }
+                else {
+                    error_log("entered else");
+                    return;
+                }	
+                $uid = md5(uniqid(rand(),true));
+                $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
+                $response_array = array('status'  => "Green",
+                                        'message' => "",
+                                        'uid'     => $uid);
+                echo json_encode($response_array);
+            }
+            else{
+                #shouldnt ever happen
+                error_log("entered else");
+            }
+        }
+    }
+
     public function processFile()
     {
         $fileId = $this->request->getVar('fileId');
@@ -783,7 +846,6 @@ use CodeIgniter\Config\Services;
 
         return json_encode(0);
     }
-
 
     public function getSourceCounts()
     {
