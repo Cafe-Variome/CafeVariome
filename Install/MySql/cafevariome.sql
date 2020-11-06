@@ -1,13 +1,14 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.4
+-- version 4.9.7deb1bionic1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Oct 28, 2020 at 05:28 PM
+-- Host: localhost:3306
+-- Generation Time: Nov 06, 2020 at 09:41 AM
 -- Server version: 5.7.32-0ubuntu0.18.04.1
 -- PHP Version: 7.4.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -29,7 +30,7 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `eavs` (
   `id` int(15) NOT NULL,
-  `uid` char(32) NOT NULL,
+  `uid` char(36) NOT NULL,
   `source_id` int(11) NOT NULL,
   `fileName` mediumint(8) UNSIGNED NOT NULL,
   `subject_id` varchar(20) NOT NULL,
@@ -196,15 +197,15 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 (23, 'allow_registrations', 'on', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'required'),
 (29, 'discovery_requires_login', 'off', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'required'),
 (30, 'show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'required'),
-(32, 'auth_server', 'http://localhost/cvnet/', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'required'),
-(33, 'installation_key', 'e9dc0637853ae6748b4d3983630710b8', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'required'),
+(32, 'auth_server', '', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'required'),
+(33, 'installation_key', '', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'required'),
 (65, 'logo', 'cafevariome_full.png', 'Main Logo', 'Main Logo', 'required|xss_clean'),
-(50, 'oidc_uri', 'https://www423.lamp.le.ac.uk/auth', 'OpenID Server Address', 'URI for keycloak authentication server', 'required'),
-(51, 'oidc_realm', 'ERN', 'Realm Name', '', 'required'),
-(52, 'oidc_client_id', 'my-client', 'Client ID', '', 'required'),
-(53, 'oidc_client_secret', '65301ba7-ddfe-4844-a5b4-ddb1e37861ac', 'Client Secret', '', 'required'),
-(54, 'oidc_login_uri', 'http://localhost/cv/auth/login', 'Login URI', '', 'required'),
-(56, 'oidc_port', '80', 'Port', '', 'required'),
+(50, 'oidc_uri', '', 'OpenID Server Address', 'URI for keycloak authentication server', 'required'),
+(51, 'oidc_realm', '', 'Realm Name', '', 'required'),
+(52, 'oidc_client_id', '', 'Client ID', '', 'required'),
+(53, 'oidc_client_secret', '', 'Client Secret', '', 'required'),
+(54, 'oidc_login_uri', '', 'Login URI', '', 'required'),
+(56, 'oidc_port', '', 'Port', '', 'required'),
 (57, 'elastic_url', 'http://localhost:9200', 'Elasticsearch Address', 'Elastic search address', 'required'),
 (58, 'key_cloak_admin_id', 'f02288f5-1c48-4be0-9868-179028a77f8a', 'Keycloak Admin Id', 'Admin user id within key cloak server', 'required'),
 (59, 'key_cloak_admin_username', 'admin', 'Keycloak Admin Username', 'Admin user username within key cloak server', 'required'),
@@ -265,7 +266,8 @@ CREATE TABLE `uploaddatastatus` (
   `user_id` mediumint(8) UNSIGNED NOT NULL,
   `ID` mediumint(8) UNSIGNED NOT NULL,
   `patient` varchar(50) DEFAULT NULL,
-  `tissue` varchar(50) DEFAULT NULL
+  `tissue` varchar(50) DEFAULT NULL,
+  `setting_file` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
