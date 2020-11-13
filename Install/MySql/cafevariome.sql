@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 06, 2020 at 09:41 AM
+-- Generation Time: Nov 13, 2020 at 03:23 PM
 -- Server version: 5.7.32-0ubuntu0.18.04.1
--- PHP Version: 7.4.11
+-- PHP Version: 7.4.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -232,6 +232,7 @@ CREATE TABLE `sources` (
   `status` varchar(15) NOT NULL,
   `type` varchar(30) NOT NULL DEFAULT 'mysql',
   `date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `record_count` bigint(255) NOT NULL DEFAULT '0',
   `elastic_status` tinyint(1) DEFAULT '0',
   `elastic_lock` tinyint(1) DEFAULT '0',
   `elastic_data` tinyint(1) DEFAULT '0',
@@ -333,7 +334,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `email`, `activation_selector`, `activation_code`, `forgotten_password_selector`, `forgotten_password_code`, `forgotten_password_time`, `remember_selector`, `remember_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`, `is_admin`, `token`, `remote`) VALUES
-(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1603893089, 1, 'Admin', 'Admin', 'Brookes Lab', '07000000000', 1, NULL, 0);
+(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1604074674, 1, 'Admin', 'Admin', 'Brookes Lab', '07000000000', 1, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -384,7 +385,8 @@ ALTER TABLE `eavs`
   ADD KEY `value` (`value`),
   ADD KEY `elastic` (`elastic`),
   ADD KEY `uid_2` (`uid`,`attribute`,`value`),
-  ADD KEY `subj_src` (`subject_id`,`source_id`);
+  ADD KEY `subj_src` (`subject_id`,`source_id`),
+  ADD KEY `comi` (`id`,`source_id`);
 
 --
 -- Indexes for table `groups`
