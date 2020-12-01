@@ -29,7 +29,7 @@ class Discover extends CVUI_Controller{
 	 */
     public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
         parent::setProtected(true);
-        parent::setIsAdmin(true);
+        parent::setIsAdmin(false);
         parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
