@@ -140,7 +140,8 @@ class CVUI_Controller extends Controller{
 			if ($this->authAdapter->loggedIn()) {
 				$this->session->set('_cvReturnUrl', uri_string());
 				if (!$this->authAdapter->isAdmin()) {
-					header('Location: '.base_url("auth/login"));
+					header('Location: '.base_url("home/index"));
+					exit;
 				}
 			}
 			else {
