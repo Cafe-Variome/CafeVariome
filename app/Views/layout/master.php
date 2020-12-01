@@ -30,14 +30,14 @@
 
     <!-- extra CSS-->
     <?php foreach($css as $c):?>
-    <link rel="stylesheet" href="<?php echo base_url().$c?>">
+    <link rel="stylesheet" href="<?php echo base_url($c) ?>">
     <?php endforeach;?>
 
     <!-- favicon and touch icons -->
     <link rel="shortcut icon" href="<?php echo base_url(IMAGES.'logos/favicon.ico');?>" />
 
     <script type="text/javascript">
-        var baseurl = "<?php print base_url(); ?>";
+        var baseurl = "<?= base_url(); ?>" + '/';
         var authurl = "<?php print rtrim($setting->settingData['auth_server'],"/"); // remove trailing slash from the auth_server config variable ?>";
     </script>
     <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
@@ -69,7 +69,7 @@
     
     <!-- extra Java Script-->
     <?php foreach($javascript as $js):?>
-    <script src="<?php echo (substr($js, 0, 4) != 'http' ? base_url().$js : $js)?>"></script>
+    <script src="<?php echo (substr($js, 0, 4) != 'http' ? base_url($js) : $js)?>"></script>
     <?php endforeach;?>    
 </body>
 </html>

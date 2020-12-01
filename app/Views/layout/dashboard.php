@@ -28,13 +28,13 @@
         <link rel="stylesheet" href="<?php echo base_url(CSS . "dashboard/dashboard.css");?>" type="text/css"/>
         <!-- extra CSS-->
         <?php foreach($css as $c):?>
-        <link rel="stylesheet" href="<?php echo base_url().$c?>">
+        <link rel="stylesheet" href="<?php echo base_url($c) ?>">
         <?php endforeach;?>
 
         <!-- favicon -->
         <link rel="shortcut icon" href="<?php echo base_url(IMAGES.'logos/favicon.ico');?>" />
         <script type="text/javascript">
-            var baseurl = "<?php print base_url(); ?>";
+        var baseurl = "<?= base_url(); ?>" + '/';
             var authurl = "<?php print rtrim($setting->settingData['auth_server'],"/"); // remove trailing slash from the auth_server config variable ?>";
         </script>
 
@@ -309,7 +309,7 @@
 
     <!-- extra Java Script-->
     <?php foreach($javascript as $js):?>
-    <script src="<?php echo base_url().$js?>"></script>
+    <script src="<?php echo base_url($js)?>"></script>
     <?php endforeach;?>    
 
     <script type="text/javascript">
