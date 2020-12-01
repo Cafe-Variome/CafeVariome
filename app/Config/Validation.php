@@ -17,7 +17,6 @@ class Validation
 		\CodeIgniter\Validation\FormatRules::class,
 		\CodeIgniter\Validation\FileRules::class,
 		\CodeIgniter\Validation\CreditCardRules::class,
-		\App\Helpers\ValidationHelper::class
 	];
 
 	/**

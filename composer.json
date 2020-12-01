@@ -6,17 +6,11 @@
     "license": "MIT",
     "require": {
         "php": ">=7.2",
-        "ext-curl": "*",
-        "ext-intl": "*",
-        "ext-json": "*",
-        "kint-php/kint": "3.3",
-        "psr/log": "^1.1",
-        "zendframework/zend-escaper": "^2.5",
-        "stevenmaguire/oauth2-keycloak": "^2.1",
+        "codeigniter4/framework": "^4",
+        "stevenmaguire/oauth2-keycloak": "^2.2.1",
         "components/font-awesome": "^5.9.0",
-        "codeigniter4/framework": "dev-master",
         "twbs/bootstrap": "^4.3",
-		"elasticsearch/elasticsearch": "^7.2",
+		"elasticsearch/elasticsearch": "7.8",
         "select2/select2": "^4.0.7",
         "datatables/datatables": "^1.10.19",
         "phpoffice/phpspreadsheet": "^1.8.2",
@@ -24,13 +18,13 @@
         "graphaware/neo4j-php-client": "^4.0",
         "components/jqueryui": "^1.12.1",
         "vakata/jstree": "^3.3.8",
-        "tinymce/tinymce": "^5.2.0"
+        "tinymce/tinymce": "^5.2.0",
+        "league/oauth2-client": "*"
         },
     "require-dev": {
-        "codeigniter4/codeigniter4-standard": "^1.0",		
-        "mikey179/vfsstream": "1.6.*",
-        "phpunit/phpunit": "^7.0",
-        "squizlabs/php_codesniffer": "^3.3"
+		"fzaninotto/faker": "^1.9@dev",
+		"mikey179/vfsstream": "1.6.*",
+		"phpunit/phpunit": "^8.5"
     },
     "autoload": {
         "psr-4": {
