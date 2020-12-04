@@ -53,7 +53,7 @@
         <!-- <p><a href="forgot_password">Forgot your password?</a></p> -->
       </div>
       <div class="col-md-6">
-        <?php if ( $setting->settingData('allow_registrations') ): ?><p><a href="signup">Register for a new account?</a></p>
+        <?php if ( $setting->settingData['allow_registrations'] ): ?><p><a href="signup">Register for a new account?</a></p>
         <?php endif; ?>
       </div>      
     </div>
