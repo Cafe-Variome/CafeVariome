@@ -57,7 +57,7 @@
             <button type="submit" name="submit" class="btn btn-primary">
                 <i class="fa fa-save"></i>  Save User
             </button>
-            <a href="<?php base_url($controllerName.'/List'); ?>" class="btn btn-secondary" >
+            <a href="<?php echo base_url($controllerName.'/List'); ?>" class="btn btn-secondary" >
                 <i class="fa fa-backward"></i> Go back
             </a>
         </div>
