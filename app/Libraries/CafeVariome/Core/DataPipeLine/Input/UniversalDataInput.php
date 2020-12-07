@@ -54,8 +54,8 @@ class UniversalDataInput extends DataInput
         $mysql_database = $dbConfig['database'];
         $mysql_port = $dbConfig['port'];
 
-        $this->shellHelperInstance->runAsync(getcwd() . DIRECTORY_SEPARATOR . CV_CONVERT_BIN . ' -s ' . getcwd() . DIRECTORY_SEPARATOR . CV_CONVERT_SETTINGS_DIR . $this->settingFile . ' -i ' . $this->filePath . ' --source-id ' . $this->sourceId . " --log db -o db --db-config mysql://$mysql_username:$mysql_password@$mysql_host:$mysql_port/$mysql_database"
-                                            , false);
+        $cmd = getcwd() . DIRECTORY_SEPARATOR . CV_CONVERT_BIN . ' -s ' . getcwd() . DIRECTORY_SEPARATOR . CV_CONVERT_SETTINGS_DIR . "'$this->settingFile' -i '$this->filePath' --source-id  $this->sourceId --log db -o db --db-config mysql://$mysql_username:$mysql_password@$mysql_host:$mysql_port/$mysql_database";
+        $this->shellHelperInstance->runAsync($cmd, false);
         $this->uploadModel->bigInsertWrap($file_id, $this->sourceId);
     }
 }
