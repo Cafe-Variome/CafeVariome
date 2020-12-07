@@ -436,7 +436,7 @@ class Network extends CVUI_Controller{
     function create_remote_user() {
 
         if (isset($_POST['rUser'])) {
-            $remote_email = filter_var($_POST['rUser'], FILTER_VALIDATE_EMAIL);
+            $remote_email = htmlentities(filter_var($_POST['rUser'], FILTER_VALIDATE_EMAIL), ENT_QUOTES);
             if (!$this->userModel->userExists($remote_email)) {
                 $user_id = $this->userModel->createRemoteUser($remote_email);
                 $user = ['status' => "success", 'data' => ['username' => $remote_email, 'id' => $user_id]];
