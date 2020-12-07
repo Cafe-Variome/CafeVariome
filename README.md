@@ -104,7 +104,7 @@ Tables imported successfully
 
 Now, it is time to enter the installation key and the URL of authentication server:
 
-Please enter your installation key: 78rtyyyuyuunkkl 
+Please enter your installation key: 78rtyyyuyuunkkl  
 Please enter the URL to authentication server:http://localhost/cvnet/
 
 Now the setup is complete and ready to login into cafe variome instance on the following link:
