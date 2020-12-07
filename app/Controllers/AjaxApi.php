@@ -807,8 +807,6 @@ use CodeIgniter\Config\Services;
 
                 $fAction = $this->request->getVar('fAction'); // File Action 
                 if ($fAction == "overwrite") {
-                    $t = new Task();
-                    $t->univUploadInsert($file_id, 1);
                     $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 1 $source_id $setting_file");
                 }
                 elseif ($fAction == "append") {
