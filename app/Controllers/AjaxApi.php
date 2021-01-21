@@ -19,6 +19,7 @@ use App\Helpers\AuthHelper;
 use App\Models\Settings;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
+use App\Libraries\CafeVariome\Net\HPONetworkInterface;
 use App\Models\Source;
 use App\Models\Network;
 use App\Models\Elastic;
@@ -97,30 +98,25 @@ use CodeIgniter\Config\Services;
         }
     }
 
-    function hpo_query($id = ''){
-        if($id) {
-            return file_get_contents("https://www240.lamp.le.ac.uk/hpo/query.php?id=" . $id);
-        }
-        else {
-            return file_get_contents("https://www240.lamp.le.ac.uk/hpo/query.php");
-        }
+    function HPOQuery(string $hpo_term = ''){
+        
+        $hpoNetworkInterface = new HPONetworkInterface('https://www240.lamp.le.ac.uk/');
+        $results = $hpoNetworkInterface->getHPO($hpo_term);
+        return json_encode($results);
     }
 
     function build_tree() {
         if ($this->request->isAJAX())
         {
+            $hpoNetworkInterface = new HPONetworkInterface('https://www240.lamp.le.ac.uk/');
+
             $hpo_json = json_decode(stripslashes($this->request->getVar('hpo_json')), 1);
-            // $hpo_json = $_POST['hpo_json'];
             $hpo_json = json_decode(str_replace('"true"', 'true', json_encode($hpo_json)), 1);
             $hpo_json = json_decode(str_replace('"false"', 'false', json_encode($hpo_json)), 1);
-    
-            error_log(json_encode($hpo_json));
-    
+        
             $ancestry = $this->request->getVar('ancestry');
             $hp_term = explode(' ', $this->request->getVar('hp_term'))[0];
-    
-            error_log($ancestry);
-    
+        
             $splits = explode('||', $ancestry);
             foreach ($splits as $split) {
                 $parent = &$hpo_json;
@@ -139,12 +135,10 @@ use CodeIgniter\Config\Services;
                                     $parent['children'] = &$child['children'];
                                 } else {
                                     $parent['state']['opened'] = "true";
-    
                                     unset($parent['state']['loading']);
                                     unset($parent['state']['loaded']);
-                                    $dat = file_get_contents("https://www240.lamp.le.ac.uk/hpo/query.php?id=" . $str);
+                                    $dat = json_encode($hpoNetworkInterface->getHPO($str));
                                     $parent['children'] = json_decode($dat, 1);
-    
                                 }
                                 break;
                             }
