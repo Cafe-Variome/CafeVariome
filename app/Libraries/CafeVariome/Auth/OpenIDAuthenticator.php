@@ -174,7 +174,7 @@ abstract class OpenIDAuthenticator extends Authenticator
                     $this->session->set('state', $token);
                 }
                 catch (\Exception $ex) {
-                    eror_log($ex->getMessage());
+                    error_log($ex->getMessage());
                 }
             }      
         }
