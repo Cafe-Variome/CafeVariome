@@ -33,8 +33,6 @@ class Discover extends CVUI_Controller{
         parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-        $this->networkModel = new \App\Models\Network($this->db);
-        $this->userModel = new \App\Models\User($this->db);
     }
 
     public function index(){
@@ -46,8 +44,8 @@ class Discover extends CVUI_Controller{
         $uidata->title = "Select Network";
 
         $networkInterface = new NetworkInterface();
-        $networkModel = new Network($this->db);
-        $sourceModel = new Source($this->db);
+        $networkModel = new Network();
+        $sourceModel = new Source();
 
         $user_id = $this->session->get('user_id');
 
@@ -124,7 +122,11 @@ class Discover extends CVUI_Controller{
         $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js',
                                     VENDOR.'components/jqueryui/jquery-ui.js',
                                     JS.'bootstrap-notify.js',
-                                    JS.'mustache.min.js', JS.'query_builder_config.js', JS.'query_builder_category.js');
+                                    JS.'mustache.min.js',
+                                    JS.'query_builder_config.js', 
+                                    JS.'cafevariome/query_builder_tree.js',
+                                    JS.'cafevariome/query_builder.js'
+                                );
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Query_Builder', $data);
     }
