@@ -15,6 +15,13 @@
 		</div>
 	</div>
 <?php endif; ?>
+<div class="row" id="timeoutalert" style="display:none;">
+    <div class="col">
+        <div class="alert alert-warning">
+        Your session has timed out. You need to log in again. Please click <a href="<?= base_url('Auth/Login') ?>">here to log in</a>.
+        </div>
+    </div>
+</div>
 <!-- Patient Characteristics -->
 <div class="row mb-2">
     <div class="col">
@@ -205,6 +212,35 @@
         <div id="jstreeArea">
                             
         </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Result Modal -->
+<div class="modal fade" id="resultModal" tabindex="-1" role="dialog" aria-labelledby="resultModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="resultModalLabel">Results</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-hover table-stripped table-bordered" id="resTbl">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Subject ID</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
