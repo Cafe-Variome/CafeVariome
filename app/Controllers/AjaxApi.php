@@ -423,8 +423,8 @@ use CodeIgniter\Config\Services;
      */
     public function jsonStart() {
         // Assign posted source to easier variable
-        $source_id = $_POST['source_id'];
-        $user_id = $_POST['user_id'];
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $user_id = htmlentities(filter_var($_POST['user_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
         // Get ID for source and lock it so further updates and uploads cannot occur
         // Until update is finished
         $this->sourceModel->toggleSourceLock($source_id);
@@ -440,7 +440,7 @@ use CodeIgniter\Config\Services;
 
     public function checkUploadJobs() {
 
-        $user_id = $_POST['user_id'];
+        $user_id = htmlentities(filter_var($_POST['user_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
         $return = ['Status' => '', 'Message' => []];
         if ($this->uploadModel->countUploadJobRecord($user_id)) {
             $return['Status'] = true;
@@ -474,7 +474,7 @@ use CodeIgniter\Config\Services;
         $dup_elastic = [];
         $pairings = [];
         $types = [];
-        $source_id = $_POST['source_id'];
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
 
         array_push($headers, "");
         $response_array = array('status' => "",
@@ -623,8 +623,8 @@ use CodeIgniter\Config\Services;
 
     public function vcfBatch() {
 
-        $source_id = $_POST['source_id']; 
-        $uid = $_POST['uid'];
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES); 
+        $uid = htmlentities(filter_var($_POST['uid'], FILTER_VALIDATE_INT), ENT_QOUTES);
         $pairings = json_decode(file_get_contents(FCPATH."upload/pairings/$uid.json"), true);
         $source_path = FCPATH."upload/UploadData/".$source_id."/";	
 
@@ -669,7 +669,7 @@ use CodeIgniter\Config\Services;
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
 
-        $uid = $_POST['uid'];
+        $uid = htmlentities(filter_var($_POST['uid'], FILTER_VALIDATE_INT), ENT_QOUTES);
 
         // Get ID for source and lock it so further updates and uploads cannot occur
         // Until update is finished

@@ -141,7 +141,7 @@ use CodeIgniter\Config\Services;
         */
     public function validateUpload() {
         // Source we are checking against
-        $source_id = $_POST['source_id'];
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
         
         // check if it exists
         
@@ -205,7 +205,7 @@ use CodeIgniter\Config\Services;
      */
     public function jsonBatch() {
         
-        $source_id = $_POST['source_id'];
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
         // Create the source upload directory if it doesnt exist
         $source_path = FCPATH."upload/UploadData/".$source_id."/";
 
@@ -317,7 +317,7 @@ use CodeIgniter\Config\Services;
         $dup_elastic = [];
         $pairings = [];
         $types = [];
-        $source_id = $_POST['source_id'];
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
 
         array_push($headers, "");
         $response_array = array('status' => "",
@@ -466,8 +466,8 @@ use CodeIgniter\Config\Services;
 
     public function vcfBatch() {
 
-        $source_id = $_POST['source_id']; 
-        $uid = $_POST['uid'];
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $uid = htmlentities(filter_var($_POST['uid'], FILTER_VALIDATE_INT), ENT_QOUTES);
         $pairings = json_decode(file_get_contents(FCPATH."upload/pairings/$uid.json"), true);
         $source_path = FCPATH."upload/UploadData/".$source_id."/";	
 
@@ -510,8 +510,8 @@ use CodeIgniter\Config\Services;
     }
 
     public function vcfStart() {
-        $source_id = $_POST['source_id'];
-        $uid = $_POST['uid'];
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $uid = htmlentities(filter_var($_POST['uid'], FILTER_VALIDATE_INT), ENT_QOUTES);
 
         // Get ID for source and lock it so further updates and uploads cannot occur
         // Until update is finished

@@ -5,6 +5,7 @@
  * Created: 13/08/2020
  * 
  * @author Mehdi Mehtarizadeh
+ * @author Farid Yavari Dizjikan
  * 
  * File Manager Class 
  */
@@ -170,6 +171,7 @@
         return false;
     }
 
+
     protected function getSize(string $path): int
     {
         return filesize($this->getFullPath() . $path);
@@ -180,4 +182,3 @@
         return bin2hex($bin);
     }
  }
- 
