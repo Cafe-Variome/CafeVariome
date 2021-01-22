@@ -118,10 +118,20 @@ class Auth extends CVUI_Controller
 	{	
 		if($this->authAdapter->loggedIn())
 		{
+			if ($this->session->has('_cvReturnUrl')) {
+				$redirect = $this->session->get('_cvReturnUrl');
+				$this->session->remove('_cvReturnUrl');
+				return redirect()->to(base_url($redirect));
+			}
 			return redirect()->to(base_url('Home/index'));
 		}
 		else{
 			if($this->authAdapter->login('', '', false)){
+				if ($this->session->has('_cvReturnUrl')) {
+					$redirect = $this->session->get('_cvReturnUrl');
+					$this->session->remove('_cvReturnUrl');
+					return redirect()->to(base_url($redirect));
+				}
 				return redirect()->to(base_url('Home/index'));
 			}
 			$uidata = new UIData();

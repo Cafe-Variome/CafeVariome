@@ -29,7 +29,7 @@ $("#uploadBulk").submit(function(event) {
         param = id;
         validateParams = 'source_id=' + id + '&size=' + size;
         $('#uploadBtn').prop('disabled', 'disabled');
-        $('#uploadSpinner').show()
+        $('#uploadSpinner').show();
 
         $.ajax({
             type: "post",  
@@ -86,9 +86,9 @@ $("#uploadBulk").submit(function(event) {
                                         success: function(response)  {
                                         	console.log(response);
                                         	  $.notify({
-										        message: 'Upload Complete. We are currently processing your data.'
+                                                message: 'Upload Complete. We are currently processing your data.',
+                                                type: 'info'
 										      },{
-										        // settings
 										        timer: 200
 										    });
                                             fileUploadInterval();                      
@@ -101,26 +101,38 @@ $("#uploadBulk").submit(function(event) {
                             }
                             else if(data.status == "Red"){
                                 $.notify({
-                                    // options
-                                    message: 'Unknown error.'
+                                    message: 'Unknown error.',
+                                    type: 'danger'
+
                                   },{
-                                    // settings
+                                    timer: 200
+                                });
+                            }
+                            else if (data.status == "InvalidFile") {
+                                $.notify({
+                                    message: 'File is not valid.',
+                                    type: 'warning'
+                                  },{
                                     timer: 200
                                 });
                             }
                             else {
                             	  $.notify({
-								        // options
-								        message: 'Upload Complete. We are currently processing your data.'
+                                        message: 'Upload Complete. We are currently processing your data.',
+                                        type: 'info'
 								      },{
-								        // settings
 								        timer: 200
 								    });
                             	fileUploadInterval();                           
                             }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
-
+                            $.notify({
+                                message: 'Unknown error.',
+                                type: 'danger'
+                              },{
+                                timer: 200
+                            });
                         }
                     });
                 }

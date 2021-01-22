@@ -1,6 +1,6 @@
 cat Install/cv.txt
 
-apacheUser=$(ps -ef | egrep '(httpd|apache2|apache)' | grep -v `whoami` | grep -v root | head -n1 | awk '{print $1}')
+apacheUser=$(ps -ef | egrep '(httpd|apache2|apache)' | grep -v 'fusionauth' | grep -v `whoami` | grep -v root | head -n1 | awk '{print $1}')
 
 echo "Welcome to Cafe Variome Installer"                                                               
 echo "Cafe Variome is produced at BrookesLab, University of Leicester."                                                               
