@@ -158,7 +158,6 @@ use CodeIgniter\Config\Services;
     
             return json_encode($hpo_json);
         }
-
 	}
 
 	/**
@@ -342,8 +341,8 @@ use CodeIgniter\Config\Services;
      */
     public function checkJsonPresence() {
 
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
-        $files = htmlentities(json_decode($_POST['files']), ENT_QUOTES);
+        $source_id = $_POST['source_id'];
+        $files = json_decode($_POST['files']);
         // Check if there are duplicates
         $duplicates = $this->uploadModel->checkJsonFiles($files,$source_id);
         if ($duplicates) {
@@ -423,8 +422,8 @@ use CodeIgniter\Config\Services;
      */
     public function jsonStart() {
         // Assign posted source to easier variable
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
-        $user_id = htmlentities(filter_var($_POST['user_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $source_id = $_POST['source_id'];
+        $user_id = $_POST['user_id'];
         // Get ID for source and lock it so further updates and uploads cannot occur
         // Until update is finished
         $this->sourceModel->toggleSourceLock($source_id);
@@ -440,7 +439,7 @@ use CodeIgniter\Config\Services;
 
     public function checkUploadJobs() {
 
-        $user_id = htmlentities(filter_var($_POST['user_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $user_id = $_POST['user_id'];
         $return = ['Status' => '', 'Message' => []];
         if ($this->uploadModel->countUploadJobRecord($user_id)) {
             $return['Status'] = true;
@@ -474,7 +473,7 @@ use CodeIgniter\Config\Services;
         $dup_elastic = [];
         $pairings = [];
         $types = [];
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $source_id = $_POST['source_id'];
 
         array_push($headers, "");
         $response_array = array('status' => "",
@@ -623,8 +622,8 @@ use CodeIgniter\Config\Services;
 
     public function vcfBatch() {
 
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES); 
-        $uid = htmlentities(filter_var($_POST['uid'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $source_id = $_POST['source_id']; 
+        $uid = $_POST['uid'];
         $pairings = json_decode(file_get_contents(FCPATH."upload/pairings/$uid.json"), true);
         $source_path = FCPATH."upload/UploadData/".$source_id."/";	
 
@@ -669,7 +668,7 @@ use CodeIgniter\Config\Services;
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
 
-        $uid = htmlentities(filter_var($_POST['uid'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $uid = $_POST['uid'];
 
         // Get ID for source and lock it so further updates and uploads cannot occur
         // Until update is finished
