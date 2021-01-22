@@ -99,7 +99,7 @@ use CodeIgniter\Config\Services;
     }
 
     function HPOQuery(string $hpo_term = ''){
-        
+
         $hpoNetworkInterface = new HPONetworkInterface('https://www240.lamp.le.ac.uk/');
         $results = $hpoNetworkInterface->getHPO($hpo_term);
         return json_encode($results);
@@ -718,9 +718,13 @@ use CodeIgniter\Config\Services;
             if (!$force) {
                 if($fileMan->Exists($source_id . DIRECTORY_SEPARATOR . $file_name)){
                     $response_array = array('status' => "Duplicate");
-                    echo json_encode($response_array);
-                    return;
+                    return json_encode($response_array);
                 }
+            }
+
+            if (!$fileMan->isValid($file)) {
+                $response_array = array('status' => "InvalidFile");
+                return json_encode($response_array);
             }
 
             $source_path = $source_id . DIRECTORY_SEPARATOR;
@@ -740,22 +744,18 @@ use CodeIgniter\Config\Services;
                 elseif ($fAction == "append") {
                     $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00 $source_id");
                 }
-                else {
-                    error_log("entered else");
-                    return;
-                }	
                 $uid = md5(uniqid(rand(),true));
                 $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
                 $response_array = array('status'  => "Green",
                                         'message' => "",
                                         'uid'     => $uid);
-                echo json_encode($response_array);
+                return json_encode($response_array);
             }
             else{
                 $response_array = array('status'  => "Red",
                 'message' => "Unknown error.");
 
-                echo json_encode($response_array);
+                return json_encode($response_array);
             }
         }
     }
@@ -874,17 +874,4 @@ use CodeIgniter\Config\Services;
         
         return json_encode($output);   
     }
-
-    function delete_file($pFilename) {
-        if ( file_exists($pFilename) ) {
-            //    Added by muhammad.begawala
-            //    '@' will stop displaying "Resource Unavailable" error because of file is open some where.
-            //    'unlink($pFilename) !== true' will check if file is deleted successfully.
-            //  Throwing exception so that we can handle error easily instead of displaying to users.
-            if( @unlink($pFilename) !== true )
-                throw new Exception('Could not delete file: ' . $pFilename . ' Please close all applications that are using it.');
-        }   
-        return true;
-    }
-
  }
