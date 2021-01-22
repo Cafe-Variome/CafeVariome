@@ -21,7 +21,7 @@ class App extends BaseConfig
 	| environments.
 	|
 	*/
-	public $baseURL = 'http://localhost/cvci4/';
+	public $baseURL = 'http://localhost/cv/';
 
 	/*
 	|--------------------------------------------------------------------------
