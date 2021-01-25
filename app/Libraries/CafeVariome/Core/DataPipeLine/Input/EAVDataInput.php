@@ -47,8 +47,8 @@ class EAVDataInput extends DataInput
                     $line = fgets(fopen($filePath, 'r'));
                     if (!preg_match("/^subject_id(.)/", $line, $matches)) {
                         $return_data['result_flag'] = 0;
-                        $return_data['error'] = $error['subject_id'];
-                        $message = $error['subject_id'];
+                        $return_data['error'] = 'No subject_id column.';
+                        $message = 'No subject_id column.';
                         $error_code = 1;
                         $this->uploadModel->errorInsert($fileId,$this->sourceId,$message,$error_code,true);
                         return $return_data;
