@@ -20,6 +20,7 @@ use Psr\Log\LoggerInterface;
 
 use App\Libraries\CafeVariome\Core\APIResponseBundle;
 use App\Libraries\CafeVariome\Auth\AuthAdapter;
+use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use CodeIgniter\Config\Services;
 
 
@@ -98,6 +99,66 @@ class QueryApi extends ResourceController
             }                  
             $apiResponseBundle->initiateResponse(1, $resp);
 
+        } catch (\Exception $ex) {
+            error_log($ex->getMessage());
+            $apiResponseBundle->initiateResponse(0);
+            $apiResponseBundle->setResponseMessage($ex->getMessage());
+        }
+
+        return $this->respond($apiResponseBundle->getResponseJSON());
+    }
+
+    public function getEAVJSON()
+    {
+        $basePath = FCPATH . JSON_DATA_DIR;
+
+        $modification_time = $this->request->getVar('modification_time');
+        $network_key = $this->request->getVar('network_key');
+
+        $apiResponseBundle = new APIResponseBundle();
+
+        try {
+            $resp = [];
+            $fileMan = new SysFileMan($basePath);
+
+            if ($fileMan->Exists($network_key . ".json")) {
+                $resp['json'] = $fileMan->Read($network_key . ".json");
+            }
+            else {
+                $resp['json'] = false;
+            }
+
+            $apiResponseBundle->initiateResponse(1, $resp);
+        } catch (\Exception $ex) {
+            error_log($ex->getMessage());
+            $apiResponseBundle->initiateResponse(0);
+            $apiResponseBundle->setResponseMessage($ex->getMessage());
+        }
+
+        return $this->respond($apiResponseBundle->getResponseJSON());
+    }
+
+    public function getHPOJSON()
+    {
+        $basePath = FCPATH . JSON_DATA_DIR;
+
+        $modification_time = $this->request->getVar('modification_time');
+        $network_key = $this->request->getVar('network_key');
+
+        $apiResponseBundle = new APIResponseBundle();
+
+        try {
+            $resp = [];
+            $fileMan = new SysFileMan($basePath);
+
+            if ($fileMan->Exists($network_key . "_hpo_ancestry.json")) {
+                $resp['json'] = $fileMan->Read($network_key . "_hpo_ancestry.json");
+            }
+            else {
+                $resp['json'] = false;
+            }
+
+            $apiResponseBundle->initiateResponse(1, $resp);
         } catch (\Exception $ex) {
             error_log($ex->getMessage());
             $apiResponseBundle->initiateResponse(0);
