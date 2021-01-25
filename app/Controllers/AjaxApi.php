@@ -24,6 +24,7 @@ use App\Models\Source;
 use App\Models\Network;
 use App\Models\Elastic;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
+use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\ShellHelper;
 use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use CodeIgniter\Config\Services;
@@ -167,8 +168,11 @@ use CodeIgniter\Config\Services;
      * 
      */
     function getPhenotypeAttributes(string $network_key) {
-        //if ($this->request->isAJAX())
-         {
+        if ($this->request->isAJAX())
+        {
+            $basePath = FCPATH . JSON_DATA_DIR;
+
+            $fileMan = new SysFileMan($basePath);
             $networkInterface = new NetworkInterface();
             $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key);
 
@@ -177,34 +181,14 @@ use CodeIgniter\Config\Services;
             if ($response->status) {
                 $installations = $response->data;
             }
-
-            $postdata = http_build_query(
-                array(
-                    'network_key' => $network_key,
-                    'modification_time' => @filemtime("resources/phenotype_lookup_data/local_" . $network_key . ".json")
-                )
-            );
-    
-            $opts = array('http' =>
-                array(
-                    'method' => 'POST',
-                    'header' => 'Content-type: application/x-www-form-urlencoded',
-                    'content' => $postdata
-                    //'timeout' => 10 //Removed timeout
-                )
-            );
-            $context = stream_context_create($opts);
     
             $data = array();
     
             foreach ($installations as $installation) {
-                $url = rtrim($installation->base_url, "/") . "/AjaxApi/get_json_for_phenotype_lookup";
-                try{
-                    $result = file_get_contents($url, 1, $context);
-                }
-                catch (\Exception $ex) {
-                    error_log($ex->getMessage());
-                }
+                $queryNetInterface = new QueryNetworkInterface($installation->base_url);
+                $eavJson = $queryNetInterface->getEAVJSON($network_key, $fileMan->GetModificationTimeStamp("local_" . $network_key . ".json"));
+                $result = $eavJson->data->json;
+
                 if ($result) {
                     foreach (json_decode($result, 1) as $res) {
     
@@ -228,58 +212,54 @@ use CodeIgniter\Config\Services;
             ksort($data);
     
             if ($data) {
-                file_put_contents("resources/phenotype_lookup_data/local_" . $network_key . ".json", json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE));
+                $fileMan->Write("local_" . $network_key . ".json", json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE));
             }
     
-            // HPO ancestry
-            $postdata = http_build_query(
-                ['network_key' => $network_key,
-                    'modification_time' => @filemtime("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json")]
-            );
-    
-            $opts = ['http' =>
-                [
-                    'method' => 'POST',
-                    'header' => 'Content-type: application/x-www-form-urlencoded',
-                    'content' => $postdata
-                    //'timeout' => 1 // Removed timeout 
-                ]
-            ];
-            $context = stream_context_create($opts);
             $hpoDataString = '';
             foreach ($installations as $installation) {
-                $url = rtrim($installation->base_url, "/") . "/AjaxApi/get_json_for_hpo_ancestry";
-                $hpoDataString = @file_get_contents($url, 1, $context);
+                $queryNetInterface = new QueryNetworkInterface($installation->base_url);
+                $hpoJson = $queryNetInterface->getHPOJSON($network_key, $fileMan->GetModificationTimeStamp("local_" . $network_key . "_hpo_ancestry.json"));
+                $hpoDataString = $hpoJson->data->json;
+
                 if ($hpoDataString) {
-                    file_put_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json", json_encode($hpoDataString)); 
+                    $fileMan->Write("local_" . $network_key . "_hpo_ancestry.json", json_encode($hpoDataString));
                 }
             }
     
-            $phen_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . ".json"), 1);
-            $hpo_data = json_decode(file_get_contents("resources/phenotype_lookup_data/" . "local_" . $network_key . "_hpo_ancestry.json"), 1);
+            $phen_data = json_decode($fileMan->Read("local_" . $network_key . ".json"), 1);
+            $hpo_data = json_decode($fileMan->Read("local_" . $network_key . "_hpo_ancestry.json"), 1);
             return json_encode([$phen_data, $hpo_data]);
         }
     }
 
-    function get_json_for_phenotype_lookup() {
+    /**
+     * @deprecated */
+    private function get_json_for_phenotype_lookup() {
+        $basePath = FCPATH . JSON_DATA_DIR;
 
+        $fileMan = new SysFileMan($basePath);
         $modification_time = $this->request->getVar('modification_time');
         $network_key = $this->request->getVar('network_key');
 
-        if (file_exists('resources/phenotype_lookup_data/' . $network_key . ".json")) {
-            return (file_get_contents("resources/phenotype_lookup_data/" . $network_key . ".json"));
+        if ($fileMan->Exists($network_key . ".json")) {
+            return $fileMan->Read($network_key . ".json");
         } else {
             return false;
         }              
     }
 
     
-    function get_json_for_hpo_ancestry() {
+    /**
+     * @deprecated */
+    private function get_json_for_hpo_ancestry() {
+        $basePath = FCPATH . JSON_DATA_DIR;
+
+        $fileMan = new SysFileMan($basePath);
         $modification_time = $this->request->getVar('modification_time');
         $network_key = $this->request->getVar('network_key');
 
-        if (file_exists('resources/phenotype_lookup_data/' . $network_key . "_hpo_ancestry.json")) {
-            return (file_get_contents("resources/phenotype_lookup_data/" . $network_key . "_hpo_ancestry.json"));
+        if ($fileMan->Exists($network_key . "_hpo_ancestry.json")) {
+            return $fileMan->Read($network_key . "_hpo_ancestry.json");
 		}
 		else {
             return false;
@@ -341,7 +321,7 @@ use CodeIgniter\Config\Services;
      */
     public function checkJsonPresence() {
 
-        $source_id = $_POST['source_id'];
+        $source_id = $this->request->getVar('source_id');
         $files = json_decode($_POST['files']);
         // Check if there are duplicates
         $duplicates = $this->uploadModel->checkJsonFiles($files,$source_id);
@@ -422,8 +402,8 @@ use CodeIgniter\Config\Services;
      */
     public function jsonStart() {
         // Assign posted source to easier variable
-        $source_id = $_POST['source_id'];
-        $user_id = $_POST['user_id'];
+        $source_id = $this->request->getVar('source_id');
+        $user_id = $this->request->getVar('user_id');
         // Get ID for source and lock it so further updates and uploads cannot occur
         // Until update is finished
         $this->sourceModel->toggleSourceLock($source_id);
@@ -439,7 +419,7 @@ use CodeIgniter\Config\Services;
 
     public function checkUploadJobs() {
 
-        $user_id = $_POST['user_id'];
+        $user_id = $this->request->getVar('user_id');
         $return = ['Status' => '', 'Message' => []];
         if ($this->uploadModel->countUploadJobRecord($user_id)) {
             $return['Status'] = true;
@@ -473,7 +453,7 @@ use CodeIgniter\Config\Services;
         $dup_elastic = [];
         $pairings = [];
         $types = [];
-        $source_id = $_POST['source_id'];
+        $source_id = $this->request->getVar('source_id');
 
         array_push($headers, "");
         $response_array = array('status' => "",
@@ -622,8 +602,9 @@ use CodeIgniter\Config\Services;
 
     public function vcfBatch() {
 
-        $source_id = $_POST['source_id']; 
-        $uid = $_POST['uid'];
+        $source_id = $this->request->getVar('source_id'); 
+        $uid = $this->request->getVar('uid');
+
         $pairings = json_decode(file_get_contents(FCPATH."upload/pairings/$uid.json"), true);
         $source_path = FCPATH."upload/UploadData/".$source_id."/";	
 
@@ -667,8 +648,7 @@ use CodeIgniter\Config\Services;
     public function vcfStart() {
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
-
-        $uid = $_POST['uid'];
+        $uid = $this->request->getVar('uid');
 
         // Get ID for source and lock it so further updates and uploads cannot occur
         // Until update is finished
