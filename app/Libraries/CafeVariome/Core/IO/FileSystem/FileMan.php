@@ -15,6 +15,7 @@
     protected $basePath;
     protected $files;
     protected $handle;
+    protected $filePath;
     private $mode;
 
     public function __construct(string $basePath)
@@ -39,11 +40,16 @@
         return file_exists($this->getFullPath() . $path);
     }
 
+    public function GetModificationTimeStamp(string $path): int
+    {
+        return $this->Exists($path) ? filemtime($this->getFullPath() . $path) : -1;
+    }
+
     public function Read(string $path, int $length = -1)
     {
         $readMode = 'r';
 
-        if (!$this->handle || $this->mode != $readMode) {
+        if (!$this->handle || $this->mode != $readMode || $this->filePath != $path) {
             $this->getHandle($path);
         }
         $buffer = ($length != -1) ? fread($this->handle, $length) : fread($this->handle, $this->getSize($path));
@@ -55,7 +61,7 @@
     {
         $readMode = 'r';
 
-        if (!$this->handle || $this->mode != $readMode) {
+        if (!$this->handle || $this->mode != $readMode || $this->filePath != $path) {
             $this->getHandle($path);
         }
         $line = ($length != -1) ? fgetcsv($this->handle, $length, $delimiter, $enclosure, $escape) : fgetcsv($this->handle, $this->getSize($path), $delimiter, $enclosure, $escape);
@@ -78,14 +84,23 @@
 
     protected function getHandle(string $path, string $mode = 'r', bool $isRelative = true)
     {
+        if ($this->handle) {
+            $this->destroyHandle();
+        }
         $absPath = $isRelative ? $this->getFullPath() . $path : $path;
         $this->handle = fopen($absPath, $mode);
         $this->mode = $mode;
+        $this->filePath = $path;
     }
 
     protected function destroyHandle(): bool
     {
         return fclose($this->handle);
+    }
+
+    protected function setFilePath($path)
+    {
+        $this->filePath = $path;
     }
 
     public function countFiles(): int
