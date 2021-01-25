@@ -25,6 +25,23 @@ class QueryNetworkInterface extends AbstractNetworkInterface
                     ];
 
         $this->networkAdapter = new cURLAdapter(null, $curlOptions);
+
+        if ($this->networkAdapterConfig->useProxy) {
+            $proxyDetails = $this->networkAdapterConfig->proxyDetails;
+            $this->configureProxy($proxyDetails);
+        }
+    }
+
+    protected function configureProxy(array $proxyConfig)
+    {
+        $this->networkAdapter->setOption(CURLOPT_FOLLOWLOCATION, true);
+        $this->networkAdapter->setOption(CURLOPT_HTTPPROXYTUNNEL, 1);
+        $this->networkAdapter->setOption(CURLOPT_PROXY, $proxyConfig['hostname']);
+        $this->networkAdapter->setOption(CURLOPT_PROXYPORT, $proxyConfig['port']);
+
+        if ($proxyConfig['username'] != '' && $proxyConfig['password'] != '') {
+            $this->networkAdapter->setOption(CURLOPT_PROXYUSERPWD, $proxyConfig['username'] . ':' . $proxyConfig['password']);
+        }
     }
 
     public function query(string $query, int $network_key, AccessToken $token = null)
@@ -40,19 +57,27 @@ class QueryNetworkInterface extends AbstractNetworkInterface
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
+    
+    public function getEAVJSON(int $network_key, int $modification_time)
+    {
+        $this->adapterw('QueryApi/getEAVJSON', ['network_key' => $network_key, 'modification_time' => $modification_time]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
 
-    // protected function adapterw(string $uriTail, array $data)
-    // {
-    //     $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
-    //     $this->networkAdapter->setOption(CURLOPT_POST, true);
-    //     $this->networkAdapter->setOption(CURLOPT_POSTFIELDS, $data);
-    // }
+    public function getHPOJSON(int $network_key, int $modification_time)
+    {
+        $this->adapterw('QueryApi/getHPOJSON', ['network_key' => $network_key, 'modification_time' => $modification_time]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
 
-    // protected function processResponse($response)
-    // {
-    //     $responseObj = json_decode($response);
-    //     return $responseObj;
-    // }
+    protected function adapterw(string $uriTail, array $data)
+    {
+        $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
+        $this->networkAdapter->setOption(CURLOPT_POST, true);
+        $this->networkAdapter->setOption(CURLOPT_POSTFIELDS, $data);
+    }
 
 }
  
