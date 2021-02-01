@@ -141,7 +141,7 @@ use CodeIgniter\Config\Services;
         */
     public function validateUpload() {
         // Source we are checking against
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QUOTES);
         
         // check if it exists
         
@@ -183,7 +183,7 @@ use CodeIgniter\Config\Services;
      */
     public function checkJsonPresence() {
 
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QUOTES);
         $files = htmlentities(json_decode($_POST['files']), ENT_QUOTES);
         // Check if there are duplicates
         $duplicates = $this->uploadModel->checkJsonFiles($files,$source_id);
@@ -205,7 +205,7 @@ use CodeIgniter\Config\Services;
      */
     public function jsonBatch() {
         
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QUOTES);
         // Create the source upload directory if it doesnt exist
         $source_path = FCPATH."upload/UploadData/".$source_id."/";
 
@@ -317,7 +317,7 @@ use CodeIgniter\Config\Services;
         $dup_elastic = [];
         $pairings = [];
         $types = [];
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QUOTES);
 
         array_push($headers, "");
         $response_array = array('status' => "",
@@ -466,8 +466,8 @@ use CodeIgniter\Config\Services;
 
     public function vcfBatch() {
 
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
-        $uid = htmlentities(filter_var($_POST['uid'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QUOTES);
+        $uid = htmlentities(filter_var($_POST['uid'], FILTER_VALIDATE_INT), ENT_QUOTES);
         $pairings = json_decode(file_get_contents(FCPATH."upload/pairings/$uid.json"), true);
         $source_path = FCPATH."upload/UploadData/".$source_id."/";	
 
@@ -510,8 +510,8 @@ use CodeIgniter\Config\Services;
     }
 
     public function vcfStart() {
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
-        $uid = htmlentities(filter_var($_POST['uid'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QUOTES);
+        $uid = htmlentities(filter_var($_POST['uid'], FILTER_VALIDATE_INT), ENT_QUOTES);
 
         // Get ID for source and lock it so further updates and uploads cannot occur
         // Until update is finished
@@ -551,7 +551,7 @@ use CodeIgniter\Config\Services;
         error_log(htmlentities(print_r($_POST,1), ENT_QUOTES));
         $tmp = $_FILES["userfile"]["tmp_name"];
         $file_name = $_FILES["userfile"]["name"];
-        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QOUTES);
+        $source_id = htmlentities(filter_var($_POST['source_id'], FILTER_VALIDATE_INT), ENT_QUOTES);
         if (!$force) {
             if ($this->uploadModel->isDuplicatePhysicalFile($source_id,$file_name, $tmp)) {
                 $response_array = array('status' => "Duplicate");
