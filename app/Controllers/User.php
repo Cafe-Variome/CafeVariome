@@ -406,6 +406,46 @@ class User extends CVUI_Controller{
     }
 
     function Details(int $id){
+	$uidata = new UIData();
+        $uidata->title = "User Details";
+        $uidata->stickyFooter = false;
 
+        $userModel = new \App\Models\User($this->db);
+        $networkModel = new Network($this->db);
+
+        $user = $userModel->getUsers('id, email, first_name, last_name,company,active,remote,phone,last_login,created_on,is_admin,ip_address', ["id" => $id]);
+        $user = $user[0];
+        $email = $user['email'];
+        $uidata->data['uemail'] = $user['email'];
+        $uidata->data['id'] = $user['id'];
+        $uidata->data['first_name'] = $user['first_name'];
+        $uidata->data['last_name'] = $user['last_name'];
+        $uidata->data['user_id'] = $user['id'];
+        $uidata->data['company'] = $user['company'];
+        $uidata->data['active'] = $user['active'];
+        $uidata->data['remote'] = $user['remote'];
+        $uidata->data['phone'] = $user['phone'];
+        $uidata->data['last_login'] = $user['last_login'];
+        //$uidata->data['last_login'] = Time::createFromTimestamp($user['last_login'],'Europe/London','en_US');
+        $uidata->data['created_on'] = $user['created_on'];
+        //$uidata->data['created_on'] = Time::createFromTimestamp($user['created_on'],'Europe/London','en_US');
+        $uidata->data['is_admin'] = $user['is_admin'];
+        $uidata->data['ip_address'] = $user['ip_address'];
+        $users_groups_data = $networkModel->getCurrentNetworkGroupsForUsers();
+        
+        $users_groups = array();
+        // If there were groups fetch from auth server for users then add them to the view
+        if (!array_key_exists('error', $users_groups_data)) {
+            foreach ($users_groups_data as $group) {
+                $users_groups[$group['user_id']][] = array('network_name' => $group['network_name'], 'group_id' => $group['group_id'], 'group_name' => $group['name'], 'group_description' => $group['description']);
+            }
+            $uidata->data['users_groups'] = $users_groups;
+        }
+        $uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
+
+        $uidata->javascript = array(JS . "cafevariome/components/datatable.js", JS . "cafevariome/admin.js", VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
+
+        $data = $this->wrapData($uidata);
+        return view($this->viewDirectory . '/Details', $data);
     }
 }
