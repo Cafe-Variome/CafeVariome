@@ -44,7 +44,9 @@ class User extends Model{
     function deleteUser(int $user_id, &$authadapter){
         $authadapter->delete($user_id);
     }
-
+function detailsUser(int $user_id, &$authadapter){
+        $authadapter->details($user_id);
+    }
     /**
      * Gets user object by Id.
      * @param int id User ID
