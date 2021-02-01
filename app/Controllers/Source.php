@@ -340,14 +340,14 @@ class Source extends CVUI_Controller{
             ],            
             'desc' => [
                 'label'  => 'Source Description',
-                'rules'  => 'required|alpha_dash',
+                'rules'  => 'required',
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
             ], 
             'long_description' => [
                 'label'  => 'Long Source Description',
-                'rules'  => 'string|alpha_dash'
+                'rules'  => 'string'
             ],   
             'status' => [
                 'label'  => 'Source Status',
