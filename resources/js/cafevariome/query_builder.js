@@ -39,7 +39,7 @@ $(function() {
             phen_data = jsonData[0];
 
             $.each( jsonData[0].chr, function( key, value ) {
-                $('#values_chr').append($('<option></option>').attr('value', value.toLowerCase()).text('Chr:' + value));
+                $('select.values_chr').append($('<option></option>').attr('value', value.toLowerCase()).text('Chr:' + value));
             });
 
             $.each( jsonData[0].alternatebases,function( key, value ){
@@ -260,8 +260,8 @@ $(function() {
                             resp = $.parseJSON(val)
                             $.each(resp, function(key, val1) {
                                 $('#resTbl tbody').empty();
-                                    trow = "<tr id = " + key + "><td>EpiCare</a></td>";
-                                    if (val1 != "Access Denied") {
+                                trow = "<tr id = " + key + "><td>" + key + "</a></td>";
+                                if (val1 != "Access Denied") {
                                         if (val1.length > 0) {
                                             var ic = 1;
                                             $.each(val1, function (rkey, rval) {
