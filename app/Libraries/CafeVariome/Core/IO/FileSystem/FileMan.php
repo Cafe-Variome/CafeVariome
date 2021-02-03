@@ -189,6 +189,7 @@
 
     protected function getSize(string $path): int
     {
+        clearstatcache();
         return filesize($this->getFullPath() . $path);
     }
 
