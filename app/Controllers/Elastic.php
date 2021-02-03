@@ -169,9 +169,7 @@ class Elastic extends CVUI_Controller{
         }
         
         // rebuild the json list for interface
-        //$this->shellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateFederatedPhenotypeAttributeValueList $source_id $add");
-        $tc = new Task();
-        $r = $tc->regenerateFederatedPhenotypeAttributeValueList($source_id, $add);
+        $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateFederatedPhenotypeAttributeValueList $source_id $add");
     }
 
     /**
