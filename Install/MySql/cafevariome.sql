@@ -34,7 +34,6 @@ CREATE TABLE `eavs` (
   `source_id` int(11) NOT NULL,
   `fileName` mediumint(8) UNSIGNED NOT NULL,
   `subject_id` varchar(20) NOT NULL,
-  `type` varchar(20) NOT NULL,
   `attribute` varchar(50) NOT NULL,
   `value` varchar(200) DEFAULT NULL,
   `elastic` bit(1) NOT NULL DEFAULT b'0'
