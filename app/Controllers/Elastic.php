@@ -66,13 +66,14 @@ class Elastic extends CVUI_Controller{
             else {
                 $sources[$i]['elastic_index'] = false;
             }
+            
+            $sources[$i]['network_assigned'] = false;
 
             foreach ($networkAssignedSources as $networkSourcePair) {
                 if ($networkSourcePair['source_id'] == $sources[$i]['source_id']) {
                     $sources[$i]['network_assigned'] = true;
                     break;
                 }
-                $sources[$i]['network_assigned'] = false;
             }
         }
 
