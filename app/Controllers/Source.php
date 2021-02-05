@@ -174,14 +174,14 @@ class Source extends CVUI_Controller{
         $uidata->data['countDSPGroups'] = $countDisplayGroups;
                 
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-            $name = htmlentities(strtolower(str_replace(' ', '_', $this->request->getVar('name'))), ENT_QUOTES); // Convert the source name to lowercase and replace whitespace with underscore
-            $uri = htmlentities($this->request->getVar('uri'), ENT_QUOTES);
-            $owner_name = htmlentities($this->request->getVar('owner_name'), ENT_QUOTES);
-            $email = htmlentities($this->request->getVar('email'), ENT_QUOTES);
-            $description = htmlentities($this->request->getVar('desc'), ENT_QUOTES);
-            $long_description = htmlentities($this->request->getVar('long_description'), ENT_QUOTES);
-            $status = htmlentities($this->request->getVar('status'), ENT_QUOTES);
-            $type = htmlentities($this->request->getVar('type'), ENT_QUOTES);
+            $name = strtolower(str_replace(' ', '_', $this->request->getVar('name'))); // Convert the source name to lowercase and replace whitespace with underscore
+            $uri = $this->request->getVar('uri');
+            $owner_name = $this->request->getVar('owner_name');
+            $email = $this->request->getVar('email');
+            $description = $this->request->getVar('desc');
+            $long_description = $this->request->getVar('long_description');
+            $status = $this->request->getVar('status');
+            $type = $this->request->getVar('type');
 
             $source_data = array("name" => $name, "owner_name" => $owner_name, "email" => $email, "uri" => $uri, "description" => $description, "long_description" => $long_description, "type" => "mysql", "status" => $status);
             try {
@@ -363,15 +363,15 @@ class Source extends CVUI_Controller{
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             //check to see if we are creating the user
             //redirect them back to the admin page
-            $source_name = htmlentities($this->request->getVar('name'), ENT_QUOTES);
-            $update_data['source_id'] = htmlentities($this->request->getVar('source_id'), ENT_QUOTES);
+            $source_name = $this->request->getVar('name');
+            $update_data['source_id'] = $this->request->getVar('source_id');
             $update_data['name'] = $source_name;
-            $update_data['email'] = htmlentities($this->request->getVar('email'), ENT_QUOTES);
-            $update_data['uri'] = htmlentities($this->request->getVar('uri'), ENT_QUOTES);
-            $update_data['description'] = htmlentities($this->request->getVar('desc'), ENT_QUOTES);
-            $update_data['long_description'] = htmlentities($this->request->getVar('long_description'), ENT_QUOTES);
-            $update_data['type'] = htmlentities($this->request->getVar('type'), ENT_QUOTES);
-            $update_data['status'] = htmlentities($this->request->getVar('status'), ENT_QUOTES);
+            $update_data['email'] = $this->request->getVar('email');
+            $update_data['uri'] = $this->request->getVar('uri');
+            $update_data['description'] = $this->request->getVar('desc');
+            $update_data['long_description'] = $this->request->getVar('long_description');
+            $update_data['type'] = $this->request->getVar('type');
+            $update_data['status'] = $this->request->getVar('status');
 
             try {
                 $this->sourceModel->updateSource($update_data, ["source_id"=>$this->request->getVar('source_id')]);
