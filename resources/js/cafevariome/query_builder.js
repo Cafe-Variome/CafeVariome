@@ -47,7 +47,7 @@ $(function() {
             });
 
             $.each(jsonData[0].referencebases,function( key, value ) {
-                $('select.values_refall').append($('<option></option>').attr('value', key.toLowerCase()).text(value))
+                $('select.values_refall').append($('<option></option>').attr('value', value.toLowerCase()).text(value))
             });
 
             $.each(JSON.parse(jsonData[1]), (hpo, ancestry) => {
