@@ -59,7 +59,7 @@ class KeyCloak extends OpenIDAuthenticator /*implements IAuthenticator*/{
             'redirectUri'           => base_url()
         ]);
         $logoutUrl = $this->provider->getLogoutUrl();
-        $logoutUrl = str_replace('//', '/', $logoutUrl);
+        $logoutUrl = str_replace('auth//', 'auth/', $logoutUrl);
         $this->session->destroy();
 
         header('Location: '.$logoutUrl);
