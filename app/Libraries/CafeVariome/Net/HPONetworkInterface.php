@@ -16,8 +16,10 @@ class HPONetworkInterface extends AbstractNetworkInterface
     public function __construct(string $targetUri = '') {
         parent::__construct($targetUri);
 
-        $curlOptions = [CURLOPT_RETURNTRANSFER => TRUE];
-
+        $curlOptions = [CURLOPT_RETURNTRANSFER => TRUE,
+                        CURLOPT_HTTPHEADER => ['Expect:'] //Removing Expect header results in speed-up on some LAMPs running with CENTOS];
+        ];
+        
         $this->networkAdapter = new cURLAdapter(null, $curlOptions);
 
         if ($this->networkAdapterConfig->useProxy) {
