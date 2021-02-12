@@ -377,7 +377,6 @@ use CodeIgniter\Database\ConnectionInterface;
             'source_id'     => $source,
             'fileName'   => $file,
             'subject_id' => $id,
-            'type'       => "attribute",
             'attribute'  => $key,
             'value'      => $value);
         if ($test) {
