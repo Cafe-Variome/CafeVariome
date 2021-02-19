@@ -136,6 +136,17 @@ use CodeIgniter\Database\ConnectionInterface;
     }
 
     /**
+     * Resets status flag for uploaded file from Success or Error to Pending.
+     */
+    public function resetFileStatus(int $file_id)
+    {
+        $data = ['Status' => 'Pending'];
+        $this->builder = $this->db->table($this->table);
+        $this->builder->where('ID', $file_id);
+        $this->builder->update($data);
+    }
+
+    /**
      * Count Upload Job Record - Count how many jobs are associated with the given user
      *
      * @param int $user_id - The user id this job is linked to
