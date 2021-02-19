@@ -111,7 +111,7 @@ class Source extends CVUI_Controller{
             ],
             'owner_name' => [
                     'label'  => 'Owner Name',
-                    'rules'  => 'required',
+                    'rules'  => 'required|alpha',
                     'errors' => [
                         'required' => '{field} is required.'
                     ]
@@ -126,7 +126,7 @@ class Source extends CVUI_Controller{
             ],
             'uri' => [
                 'label'  => 'Source URI',
-                'rules'  => 'required',
+                'rules'  => 'required|valid_url',
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
@@ -332,7 +332,7 @@ class Source extends CVUI_Controller{
             ],
             'uri' => [
                 'label'  => 'Source URI',
-                'rules'  => 'required',
+                'rules'  => 'required|valid_url',
                 'errors' => [
                     'required' => '{field} is required.'
                 ]

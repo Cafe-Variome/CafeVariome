@@ -8,6 +8,7 @@
  * @author Mehdi Mehtraizadeh
  * @author Gregory Warren
  * @author Owen Lancaster
+ * @author Farid Yavari Dizjikan
  * 
  * This controller contains listener methods for client-side ajax requests.
  * Methods in this controller were formerly in other controllers. 
@@ -26,7 +27,7 @@ use App\Models\Elastic;
 use App\Models\Upload;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
-use App\Libraries\CafeVariome\ShellHelper;
+use App\Libraries\CafeVariome\PHPShellHelper;
 use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use CodeIgniter\Config\Services;
 
@@ -36,7 +37,7 @@ use CodeIgniter\Config\Services;
 
     protected $setting;
     
-    private $shellHelperInstance;
+    private $phpshellHelperInstance;
 
     /**
 	 * Constructor
@@ -51,7 +52,8 @@ use CodeIgniter\Config\Services;
         $this->sourceModel = new Source($this->db);
         $this->uploadModel = new \App\Models\Upload($this->db);
 
-        $this->shellHelperInstance = new ShellHelper();
+        $this->phpshellHelperInstance = new PHPShellHelper();
+        
     }
 
     function query($network_key = '') {
@@ -412,7 +414,7 @@ use CodeIgniter\Config\Services;
         $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
 
         // Create thread to begin SQL insert in the background
-        $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsert ".$source_id);
+        $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsert ".$source_id);
 
         // Report to front end that the process has now begun
         echo json_encode("Green");
@@ -663,7 +665,7 @@ use CodeIgniter\Config\Services;
                 error_log(" delete success");	    	
             }
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
             error_log($e->getMessage()); // will print Exception message defined above.
         }
         // Create thread to begin SQL insert in the background
@@ -719,10 +721,10 @@ use CodeIgniter\Config\Services;
 
                 $fAction = $this->request->getVar('fAction'); // File Action 
                 if ($fAction == "overwrite") {
-                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 1 $source_id");
+                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 1 $source_id");
                 }
                 elseif ($fAction == "append") {
-                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00 $source_id");
+                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00 $source_id");
                 }
                 $uid = md5(uniqid(rand(),true));
                 $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
@@ -781,10 +783,10 @@ use CodeIgniter\Config\Services;
 
                 $fAction = $this->request->getVar('fAction'); // File Action 
                 if ($fAction == "overwrite") {
-                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 1 $source_id $setting_file");
+                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 1 $source_id $setting_file");
                 }
                 elseif ($fAction == "append") {
-                    $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 00 $source_id $setting_file");
+                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 00 $source_id $setting_file");
                 }
                 else {
                     error_log("entered else");
@@ -813,10 +815,12 @@ use CodeIgniter\Config\Services;
         $uploadModel->resetFileStatus($fileId);
 
         if ($overwrite) {
-            $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $fileId 1");
+            $task = new Task();
+            $task->bulkUploadInsert($fileId, 1);
+            $exec = $this->phpshellHelperInstance->run(getcwd() . "/index.php Task bulkUploadInsert $fileId 1");
         }
         else{
-            $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $fileId 00"); //Don't change 00 to 0 as it won't be detected on Windows machines.
+            $exec = $this->phpshellHelperInstance->run(getcwd() . "/index.php Task bulkUploadInsert $fileId 00"); //Don't change 00 to 0 as it won't be detected on Windows machines.
         }
 
         return json_encode(0);

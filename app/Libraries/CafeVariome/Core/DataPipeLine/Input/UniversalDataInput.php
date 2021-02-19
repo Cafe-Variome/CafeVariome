@@ -7,15 +7,16 @@
  * @author Samuel Balco
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
+ * @author Farid Yavari Dizjikan
  * 
  */
 
-use App\Libraries\CafeVariome\ShellHelper;
+use App\Libraries\CafeVariome\UniversalUploaderShellHelper;
 
 class UniversalDataInput extends DataInput
 {
     private $delete;
-    private $shellHelperInstance;
+    private $universalUploaderShellHelperInstance;
     private $filePath;
     private $settingFile;
 
@@ -23,7 +24,7 @@ class UniversalDataInput extends DataInput
         parent::__construct($source_id);
         $this->delete = $delete;
         $this->settingFile = $setting_file;
-        $this->shellHelperInstance = new ShellHelper();
+        $this->universalUploaderShellHelperInstance = new UniversalUploaderShellHelper();
     }
 
     public function absorb(int $file_id){
@@ -55,7 +56,7 @@ class UniversalDataInput extends DataInput
         $mysql_port = $dbConfig['port'];
 
         $cmd = getcwd() . DIRECTORY_SEPARATOR . CV_CONVERT_BIN . ' -s ' . getcwd() . DIRECTORY_SEPARATOR . CV_CONVERT_SETTINGS_DIR . "'$this->settingFile' -i '$this->filePath' --source-id  $this->sourceId --log db -o db --db-config mysql://$mysql_username:$mysql_password@$mysql_host:$mysql_port/$mysql_database";
-        $this->shellHelperInstance->runAsync($cmd, false);
+        $this->universalUploaderShellHelperInstance->runAsync($cmd);
         $this->uploadModel->bigInsertWrap($file_id, $this->sourceId);
     }
 }
