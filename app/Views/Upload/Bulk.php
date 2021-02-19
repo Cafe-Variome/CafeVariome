@@ -52,7 +52,7 @@
 			<label class="custom-control-label" for="fActionOverwrite" data-toggle="tooltip" data-placement="right" title="By selecting this option you will delete all data currently in this source.">Overwrite</label>
 		</div>
 		<div class="custom-control custom-radio">
-			<input type="radio" id="fActionAppend" name="fAction[]" value="append" class="custom-control-input">
+			<input type="radio" id="fActionAppend" name="fAction[]" value="append" class="custom-control-input" checked>
 			<label class="custom-control-label" for="fActionAppend" data-toggle="tooltip" data-placement="right" title="By selecting this option you will not impact any prior data already within the source.">Append</label>
 		</div>
 	</div>
@@ -83,9 +83,6 @@
 	<tr>
 		<th>File-name</th>
 		<th>User</th>
-		<th>Upload Start</th>
-		<th>Upload End</th>
-		<th>Errors</th>
 		<th>Status</th>
 		<th>Action</th>
 	</tr>

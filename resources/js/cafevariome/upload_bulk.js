@@ -84,14 +84,16 @@ $("#uploadBulk").submit(function(event) {
                                         contentType: false,
                                         processData: false,
                                         success: function(response)  {
-                                        	console.log(response);
+                                            //location.reload(); 
+
                                         	  $.notify({
                                                 message: 'Upload Complete. We are currently processing your data.',
                                                 type: 'info'
 										      },{
 										        timer: 200
 										    });
-                                            fileUploadInterval();                      
+                                            //fileUploadInterval();     
+                                            reloadTable($('#source_id').val(),false);
                                         },
                                         error: function(jqXHR, textStatus, errorThrown) {
                                             alert("loading error data " + errorThrown);
@@ -117,13 +119,14 @@ $("#uploadBulk").submit(function(event) {
                                 });
                             }
                             else {
-                            	  $.notify({
-                                        message: 'Upload Complete. We are currently processing your data.',
-                                        type: 'info'
-								      },{
-								        timer: 200
-								    });
-                            	fileUploadInterval();                           
+                                $.notify({
+                                    message: 'Upload Complete. We are currently processing your data.',
+                                    type: 'info'
+                                    },{
+                                    timer: 200
+                                });
+                                reloadTable($('#source_id').val(),false);
+                            	//fileUploadInterval();                           
                             }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
@@ -172,6 +175,9 @@ function processFile(fileId, overwrite) {
                 // settings
                 timer: 200
             });
+            id = $('#source_id').val();
+            $('[data-toggle="tooltip"]').tooltip('hide');
+            reloadTable(id,false);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $.notify({
