@@ -23,6 +23,7 @@ use App\Libraries\CafeVariome\Net\HPONetworkInterface;
 use App\Models\Source;
 use App\Models\Network;
 use App\Models\Elastic;
+use App\Models\Upload;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\ShellHelper;
@@ -808,6 +809,9 @@ use CodeIgniter\Config\Services;
         $fileId = $this->request->getVar('fileId');
         $overwrite = $this->request->getVar('overwrite');
 
+        $uploadModel = new Upload();
+        $uploadModel->resetFileStatus($fileId);
+
         if ($overwrite) {
             $this->shellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $fileId 1");
         }
@@ -821,7 +825,7 @@ use CodeIgniter\Config\Services;
     public function getSourceCounts()
     {
         $sourceModel = new Source();
-        $sourceRecordount = $sourceModel->countSourceEntries();
+        $sourceRecordount = $sourceModel->getSources('source_id, name, record_count', ['status' => 'online']);
 
         $sc = 0;
         $maxSourcesToDisplay = 12;
@@ -830,7 +834,7 @@ use CodeIgniter\Config\Services;
             if ($sc > $maxSourcesToDisplay) {
                 break;
             }
-            array_push($sourceCountList, $srCount);
+            array_push($sourceCountList, $srCount['record_count']);
             $sc++;
         }
 
@@ -838,15 +842,12 @@ use CodeIgniter\Config\Services;
     }
 
     public function getSourceStatus(int $source_id){
-
         $sourceModel = new Source();
         $output = ['Files' => [], 'Error' => []];
         if ($source_id== 'all') {
             $output['Files'] = $sourceModel->getSourceStatus('all');
-            //$output['Error'] = $this->upload_data_model->getErrorForSource('all');
         }
         else {
-          //source_id = $this->upload_data_model->getSourceId($_POST['source']);  
           $output['Files'] = $sourceModel->getSourceStatus($source_id);
           $output['Error'] = $sourceModel->getErrorForSource($source_id);
         }       

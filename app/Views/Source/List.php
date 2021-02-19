@@ -31,28 +31,11 @@
 		<?php $c = 0; ?>
 		<?php foreach ($sources as $source): ?>
 		<?php $c++; ?>
-		<?php if ( $source['type'] == "api"): ?>
-		<tr id="<?php echo $source['source_id']; ?>" style="background-color:#57FEFF">
-		<?php else: ?>
-		<tr id="<?php echo $source['source_id']; ?>">	
-		<?php endif; ?>
 			<td><?php echo $source['name']; ?></td>
 			<td><?php echo $source['description']; ?></td>
-			<td>
-				<?php if ( $source['type'] != "api" && $source['type'] != "central" ): ?>
-					<?php
-					if ( isset($variant_counts[$source['source_id']]) ):
-						echo $variant_counts[$source['source_id']];
-					else:
-						echo '0';
-					endif; ?>
-				<?php else: ?>
-						<a href="#" rel="popover" data-content="You cannot edit or import records for a federated source. This must be done via the source installation." data-original-title="Import Records" ><i class="fa fa-minus"></i></a>
-				<?php endif; ?>
-			</td>
+			<td><?= $source['record_count']; ?></td>
 			<td>
 				<?php
-				if ( $source['type'] != "api" && $source['type'] != "central" ):
 					if ( isset($source_network_groups)):
 						if (array_key_exists($source['source_id'], $source_network_groups)):
 							foreach ($source_network_groups[$source['source_id']] as $group):
@@ -64,21 +47,15 @@
 					else:
 						echo "No groups assigned";
 					endif;
-				else:?>
-					<a href="#" rel="popover" data-content="You cannot assign groups federated source. All access to these records is controlled via the source installation." data-original-title="Cannot Edit Groups" >
-						<i class="fa fa-minus"></i>
-					</a>
-				<?php endif; ?>
+				?>
 			</td>
 			<td>
-			<?php if ( $source['type'] != "api" && $source['type'] != "central" ): ?>
 				<a data-toggle="modal" data-target="#addVariantsModal" data-id="<?= $source['source_id'] ?>" data-placement="top" title="Import Records" id="ImportRecordsBtn">
 					<i class="fa fa-plus text-success"></i>
 				</a>
 				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Source">
 					<i class="fa fa-edit text-warning"></i>
 				</a>
-			<?php endif; ?>
 				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] . "/" . $source['name']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Source">
 					<i class="fa fa-trash text-danger"></i>
 				</a>

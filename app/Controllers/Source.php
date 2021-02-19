@@ -37,7 +37,7 @@ class Source extends CVUI_Controller{
         parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-        $this->sourceModel = new \App\Models\Source($this->db);
+        $this->sourceModel = new \App\Models\Source();
         helper('filesystem');
 
     }
@@ -51,7 +51,6 @@ class Source extends CVUI_Controller{
         $uidata = new UIData();
         $uidata->title = "Sources";
 
-        $uidata->data['variant_counts'] = $this->sourceModel->countSourceEntries();
         $sources = $this->sourceModel->getSources();
         $uidata->data['sources'] = $sources;
         $source_groups = array();
