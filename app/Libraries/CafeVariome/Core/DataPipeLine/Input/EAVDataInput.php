@@ -208,22 +208,4 @@ class EAVDataInput extends DataInput
         }
         return $rc;
     }
-
-    // private function report(array $report)
-    // {
-    //     $address = "127.0.0.1";
-    //     $service_port = "49200";
-
-    //     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-
-    //     $result = socket_connect($socket, $address, $service_port);
-    
-    //     socket_write($socket, json_encode($report), strlen(json_encode($report)));
-    //     while ($out = socket_read($socket, 2048)) {
-    //         echo $out;
-    //     }
-    //     socket_close($socket);
-    
-    //     usleep(100);
-    // }
 }
