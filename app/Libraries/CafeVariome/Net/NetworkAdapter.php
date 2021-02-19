@@ -14,6 +14,6 @@ class NetworkAdapter  implements INetworkAdapter
 
     public function Send()
     {
-        $this->$adapterInstance->Send();
+        $this->adapterInstance->Send();
     }
 }
