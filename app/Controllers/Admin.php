@@ -20,6 +20,7 @@ use App\Libraries\CafeVariome\Auth\KeyCloak;
 use App\Models\NetworkRequest;
 use App\Helpers\AuthHelper;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
+use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Config\Services;
 
 class Admin extends CVUI_Controller{
@@ -64,6 +65,7 @@ class Admin extends CVUI_Controller{
         $elasticSearch = new ElasticSearch(array($this->setting->getElasticSearchUri()));
         $neo4j = new Neo4J($this->setting->getNeo4JUserName(), $this->setting->getNeo4JPassword(), $this->setting->getNeo4JUri(), $this->setting->getNeo4JPort());
         $keyCloak = new KeyCloak();
+        $service = new ServiceInterface();
 
         $sourceList = $sourceModel->getSources('source_id, name', ['status'=>'online']);
 
@@ -93,7 +95,7 @@ class Admin extends CVUI_Controller{
         $networks = $networkInterface->GetNetworksByInstallationKey($this->setting->getInstallationKey());
         if ($networks->status) {
             $uidata->data['networksCount'] = count($networks->data);
-            $uidata->data['networkMsg'] = Null;
+            $uidata->data['networkMsg'] = null;
         }
         else{
             //Problem contacting network server
@@ -106,19 +108,22 @@ class Admin extends CVUI_Controller{
 
         $elasticStatus = $elasticSearch->ping();
         $uidata->data['elasticStatus'] = $elasticStatus;
-        $uidata->data['elasticMsg'] = Null;
+        $uidata->data['elasticMsg'] = null;
         if (!$elasticStatus) {
             $uidata->data['elasticMsg'] = "Elasticsearch is not running. The query interface is not accessible. Please ask the server administrator to start it.";
         }
 
         $neo4jStatus = $neo4j->ping(); 
         $uidata->data['neo4jStatus'] = $neo4jStatus;
-        $uidata->data['neo4jMsg'] = Null;
+        $uidata->data['neo4jMsg'] = null;
         if (!$neo4jStatus) {
             $uidata->data['neo4jMsg'] = "Neo4J is not running. Some capabilities of the system are disabled because of this. Please ask the server administrator to start it.";
         }
 
         $uidata->data['keycloakStatus'] = $keyCloak->ping();
+        $uidata->data['serviceStatus'] = $service->ping();
+
+
         
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Index', $data);

@@ -177,63 +177,60 @@
 				<div class="card-body">
 					<div class="row mb-1">
 						<div class="col-4">Elastic Search</div>
-						<div class="col-8">
+						<div class="col-2">
 							<?php if($elasticStatus): ?>
-							<a href="#" class="btn btn-success btn-icon-split">
-								<span class="icon text-white-50">
-								<i class="fas fa-check"></i>
+								<span class="icon text-50">
+								<i class="fas fa-check text-success"></i>
 								</span>
-								<span class="text">Running</span>
-							</a>
 							<?php else: ?>
-							<a href="#" class="btn btn-secondary btn-icon-split">
-								<span class="icon text-white-50">
-								<i class="fas fa-cross"></i>
+								<span class="icon text-50">
+								<i class="fas fa-cross text-secondary"></i>
 								</span>
-								<span class="text">Stopped</span>
-							</a>
 							<?php endif ?>
+						</div>
+						<div class="col-4">Service</div>
+						<div class="col-2">
+						<?php if($serviceStatus): ?>
+								<span class="icon text-50">
+								<i class="fas fa-check text-success"></i>
+								</span>
+							<?php else: ?>
+								<span class="icon text-50">
+								<i class="fas fa-cross text-secondary"></i>
+								</span>
+							<?php endif ?> 
 						</div>
 					</div>
 					<div class="row mb-1">
 						<div class="col-4">Neo4J</div>
-						<div class="col-8">
+						<div class="col-2">
 						<?php if($neo4jStatus): ?>
-							<a href="#" class="btn btn-success btn-icon-split">
-								<span class="icon text-white-50">
-								<i class="fas fa-check"></i>
+								<span class="icon text-50">
+								<i class="fas fa-check text-success"></i>
 								</span>
-								<span class="text">Running</span>
-							</a>
 							<?php else: ?>
-							<a href="#" class="btn btn-secondary btn-icon-split">
-								<span class="icon text-white-50">
-								<i class="fas fa-cross"></i>
+								<span class="icon text-50">
+								<i class="fas fa-cross text-secondary"></i>
 								</span>
-								<span class="text">Stopped</span>
-							</a>
 							<?php endif ?> 
 						</div>
-					</div> 
-					<div class="row mb-1">
 						<div class="col-4">OpenID Provider</div>
-						<div class="col-8">					                                                                                                                                                                          
+						<div class="col-2">					                                                                                                                                                                          
 							<?php if($keycloakStatus): ?>
-							<a href="#" class="btn btn-success btn-icon-split">
-								<span class="icon text-white-50">
-								<i class="fas fa-check"></i>
+								<span class="icon text-50">
+								<i class="fas fa-check text-success"></i>
 								</span>
-								<span class="text">Running</span>
-							</a>
 							<?php else: ?>
-							<a href="#" class="btn btn-secondary btn-icon-split">
 								<span class="icon text-white-50">
-								<i class="fas fa-cross"></i>
+								<i class="fas fa-cross text-secondary"></i>
 								</span>
-								<span class="text">Stopped</span>
-							</a>
 							<?php endif ?> 
 						</div>
+					</div>
+					<hr>
+					<div class="row mb-1">
+						<div class="col"><i class="fas fa-check text-success"></i> : Running </div>
+						<div class="col"><i class="fas fa-cross text-secondary"></i> : Inactive </div>
 					</div>
 				</div>
 			</div>
