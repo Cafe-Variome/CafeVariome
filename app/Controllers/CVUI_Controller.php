@@ -13,6 +13,7 @@ use App\Models\cms_model;
 use App\Models\Settings;
 use App\Models\URISegment;
 use App\Libraries\CafeVariome\Auth\AuthAdapter;
+use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Config\Services;
 
 class CVUI_Controller extends Controller{
@@ -58,6 +59,8 @@ class CVUI_Controller extends Controller{
 
 		$this->controllerName = $this->getClassName();
 		$this->viewDirectory = $this->controllerName;
+
+		$this->checkService();
 		//Load form helper
 		//Might be moved to a more suitable location
 		helper('form');
@@ -236,6 +239,14 @@ class CVUI_Controller extends Controller{
 			default:
 				return 'info';
 			break;
+		}
+	}
+
+	private function checkService()
+	{
+		$service = new ServiceInterface();
+		if (!$service->ping()){
+			$service->Start();
 		}
 	}
 }
