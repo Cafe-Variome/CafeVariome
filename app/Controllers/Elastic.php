@@ -6,6 +6,7 @@
  * Created 08/08/2019
  * 
  * @author Mehdi Mehtarizadeh
+ * @author Farid Yavari Dizjikan
  * 
  * This controller makes it possible for users to contact elastic search server.
  */
@@ -16,12 +17,12 @@ use App\Models\Settings;
 use App\Models\Source;
 use App\Models\Network;
 use App\Libraries\ElasticSearch;
-use App\Libraries\CafeVariome\ShellHelper;
+use App\Libraries\CafeVariome\PHPShellHelper;
 use CodeIgniter\Config\Services;
 
 class Elastic extends CVUI_Controller{
 
-    private $shellHelperInstance;
+    private $phpshellHelperInstance;
 
     /**
 	 * Constructor
@@ -36,7 +37,7 @@ class Elastic extends CVUI_Controller{
 		$this->db = \Config\Database::connect();
         $this->setting =  Settings::getInstance($this->db);
 
-        $this->shellHelperInstance = new ShellHelper();
+        $this->phpshellHelperInstance = new PHPShellHelper();
     }
 
     public function Status(){
