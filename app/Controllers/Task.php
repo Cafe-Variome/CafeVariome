@@ -302,10 +302,15 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      */
     public function bulkUploadInsert(int $fileId, int $overwrite) {
         $uploadModel = new Upload();
+        $sourceModel = new Source();
+
         $fileRec = $uploadModel->getFiles('ID, source_id', ['ID' => $fileId]);
 
         if (count($fileRec) == 1) {
             $sourceId = $fileRec[0]['source_id'];
+            if($overwrite){
+                $sourceModel->updateSource(['record_count' => 0], ['source_id' => $sourceId]);
+            }
 
             $inputPipeLine = new EAVDataInput($sourceId, $overwrite);
             $inputPipeLine->absorb($fileId);
