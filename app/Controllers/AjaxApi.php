@@ -815,12 +815,10 @@ use CodeIgniter\Config\Services;
         $uploadModel->resetFileStatus($fileId);
 
         if ($overwrite) {
-            $task = new Task();
-            $task->bulkUploadInsert($fileId, 1);
-            $exec = $this->phpshellHelperInstance->run(getcwd() . "/index.php Task bulkUploadInsert $fileId 1");
+            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $fileId 1");
         }
         else{
-            $exec = $this->phpshellHelperInstance->run(getcwd() . "/index.php Task bulkUploadInsert $fileId 00"); //Don't change 00 to 0 as it won't be detected on Windows machines.
+            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $fileId 00"); //Don't change 00 to 0 as it won't be detected on Windows machines.
         }
 
         return json_encode(0);
