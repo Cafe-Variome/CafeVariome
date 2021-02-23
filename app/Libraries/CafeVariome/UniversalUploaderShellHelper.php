@@ -19,7 +19,7 @@ class UniversalUploaderShellHelper extends ShellHelper
     private function getUnivPath(): string
     {
         if (defined('CV_CONVERT_BIN')) {
-            return CV_BIN;
+            return CV_CONVERT_BIN;
         }
         return CV_BIN . '/cv-convert';
     }
