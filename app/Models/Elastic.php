@@ -135,7 +135,7 @@ class Elastic extends Model{
         $this->builder = $this->db->table('eavs');
 
         $this->builder->where('elastic', 0);
-        $this->builder->where('source', $source_id);
+        $this->builder->where('source_id', $source_id);
 
         $count = $this->builder->countAllResults();
         return $count;

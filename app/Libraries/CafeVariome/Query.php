@@ -508,7 +508,7 @@ class Query extends CafeVariome{
         }
 		if ($isnot){ 
             $eavModel = new EAV($this->db);
-            $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source'=> $sourceId, 'elastic' => 1], true);	
+            $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $sourceId, 'elastic' => 1], true);	
             $uniqueSubjectIds = [];
             foreach ($uniqueSubjectIdsArray as $uid) {
                 array_push($uniqueSubjectIds, $uid['subject_id']);
@@ -567,7 +567,7 @@ class Query extends CafeVariome{
 		else $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
 		if ($isnot){ 
             $eavModel = new EAV($this->db);
-            $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source'=> $sourceId, 'elastic' => 1], true);	
+            $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $sourceId, 'elastic' => 1], true);	
             $uniqueSubjectIds = [];
             foreach ($uniqueSubjectIdsArray as $uid) {
                 array_push($uniqueSubjectIds, $uid['subject_id']);
