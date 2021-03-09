@@ -206,6 +206,7 @@ class Elastic extends Model{
     }
 
     /**
+     * @deprecated
      * Regenerate Federated Phenotype Attributes And Values List - Update Attributes and Values lists for given source
      *
      * @param string $source_name - The source we performing this operation for
