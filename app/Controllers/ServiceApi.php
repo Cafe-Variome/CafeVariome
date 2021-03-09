@@ -43,7 +43,7 @@ class ServiceApi extends ResourceController
 
         }
 
-        $this->response->setHeader('Content-Type', "text/event-stream");
+        $this->response->setHeader("Content-Type", "text/event-stream");
         $this->response->setHeader("Cache-Control", "no-cache");
 
 
