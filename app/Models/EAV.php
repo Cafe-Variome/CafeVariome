@@ -123,7 +123,6 @@ class EAV extends Model{
         $query = $this->builder->get()->getResultArray();
         $data = [];
         foreach ($query as $record) {
-            $orpha_terms = [];
             if (array_key_exists($record['subject_id'], $data)) {
                 $data[$record['subject_id']][] = ['orpha' => $record['value']];
             }
@@ -163,4 +162,20 @@ class EAV extends Model{
         return $data;
     }
 
+    public function getHPOTermsForSources(array $source_ids)
+    { 
+        $this->builder = $this->db->table('eavs');
+        $this->builder->select('value');
+        $this->builder->distinct();
+        $this->builder->whereIn('source_id', $source_ids);
+        $this->builder->like('value', 'HP:', 'after');
+
+        $terms = $this->builder->get()->getResultArray();
+
+        $hpo_terms = [];
+		foreach ($terms as $term) {
+			$hpo_terms[] = $term['value'];
+		}
+		return $hpo_terms;
+	}
 }
