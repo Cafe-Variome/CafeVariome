@@ -77,11 +77,3 @@
 		</ul>	  
     </div>
 </nav>
-		<!-- End ToDo -->
-
-
-<?php if(file_exists("resources/elastic_search_status_incomplete")) { ?>
-    <script>
-        //show_growl_elastic_search();
-    </script>
-<?php } ?>
