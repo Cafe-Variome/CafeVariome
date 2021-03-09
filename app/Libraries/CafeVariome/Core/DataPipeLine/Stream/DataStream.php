@@ -209,6 +209,7 @@ class DataStream
             if (!$add) {
                 $response = $elasticClient->indices()->delete($params);
                 $flag = true;
+                $eavModel->updateEAVs(["elastic"=>0], ['source_id'=> $source_id]) ;     // Reset elastic flag in eavs so that records appear in later selects
             }      
         }
         else{
@@ -254,10 +255,7 @@ class DataStream
             $bulk['body'][] = ["subject_id"=>$index_data['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"sub", "source"=>$source_name."_eav"];    
 
             $countparents++;
-            if($countparents == 0){
-                print_r($bulk);
-            }
-            
+
             if ($countparents%500 == 0){
                 $responses = $elasticClient->bulk($bulk);
                 $bulk=[];
@@ -303,7 +301,6 @@ class DataStream
         if (!empty($bulk['body'])){
             $responses = $elasticClient->bulk($bulk);
         }   
-
 
         $sourceModel->toggleSourceLock($source_id);	
         $eavModel->updateEAVs(["elastic"=>1], ['source_id'=> $source_id]) ;     
