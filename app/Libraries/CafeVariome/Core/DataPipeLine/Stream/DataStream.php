@@ -106,6 +106,7 @@ class DataStream
 
     public function generateHPOIndex(int $source_id)
     {
+        $eavModel = new EAV();
         $networkModel = new Network();
         $neo4jModel = new Neo4j();
         $phenotypeModel = new Phenotype();
@@ -122,7 +123,7 @@ class DataStream
         }
 
         foreach ($sourceslist as $network => $sourcelist) {
-            $hpo_terms = $phenotypeModel->getHPOTerms($sourcelist);
+            $hpo_terms = $eavModel->getHPOTermsForSources($sourcelist);
 
             $hpo = [];
             foreach ($hpo_terms as $term){
@@ -316,7 +317,7 @@ class DataStream
         $sourceModel = new Source();
 
         $batch = md5(uniqid(rand(),true));	
-        $HPOData = $eavModel->getHPOTerms($source_id); 
+        $HPOData = $eavModel->getHPOTermsWithNegatedBySourceId($source_id); 
         $ORPHAData = $eavModel->getORPHATerms($source_id); 
         $source_name = $sourceModel->getSourceNameByID($source_id);
 
