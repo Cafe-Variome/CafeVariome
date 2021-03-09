@@ -881,7 +881,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             $dataStream->generateHPOIndex($source_id);
             $dataStream->generateElasticSearchIndex($source_id, $add);
             $dataStream->Neo4JInsert($source_id);
-        } catch (\Excdeption $ex) {
+        } catch (\Exception $ex) {
             error_log($ex->getMessage());
         }
     }
