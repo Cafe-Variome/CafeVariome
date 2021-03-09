@@ -357,10 +357,24 @@ class Elastic extends Model{
      * @param void 
      * @return string
      */
-    public function getTitlePrefix(): string{
+    public function getTitlePrefix(): string
+    {
         $title = $this->setting->settingData['site_title'];
         $title = preg_replace("/\s.+/", '', $title);
-        $title = strtolower($title); 
-        return $title;
+        $title = strtolower($title);
+
+        $baseUrl = base_url();
+        if(strpos($baseUrl, "http://") !== false){
+            $baseUrl = str_replace('http://', '', $baseUrl);
+        }
+        elseif (strpos($baseUrl, 'https://') !== false) {
+            $baseUrl = str_replace('https://', '', $baseUrl);
+        }
+
+        $segments = explode('/', $baseUrl);
+
+        $prefix = count($segments) > 0 ? $segments[1] : $title;
+ 
+        return $prefix;
     }
 }
