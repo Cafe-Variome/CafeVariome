@@ -73,40 +73,43 @@ class EAV extends Model{
         $this->builder->update($data);
     }
 
-    public function getHPOTerms(int $source_id) 
+    public function getHPOTermsWithNegatedBySourceId(int $source_id) 
     {
-        $this->builder = $this->db->table('eavs e');
+        $subjectHPOWithNegatedArray = [];
 
-        $this->builder->select('e.subject_id as subject, e.value as hpo,m.value as negated');
-        $this->builder->join('eavs m', 'e.uid = m.uid', 'inner');
-        $this->builder->like('e.value', 'HP', 'after');
-        //$this->builder->where('m.attribute', "negated");
-        $this->builder->orWhere('m.attribute', "negated");
-        $this->builder->where('e.elastic', 0);
-        $this->builder->where('e.source_id', $source_id);
-
-        $data = $this->builder->get()->getResultArray();
-
-        foreach ($data as &$drow) {
-            if ($drow['hpo'] == $drow['negated']) {
-                $drow['negated'] = null;
-            }
+        $uidSubjectIds = $this->getEAVs('uid, subject_id', ['source_id' => $source_id, 'elastic' => 0], true);
+        $uids = [];
+        foreach ($uidSubjectIds as $uid_sid) {
+            $uids[$uid_sid['uid']] = $uid_sid['subject_id'];
         }
 
-        list($subject,$new_data,$t) = array("",[],0);
-        
-        for ($i=0; $i < count($data); $i++) { 
-            if ($subject != $data[$i]['subject']) {
-                $subject = $data[$i]['subject'];
-                $new_data[$subject] = [];
-                $t = 0;
-            }
-            $new_data[$subject][$t]['hpo'] = $data[$i]['hpo'];
-            $new_data[$subject][$t]['negated'] = $data[$i]['negated'];
-            $t++;
+        $uidHPOTerms = $this->getHPOTermsBySourceId($source_id);
+
+        $uidHPOArray = [];
+        foreach ($uidHPOTerms as $hpo) {
+            $uidHPOArray[$hpo['uid']] = $hpo['value'];
         }
 
-        return $new_data;
+        $negatedHPOTerms = $this->getNegatedHPOTermsBySourceId($source_id);
+
+        $uidNegatedHPOArray = [];
+        foreach ($negatedHPOTerms as $negated_hpo) {
+            $uidNegatedHPOArray[$negated_hpo['uid']] = $negated_hpo['value'];
+        }
+
+        foreach ($uids as $uid => $subject_id) {
+            if (array_key_exists($uid, $uidHPOArray)) {
+                if (array_key_exists($uid, $negatedHPOTerms)) {
+                    $subjectHPOWithNegatedArray[$subject_id][] = ['hpo' => $uidHPOArray[$uid], 'negated' => $uidNegatedHPOArray[$uid]];
+                }
+                else {
+                    $subjectHPOWithNegatedArray[$subject_id][] = ['hpo' => $uidHPOArray[$uid], 'negated' => 0];
+                }
+            }
+
+        }
+
+        return $subjectHPOWithNegatedArray;
     }
 
     public function getORPHATerms(int $source_id)
@@ -131,4 +134,33 @@ class EAV extends Model{
 
         return $data;
     }
+
+    public function getHPOTermsBySourceId(int $source_id)
+    {
+        $this->builder = $this->db->table($this->table);
+        $this->builder->select('uid, value');
+        $this->builder->where('source_id', $source_id);
+        $this->builder->where('attribute !=', 'ancestor_hpo_id'); // attribute != "ancestor_hpo_id"
+        $this->builder->where('attribute !=', 'classOfOnset_id'); // attribute != 'classOfOnset_id'
+        $this->builder->like('value', 'hp:', 'after');
+        $this->builder->where('elastic', 0);
+
+        $data = $this->builder->get()->getResultArray();
+
+        return $data;
+    }
+
+    public function getNegatedHPOTermsBySourceId(int $source_id)
+    {
+        $this->builder = $this->db->table($this->table);
+        $this->builder->select('uid, value');
+        $this->builder->where('source_id', $source_id);
+        $this->builder->where('attribute', 'negated');
+        $this->builder->where('elastic', 0);
+
+        $data = $this->builder->get()->getResultArray();
+
+        return $data;
+    }
+
 }
