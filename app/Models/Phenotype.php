@@ -103,21 +103,5 @@ use CodeIgniter\Database\ConnectionInterface;
             }
         }
     }
-
-    function getHPOTerms($source_ids) { //edited may13 2019 to remove match for phenotypes_id
-        $this->builder = $this->db->table('eavs');
-        $this->builder->select('value');
-        $this->builder->distinct();
-        $this->builder->whereIn('source_id', $source_ids);
-        $this->builder->like('value', 'HP:', 'after');
-
-        $terms = $this->builder->get()->getResultArray();
-
-        $hpo_terms = [];
-		foreach ($terms as $term) {
-			$hpo_terms[] = $term['value'];
-		}
-		return $hpo_terms;
-	}
-
+    
  }
