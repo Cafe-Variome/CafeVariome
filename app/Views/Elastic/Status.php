@@ -22,6 +22,7 @@
   <thead>
     <tr>
         <th>ElasticSearch Index Name</th>
+        <th>Source Name</th>
         <th>Status</th>
         <th>Action</th>
     </tr>
@@ -29,7 +30,8 @@
   <tbody id="index_grid">
     <?php foreach ($elastic_update as $row): ?> 
     <tr id="index_<?php echo $row['source_id']; ?>">
-      <td><?php echo $host."_".$row['source_id']." (Source: ".$row['name'].")"; ?></td>
+      <td><?= $indexPrefix."_".$row['source_id']; ?></td>
+      <td><?= $row['name'] ?></td>
       <?php if (!$isRunning): ?>
           <td style="background-color: lightgray;">
             Unknown
@@ -43,19 +45,19 @@
             </a>            
           </td>
       <?php else: ?>
-        <?php if ($row['elastic_index'] == true): ?>
-          <td style="background-color: lightgreen;">
-            <i class="fa fa-check"></i>
-            Up to Date
-          </td>                                  
-        <?php else: ?>
-          <td style="background-color: lightblue;">
-              <i class="fa fa-plus"></i>
-              Update Possible
-            <!-- Update Possible -->
-          </td>                                               
+      <td id="status-<?= $row['source_id']; ?>">
+      <?php if ($row['elastic_index'] == true): ?>
+
+        <a data-toggle="tooltip" data-placement="top" title="Index '<?= $indexPrefix."_".$row['source_id']; ?>' exists.">
+          <i class="fa fa-database text-success"></i>
+        </a>
+      <?php else: ?>
+        <a data-toggle="tooltip" data-placement="top" title="Index '<?= $indexPrefix."_".$row['source_id']; ?>' does not exist.">
+          <i class="fa fa-database text-danger"></i>
+        </a>
       <?php endif; ?>
-        <td>   
+      </td>
+        <td id="action-<?= $row['source_id']; ?>">   
           <?php if ($row['network_assigned']): ?>                                 
             <a onclick="regenElastic('<?php echo $row['source_id']; ?>', false);" id="update_<?php echo $row['name']; ?>" data-toggle="tooltip" data-placement="top" title="Click to regenerate this ElasticSearch Index">
               <span class="fa fa-redo text-info"></span>

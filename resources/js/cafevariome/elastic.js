@@ -30,7 +30,7 @@ function regenElastic(id,add) {
     console.log(dataArray);
     // param = "id="+id                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ;
     // console.log(param);
-     $.ajax({url: baseurl + 'elastic/elastic_check',
+     $.ajax({url: baseurl + 'AjaxApi/elastic_check',
           delay: 200,
           type: 'POST',
           data : {u_data : JSON.stringify(dataArray)},
@@ -40,14 +40,19 @@ function regenElastic(id,add) {
             console.log(data);
             data = $.parseJSON(data);
               if (data.Status == "Success") {
-                $.ajax({url  : baseurl + 'elastic/elastic_start',
+                $.ajax({url  : baseurl + 'AjaxApi/elastic_start',
                   type: 'POST',
                   data : {u_data : JSON.stringify(dataArray)},
                   // data: param,
                   dataType: 'json'
                 });
                 setToOff(data.Time);
-                //elasticSearchInterval(id);
+
+                $('#status-' + id.toString()).empty();
+                $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div>")
+
+                $('#action-' + id.toString()).children().hide();
+
               }
               else if (data.Status == "Empty") {
                 alert("This Source doesnt have any data uploaded to it yet. Please go to Data tab to rectify this.");
@@ -61,25 +66,59 @@ function regenElastic(id,add) {
   }
 
 function setToOff(time) {
-  $('#e_status').html('<div class="ad-left">\
-        <i class="fa fa-spinner fa-spin" style="font-size:24px"></i>\
-        </div><div class="ad-right">Update in Progress.</div>');
-  $("#buttonswitch").children('a').addClass('disabled');
-  $('#index_table tr').not(':first').each(function (i, row) {
-    id = this.id;   
-    id = id.substring('index_'.length);
-    $("#update_"+id).replaceWith('<a onclick="regenElastic(\'test\');" class="btn disabled" rel="popover" id="update_test" data-content="Click to regenerate this ElasticSearch Index" data-original-title="Regenerate ElasticSearch"><i class="icon-list-alt"></i>  Regenerate epadtest_test </a>');
-    if (document.getElementById("update_"+id+"_force")) {
-        document.getElementById("update_"+id+"_force").disabled = true;
-    }
-  });
-  var date = new Date(null);
-  date.setSeconds(time); // specify value for SECONDS here
-  var result = date.toISOString().substr(11, 8);
   $.notify({
     // options
-    message: 'ElasticSearch is now regenerating. We estimate it will take '+result},{
+    message: 'ElasticSearch is now regenerating.'},{
     // settings
     timer: 200
   });
 }
+
+$(document).ready(function() {
+  let eventSource = new EventSource(baseurl + "ServiceApi/pollElasticSearch");
+
+  eventSource.onmessage = function(event) {
+      id = event.lastEventId;
+      $progress = event.data;
+
+      if ($progress > -1) {
+          if($('#progressbar-' + id.toString()).length){
+              $('#fActionOverwrite').prop('disabled', true);
+
+              $('#progressbar-' + id.toString()).text(event.data.toString() + '%');
+              $('#progressbar-' + id.toString()).css( "width", event.data.toString() + "%" );
+          }
+          else{
+              $('#status-' + id.toString()).empty();
+              $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div>")
+              $('#action-' + id.toString()).children().hide();
+
+              $('#progressbar-' + id.toString()).text(event.data.toString() + '%');
+              $('#progressbar-' + id.toString()).css( "width", event.data.toString() + "%" );
+          }
+      }
+      else if(id == 0){
+          $('#fActionOverwrite').prop('disabled', false);
+      }
+
+      if(event.data == 100)
+      {
+          $('#progressbar-' + id.toString()).addClass('bg-success');
+          $('#action-' + id.toString()).children().show();
+
+      }
+  };
+
+  eventSource.onerror = function(err) {
+  };
+
+  if ($('#index_table').length) {
+    $('#index_table').dataTable( {
+    "sDom": "<'row'<'col 'l><'col'f>r>t<'row'<'col 'i><'col'p>>",
+    "oLanguage": {
+        "sLengthMenu": "_MENU_ records per page"
+      }
+    } );        
+}
+
+})
