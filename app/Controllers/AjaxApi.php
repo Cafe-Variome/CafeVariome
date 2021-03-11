@@ -856,4 +856,83 @@ use CodeIgniter\Config\Services;
         
         return json_encode($output);   
     }
+
+
+    /**
+     * Elastic Check - Checking function prior to update to determine type of update desired and whether it is needed.
+     *
+     * @param int $force     - Are we forcing the regnerate? 1 if so and 0 if not
+     * @param int $id        - The source id for the elasticsearch index
+     * @param int $add       - 1 if we are adding to index instead of fully regenerating
+     * @return array $result - Various parameters to allow front end decision
+     */
+    public function elastic_check() {	   
+            
+        $elasticModel = new \App\Models\Elastic(); 
+
+        $data = json_decode($this->request->getVar('u_data'));
+        $force = $data->force;
+        $source_id = $data->id;
+        $add = $data->add;
+
+        $unprocessedFilesCount = $elasticModel->getUnprocessedFilesForSource($source_id);
+
+        if (!$unprocessedFilesCount) {
+            $result = ['Status' => 'Empty'];
+            echo json_encode($result);
+            return;
+        }
+        if ($add) {
+            $unaddedEAVsCount = $elasticModel->getUnaddedEAVs($source_id);
+            if (!$unaddedEAVsCount) {
+                $result = ['Status' => 'Fully Updated'];
+                echo json_encode($result);
+                return;
+            }
+            else {
+                $time = $unaddedEAVsCount/2786;
+                $result = ['Status' => 'Success','Time'=> $time];
+                echo json_encode($result);
+            }
+        }
+        else {
+            if ($force) {
+                $count = $elasticModel->getEAVsCountForSource($source_id);
+                $time = $count/2786;
+                $result = ['Status' => 'Success','Time'=> $time];
+                echo json_encode($result);
+
+            }
+            else {
+                $result = ['Status' => 'Fully Updated'];
+                echo json_encode($result);
+            }
+        } 	
+    }
+
+
+    /**
+     * Elastic Start - Begin ElasticSearch regeneration
+     *
+     * @param int $force     - Are we forcing the regnerate? 1 if so and 0 if not
+     * @param int $id        - The source id for the elasticsearch index
+     * @param int $add       - 1 if we are adding to index instead of fully regenerating
+     * @return N/A
+     */
+    public function elastic_start() {
+        $elasticModel = new \App\Models\Elastic(); 
+        $phpshellHelperInstance = new PHPShellHelper();
+        $data = json_decode($this->request->getVar('u_data'));
+        $force = $data->force;
+        $source_id = $data->id;
+        $add = (int)$data->add;
+
+        if ($force) {
+            // if the regenerate was forced set the elastic state for all eav data rows
+            $elasticModel->resetElasticFlagForSourceEAVs($source_id);
+        }
+        
+        // rebuild the json list for interface
+        $phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateFederatedPhenotypeAttributeValueList $source_id $add");
+    }
  }
