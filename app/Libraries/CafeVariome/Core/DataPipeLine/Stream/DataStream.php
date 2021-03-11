@@ -19,7 +19,7 @@ use App\Models\EAV;
 use App\Models\Neo4j;
 use App\Models\Phenotype;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
-
+use App\Libraries\CafeVariome\Net\ServiceInterface;
 
 class DataStream
 {
@@ -30,9 +30,10 @@ class DataStream
 
         $this->setting =  Settings::getInstance();
         $hosts = (array)$this->setting->getElasticSearchUri();
+        $this->serviceInterface = new ServiceInterface();
+
 
         $this->elasticClient = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-        $elasticClient = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
     }
 
     public function generateAttributeValueIndex(int $source_id)
@@ -243,8 +244,15 @@ class DataStream
         // Set the elastic state of data to stale  
         $sourceModel->updateSource(["elastic_status"=>0], ["source_id" => $source_id]);
 
+        // Figure out how many documents we need to index
+        $eavsize = count($eavModel->getEAVs('uid,subject_id', ["source_id"=>$source_id, "elastic"=>0]));
+
         // Get all the unique subject ids for this source
         $unique_ids = $eavModel->getEAVs('uid,subject_id', ["source_id"=>$source_id, "elastic"=>0], true);
+
+        $totalRecords = $eavsize + count($unique_ids); //Total number of Elasticsearch documents to be created.
+
+        $this->serviceInterface->RegisterProcess($source_id, $totalRecords, 'elasticsearchindex');
 
         $bulk = [];
         $counta = 0;
@@ -260,7 +268,9 @@ class DataStream
                 $responses = $elasticClient->bulk($bulk);
                 $bulk=[];
                 unset ($responses);
-            }                    
+
+                $this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex');
+            }
         }
 
         // Send the last parents through who didnt get finished in loop
@@ -268,10 +278,10 @@ class DataStream
             $responses = $elasticClient->bulk($bulk);
             $bulk=[];
             unset ($responses);
+
+            $this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex');
         }
 
-        // Figure out how many documents we need to index
-        $eavsize = count($eavModel->getEAVs('uid,subject_id', ["source_id"=>$source_id, "elastic"=>0]));
         $bulk=[];
         $offset = 0;
 
@@ -291,6 +301,8 @@ class DataStream
                     $responses = $elasticClient->bulk($bulk);
                     $bulk=[];
                     unset ($responses);
+
+                    $this->serviceInterface->ReportProgress($source_id, $countparents + $counta, $totalRecords, 'elasticsearchindex');
                 }   
             }
             // Update offset 
@@ -300,6 +312,7 @@ class DataStream
         // Send the last set of documents through
         if (!empty($bulk['body'])){
             $responses = $elasticClient->bulk($bulk);
+            $this->serviceInterface->ReportProgress($source_id, $countparents + $counta, $totalRecords, 'elasticsearchindex');
         }   
 
         $sourceModel->toggleSourceLock($source_id);	
