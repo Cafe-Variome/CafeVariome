@@ -50,12 +50,29 @@ class Elastic extends CVUI_Controller{
         //ping elasticsearch
         $uidata->data['isRunning'] = $elasticSearch->ping();
 
+        $hosts = (array)$this->setting->getElasticSearchUri();
+
+		$elasticClient = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
+
+		$indicesStatus = $elasticClient->indices()->stats();
+
+
         $title_prefix = $elasticModel->getTitlePrefix();
         
         for ($i=0; $i < count($sources); $i++) { 
 
             if($elasticSearch->indexExists($title_prefix . "_" .$sources[$i]['source_id']) != null){
                 $sources[$i]['elastic_index'] = true;
+
+                if($indicesStatus && array_key_exists('indices', $indicesStatus)){
+                    $indexStatus = $indicesStatus['indices'][$title_prefix . "_" .$sources[$i]['source_id']];
+                    $indexStatusString = "UUID: " . $indexStatus['uuid'];
+                    $indexStatusString .= "<br/> Total Documents: " .  $indexStatus['total']['docs']['count'];
+                    $indexStatusString .= "<br/> Deleted Documents: " .  $indexStatus['total']['docs']['deleted'];
+                    $indexStatusString .= "<br/> Size : " .  round((intval($indexStatus['total']['store']['size_in_bytes'])/1048576), 2) . " M.B.";
+                    
+                    $sources[$i]['elastic_status'] = $indexStatusString;
+                }
             }
             else {
                 $sources[$i]['elastic_index'] = false;

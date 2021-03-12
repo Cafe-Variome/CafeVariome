@@ -1,10 +1,4 @@
 function regenElastic(id,add) {
-    //on = $("#elasticon").html();
-    //console.log(on);
-    //if (on != "ElasticSeach is running") {
-    //  alert("Can't Regenerate ElasticSearch when ElasticSearch is not running.");
-    //}
-    //else {
       if (add) {
          callElastic(id,false,true);
       }
@@ -17,7 +11,6 @@ function regenElastic(id,add) {
             callElastic(id,force,false);
           } 
       }   
-  //  }
   }
   
   function callElastic(id,force,add) {
@@ -27,9 +20,6 @@ function regenElastic(id,add) {
       "add"  :add
     };
   
-    console.log(dataArray);
-    // param = "id="+id                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ;
-    // console.log(param);
      $.ajax({url: baseurl + 'AjaxApi/elastic_check',
           delay: 200,
           type: 'POST',
@@ -43,7 +33,6 @@ function regenElastic(id,add) {
                 $.ajax({url  : baseurl + 'AjaxApi/elastic_start',
                   type: 'POST',
                   data : {u_data : JSON.stringify(dataArray)},
-                  // data: param,
                   dataType: 'json'
                 });
                 setToOff(data.Time);
@@ -83,7 +72,6 @@ $(document).ready(function() {
 
       if ($progress > -1) {
           if($('#progressbar-' + id.toString()).length){
-              $('#fActionOverwrite').prop('disabled', true);
 
               $('#progressbar-' + id.toString()).text(event.data.toString() + '%');
               $('#progressbar-' + id.toString()).css( "width", event.data.toString() + "%" );
@@ -97,15 +85,11 @@ $(document).ready(function() {
               $('#progressbar-' + id.toString()).css( "width", event.data.toString() + "%" );
           }
       }
-      else if(id == 0){
-          $('#fActionOverwrite').prop('disabled', false);
-      }
 
       if(event.data == 100)
       {
           $('#progressbar-' + id.toString()).addClass('bg-success');
           $('#action-' + id.toString()).children().show();
-
       }
   };
 
@@ -114,11 +98,25 @@ $(document).ready(function() {
 
   if ($('#index_table').length) {
     $('#index_table').dataTable( {
-    "sDom": "<'row'<'col 'l><'col'f>r>t<'row'<'col 'i><'col'p>>",
-    "oLanguage": {
-        "sLengthMenu": "_MENU_ records per page"
+      "sDom": "<'row'<'col 'l><'col'f>r>t<'row'<'col 'i><'col'p>>",
+      "oLanguage": {
+          "sLengthMenu": "_MENU_ records per page"
       }
     } );        
 }
+
+$('#indexStatusModal').on('show.bs.modal', function (event) {
+  var button = $(event.relatedTarget);
+  var indexName = button.data('indexname'); 
+  var indexStatus = button.data('elasticstatus'); 
+  var modal = $(this)
+  modal.find('.modal-title').html('Index Status for ' + indexName)
+  modal.find('.modal-body div').html(indexStatus)
+})
+
+$('#indexStatusModal').on('hide.bs.modal', function (e) {
+  var modal = $(this)
+  modal.find('.modal-body div').empty()
+})
 
 })

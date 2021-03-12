@@ -51,6 +51,9 @@
         <a data-toggle="tooltip" data-placement="top" title="Index '<?= $indexPrefix."_".$row['source_id']; ?>' exists.">
           <i class="fa fa-database text-success"></i>
         </a>
+        <a title="Click to see index details." data-toggle="modal" data-target="#indexStatusModal" data-indexname="<?= $indexPrefix."_".$row['source_id']; ?>" data-elasticstatus="<?= $row['elastic_status'] ?>">
+          <i class="fa fa-info-circle text-info"></i>
+        </a>
       <?php else: ?>
         <a data-toggle="tooltip" data-placement="top" title="Index '<?= $indexPrefix."_".$row['source_id']; ?>' does not exist.">
           <i class="fa fa-database text-danger"></i>
@@ -77,4 +80,24 @@
     <?php endforeach; ?>
   </tbody>
 </table>
+
+
+<div class="modal fade" id="indexStatusModal" tabindex="-1" role="dialog" aria-labelledby="indexStatusModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="indexStatusModalLabel"></h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <div id="index_details"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <?= $this->endSection() ?>
