@@ -38,7 +38,7 @@ function regenElastic(id,add) {
                 setToOff(data.Time);
 
                 $('#status-' + id.toString()).empty();
-                $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div>")
+                $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div><p id='statusmessage-" + id.toString() + "' style='font-size: 10px'></p>")
 
                 $('#action-' + id.toString()).children().hide();
 
@@ -68,25 +68,30 @@ $(document).ready(function() {
 
   eventSource.onmessage = function(event) {
       id = event.lastEventId;
-      $progress = event.data;
+      edata = JSON.parse(event.data);
+      progress = edata.progress;
+      status = edata.status;
 
-      if ($progress > -1) {
+      if (progress > -1) {
           if($('#progressbar-' + id.toString()).length){
+            $('#progressbar-' + id.toString()).removeClass('bg-success');
 
-              $('#progressbar-' + id.toString()).text(event.data.toString() + '%');
-              $('#progressbar-' + id.toString()).css( "width", event.data.toString() + "%" );
+              $('#progressbar-' + id.toString()).text(progress.toString() + '%');
+              $('#progressbar-' + id.toString()).css( "width", progress.toString() + "%" );
+              $('#statusmessage-' + id.toString()).html(status);
+
           }
           else{
               $('#status-' + id.toString()).empty();
-              $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div>")
+              $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div><p id='statusmessage-" + id.toString() + "' style='font-size: 10px'>" + status + "</p>")
               $('#action-' + id.toString()).children().hide();
 
-              $('#progressbar-' + id.toString()).text(event.data.toString() + '%');
-              $('#progressbar-' + id.toString()).css( "width", event.data.toString() + "%" );
+              $('#progressbar-' + id.toString()).text(progress.toString() + '%');
+              $('#progressbar-' + id.toString()).css( "width", progress.toString() + "%" );
           }
       }
 
-      if(event.data == 100)
+      if(progress == 100 && status.toLowerCase() == 'finished')
       {
           $('#progressbar-' + id.toString()).addClass('bg-success');
           $('#action-' + id.toString()).children().show();
