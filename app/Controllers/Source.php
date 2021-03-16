@@ -73,12 +73,11 @@ class Source extends CVUI_Controller{
             $groups = $networkModel->getCurrentNetworkGroupsForSourceInInstallation($source_id);
             $groups_for_source_ids[$source_id] = $groups;
         }
+
         if ( $groups_for_source_ids ) {
            $returned_groups = json_decode(json_encode($groups_for_source_ids), TRUE);
         }
-        else {
-            $this->response(array("error" => "Unable to get current network groups for sources in this installation"));
-        }
+
         // Loop through each source
         foreach ($returned_groups as $source_id => $selected_groups) {
             if (!empty($selected_groups)) { // If there's groups assigned to this source then pass to the view
