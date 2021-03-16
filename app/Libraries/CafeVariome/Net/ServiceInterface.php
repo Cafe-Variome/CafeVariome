@@ -60,7 +60,7 @@ class ServiceInterface
         return $results;
     }
 
-    public function RegisterProcess(int $entity_id, int $total_records, string $name): bool
+    public function RegisterProcess(int $entity_id, int $total_records, string $name, string $status = "", string $message = "records_count"): bool
     {
         $message = [
             'type' => 'registerprocess',
@@ -68,8 +68,10 @@ class ServiceInterface
                 'pid' => getmypid(), 
                 'name' => $name,
                 'entityId' => $entity_id,
-                'message' => 'records_count',
-                'count' => $total_records
+                'message' => $message,
+                'count' => $total_records,
+                'status' => $status,
+                'finished' => false
             ]
         ];
 
@@ -85,7 +87,7 @@ class ServiceInterface
         return false;
     }
 
-    public function ReportProgress(int $entity_id, int $records_processed, int $total_records, string $name): bool
+    public function ReportProgress(int $entity_id, int $records_processed, int $total_records, string $name, string $status = "", bool $finished = false, string $message = "records_processed"): bool
     {
         $message = [
             'type' => 'reportprogress',
@@ -93,9 +95,11 @@ class ServiceInterface
                 'pid' => getmypid(), 
                 'name' => $name, //'bulkupload'
                 'entityId' => $entity_id,
-                'message' => 'records_processed',
+                'message' => $message,
                 'count' => $records_processed,
-                'total'  => $total_records
+                'total'  => $total_records,
+                'status' => $status,
+                'finished' => $finished
             ]
         ];
 
