@@ -25,13 +25,17 @@ class DataStream
 {
     private $setting;
     private $elasticClient;
+    protected $source_id;
 
-    public function __construct() {
+    public function __construct(int $source_id) {
+
+        $this->source_id = $source_id;
 
         $this->setting =  Settings::getInstance();
         $hosts = (array)$this->setting->getElasticSearchUri();
         $this->serviceInterface = new ServiceInterface();
 
+        $this->serviceInterface->RegisterProcess($source_id, 1, 'elasticsearchindex', "Starting");
 
         $this->elasticClient = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
     }
@@ -52,8 +56,6 @@ class DataStream
 
         //Get all sources that belong to the above network(s)
         $networkAssignedSources = $sourceModel->getSourcesByNetworks($networks);
-
-        //$phenotypeModel->deleteAllLocalPhenotypesLookup();
 
         $files = $fileMan->getFiles();
 
@@ -110,7 +112,6 @@ class DataStream
         $eavModel = new EAV();
         $networkModel = new Network();
         $neo4jModel = new Neo4j();
-        $phenotypeModel = new Phenotype();
 
         $results = $networkModel->getNetworkSourcesForCurrentInstallation($source_id);
         $sourceslist = []; // NEED to DO THIS per NETWORK!!!!
@@ -124,9 +125,16 @@ class DataStream
         }
 
         foreach ($sourceslist as $network => $sourcelist) {
+
             $hpo_terms = $eavModel->getHPOTermsForSources($sourcelist);
 
             $hpo = [];
+            $hpoTermsProcessed = 0;
+
+            if (count($hpo_terms) > 0) {
+                $this->serviceInterface->ReportProgress($this->source_id, $hpoTermsProcessed, count($hpo_terms), 'elasticsearchindex', 'Processing HPO terms');
+            }
+
             foreach ($hpo_terms as $term){
                 $matchedTerms = $neo4jModel->MatchHPO($term);
                 $pars = [];
@@ -162,10 +170,16 @@ class DataStream
                     }
                     $hpo[$term] = $parents;
                 }
+
+                $hpoTermsProcessed++;
+
+                $this->serviceInterface->ReportProgress($this->source_id, $hpoTermsProcessed, count($hpo_terms), 'elasticsearchindex');
             }
+
             foreach($hpo as $term => $ancestory) {
                 $hpo[$term] = implode('||', $ancestory);
             }
+
             file_put_contents($jsonIndexPath . $network . "_hpo_ancestry.json", json_encode($hpo));
         }   
     }
@@ -252,11 +266,12 @@ class DataStream
 
         $totalRecords = $eavsize + count($unique_ids); //Total number of Elasticsearch documents to be created.
 
-        $this->serviceInterface->RegisterProcess($source_id, $totalRecords, 'elasticsearchindex');
-
         $bulk = [];
         $counta = 0;
         $countparents = 0;
+
+        $this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex', 'Generating Elasticsearch index');
+
         // start making all the parent documents in ElasticSearch
         foreach($unique_ids as $index_data){
             $bulk['body'][] = ["index"=>[ "_id"=>$index_data['uid'],"_index"=>$index_name]];
@@ -315,7 +330,7 @@ class DataStream
             $this->serviceInterface->ReportProgress($source_id, $countparents + $counta, $totalRecords, 'elasticsearchindex');
         }   
 
-        $sourceModel->toggleSourceLock($source_id);	
+        $sourceModel->unlockSource($source_id);	
         $eavModel->updateEAVs(["elastic"=>1], ['source_id'=> $source_id]) ;     
 
     }
@@ -338,6 +353,9 @@ class DataStream
             $neo4jModel->ConnectSubjects($HPOData, 'HPOterm', 'hpoid', 'hpo', $this->source_id);
             $neo4jModel->ConnectSubjects($ORPHAData, 'ORPHAterm', 'orphaid', 'orpha', $this->source_id);
         }
+
+        $this->serviceInterface->ReportProgress($source_id, 1, 1, 'elasticsearchindex', 'Finished', true);
+
     }
 
 
