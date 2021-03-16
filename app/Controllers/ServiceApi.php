@@ -29,14 +29,16 @@ class ServiceApi extends ResourceController
     public function pollUploadedFiles()
     {
         $si = new ServiceInterface();
-        $result = "retry: 3000\nid: 0\ndata: -1\n\n";
+        $result = "retry: 3000\nid: 0\ndata: {\"progress\": \"-1\", \"status\": \"\"}\n\n";
         try {
             $fileStatus = json_decode($si->GetUploadedFilesStatus(), true);
 
             if (json_last_error() == JSON_ERROR_NONE && count($fileStatus) > 0) {
                 $result = "retry: 1000\n";
                 foreach ($fileStatus as $taskId => $value) {
-                    $result .= "id: " . $taskId . "\ndata: " . $value ."\n\n";
+                    //$result .= "id: " . $taskId . "\ndata: " . $value ."\n\n";
+                    $result .= "id: " . $taskId . "\n";
+                    $result .= "data: {\"progress\": \"" . $value['progress'] . "\", \"status\": \"" . $value['status'] . "\"}\n\n";
                 }
             }
         } catch (\Exception $ex) {
@@ -54,14 +56,15 @@ class ServiceApi extends ResourceController
     public function pollElasticSearch()
     {
         $si = new ServiceInterface();
-        $result = "retry: 3000\nid: 0\ndata: -1\n\n";
+        $result = "retry: 3000\nid: 0\ndata: {\"progress\": \"-1\", \"status\": \"\"}\n\n";
         try {
             $fileStatus = json_decode($si->GetElasticsearchStatus(), true);
 
             if (json_last_error() == JSON_ERROR_NONE && count($fileStatus) > 0) {
                 $result = "retry: 1000\n";
                 foreach ($fileStatus as $taskId => $value) {
-                    $result .= "id: " . $taskId . "\ndata: " . $value ."\n\n";
+                    $result .= "id: " . $taskId . "\n";
+                    $result .= "data: {\"progress\": \"" . $value['progress'] . "\", \"status\": \"" . $value['status'] . "\"}\n\n";
                 }
             }
         } catch (\Exception $ex) {
