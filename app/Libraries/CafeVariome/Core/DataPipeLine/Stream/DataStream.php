@@ -335,8 +335,8 @@ class DataStream
             $neo4jModel->InsertSubjects($HPOData, $source_name, $batch);
             $neo4jModel->InsertSubjects($ORPHAData, $source_name, $batch);
             
-            $neo4jModel->ConnectSubjects($HPOData, 'HPOterm', 'hpoid', 'hpo');
-            $neo4jModel->ConnectSubjects($ORPHAData, 'ORPHAterm', 'orphaid', 'orpha');
+            $neo4jModel->ConnectSubjects($HPOData, 'HPOterm', 'hpoid', 'hpo', $this->source_id);
+            $neo4jModel->ConnectSubjects($ORPHAData, 'ORPHAterm', 'orphaid', 'orpha', $this->source_id);
         }
     }
 
