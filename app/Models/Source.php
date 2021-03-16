@@ -310,7 +310,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * uploaded to
      * 
      * Moved to source model by Mehdi Mehtarizadeh (02/08/2019)
-     * 
+     * @deprecated
      * @param int $source_id - The source we are locking
      * @return N/A
      */
@@ -320,6 +320,42 @@ use CodeIgniter\Database\ConnectionInterface;
         $data = array(
             "elastic_lock" => "!elastic_lock"
         );
+        $this->builder->where('source_id', $source_id);
+        $this->builder->update($data);
+    }
+
+    /**
+     * Source Lock -  Lock the source which is currently being regenerated or
+     * uploaded to
+     * 
+     * Moved to source model by Mehdi Mehtarizadeh (02/08/2019)
+     * 
+     * @param int $source_id - The source we are locking
+     * @return void
+     */
+    public function lockSource(int $source_id)
+    {
+        $this->builder = $this->db->table($this->table);
+
+        $data = ["elastic_lock" => "1"];
+        $this->builder->where('source_id', $source_id);
+        $this->builder->update($data);
+    }
+
+    /**
+     * Source Unock -  Unlock the source which was being regenerated or
+     * uploaded to
+     * 
+     * Moved to source model by Mehdi Mehtarizadeh (02/08/2019)
+     * 
+     * @param int $source_id - The source we are locking
+     * @return void
+     */
+    public function unlockSource(int $source_id)
+    {
+        $this->builder = $this->db->table($this->table);
+
+        $data = ["elastic_lock" => "0"];
         $this->builder->where('source_id', $source_id);
         $this->builder->update($data);
     }

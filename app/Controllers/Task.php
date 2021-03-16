@@ -114,7 +114,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             $uploadModel->bigInsertWrap($file_id, $source_id);
         }
         // we have finished updating the source and unlock it so further uploads and updates can be performed
-        $sourceModel->toggleSourceLock($source_id);	
+        $sourceModel->lockSource($source_id);	
     }
 
     /**
@@ -288,7 +288,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
         }	
         error_log("toggling source lock on: ".$source_id);
-        $sourceModel->toggleSourceLock($source_id); 		      
+        $sourceModel->unlockSource($source_id); 		      
     }
 
 
@@ -718,7 +718,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     public function regenerateFederatedPhenotypeAttributeValueList(int $source_id, $add)
     {
         try {
-            $dataStream = new DataStream();
+            $dataStream = new DataStream($source_id);
             $dataStream->generateAttributeValueIndex($source_id);
             $dataStream->generateHPOIndex($source_id);
             $dataStream->generateElasticSearchIndex($source_id, $add);

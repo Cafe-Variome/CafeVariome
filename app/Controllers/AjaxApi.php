@@ -409,7 +409,7 @@ use CodeIgniter\Config\Services;
         $user_id = $this->request->getVar('user_id');
         // Get ID for source and lock it so further updates and uploads cannot occur
         // Until update is finished
-        $this->sourceModel->toggleSourceLock($source_id);
+        $this->sourceModel->lockSource($source_id);
         $uid = md5(uniqid(rand(),true));
         $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
 
@@ -656,7 +656,7 @@ use CodeIgniter\Config\Services;
         // Get ID for source and lock it so further updates and uploads cannot occur
         // Until update is finished
 
-        $this->sourceModel->toggleSourceLock($source_id);
+        $this->sourceModel->lockSource($source_id);
         $uid = md5(uniqid(rand(),true));
         $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
         $path = FCPATH."upload/pairings/".$uid.".json";

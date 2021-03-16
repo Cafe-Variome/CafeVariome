@@ -45,7 +45,7 @@ class DataStream
         $phenotypeModel = new Phenotype();
         $fileMan = new SysFileMan($jsonIndexPath);
 
-        $sourceModel->toggleSourceLock($source_id);	
+        $sourceModel->lockSource($source_id);	
 
         //Get network(s) source is assigned to
         $networks = $networkModel->getNetworksBySource($source_id);
