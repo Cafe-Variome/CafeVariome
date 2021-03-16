@@ -17,7 +17,7 @@ use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 use GraphAware\Neo4j\Client\ClientBuilder;
 use App\Models\Settings;
-
+use App\Libraries\CafeVariome\Net\ServiceInterface;
 
 class Neo4j extends Model{
 
@@ -94,19 +94,38 @@ class Neo4j extends Model{
 
     public function InsertSubjects(array $data, string $source_name, string $batch)
     {
+        $serviceInterface = new ServiceInterface();
+        $sourceModel = new Source();
+
         $keys = array_keys($data);
+
+        $source_id = $sourceModel->getSourceIDByName($source_name);
         $this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
+
+        $subjectsAdded = 0;
+        if (count($keys) > 0) {
+            $serviceInterface->ReportProgress($source_id, $subjectsAdded, count($keys), 'elasticsearchindex', 'Adding subjects to Neo4J');
+        }
 
         foreach ($keys as $subject_id) {
             $this->InsertSubject($subject_id, $source_name, $batch);
+            $serviceInterface->ReportProgress($source_id, $subjectsAdded++, count($keys), 'elasticsearchindex');
         }
         $this->commitTransaction(true);
     }
 
-    public function ConnectSubjects(array $data, string $node_type, string $node_key, string $data_type)
+    public function ConnectSubjects(array $data, string $node_type, string $node_key, string $data_type, int $source_id)
     {
+        $serviceInterface = new ServiceInterface();
+
         $keys = array_keys($data);
+
         $this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
+
+        $subjectsConnected = 0;
+        if (count($keys) > 0) {
+            $serviceInterface->ReportProgress($source_id, $subjectsConnected, count($keys), 'elasticsearchindex', 'Connecting subjects in Neo4J');
+        }
 
         foreach ($keys as $subject_id) {
             for ($i=0; $i < count($data[$subject_id]); $i++) { 
@@ -118,6 +137,9 @@ class Neo4j extends Model{
                     $this->ConnectSubject($subject_id, $node_type, $node_key, $data_element, 'PHENOTYPE_OF');
                 }
             }
+
+            $subjectsConnected++;
+            $serviceInterface->ReportProgress($source_id, $subjectsConnected, count($keys), 'elasticsearchindex');
         }
         $this->commitTransaction(true);
     }
