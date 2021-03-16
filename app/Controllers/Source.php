@@ -67,7 +67,8 @@ class Source extends CVUI_Controller{
 
         $networkModel = new \App\Models\Network($this->db);
         $source_ids_exploded = explode('|', $source_ids);
-        $groups_for_source_ids;
+
+        $groups_for_source_ids = [];
         foreach ( $source_ids_exploded as $source_id ) {
             $groups = $networkModel->getCurrentNetworkGroupsForSourceInInstallation($source_id);
             $groups_for_source_ids[$source_id] = $groups;
