@@ -8,6 +8,8 @@
  * 
  */
 
+use App\Models\Settings;
+
 class SocketAdapter extends NetworkAdapter
 {
     private $address;
@@ -55,6 +57,7 @@ class SocketAdapter extends NetworkAdapter
 
     public function Write(array $message, int $delay = 0)
     {
+        $this->attachInstallationKey($message);
         $message = json_encode($message);
 
         $bytesWritten = socket_write($this->socket, $message, strlen($message));
@@ -84,6 +87,12 @@ class SocketAdapter extends NetworkAdapter
     private function delay(int $length)
     {
         usleep($length);
+    }
+
+    private function attachInstallationKey(array & $message)
+    {
+        $settings = Settings::getInstance();
+        $message['installation_key'] = $settings->getInstallationKey();
     }
 
     public function isConnected(): bool
