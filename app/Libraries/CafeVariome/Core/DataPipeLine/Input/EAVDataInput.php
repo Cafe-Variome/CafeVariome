@@ -25,6 +25,8 @@ class EAVDataInput extends DataInput
 
     public function absorb(int $file_id){
 
+        $this->serviceInterface->RegisterProcess($file_id, 1, 'bulkupload', "Starting");
+
         $files = $this->getSourceFiles($file_id); //Get a list of files for source
 
         foreach ($files as $key => $fname) {
@@ -34,8 +36,11 @@ class EAVDataInput extends DataInput
 
             if ($this->fileMan->Exists($file)) {
                 $this->uploadModel->clearErrorForFile($fileId);
+                $this->sourceModel->lockSource($this->sourceId);	
         
                 if ($this->delete == 1) {		
+                    $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data');
+
                     $this->sourceModel->deleteSourceFromEAVs($this->sourceId);
                 }
                 
@@ -75,7 +80,6 @@ class EAVDataInput extends DataInput
                     return $return_data;
                 }
         
-                $this->sourceModel->toggleSourceLock($this->sourceId);	
                 $this->reader->open($filePath);
             }
         }
@@ -83,8 +87,11 @@ class EAVDataInput extends DataInput
 
     public function save(int $file_id)
     { 
+        $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Counting records');
+
         $recordCount = $this->countRecords();
-        $this->serviceInterface->RegisterProcess($file_id, $recordCount, 'bulkupload');
+
+        $this->serviceInterface->ReportProgress($file_id, 0, $recordCount, 'bulkupload', 'Importing data');
 
         list($true, $linerow, $counter, $groupnumber) = array(true, 1, 0, 0);
 
@@ -101,7 +108,7 @@ class EAVDataInput extends DataInput
                                 $message = "No subject_id column.";
                                 $error_code = 1;
                                 $this->uploadModel->errorInsert($file_id,$this->sourceId,$message,$error_code,true);
-                                $this->sourceModel->toggleSourceLock($this->sourceId);
+                                $this->sourceModel->unlockSource($this->sourceId);
                                 return $return_data;
                             }
                             continue;
@@ -133,7 +140,7 @@ class EAVDataInput extends DataInput
                         $message = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
                         $error_code = 3;
                         $this->uploadModel->errorInsert($file_id,$this->sourceId,$message,$error_code,true);
-                        $this->sourceModel->toggleSourceLock($this->sourceId);
+                        $this->sourceModel->unlockSource($this->sourceId);
                         return $return_data;
                     }
                     foreach ($attgroups as $group){
@@ -152,7 +159,7 @@ class EAVDataInput extends DataInput
                                     $return_data['result_flag'] = 0;
                                     $return_data['error'] = "MySQL insert was unsuccessful.";
 
-                                    $this->sourceModel->toggleSourceLock($this->sourceId);
+                                    $this->sourceModel->unlockSource($this->sourceId);
                                     return $return_data;
                                 }
                             }                         
@@ -177,7 +184,10 @@ class EAVDataInput extends DataInput
         $this->uploadModel->insertStatistics($file_id, $this->sourceId);
         $this->uploadModel->bigInsertWrap($file_id, $this->sourceId);
         $this->uploadModel->clearErrorForFile($file_id);
-        $this->sourceModel->toggleSourceLock($this->sourceId);	
+        $this->sourceModel->unlockSource($this->sourceId);	
+
+        $this->serviceInterface->ReportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
+
 
     }
 
