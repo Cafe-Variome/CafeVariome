@@ -15,10 +15,15 @@
 
 use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
+use App\Libraries\CafeVariome\Net\ServiceInterface;
+
 
  class Phenotype extends Model{
+
     protected $db;
     protected $builder;
+
+    private $serviceInterface;
 
     public function __construct(ConnectionInterface &$db = null)
     {
@@ -28,6 +33,8 @@ use CodeIgniter\Database\ConnectionInterface;
         else {
             $this->db = \Config\Database::connect();
         }
+
+        $this->serviceInterface = new ServiceInterface();
     }
 
     /**
@@ -42,17 +49,29 @@ use CodeIgniter\Database\ConnectionInterface;
     function localPhenotypesLookupValues(int $source_id, string $network_key) {
 
         $eavModel = new EAV();
+        $sourceModel = new Source();
+
         $eavCount = $eavModel->getEAVs('count(*) as totalEAVs', ['source_id' => $source_id]);
+        $totalEAVRecords = $eavCount[0]['totalEAVs'];
+
+        $source_name = $sourceModel->getSourceNameByID($source_id);
+        
         $data = [];
         $tempLocalPhenotypes = [];
+        $recordsProcessed = 0;
 
-        for ($i=0; $i < $eavCount[0]['totalEAVs']; $i+=10000) { 
-            $data = $eavModel->getEAVsForSource($source_id, 10000, $i);
-            $this->swapLocalPhenotypes($data, $tempLocalPhenotypes, $network_key);
+        if ($totalEAVRecords > 0) {
+            $this->serviceInterface->ReportProgress($source_id, $recordsProcessed, $totalEAVRecords, 'elasticsearchindex', 'Processing attributes and values for: ' . $source_name);
         }
 
-        $data = $eavModel->getEAVsForSource($source_id, $i - $eavCount[0]['totalEAVs'], $i - 10000);
-        $this->swapLocalPhenotypes($data, $tempLocalPhenotypes, $network_key);
+        $batchSize = 10000;
+
+        for ($i=0; $i < $totalEAVRecords; $i+=$batchSize) { 
+            $data = $eavModel->getEAVsForSource($source_id, $batchSize, $i);
+            $this->swapLocalPhenotypes($data, $tempLocalPhenotypes, $network_key);
+            $recordsProcessed += count($data);
+            $this->serviceInterface->ReportProgress($source_id, $recordsProcessed, $totalEAVRecords, 'elasticsearchindex');
+        }
 
         return $tempLocalPhenotypes;
     }
