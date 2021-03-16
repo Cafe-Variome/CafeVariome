@@ -53,7 +53,6 @@ class Source extends CVUI_Controller{
 
         $sources = $this->sourceModel->getSources();
         $uidata->data['sources'] = $sources;
-        $source_groups = array();
 
         $source_ids_array = array(); // Array for storing all source IDs for this install
         foreach ($sources as $source) {
