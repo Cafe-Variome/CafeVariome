@@ -43,7 +43,7 @@ class Elastic extends CVUI_Controller{
         $elasticSearch = new ElasticSearch((array)$this->setting->getElasticSearchUri());
         $elasticModel = new \App\Models\Elastic($this->db);
         $sourceModel = new Source($this->db);
-        $sources = $sourceModel->getSources('source_id, name, elastic_status');
+        $sources = $sourceModel->getSources('source_id, name, elastic_status, elastic_lock');
 
         $networkAssignedSources = $networkModel->getNetworkSourcesForCurrentInstallation();
 

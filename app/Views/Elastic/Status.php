@@ -61,13 +61,19 @@
       <?php endif; ?>
       </td>
         <td id="action-<?= $row['source_id']; ?>">   
-          <?php if ($row['network_assigned']): ?>                                 
+          <?php if ($row['network_assigned']): ?>    
+            <?php if($row['elastic_lock']): ?>
+            <a data-toggle="tooltip" data-placement="top" title="The source is locked as it appears that data is being appended to the source at the moment. Wait until the operation finishes and the source is unlocked.">
+              <span class="fa fa-lock text-danger"></span>
+            </a>
+            <?php else: ?>                             
             <a onclick="regenElastic('<?php echo $row['source_id']; ?>', false);" id="update_<?php echo $row['name']; ?>" data-toggle="tooltip" data-placement="top" title="Click to regenerate this ElasticSearch Index">
               <span class="fa fa-redo text-info"></span>
             </a>
             <a onclick="regenElastic('<?php echo $row['source_id']; ?>',true);" data-toggle="tooltip" data-placement="top" title="Click to append newly-uploaded data to ElasticSearch (This does not affect data already present)">
               <span class="fa fa-sync text-warning"></span>
             </a>
+            <?php endif; ?>
           <?php else: ?>
             <a data-toggle="tooltip" data-placement="top" title="Source is not assigned to a network. Please assign it to a network in network groups.">
               <span class="fa fa-exclamation-triangle text-warning"></span>
