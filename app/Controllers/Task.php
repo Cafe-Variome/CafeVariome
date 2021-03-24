@@ -23,6 +23,7 @@ use App\Models\EAV;
 use App\Models\Neo4j;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\DataStream;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\EAVDataInput;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Input\PhenoPacketDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\UniversalDataInput;
 use CodeIgniter\Config;
 
@@ -42,79 +43,28 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * @param string $source - Name of source update should be performed for
      * @return N/A
      */
-    public function phenoPacketInsert($source_id) {
+    public function phenoPacketInsert($source_id, bool $overwrite = false) {
               
-        $uploadModel = new Upload($this->db);
-        $sourceModel = new Source($this->db);
+        $uploadModel = new Upload();
+        $sourceModel = new Source();
+        $inputPipeLine = new PhenoPacketDataInput($source_id, $overwrite);
 
         // get a list of json files just uploaded to this source
-        $files = $uploadModel->phenoPacketFiles($source_id);
-        // error_log("files");
-        // error_log(print_r($files,1));
+        $files = $uploadModel->getPhenoPacketFiles($source_id, !$overwrite);
+
         for ($t=0; $t < count($files); $t++) {
+
             $file = $files[$t]['FileName'];
             $file_id = $files[$t]['ID'];
-            error_log("Now doing: ".$file);
-            // create array of the given json file
-            $data = json_decode(file_get_contents(FCPATH . "upload/UploadData/".$source_id."/json/".$file), true);
-            $uploadModel->phenoPacketClear($source_id,$file_id);
-            $uploadModel->clearErrorForFile($file_id);
-            $meta = null;
-            if (array_key_exists("metaData", $data)) {
-                $meta = [];
-                $target = &$data['metaData']['resources'];
-                for ($i=0; $i < count($target); $i++) { 
-                    $meta[$target[$i]['namespacePrefix']] = [];
-                    $meta[$target[$i]['namespacePrefix']]['meta_name'] = $target[$i]['name'];
-                    $meta[$target[$i]['namespacePrefix']]['meta_version'] = $target[$i]['version'];
-                }		
-                
+
+            try {
+                $inputPipeLine->absorb($file_id);
+                $inputPipeLine->save($file_id);
+
+            } catch (\Exception $ex) {
+                error_log($ex->getMessage());
             }
-            preg_match("/(.*)\./", $file, $matches);
-            $data['id'] = $matches[1];
-            $id = $data['id'];
-            
-            $this->db->transStart();			
-            // perform recursive insert for given file
-            $done = $this->recursivePacket($data,$meta,$id,$file_id,$source_id,null,null,null, null);
-            if (!$done['negated']['true'] && !empty($done['negated']['uid'])) {
-                $uploadModel->jsonInsert($done['negated']['uid'],$source_id,$file_id,$id,'negated',0);	
-            }
-            $output = [];
-            $hits = [];
-            $matches = array_unique($this->arrSearch($data,$output));
-            $matches = $uploadModel->checkNegatedForHPO($matches,$file_id);
-            for ($i=0; $i < count($matches); $i++) { 
-                $result = json_decode($this->ancestorCurl($matches[$i]),1);
-                if (array_key_exists('ancestor', $result)) {
-                    foreach ($result['ancestor'] as $key => $value) {
-                        if (!array_key_exists($value['id'], $hits)) {
-                            $hits[$value['id']] = $value['label'];
-                        }
-                    }
-                }						
-            }
-            $uid = md5(uniqid(rand(),true));	
-            $uploadModel->jsonInsert($uid,$source_id,$file_id,$id,'type','ancestor');
-            foreach ($hits as $key => $value) {
-                $uploadModel->jsonInsert($uid,$source_id,$file_id,$id,'ancestor_hpo_id',$key);
-                $uploadModel->jsonInsert($uid,$source_id,$file_id,$id,'ancestor_hpo_label',$value);
-            }
-            $dbRet = $this->db->transComplete();
-            if ($this->db->transStatus() === FALSE) {
-                $error = true;
-                error_log("failed");
-                error_log($this->db->transStatus());
-                $message = "Data Failed to insert. Please double check file for sanity.";
-                $error_code = 4;
-                $uploadModel->errorInsert($file,$source,$message,$error_code,true);
-            }
-            // update status table to class current file as inserted to database
-            $uploadModel->insertStatistics($file_id, $source_id);
-            $uploadModel->bigInsertWrap($file_id, $source_id);
         }
-        // we have finished updating the source and unlock it so further uploads and updates can be performed
-        $sourceModel->lockSource($source_id);	
     }
 
     /**
@@ -325,7 +275,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * Recursive Packet 2 - Up to Date Recursive Loop to iterate through a multi nested 
      * array created from json_decoding a phenoPacket and preparing arrays
      * to insert into mysql - Table eavs
-     *
+     * @deprecated
+     * @see PhenoPacketDataInput class
      * @param array $array       - The array we are currently iterating through
      * @param array $meta        - The list of metaData tags,versions and names listed in the phenoPacket
      * @param string $id         - The subject ID for the phenoPacket
@@ -444,7 +395,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
     /**
      * Array Search - Recursive loop to find all HP terms within PhenoPacket
-     *
+     * @deprecated
+     * @see PhenoPacketDataInput class
      * @param array $array    - Array we are searching
      * @param array $output   - Array we are adding results to
      * @return array $output  - See Above
@@ -467,7 +419,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
     /**
      * Ancestor Curl - Hit Tim Beck's api to get all parents of given HPO term
-     * 
+     * @deprecated
+     * @see PhenoPacketDataInput class
      * @param string $array   - HPO term we are wanting parents for 
      * @return array $result  - Array for list of HPO terms and labels
      */
@@ -495,7 +448,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     /**
      * Recursive Numeric - Inner recursive loop to only deal with numbered nested arrays
      * to ensure that the whole nested group is kept in a single uid group
-     *
+     * @deprecated
+     * @see PhenoPacketDataInput class
      * @param array $array       - The array we are currently iterating through
      * @param array $meta        - The list of metaData tags,versions and names listed in the phenoPacket
      * @param string $id         - The subject ID for the phenoPacket
@@ -630,7 +584,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
     /**
      * Cell Base Api - Function to handle the top end of api calls to cell base
-     *
+     * @deprecated
+     * @see PhenoPacketDataInput class
      * @param array $compact - List of ten variables to pass into this function
      * ("assembly","chrom","coordinateSystem","pos","ref","alt","uid","id","file","source");
      * @return array $result - Returns result from the api call    
@@ -709,7 +664,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             $uploadModel->jsonInsert($uid,$source,$file,$id,"position",$pos);  
             $uploadModel->jsonInsert($uid,$source,$file,$id,"deletion",$ref);  
             $uploadModel->jsonInsert($uid,$source,$file,$id,"insertion",$alt);  
-            $uploadModel->recursiveCell($output[$key],$uid,$source,$file,$id);
+            $this->recursiveCell($output[$key],$uid,$source,$file,$id);
         }
         return $pos;
         // error_log(print_r($output,1));
@@ -758,7 +713,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     /**
      * Variant Validator Curl - Hit Variant Validator to confirm given variant details are
      * accurate
-     * 
+     * @deprecated
      * @param int $chrom         - Chromosome we are checking
      * @param int $position      - Start ref position
      * @param string $assembly   - Which Genome build we are checking
@@ -775,7 +730,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         // 05/08/2019
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
 
-        curl_setopt($ch, CURLOPT_URL, 'https://rest.variantvalidator.org/variantformatter/'.$assembly.'/'.$chrom.'-'.$position.'-'.$ref.'-'.$alt.'/None/None/True'); 
+        curl_setopt($ch, CURLOPT_URL, 'https://rest.variantvalidator.org/VariantFormatter/variantformatter/'.$assembly.'/'.$chrom.'-'.$position.'-'.$ref.'-'.$alt.'/None/None/True'); 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
         $result = json_decode(curl_exec($ch),1); 
         // error_log(print_r($result,1));
@@ -791,7 +746,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     /**
      * Variant Annotation Curl - Hit CellBase API post /genomic/variant/annotation endpoint
      * to get variant data 
-     * 
+     * @deprecated 
      * @param int $chrom         - Chromosome we are checking
      * @param int $positionStart - Start ref position
      * @param string $assembly   - Which Genome build we are checking
@@ -828,7 +783,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
     /**
      * Recursive Cell - Recursive Loop to append data into eavs of all data from all CellBase Data
-     *
+     * @deprecated
+     * @see PhenoPacketDataInput class
      * @param array $array - Array we adding from
      * @param string $uid  - The group id we are adding to
      * @param int $source  - The source we are adding to
@@ -837,6 +793,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * @return N/a
      */
     function recursiveCell($array,$uid,$source,$file,$id) {
+        $uploadModel = new Upload();
+
         foreach($array as $key => $value){
             if(is_array($value)){
                 $output =$this->recursiveCell($value,$uid,$source,$file,$id);
@@ -868,6 +826,9 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         }
     }
 
+    /**
+     * @deprecated
+     */
     public  function set_config($key, $value, $json) {
         $levels = array();
     
@@ -897,7 +858,8 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     /**
      * Mempty - Checks all parameters (variable amount) 
      * If any are empty return false. If all have content return true.
-     *
+     * @deprecated
+     * @see PhenoPacketDataInput class
      * @param string - Variable amount of parameters
      * @return false if any params are empty | true if none are empty
      */
