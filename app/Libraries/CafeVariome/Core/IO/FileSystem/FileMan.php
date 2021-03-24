@@ -45,14 +45,14 @@
         return $this->Exists($path) ? filemtime($this->getFullPath() . $path) : -1;
     }
 
-    public function Read(string $path, int $length = -1)
+    public function Read(string $path, int $length = -1, $isRelative = true)
     {
         $readMode = 'r';
 
         if (!$this->handle || $this->mode != $readMode || $this->filePath != $path) {
-            $this->getHandle($path);
+            $this->getHandle($path, $readMode, $isRelative);
         }
-        $buffer = ($length != -1) ? fread($this->handle, $length) : fread($this->handle, $this->getSize($path));
+        $buffer = ($length != -1) ? fread($this->handle, $length) : fread($this->handle, $this->getSize($path, $isRelative));
 
         return $buffer;
     }
@@ -142,6 +142,13 @@
             $this->destroyHandle();
             return true;
         }
+        elseif ($fExt === 'phenopacket' ) {
+            $this->getHandle($path, 'r', false);
+
+            $fcontent = $this->Read($path, -1, false);
+
+            return json_decode($fcontent) != null; 
+        }
         else if($fExt === 'xls' || $fExt === 'xlsx' || $fExt === 'vcf'){
             // Signatures of allowed files as follows: XLSX, XLS and VCF
             $allowed = array('504B0304',         // XLSX File signature
@@ -187,10 +194,10 @@
     }
 
 
-    protected function getSize(string $path): int
+    protected function getSize(string $path, bool $isRelative = true): int
     {
         clearstatcache();
-        return filesize($this->getFullPath() . $path);
+        return filesize(($isRelative ? $this->getFullPath() : "") . $path);
     }
 
     protected function bin2Hex(string $bin): string
