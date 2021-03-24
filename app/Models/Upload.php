@@ -201,7 +201,7 @@ use CodeIgniter\Database\ConnectionInterface;
     /**
      * Check Json Files - Check if any of the Json files already exist on the server for
      * given source
-     *
+     * @deprecated
      * @param array $files   - The list of files to check
      * @param int $source_id - The source_id we are checking
      * @return array empty if no duplicates | with elements of file names if they exist
@@ -251,22 +251,20 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param int $source_id - The source_id we are checking
      * @return array empty if no files | with elements of file names
      */
-    public function phenoPacketFiles(int $source_id) {
+    public function getPhenoPacketFiles(int $source_id, bool $pending = true) {
 
         $this->builder = $this->db->table($this->table);
 
         $this->builder->select('FileName, ID');
         $this->builder->where('source_id', $source_id);
-        $this->builder->where('Status', 'Pending');
+        if ($pending) {
+            $this->builder->where('Status', 'Pending');
+        }
         $this->builder->like('FileName', '.phenopacket');
+        $this->builder->orLike('FileName', '.json');
+
         $query = $this->builder->get()->getResultArray();
 
-        $this->builder->select('FileName, ID');
-        $this->builder->like('FileName', '.json');
-        $this->builder->where('source_id', $source_id);
-        $this->builder->where('Status', 'Pending');
-        $query2 = $this->builder->get()->getResultArray();
-        $query = array_merge($query,$query2);
         return $query;
     }
 
@@ -620,6 +618,5 @@ use CodeIgniter\Database\ConnectionInterface;
         }    	
     }
 
-    
  }
  
