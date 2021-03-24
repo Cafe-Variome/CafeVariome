@@ -40,7 +40,7 @@ use CodeIgniter\Config\Services;
      * @param string $source - The source name we will be uploading to
      * @return N/A
      */
-    public function Json($source_id) {
+    public function Phenopacket($source_id) {
         // Check if user is logged in and admin
         // Since this is a shared function for curators and admin check that the curator is a curator for this source
         $user_id = $this->authAdapter->getUserId();
@@ -55,10 +55,10 @@ use CodeIgniter\Config\Services;
 
         // preparing webpage
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/vcf.js',JS.'cafevariome/status.js'];
+        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/phenopacket.js',JS.'cafevariome/status.js'];
 
         $data = $this->wrapData($uidata);
-        return view($this->viewDirectory . '/Json', $data);
+        return view($this->viewDirectory . '/Phenopacket', $data);
     }
 
     /**
