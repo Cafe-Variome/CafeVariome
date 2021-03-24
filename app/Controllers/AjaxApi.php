@@ -104,7 +104,7 @@ use CodeIgniter\Config\Services;
 
     function HPOQuery(string $hpo_term = ''){
 
-        $hpoNetworkInterface = new HPONetworkInterface('https://www240.lamp.le.ac.uk/');
+        $hpoNetworkInterface = new HPONetworkInterface();
         $results = $hpoNetworkInterface->getHPO($hpo_term);
         return json_encode($results);
     }
@@ -112,7 +112,7 @@ use CodeIgniter\Config\Services;
     function build_tree() {
         if ($this->request->isAJAX())
         {
-            $hpoNetworkInterface = new HPONetworkInterface('https://www240.lamp.le.ac.uk/');
+            $hpoNetworkInterface = new HPONetworkInterface();
 
             $hpo_json = json_decode(stripslashes($this->request->getVar('hpo_json')), 1);
             $hpo_json = json_decode(str_replace('"true"', 'true', json_encode($hpo_json)), 1);
@@ -318,21 +318,30 @@ use CodeIgniter\Config\Services;
      * Check Json Presence - Check if the server has any of the targeted json files 
      * Already present for this source
      *
-     * @param arrray $_POST['files']  - The list of files we must check presence for
+     * @param array $_POST['files']  - The list of files we must check presence for
      * @param string $_POST['source'] - The source we must check presense for inside
      * @return string Green | json_encoded array with list of files
      */
     public function checkJsonPresence() {
 
+        $duplicates = [];
+
         $source_id = $this->request->getVar('source_id');
-        $files = json_decode($_POST['files']);
-        // Check if there are duplicates
-        $duplicates = $this->uploadModel->checkJsonFiles($files,$source_id);
-        if ($duplicates) {
-            echo json_encode($duplicates);
+        $fileNames = $this->request->getVar('fileNames');
+
+        $sourceFiles = $this->uploadModel->getFiles('FileName', ['source_id' => $source_id]);
+
+        foreach ($sourceFiles as $sourceFile) {
+            if (in_array($sourceFile['FileName'], $fileNames)) {
+                array_push($duplicates, $sourceFile['FileName']);
+            }
+        }
+
+        if (count($duplicates) > 0) {
+            return json_encode($duplicates);
         }
         else {
-            echo json_encode("Green");
+            return json_encode("Green");
         }
     }
 
@@ -340,7 +349,7 @@ use CodeIgniter\Config\Services;
      * Json Batch - At this point all checks have been performed. Upload the json files in
      * Batches of 20 (as limited by php.ini)
      *
-     * @param arrray $_FILES          - The list of files we must upload
+     * @param array $_FILES          - The list of files we must upload
      * @param string $_POST['source'] - The source we must upload into
      * @return N/A
      */
@@ -358,41 +367,29 @@ use CodeIgniter\Config\Services;
             $fileMan->CreateDirectory($source_path);
         }
 
-        $source_path =  $source_id . DIRECTORY_SEPARATOR . UPLOAD_JSON;
+        $source_path =  $source_id . DIRECTORY_SEPARATOR;
 
         if (!$fileMan->Exists($source_path)) {
             $fileMan->CreateDirectory($source_path);
         }
 
-        // Check the number of files we are uploading
-        $filesCount = $fileMan->countFiles(); //count($_FILES['userfile']['name']);
-
         $files = $fileMan->getFiles();
 
-        foreach ($files as $file) {
-           
-            // Check the mime and extension for the file we are currently uploading
-            $mime = $file->getType();
-
-            // if it doesnt conform to expectation
-            // TODO: Make it return failure and reflect in JS for this eventuality
-            if ($mime != "text/plain" && $file->getExtension() == "json" ) {
-                error_log("failure");
+        foreach ($files as $file) {    
+            if (!$fileMan->isValid($file)) {
+                return false;
             }   
-            
+
             if($fileMan->Save($file, $source_path))
             {     
-                // if file upload was successful
-                // Update UploadDataStatus table with the new file    
                 $this->uploadModel->createUpload($file->getName(),$source_id, $user_id);
             }
             else
             {
-                // if it failed to upload report error
-                // TODO: Make it return failure and reflect in JS for this eventuality
                 return false;
             } 
         }
+        
         return true;
     }
  
@@ -695,8 +692,8 @@ use CodeIgniter\Config\Services;
 
         if ($fileMan->countFiles() == 1){ // Only 1 file is allowed to go through this uploader
             $file = $fileMan->getFiles()[0];
-            $tmp = $file->getTempPath();
             $file_name = $file->getName();
+
             if (!$force) {
                 if($fileMan->Exists($source_id . DIRECTORY_SEPARATOR . $file_name)){
                     $response_array = array('status' => "Duplicate");
