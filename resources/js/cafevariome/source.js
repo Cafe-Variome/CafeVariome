@@ -32,7 +32,7 @@ $('#addVariantsModal').on('show.bs.modal', function (event) {
     var modal = $(this);
     modal.find('.modal-title').text('Add Records To ' + sourceDesc);
     modal.find('#bulkImport').attr('href', baseurl + "Upload/Bulk/" + sourceId);
-    modal.find('#phenoPacketsImport').attr('href', baseurl + "Upload/Json/" + sourceId);
+    modal.find('#phenoPacketsImport').attr('href', baseurl + "Upload/Phenopacket/" + sourceId);
     modal.find('#VCFImport').attr('href', baseurl + "Upload/VCF/" + sourceId);
     modal.find('#UniversalImport').attr('href', baseurl + "Upload/Universal/" + sourceId);
   })
