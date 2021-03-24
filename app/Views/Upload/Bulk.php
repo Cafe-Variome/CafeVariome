@@ -72,12 +72,6 @@
 
 <hr>
 
-<div class="row">
-  <div class="col">
-	<p>The Status table will refresh every 5 seconds. However as long as the search box is highlighted the refresh will not occur.</p>
-  </div>
-</div>
-
 <table class="table table-bordered table-striped table-hover" id="file_table" width="100%" cellspacing="0">
   <thead>
 	<tr>
