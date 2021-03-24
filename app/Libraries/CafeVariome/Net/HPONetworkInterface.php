@@ -3,7 +3,7 @@
 /**
  * HPONetworkInterface.php
  * 
- * Created: 21/01/2020
+ * Created: 21/01/2021
  * 
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
@@ -13,7 +13,7 @@
 
 class HPONetworkInterface extends AbstractNetworkInterface
 {
-    public function __construct(string $targetUri = '') {
+    public function __construct(string $targetUri = 'https://www240.lamp.le.ac.uk/') {
         parent::__construct($targetUri);
 
         $curlOptions = [CURLOPT_RETURNTRANSFER => TRUE,
@@ -43,6 +43,13 @@ class HPONetworkInterface extends AbstractNetworkInterface
     public function getHPO(string $term)
     {
         $this->adapterw("hpo/query.php", ['id' => $term]);
+        $response = $this->networkAdapter->Send();
+        return $this->processResponse($response);
+    }
+
+    public function getAncestor(string $term)
+    {
+        $this->adapterw("hpo/ancestor.php", ['id' => $term]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
