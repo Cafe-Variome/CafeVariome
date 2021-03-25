@@ -1,4 +1,11 @@
-<?php namespace Config;
+<?php
+
+namespace Config;
+
+use CodeIgniter\Validation\CreditCardRules;
+use CodeIgniter\Validation\FileRules;
+use CodeIgniter\Validation\FormatRules;
+use CodeIgniter\Validation\Rules;
 
 class Validation
 {
@@ -10,13 +17,13 @@ class Validation
 	 * Stores the classes that contain the
 	 * rules that are available.
 	 *
-	 * @var array
+	 * @var string[]
 	 */
 	public $ruleSets = [
-		\CodeIgniter\Validation\Rules::class,
-		\CodeIgniter\Validation\FormatRules::class,
-		\CodeIgniter\Validation\FileRules::class,
-		\CodeIgniter\Validation\CreditCardRules::class,
+		Rules::class,
+		FormatRules::class,
+		FileRules::class,
+		CreditCardRules::class,
 		\App\Helpers\ValidationHelper::class
 	];
 
@@ -24,7 +31,7 @@ class Validation
 	 * Specifies the views that are used to display the
 	 * errors.
 	 *
-	 * @var array
+	 * @var array<string, string>
 	 */
 	public $templates = [
 		'list'   => 'CodeIgniter\Validation\Views\list',
