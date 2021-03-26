@@ -5,7 +5,7 @@
     "homepage": "https://codeigniter.com",
     "license": "MIT",
     "require": {
-        "php": ">=7.2",
+		"php": "^7.3||^8.0",
         "codeigniter4/framework": "^4",
         "stevenmaguire/oauth2-keycloak": "^2.2.1",
         "components/font-awesome": "^5.9.0",
@@ -22,9 +22,9 @@
         "league/oauth2-client": "*"
         },
     "require-dev": {
-		"fzaninotto/faker": "^1.9@dev",
-		"mikey179/vfsstream": "1.6.*",
-		"phpunit/phpunit": "^8.5"
+		"fakerphp/faker": "^1.9",
+		"mikey179/vfsstream": "^1.6",
+		"phpunit/phpunit": "^9.1"
     },
     "autoload": {
         "psr-4": {
