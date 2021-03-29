@@ -45,8 +45,6 @@ Options FollowSymLinks
 	Header set X-XSS-Protection "1; mode=block"
 	# Protect against content-sniffing
 	Header set X-Content-Type-Options nosniff
-	# Secure cookie with HttpOnly and Secure flag
-	Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure;SameSite=Strict
 </IfModule>
 
 <IfModule !mod_rewrite.c>
