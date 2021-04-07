@@ -236,41 +236,6 @@ use CodeIgniter\Config\Services;
     }
 
     /**
-     * @deprecated */
-    private function get_json_for_phenotype_lookup() {
-        $basePath = FCPATH . JSON_DATA_DIR;
-
-        $fileMan = new SysFileMan($basePath);
-        $modification_time = $this->request->getVar('modification_time');
-        $network_key = $this->request->getVar('network_key');
-
-        if ($fileMan->Exists($network_key . ".json")) {
-            return $fileMan->Read($network_key . ".json");
-        } else {
-            return false;
-        }              
-    }
-
-    
-    /**
-     * @deprecated */
-    private function get_json_for_hpo_ancestry() {
-        $basePath = FCPATH . JSON_DATA_DIR;
-
-        $fileMan = new SysFileMan($basePath);
-        $modification_time = $this->request->getVar('modification_time');
-        $network_key = $this->request->getVar('network_key');
-
-        if ($fileMan->Exists($network_key . "_hpo_ancestry.json")) {
-            return $fileMan->Read($network_key . "_hpo_ancestry.json");
-		}
-		else {
-            return false;
-        }              
-	}
-
-
-    /**
      * validateUpload - Ensure the source we are wanting to upload to is an actual source
      * Users can change the parameter on url to what they wish
      * Check if the source is locked by another update/upload operation
@@ -411,7 +376,7 @@ use CodeIgniter\Config\Services;
         $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
 
         // Create thread to begin SQL insert in the background
-        $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsert ".$source_id);
+        $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertBySourceId " . $source_id . " 00");
 
         // Report to front end that the process has now begun
         echo json_encode("Green");
@@ -807,18 +772,35 @@ use CodeIgniter\Config\Services;
     {
         $fileId = $this->request->getVar('fileId');
         $overwrite = $this->request->getVar('overwrite');
+        $uploader = $this->request->getVar('uploader');
+
+        $method = '';
+
+        switch ($uploader) {
+            case 'bulk':
+                $method = 'bulkUploadInsert';
+                break;
+            case 'phenopacket':
+                $method = 'phenoPacketInsertByFileId';
+                break;
+            default:
+                return json_encode(0);
+                break;
+        }
 
         $uploadModel = new Upload();
         $uploadModel->resetFileStatus($fileId);
 
+        $uriSegments = $this->request->uri->getSegments();
+
         if ($overwrite) {
-            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $fileId 1");
+            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fileId . " 1");
         }
         else{
-            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $fileId 00"); //Don't change 00 to 0 as it won't be detected on Windows machines.
+            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fileId . " 00"); //Don't change 00 to 0 as it won't be detected on Windows machines.
         }
 
-        return json_encode(0);
+        return json_encode(1);
     }
 
     public function getSourceCounts()
