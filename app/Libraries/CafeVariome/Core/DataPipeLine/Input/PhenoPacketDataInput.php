@@ -13,24 +13,28 @@ use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\Net\CellBaseNetworkInterface;
 use App\Libraries\CafeVariome\Net\VariantValidatorNetworkInterface;
 use App\Libraries\CafeVariome\Net\HPONetworkInterface;
+use App\Libraries\CafeVariome\Net\ServiceInterface;
 
 class PhenoPacketDataInput extends DataInput
 {
-
     private $data;
     private $meta;
     private $id;
 
     private $overwrite;
+    private $serviceInterface;
 
     public function __construct(int $source_id, bool $overwrite)
     {
         parent::__construct($source_id);
         $this->overwrite = $overwrite;
+        $this->serviceInterface = new ServiceInterface();
     }
 
     public function absorb(int $file_id)
     {
+        $this->serviceInterface->RegisterProcess($file_id, 1, 'bulkupload', "Starting");
+
         $fileRecord = $this->getSourceFiles($file_id);
 
         if (count($fileRecord) == 1) {
@@ -41,6 +45,8 @@ class PhenoPacketDataInput extends DataInput
                 $this->data = json_decode($fileContent, true);
     
                 if ($this->overwrite) {
+                    $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data');
+
                     $this->uploadModel->phenoPacketClear($this->sourceId, $file_id);
                     $this->uploadModel->clearErrorForFile($file_id);
                 }
@@ -67,17 +73,25 @@ class PhenoPacketDataInput extends DataInput
 
     public function save(int $file_id)
     {
+        $steps = 3;
         $HPOApi = new HPONetworkInterface();
 
         $this->sourceModel->lockSource($this->sourceId);
 
-        $this->db->transStart();			
+        $this->db->transStart();	
+        $this->serviceInterface->ReportProgress($file_id, 0, $steps, 'bulkupload', 'Importing data');
+		
         // perform recursive insert for given file
         $done = $this->recursivePacket($this->data, $this->meta, $this->id, $file_id, $this->sourceId, null, null, null, null);
+
+        $this->serviceInterface->ReportProgress($file_id, 1, $steps, 'bulkupload');
 
         if (!$done['negated']['true'] && !empty($done['negated']['uid'])) {
             $this->uploadModel->jsonInsert($done['negated']['uid'], $this->sourceId, $file_id, $this->id, 'negated', 0);	
         }
+
+        $this->serviceInterface->ReportProgress($file_id, 2, $steps, 'bulkupload');
+
 
         $output = [];
         $hits = [];
@@ -110,6 +124,10 @@ class PhenoPacketDataInput extends DataInput
             $message = "Data Failed to insert. Please double check file for sanity.";
             $error_code = 4;
             $this->uploadModel->errorInsert($file, $this->sourceId, $message, $error_code, true);
+        }
+        else {
+            $this->serviceInterface->ReportProgress($file_id, 3, $steps, 'bulkupload');
+            $this->serviceInterface->ReportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
         }
 
         $totalRecordCount = $this->sourceModel->countSourceEntries($this->sourceId);
@@ -436,14 +454,11 @@ class PhenoPacketDataInput extends DataInput
 
         
         if (!is_null($variantValidatorApi->ValidateVariant($chrom, $pos, $ref, $alt, $assembly))) {
-            error_log("failed petes api");
             $message = "Variant is not valid, as according to VariantValidator. https://variantvalidator.org/";
             $error_code = 3;
             $this->uploadModel->errorInsert($file,$source,$message,$error_code,true,true);
             return;
         }
-
-        //$results = json_decode($this->variantAnnotationCurl($chrom,$pos,$assembly,$possibleRef,$alt),1);
 
         $results = $cellBaseApi->AnnotateVariant($chrom, $pos, $ref, $alt, $assembly);
         $results = $results->response[0]->result[0]->consequenceTypes;
