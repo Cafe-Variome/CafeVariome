@@ -54,8 +54,7 @@ class Elastic extends CVUI_Controller{
 
 		$elasticClient = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
 
-		$indicesStatus = $elasticClient->indices()->stats();
-
+		$indicesStatus = $elasticSearch->ping() ? $elasticClient->indices()->stats() : null;
 
         $title_prefix = $elasticModel->getTitlePrefix();
         
