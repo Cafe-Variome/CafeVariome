@@ -43,7 +43,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * @param string $source - Name of source update should be performed for
      * @return N/A
      */
-    public function phenoPacketInsert($source_id, bool $overwrite = false) {
+    public function phenoPacketInsertBySourceId(int $source_id, bool $overwrite = false) {
               
         $uploadModel = new Upload();
         $sourceModel = new Source();
@@ -65,6 +65,32 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                 error_log($ex->getMessage());
             }
         }
+    }
+
+        /**
+     * Pheno Packet Insert - manages the loop to insert all recently uploaded json files sequentially 
+     * into mysql for the given source.
+     *
+     * @param string $source - Name of source update should be performed for
+     * @return N/A
+     */
+    public function phenoPacketInsertByFileId(int $file_id, bool $overwrite = false) {
+              
+        $uploadModel = new Upload();
+        $sourceModel = new Source();
+
+        $source_id = $uploadModel->getSourceIdByFileId($file_id);
+
+        $inputPipeLine = new PhenoPacketDataInput($source_id, $overwrite);
+
+        try {
+            $inputPipeLine->absorb($file_id);
+            $inputPipeLine->save($file_id);
+
+        } catch (\Exception $ex) {
+            error_log($ex->getMessage());
+        }
+
     }
 
     /**
