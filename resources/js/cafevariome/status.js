@@ -1,6 +1,8 @@
 var tooltipObj;
+var appendAllowed = window.location.href.split('/').indexOf('Phenopacket') < 0; //If the user is in Phenopacket uploader appending data to the source is the same as reprocessing.
 
 $(document).ready(function() {
+
     param = $('#source_id').val();
     reloadTable(param,true);
 
@@ -79,8 +81,19 @@ function reloadTable(param,first) {
                     $('#file_' + response.Files[i].ID).append("<td><a href='#' data-toggle='tooltip' data-html='true' data-placement='top' title='" + ErrorString + "'><i class='fa fa-exclamation-triangle text-warning'></i></a> </td>");
                     ///*If Errors, Display*/$('#file_' + response.Files[i].ID).append("<td>"+ response.Files[i].uploadStart +"</td> <td>"+ response.Files[i].uploadEnd+"</td><td>"+ response.Files[i].ID +" error(s) <hr/><i class='fa fa-exclamation-triangle text-warning'></i> " + ErrorString + " </td> <td style='text-align:center'><a href='#' data-toggle='tooltip' data-placement='bottom' title='There was an error processing this file. Fix the issues and try again.'> <i class='fa fa-exclamation text-danger'>   </i>  </a></td>");
                 }
-                $('#file_' + response.Files[i].ID).append("<td id='action-" + response.Files[i].ID + "'><a href='#' data-toggle='tooltip' data-placement='top' title='Remove Records and Re-process File' class='reprocess' onclick='processFile(" + response.Files[i].ID + ", 1)'><i class='fa fa-redo-alt text-info'></i></a> <a href='#' data-toggle='tooltip' data-placement='top' title='Re-process File and Append Records' onclick='processFile(" + response.Files[i].ID + ", 0)'><i class='fa fa-sync-alt text-warning'></i></a></td>");
+
+                actionStr = "<td id='action-" + response.Files[i].ID + "'><a href='#' data-toggle='tooltip' data-placement='top' title='Remove Records and Re-process File' class='reprocess' onclick='processFile(" + response.Files[i].ID + ", 1)'><i class='fa fa-redo-alt text-info'></i></a>";
+                
+                if(appendAllowed){
+                    actionStr += " <a href='#' data-toggle='tooltip' data-placement='top' title='Re-process File and Append Records' class='append' onclick='processFile(" + response.Files[i].ID + ", 0)'><i class='fa fa-sync-alt text-warning'></i></a>";
+                } 
+
+                actionStr += "</td>";
+
+                $('#file_' + response.Files[i].ID).append(actionStr);
+
             }  
+
             filesDt();  
             $(window).scrollTop(currentscroll);  
             $('[data-toggle="tooltip"]').tooltip();
@@ -99,5 +112,42 @@ function filesDt() {
         //"aLengthMenu": [[5, 10, 25, 50, 100, 200, -1], [5, 10, 25, 50, 100, 200, "All"]]
         } );        
     }
+}
 
+function processFile(fileId, overwrite) {
+
+    var fileData = new FormData();
+    fileData.append('fileId', fileId.toString());
+    fileData.append('overwrite', overwrite.toString());
+    fileData.append('uploader', $('#uploader').val());
+
+    $.ajax({
+        type: "POST",  
+        url: baseurl+'AjaxApi/processFile',
+        data: fileData,
+        dataType: "json", 
+        contentType: false,
+        processData: false,   
+        success: function(response)  {
+            $.notify({
+                // options
+                message: 'Task started.'
+              },{
+                // settings
+                timer: 200
+            });
+            id = $('#source_id').val();
+            $('[data-toggle="tooltip"]').tooltip('hide');
+            reloadTable(id,false);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $.notify({
+                // options
+                message: 'There was an error.'
+              },{
+                // settings
+                timer: 200
+            });
+        }
+    });
 }

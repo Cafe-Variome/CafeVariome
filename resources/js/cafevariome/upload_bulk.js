@@ -154,39 +154,3 @@ $('#dataFile').on('change',function(){
     $(this).next('.custom-file-label').html(fileName);
 })
 
-function processFile(fileId, overwrite) {
-
-    var fileData = new FormData();
-    fileData.append('fileId', fileId.toString());
-    fileData.append('overwrite', overwrite.toString());
-
-    $.ajax({
-        type: "POST",  
-        url: baseurl+'AjaxApi/processFile',
-        data: fileData,
-        dataType: "json", 
-        contentType: false,
-        processData: false,   
-        success: function(response)  {
-            $.notify({
-                // options
-                message: 'Task started.'
-              },{
-                // settings
-                timer: 200
-            });
-            id = $('#source_id').val();
-            $('[data-toggle="tooltip"]').tooltip('hide');
-            reloadTable(id,false);
-        },
-        error: function(jqXHR, textStatus, errorThrown) {
-            $.notify({
-                // options
-                message: 'There was an error.'
-              },{
-                // settings
-                timer: 200
-            });
-        }
-    });
-}
