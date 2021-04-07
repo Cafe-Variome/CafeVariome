@@ -618,5 +618,16 @@ use CodeIgniter\Database\ConnectionInterface;
         }    	
     }
 
+    public function getSourceIdByFileId(int $file_id): int
+    {
+        $this->builder = $this->db->table($this->table);
+        $this->builder->select('source_id');
+        $this->builder->where('ID', $file_id);
+
+        $query = $this->builder->get()->getResultArray();
+
+        return count($query) == 1 ? $query[0]['source_id'] : -1;
+    }
+
  }
  
