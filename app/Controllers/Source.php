@@ -293,7 +293,7 @@ class Source extends CVUI_Controller{
         $uidata->data['source_id'] = $source_id;
         $uidata->data['title'] = "Edit Source";
 
-        $networkModel = new \App\Models\Network($this->db);
+        $networkModel = new \App\Models\Network();
 
         $networkGroups = $networkModel->getNetworkGroupsForInstallation();
 
