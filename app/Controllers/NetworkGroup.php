@@ -41,9 +41,9 @@ class NetworkGroup extends CVUI_Controller{
 		parent::initController($request, $response, $logger);
 		
 		$this->validation = Services::validation();
-		$this->networkModel = new Network($this->db);
+		$this->networkModel = new Network();
 		$this->networkGroupModel = new \App\Models\NetworkGroup();
-
+        $this->userModel = new User();
 	}
 	
 	public function Index(){
@@ -189,9 +189,7 @@ class NetworkGroup extends CVUI_Controller{
     public function Delete(int $id){
 		$uidata = new UIData();
 		$uidata->title = "Delete Network Group";
-		// insert csrf check
 		$uidata->data['group_id'] = $id;
-		$uidata->data['csrf'] = $this->_get_csrf_nonce();
 
 		$uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
@@ -242,16 +240,148 @@ class NetworkGroup extends CVUI_Controller{
 		
 	}
 
-	function _get_csrf_nonce()
-	{
-		helper('text');
+	function Update_Users(int $id, $isMaster = false) {
 
-		$key   = random_string('alnum', 8);
-		$value = random_string('alnum', 20);
-		$this->session->setFlashdata('csrfkey', $key);
-		$this->session->setFlashdata('csrfvalue', $value);
+        $uidata = new UIData();
+        $uidata->title = "Edit User Network Groups";
+        $uidata->stickyFooter = false;
+        if ($this->request->getPost()){
 
-		return array($key => $value);
-	}
+            $uidata->data['selectedUsers'] = $this->request->getVar('users') ? $this->request->getVar('users') :[];
+            $uidata->data['selectedSources'] = $this->request->getVar('sources') ? $this->request->getVar('sources') :[];
+            $name = $this->request->getVar('name');
+
+            if ($this->request->getVar('users')) {
+
+                $group_id = $this->request->getVar('id');
+                $installation_key = $this->request->getVar('installation_key');
+
+                try {
+                    $this->networkModel->deleteAllUsersFromNetworkGroup($group_id);
+                    $network_key = $this->networkModel->getNetworkKeybyGroupId($group_id);
+    
+                    foreach ($this->request->getVar('users') as $user_id)
+                    {
+                        $this->networkModel->addUserToNetworkGroup($user_id, $group_id, $installation_key, $network_key);
+                    }
+    
+                    $this->networkModel->deleteUserFromAllOtherNetworkGroups($network_key, $this->request->getVar('users'));
+                    $this->setStatusMessage("Granted users list was updated for '$name'.", STATUS_SUCCESS);
+
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem updating granted users list for '$name'.", STATUS_ERROR);
+                }
+            }
+            else {
+                // No groups selected so remove the user from all network groups
+                $group_id = $this->request->getVar('id');
+                $isMaster = $this->request->getVar('isMaster');
+                $installation_key =  $this->request->getVar('installation_key');
+                try {
+                    $this->networkModel->deleteAllUsersFromNetworkGroup($group_id, $isMaster);
+                    $this->setStatusMessage("Granted users list was updated for '$name'.", STATUS_SUCCESS);
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem removing all users from the list of granted users for '$name'.", STATUS_ERROR);
+                }
+            }
+            if ($this->request->getVar('sources')) {
+                $group_id = $this->request->getVar('id');
+                $installation_key = $this->request->getVar('installation_key');
+
+                try {
+                    $this->networkModel->deleteAllSourcesFromNetworkGroup($group_id, $installation_key);
+
+                    foreach ($this->request->getVar('sources') as $source_id)
+                    {
+                        $this->networkModel->addSourceToNetworkGroup($source_id, $group_id, $installation_key);
+                    }
+                    $this->setStatusMessage("Granted sources list was updated for '$name'.", STATUS_SUCCESS, true);
+
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem updating granted sources list for '$name'.", STATUS_ERROR, true);
+                }
+            }
+            else { 
+                // No groups selected so remove the user from all network groups
+                $group_id = $this->request->getVar('id');
+                $installation_key = $this->request->getVar('installation_key');
+                try {
+                    $this->networkModel->deleteAllSourcesFromNetworkGroup($group_id, $installation_key);
+                    $this->setStatusMessage("Granted sources list was updated for '$name'.", STATUS_SUCCESS, true);
+
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem removing all sources from the list of granted sources for '$name'.", STATUS_ERROR, true);
+                }
+            }
+    
+			return redirect()->to(base_url($this->controllerName.'/List'));            
+        }
+        else{
+
+            $uidata->data['user_id'] = $id;
+    
+            //set the flash data error message if there is one
+            $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+            $users = $this->userModel->getUsers();
+            $selectedUsers = $this->networkModel->getNetworkGroupUsers($id);
+            $group_details = $this->networkModel->getNetworkGroup($id);
+            $uidata->data['name'] = $group_details['name'];   
+            $uidata->data['group_type'] = $group_details['group_type']; 
+    
+            $sourceModel = new Source();
+    
+            $sources = $sourceModel->getSources();
+            $selectedSources = $sourceModel->getSourceId($id);
+
+            $sourcesList = [];
+            $selectedSourcesList = [];
+
+            foreach ($sources as $source) {
+                $sourcesList[$source['source_id']] = $source['name'];
+            }
+
+            foreach ($selectedSources as $selectedSource) {
+                array_push($selectedSourcesList, $selectedSource['source_id']);
+            }
+
+            $uidata->data['sources'] = $sourcesList;
+            $uidata->data['selectedSources'] = $selectedSourcesList;
+            
+            $usersList = [];
+            $selectedUsersList = [];
+
+            foreach ($users as $user) {
+                $usersList[$user['id']] = $user['email'];
+            }
+
+            foreach ($selectedUsers as $user) {
+                for($i = 0; $i < count($users); $i++) {
+                    if($user['id'] == $users[$i]['id']) {
+                        array_push($selectedUsersList, $user['id']);
+                    }
+                }
+            }
+
+            $uidata->data['users'] = $usersList;
+            $uidata->data['selectedUsers'] = $selectedUsersList;   
+            
+            $uidata->data['remote_user_email'] = array(
+                'name' => 'remote_user_email',
+                'id' => 'remote_user_email',
+                'type' => 'text',
+                'class' => 'form-control',
+                'value' =>set_value('remote_user_email'),
+            );
+            
+            $uidata->data['isMaster'] = ($isMaster ? $isMaster : 0);
+            $uidata->data['user_id'] = $id;
+            $uidata->data['installation_key'] = $this->setting->getInstallationKey();
+    
+            $uidata->javascript = array(JS."cafevariome/network.js", JS."cafevariome/components/transferbox.js");
+    
+            $data = $this->wrapData($uidata);
+            return view($this->viewDirectory.'/Update_Users', $data);
+        }
+    }
 
 }
