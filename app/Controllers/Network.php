@@ -41,8 +41,8 @@ class Network extends CVUI_Controller{
         parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-        $this->networkModel = new \App\Models\Network($this->db);
-        $this->userModel = new \App\Models\User($this->db);
+        $this->networkModel = new \App\Models\Network();
+        $this->userModel = new \App\Models\User();
     }
 
     public function index(){
@@ -261,8 +261,6 @@ class Network extends CVUI_Controller{
         else{
 
             $uidata->data['user_id'] = $id;
-            //display the edit user form
-            $uidata->data['csrf'] = $this->_get_csrf_nonce();
     
             //set the flash data error message if there is one
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
@@ -569,15 +567,4 @@ class Network extends CVUI_Controller{
         }
     }
 
-    function _get_csrf_nonce()
-	{
-        helper('text');
-
-		$key   = random_string('alnum', 8);
-		$value = random_string('alnum', 20);
-		$this->session->setFlashdata('csrfkey', $key);
-		$this->session->setFlashdata('csrfvalue', $value);
-
-		return array($key => $value);
-	}
 }

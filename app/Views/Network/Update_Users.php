@@ -28,24 +28,6 @@
 <?php echo form_open($controllerName.'/Update_Users/' . $user_id . '/' . $isMaster, ['name' => 'editUser']); ?>
 <?php echo form_hidden(['installation_key' => $installation_key]); ?>  
 
-<!-- <div class="form-group row">
-	<div class="col-2">
-		<?php echo form_label('Remote User Email', 'remote_user_email'); ?>
-	</div>
-	<div class="col-8">
-		<?php echo form_input($remote_user_email); ?>
-	</div>
-	<div class="col-2">
-		<button type="button" onclick="addRemoteUser()">Add User</button>
-	</div>
-</div>
-<div class="row">
-	<div class="col">
-		<h4 style="padding-top: 10px;">Users</h4>   
-		<p> (R) signifies the user is a Remote user.</p>
-	</div>    
-</div> -->
-
 <div class="form-group row">
 	<div class=col-6>
 		<?php echo form_label('Users Granted Access', 'users'); ?>
@@ -66,7 +48,6 @@
 <?php echo form_hidden('isMaster', $isMaster); ?>                
 <?php echo form_hidden('name', $name); ?>                
 <?php echo form_hidden('id', $user_id); ?>
-<?php echo form_hidden($csrf); ?>
 <div class="form-group row">
 	<div class="col">
 		<button type="submit" name="submit" class="btn btn-primary" onclick="edit_user_network_groups_sources();">
