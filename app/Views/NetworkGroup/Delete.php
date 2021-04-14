@@ -30,7 +30,6 @@
         <label for="confirm" class="form-check-label">No</label>
     </div>
 </div>
-<?php echo form_hidden($csrf); ?>
 <?php echo form_hidden(array('id' => $group_id)); ?>
 
 <br/>
