@@ -1,14 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 4.9.7deb1bionic1
+-- version 5.0.4deb1+bionic9
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Nov 13, 2020 at 03:23 PM
--- Server version: 5.7.32-0ubuntu0.18.04.1
--- PHP Version: 7.4.12
+-- Generation Time: Apr 13, 2021 at 02:13 PM
+-- Server version: 5.7.33-0ubuntu0.18.04.1
+-- PHP Version: 7.4.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET AUTOCOMMIT = 0;
 START TRANSACTION;
 SET time_zone = "+00:00";
 
@@ -105,7 +104,7 @@ CREATE TABLE `networks` (
 --
 
 CREATE TABLE `network_groups` (
-  `id` mediumint(8) UNSIGNED NOT NULL,
+  `id` int(11) UNSIGNED NOT NULL,
   `name` varchar(100) NOT NULL,
   `description` varchar(100) NOT NULL,
   `network_key` int(11) NOT NULL,
@@ -120,11 +119,11 @@ CREATE TABLE `network_groups` (
 --
 
 CREATE TABLE `network_groups_sources` (
-  `id` mediumint(8) UNSIGNED NOT NULL,
-  `source_id` mediumint(8) UNSIGNED NOT NULL,
-  `group_id` mediumint(8) UNSIGNED NOT NULL,
-  `installation_key` varchar(100) NOT NULL,
-  `network_key` varchar(100) NOT NULL
+  `id` int(11) UNSIGNED NOT NULL,
+  `source_id` int(11) UNSIGNED NOT NULL,
+  `group_id` int(11) UNSIGNED NOT NULL,
+  `installation_key` varchar(32) NOT NULL,
+  `network_key` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
@@ -165,7 +164,7 @@ CREATE TABLE `pages` (
 --
 
 INSERT INTO `pages` (`id`, `Title`, `Content`, `Author`, `Active`, `Removable`) VALUES
-(1, 'Home', '<div class=\"&quot;row\">\r\n<div class=\"col\">\r\n<table style=\"border-collapse: collapse; width: 100%;\" border=\"0\">\r\n<tbody>\r\n<tr>\r\n<td style=\"width: 50%;\">\r\n<h3>What is Cafe Variome?</h3>\r\n<p>Cafe Variome is a flexible web-based, data discovery tool that can be quickly installed by any biomedical data owner to enable the &ldquo;existence&rdquo; rather than the &ldquo;substance&rdquo; of the data to be discovered.</p>\r\n<h3>What data is Cafe Variome designed for?</h3>\r\n<p>Cafe Variome has been designed for use with all sensitive biomedical data, whether this be genomic variants or cohort data.</p>\r\n<p>For full details please look at the <a href=\"https://www.cafevariome.org/about#Data\"> data section</a>.</p>\r\n<h3>Who is cafe Variome designed for?</h3>\r\n<p>Cafe Variome is designed for owners of sensitive biomedical data who would like to make their data discoverable but don\'t want to risk exposing the content to the outside world. This is not limited to individual institutions, federated Cafe Variome networks can be setup by consortia.</p>\r\n</td>\r\n<td style=\"width: 50%;\">\r\n<h3>Want to explore a Cafe Variome installation to learn more?</h3>\r\n<a href=\"https://central.cafevariome.org\" target=\"_blank\" rel=\"noopener\"><img class=\"img-responsive center-block\" style=\"max-width: 300px;\" title=\"Cafe Variome Central\" src=\"https://www.cafevariome.org/assets/images/CVLogos/cvc_transparent.png\" alt=\"Cafe Variome Central\" data-toggle=\"tooltip\" /></a>\r\n<h3>Take a look through <a href=\"https://central.cafevariome.org\" target=\"_blank\" rel=\"noopener\"> Cafe Variome Central</a>, our installation created from publicly available datasets.</h3>\r\n</td>\r\n</tr>\r\n<tr>\r\n<td style=\"width: 50%;\">&nbsp;</td>\r\n<td style=\"width: 50%;\">&nbsp;</td>\r\n</tr>\r\n</tbody>\r\n</table>\r\n</div>\r\n</div>', 1, b'1', b'0'),
+(1, 'Home', '<div class=\"&quot;row\">\r\n<h3>What is Cafe Variome?</h3>\r\n<p>Cafe Variome is a flexible web-based, data discovery tool that can be quickly installed by any biomedical data owner to enable the &ldquo;existence&rdquo; rather than the &ldquo;substance&rdquo; of the data to be discovered.</p>\r\n<p>&nbsp;</p>\r\n<h3>What data is Cafe Variome designed for?</h3>\r\n<p>Cafe Variome has been designed for use with all sensitive biomedical data, whether this be genomic variants or cohort data.</p>\r\n<p>For full details please look at the <a href=\"https://www.cafevariome.org/about#Data\"> data section</a>.</p>\r\n<h3>Who is cafe Variome designed for?</h3>\r\n<p>Cafe Variome is designed for owners of sensitive biomedical data who would like to make their data discoverable but don\'t want to risk exposing the content to the outside world. This is not limited to individual institutions, federated Cafe Variome networks can be setup by consortia.</p>\r\n</div>', 1, b'1', b'0'),
 (2, 'Contact', '', 1, b'1', b'0');
 
 -- --------------------------------------------------------
@@ -196,15 +195,15 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 (23, 'allow_registrations', 'on', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'required'),
 (29, 'discovery_requires_login', 'off', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'required'),
 (30, 'show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'required'),
-(32, 'auth_server', '', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'required'),
-(33, 'installation_key', '', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'required'),
+(32, 'auth_server', 'http://localhost/cvnet/', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'required'),
+(33, 'installation_key', 'e9dc0637853ae6748b4d3983630710b8', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'required'),
 (65, 'logo', 'cafevariome_full.png', 'Main Logo', 'Main Logo', 'required|xss_clean'),
-(50, 'oidc_uri', '', 'OpenID Server Address', 'URI for keycloak authentication server', 'required'),
-(51, 'oidc_realm', '', 'Realm Name', '', 'required'),
-(52, 'oidc_client_id', '', 'Client ID', '', 'required'),
-(53, 'oidc_client_secret', '', 'Client Secret', '', 'required'),
-(54, 'oidc_login_uri', '', 'Login URI', '', 'required'),
-(56, 'oidc_port', '', 'Port', '', 'required'),
+(50, 'oidc_uri', 'https://www423.lamp.le.ac.uk/auth', 'OpenID Server Address', 'URI for keycloak authentication server', 'required'),
+(51, 'oidc_realm', 'ERN', 'Realm Name', '', 'required'),
+(52, 'oidc_client_id', 'my-client', 'Client ID', '', 'required'),
+(53, 'oidc_client_secret', '65301ba7-ddfe-4844-a5b4-ddb1e37861ac', 'Client Secret', '', 'required'),
+(54, 'oidc_login_uri', 'http://localhost/cv/auth/login', 'Login URI', '', 'required'),
+(56, 'oidc_port', '80', 'Port', '', 'required'),
 (57, 'elastic_url', 'http://localhost:9200', 'Elasticsearch Address', 'Elastic search address', 'required'),
 (58, 'key_cloak_admin_id', 'f02288f5-1c48-4be0-9868-179028a77f8a', 'Keycloak Admin Id', 'Admin user id within key cloak server', 'required'),
 (59, 'key_cloak_admin_username', 'admin', 'Keycloak Admin Username', 'Admin user username within key cloak server', 'required'),
@@ -221,7 +220,7 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 --
 
 CREATE TABLE `sources` (
-  `source_id` int(11) NOT NULL,
+  `source_id` int(11) UNSIGNED NOT NULL,
   `owner_name` text NOT NULL,
   `email` text NOT NULL,
   `name` varchar(30) NOT NULL,
@@ -241,18 +240,6 @@ CREATE TABLE `sources` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `sources_groups`
---
-
-CREATE TABLE `sources_groups` (
-  `id` mediumint(8) UNSIGNED NOT NULL,
-  `source_id` mediumint(8) UNSIGNED NOT NULL,
-  `group_id` mediumint(8) UNSIGNED NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `uploaddatastatus`
 --
 
@@ -263,8 +250,8 @@ CREATE TABLE `uploaddatastatus` (
   `Status` varchar(20) NOT NULL,
   `elasticStatus` varchar(20) NOT NULL,
   `source_id` int(11) NOT NULL,
-  `user_id` mediumint(8) UNSIGNED NOT NULL,
-  `ID` mediumint(8) UNSIGNED NOT NULL,
+  `user_id` int(11) UNSIGNED NOT NULL,
+  `ID` int(11) UNSIGNED NOT NULL,
   `patient` varchar(50) DEFAULT NULL,
   `tissue` varchar(50) DEFAULT NULL,
   `setting_file` varchar(50) DEFAULT NULL
@@ -333,7 +320,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `email`, `activation_selector`, `activation_code`, `forgotten_password_selector`, `forgotten_password_code`, `forgotten_password_time`, `remember_selector`, `remember_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`, `is_admin`, `token`, `remote`) VALUES
-(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1604074674, 1, 'Admin', 'Admin', 'Brookes Lab', '07000000000', 1, NULL, 0);
+(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1610638048, 1, 'Admin', 'Admin', 'Brookes Lab', '', 1, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -352,7 +339,8 @@ CREATE TABLE `users_groups` (
 --
 
 INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
-(36, 1, 1);
+(38, 1, 1),
+(39, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -361,9 +349,9 @@ INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
 --
 
 CREATE TABLE `users_groups_networks` (
-  `id` mediumint(8) UNSIGNED NOT NULL,
-  `user_id` mediumint(8) UNSIGNED NOT NULL,
-  `group_id` mediumint(8) UNSIGNED NOT NULL,
+  `id` int(11) UNSIGNED NOT NULL,
+  `user_id` int(11) UNSIGNED NOT NULL,
+  `group_id` int(11) UNSIGNED NOT NULL,
   `installation_key` varchar(100) NOT NULL,
   `network_key` int(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -459,14 +447,6 @@ ALTER TABLE `sources`
   ADD KEY `type` (`type`);
 
 --
--- Indexes for table `sources_groups`
---
-ALTER TABLE `sources_groups`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `source_id` (`source_id`),
-  ADD KEY `group_id` (`group_id`);
-
---
 -- Indexes for table `uploaddatastatus`
 --
 ALTER TABLE `uploaddatastatus`
@@ -509,8 +489,7 @@ ALTER TABLE `users_groups`
 ALTER TABLE `users_groups_networks`
   ADD PRIMARY KEY (`id`),
   ADD KEY `source_id` (`user_id`),
-  ADD KEY `group_id` (`group_id`),
-  ADD KEY `NetworkKey_FK` (`network_key`);
+  ADD KEY `group_id` (`group_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -544,13 +523,13 @@ ALTER TABLE `menu_items`
 -- AUTO_INCREMENT for table `network_groups`
 --
 ALTER TABLE `network_groups`
-  MODIFY `id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `network_groups_sources`
 --
 ALTER TABLE `network_groups_sources`
-  MODIFY `id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `network_requests`
@@ -574,19 +553,13 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `sources`
 --
 ALTER TABLE `sources`
-  MODIFY `source_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `sources_groups`
---
-ALTER TABLE `sources_groups`
-  MODIFY `id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `source_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `uploaddatastatus`
 --
 ALTER TABLE `uploaddatastatus`
-  MODIFY `ID` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `ID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `upload_error`
@@ -604,19 +577,19 @@ ALTER TABLE `upload_jobs`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users_groups`
 --
 ALTER TABLE `users_groups`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `users_groups_networks`
 --
 ALTER TABLE `users_groups_networks`
-  MODIFY `id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -629,10 +602,11 @@ ALTER TABLE `menu_items`
   ADD CONSTRAINT `Page_FK` FOREIGN KEY (`Page_Id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `network_groups`
+-- Constraints for table `network_groups_sources`
 --
-ALTER TABLE `network_groups`
-  ADD CONSTRAINT `NetworkKey_NetworkGroup_FK` FOREIGN KEY (`network_key`) REFERENCES `networks` (`network_key`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `network_groups_sources`
+  ADD CONSTRAINT `NetworkGroupIDFK` FOREIGN KEY (`group_id`) REFERENCES `network_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `SourceIDFK` FOREIGN KEY (`source_id`) REFERENCES `sources` (`source_id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `network_requests`
@@ -657,7 +631,8 @@ ALTER TABLE `users_groups`
 -- Constraints for table `users_groups_networks`
 --
 ALTER TABLE `users_groups_networks`
-  ADD CONSTRAINT `NetworkKey_FK` FOREIGN KEY (`network_key`) REFERENCES `networks` (`network_key`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `GroupIDFK` FOREIGN KEY (`group_id`) REFERENCES `network_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `UserFK` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
