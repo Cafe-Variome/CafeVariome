@@ -218,7 +218,6 @@ class Elastic extends Model{
     {
         $title = $this->setting->settingData['site_title'];
         $title = preg_replace("/\s.+/", '', $title);
-        $title = strtolower($title);
 
         $baseUrl = base_url();
         if(strpos($baseUrl, "http://") !== false){
@@ -232,6 +231,6 @@ class Elastic extends Model{
 
         $prefix = count($segments) > 0 ? $segments[1] : $title;
  
-        return $prefix;
+        return strtolower($prefix);
     }
 }
