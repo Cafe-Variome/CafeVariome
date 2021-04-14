@@ -21,6 +21,9 @@ class Network extends Model{
     protected $builder;
 
     protected $primaryKey = 'network_key';
+
+	private $setting;
+	private $networkGroupModel;
 	
 	public function __construct(ConnectionInterface &$db = Null){
 
@@ -30,8 +33,9 @@ class Network extends Model{
         else {
             $this->db = \Config\Database::connect();
 		}
-		$this->setting =  Settings::getInstance($this->db);
 
+		$this->setting =  Settings::getInstance();
+		$this->networkGroupModel = new NetworkGroup();
 	}
 
 	/**
@@ -311,9 +315,19 @@ class Network extends Model{
 		}
 	}	
 
-	function deleteSourceFromInstallationFromAllNetworkGroups($source_id) {
+	function deleteSourceFromNetworkGroups(int $source_id, bool $delete_master = false) {
+
+		$masterNetworkGroupIds = $this->networkGroupModel->getMasterNetworkGroupsBySourceId($source_id);
+		
 		$this->builder = $this->db->table('network_groups_sources');
-		$this->builder->where('source_id',$source_id);
+
+		if (!$delete_master) {
+			$this->builder->whereNotIn('group_id', $masterNetworkGroupIds);
+
+		}
+
+		$this->builder->where('source_id', $source_id);
+
 		$this->builder->delete();
 	}
 
@@ -352,7 +366,7 @@ class Network extends Model{
 
 	function modify_current_network_groups_for_source_in_installation($source_id,$group_post_data) {
 		$installation_key = $this->setting->settingData['installation_key'];
-		$this->deleteSourceFromInstallationFromAllNetworkGroups($source_id, $installation_key);
+		$this->deleteSourceFromNetworkGroups($source_id);
 		if($group_post_data) {
 			foreach ( explode('|', $group_post_data) as $group ) {
 
