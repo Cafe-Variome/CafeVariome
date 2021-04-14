@@ -51,7 +51,7 @@
             <!-- Sidebar - Brand -->
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?= base_url('Home/Index') ?>">
                 <div class="sidebar-brand-icon rotate-n-15">
-                <img src="<?= base_url(IMAGES . "cafevariome/cafevariome_icon.png") ?>" />
+                    <img src="<?= base_url(IMAGES . "cafevariome/cafevariome_icon.png") ?>" />
                 </div>
                 <div class="sidebar-brand-text mx-2 text-gray-900"><?= $heading ?></div>
             </a>
@@ -211,70 +211,69 @@
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content">
 
-        <!-- Main Content -->
-        <div id="content">
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
 
-        <!-- Topbar -->
-        <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-            <!-- Sidebar Toggle (Topbar) -->
-            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                <i class="fa fa-bars"></i>
-            </button>
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= $auth->getName() ?></span>
+                            <img class="img-profile rounded-circle" src="<?= base_url(IMAGES. '/cafevariome/dashboard/user-icon.png') ?>" width="32" height="32">
+                        </a>
+                        <!-- Dropdown - User Information -->
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                            <?php if ($auth->getAuthEngineName() === "app\libraries\cafevariome\auth\keycloak"): ?>
+                            <a class="dropdown-item" href="<?= $setting->settingData['oidc_uri'] . "/realms/". $setting->settingData['oidc_realm'] ."/account/" ?>">
+                            <?php else : ?>
+                            <a class="dropdown-item" href="<?= base_url('Auth/Edit_User/'. $auth->getUserId()) ?>">
+                            <?php endif ?>
+                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                            Logout
+                            </a>
+                        </div>
+                        </li>
+                    </ul>
 
-            <!-- Topbar Navbar -->
-            <ul class="navbar-nav ml-auto">
-                <!-- Nav Item - User Information -->
-                <li class="nav-item dropdown no-arrow">
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= $auth->getName() ?></span>
-                    <img class="img-profile rounded-circle" src="<?= base_url(IMAGES. '/cafevariome/dashboard/user-icon.png') ?>" width="32" height="32">
-                </a>
-                <!-- Dropdown - User Information -->
-                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                    <?php if ($auth->getAuthEngineName() === "app\libraries\cafevariome\auth\keycloak"): ?>
-                    <a class="dropdown-item" href="<?= $setting->settingData['oidc_uri'] . "/realms/". $setting->settingData['oidc_realm'] ."/account/" ?>">
-                    <?php else : ?>
-                    <a class="dropdown-item" href="<?= base_url('Auth/Edit_User/'. $auth->getUserId()) ?>">
-                    <?php endif ?>
-                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Profile
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                    Logout
-                    </a>
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    <div class="content">
+                        <?= $this->renderSection('content') ?>
+                    </div>
                 </div>
-                </li>
-            </ul>
+                <!-- /.container-fluid -->
 
-        </nav>
-        <!-- End of Topbar -->
-
-        <!-- Begin Page Content -->
-        <div class="container-fluid">
-            <div class="content">
-                <?= $this->renderSection('content') ?>
             </div>
+            <!-- End of Main Content -->
+
+            <!-- Footer -->
+            <footer class="sticky-footer">
+                <div class="container my-auto">
+                    <div class="copyright text-center my-auto">
+                        <span>Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a> <br> Copyright &copy; <?= date("Y") . ', University of Leicester' ?> </span>
+                    </div>
+                </div>
+            </footer>
+            <!-- End of Footer -->
         </div>
-        <!-- /.container-fluid -->
-
-    </div>
-        <!-- End of Main Content -->
-
-        <!-- Footer -->
-        <footer class="sticky-footer">
-            <div class="container my-auto">
-                <div class="copyright text-center my-auto">
-                    <span>Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a> <br> Copyright &copy; <?= date("Y") . ', University of Leicester' ?> </span>
-                </div>
-            </div>
-        </footer>
-        <!-- End of Footer -->
-
         <!-- End of Content Wrapper -->
-
+    </div>
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->
