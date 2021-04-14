@@ -26,11 +26,17 @@ width: 100%;
 }
 main > .container {
   margin-top: 180px;
+  width: auto;
 }
 
+.footer{
+  left: 0;
+  right: 0;
+}
 .footer > .container {
 padding-right: 15px;
 padding-left: 15px;
+
 }
 
 .footer-sticky{
@@ -221,8 +227,8 @@ bottom: 0;
   height:100px;
   border-bottom: 2px solid #666666;
   position:absolute;
-
 }
+
 .navbar-brand{
   font-weight:bold;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
