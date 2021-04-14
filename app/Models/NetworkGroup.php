@@ -113,4 +113,22 @@ class NetworkGroup extends Model{
         $query = $this->builder->get()->getResultArray();
         return $query;
     }
+
+    public function getMasterNetworkGroupsBySourceId(int $source_id): array
+    {
+        $this->builder->select($this->table . '.id');
+        $this->builder->join('network_groups_sources', 'network_groups_sources.group_id = ' . $this->table . '.id');
+        $this->builder->where('network_groups_sources.source_id', $source_id);
+        $this->builder->where($this->table . '.group_type', 'master');
+
+        $query = $this->builder->get()->getResultArray();
+
+        $ids = [];
+
+        foreach ($query as $row) {
+            array_push($ids, $row['id']);
+        }
+        
+        return $ids;
+    }
  }
