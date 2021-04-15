@@ -228,9 +228,18 @@ use CodeIgniter\Config\Services;
                     $fileMan->Write("local_" . $network_key . "_hpo_ancestry.json", json_encode($hpoDataString));
                 }
             }
-    
-            $phen_data = json_decode($fileMan->Read("local_" . $network_key . ".json"), 1);
-            $hpo_data = json_decode($fileMan->Read("local_" . $network_key . "_hpo_ancestry.json"), 1);
+            
+            $phen_data = [];
+            $hpo_data = [];
+
+            if ($fileMan->Exists("local_" . $network_key . ".json")) {
+                $phen_data = json_decode($fileMan->Read("local_" . $network_key . ".json"), 1);
+            }
+
+            if ($fileMan->Exists("local_" . $network_key . "_hpo_ancestry.json")) {
+                $hpo_data = json_decode($fileMan->Read("local_" . $network_key . "_hpo_ancestry.json"), 1);
+            }
+            
             return json_encode([$phen_data, $hpo_data]);
         }
     }
