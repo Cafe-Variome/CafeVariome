@@ -115,7 +115,7 @@ class Discover extends CVUI_Controller{
         }
 
         $uidata->title = "Discover - Query Builder";
-        $uidata->css = array(VENDOR.'vakata/jstree/dist/themes/default/style.css', VENDOR.'components/jqueryui/themes/base/jquery-ui.css', CSS.'jquery.querybuilder.css', VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css', VENDOR. 'drmonty/datatables-buttons/css/buttons.dataTables.min.css');  
+        $uidata->css = array(VENDOR.'vakata/jstree/dist/themes/default/style.css', VENDOR.'components/jqueryui/themes/base/jquery-ui.css', CSS.'jquery.querybuilder.css', VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');  
 
         $uidata->stickyFooter = false;
 
