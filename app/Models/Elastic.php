@@ -229,7 +229,7 @@ class Elastic extends Model{
 
         $segments = explode('/', $baseUrl);
 
-        $prefix = count($segments) > 0 ? $segments[1] : $title;
+        $prefix = count($segments) > 1 ? $segments[1] : $title;
  
         return strtolower($prefix);
     }
