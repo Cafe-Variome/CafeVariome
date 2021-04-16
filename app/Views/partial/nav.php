@@ -1,5 +1,5 @@
 <nav class="navbar navbar-expand-md navbar-light fixed-top">
-	<!-- <img src="<?php echo base_url() . "resources/images/logos/" . $setting->settingData['logo'];?>"> -->
+	<!-- <img src="<?php echo base_url("resources/images/logos/") .'/' . $setting->settingData['logo'];?>"> -->
 	<div class="cv-logo-square">
 		<div class="mug-coffee">
 			<div class="smoke-container">
