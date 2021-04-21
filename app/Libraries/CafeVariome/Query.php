@@ -488,6 +488,18 @@ class Query extends CafeVariome{
 			case '<=':
 				$tmp[]['range'] = ['value.d' => [ 'lte' => $lookup['value']]];
 				break;
+            case 'dt>':
+				$tmp[]['range'] = ['value.dt' => [ 'gt' => $lookup['value']]];
+                break;
+            case 'dt>=':
+				$tmp[]['range'] = ['value.dt' => [ 'gte' => $lookup['value']]];
+                break;
+            case 'dt<':
+				$tmp[]['range'] = ['value.dt' => [ 'lt' => $lookup['value']]];
+                break;
+            case 'dt<=':
+				$tmp[]['range'] = ['value.dt' => [ 'lte' => $lookup['value']]];
+                break;
 
 		}	
 		$arr = [];		

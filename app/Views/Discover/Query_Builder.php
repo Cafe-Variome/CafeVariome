@@ -48,6 +48,11 @@
                             <option value=">">&gt;</option>
                             <option value="<=">&lt;=</option>
                             <option value=">=">&gt;=</option>
+                            <option value="---------------" disabled="">---------------</option>
+                            <option value="dt<">&lt; (Date)</option>
+                            <option value="dt>">&gt; (Date)</option>
+                            <option value="dt<=">&lt;= (Date)</option>
+                            <option value="dt>=">&gt;= (Date)</option>
                         </select>
                     </div>
                     <div class="col">
