@@ -246,7 +246,7 @@ class DataStream
                             "fields": 
                                 {"raw":{"type": "keyword"},
                                 "d":{"type": "double", "ignore_malformed": "true"},
-                                "dt":{"type": "date", "ignore_malformed": "true"}}}           
+                                "dt":{"type": "date", "ignore_malformed": "true", "format": "dateOptionalTime"}}}           
                     }  
                 }
             }';
