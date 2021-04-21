@@ -9,9 +9,7 @@
 <div class="row">
 	<div class="col">
 		<h4>Import records for <?php echo $source_name; ?></h3>
-		<p>Accepted file formats are tab delimited, csv & xlsx. </p>
-		<p><a id="headerInfo">Click me for a description of header rules to implement into your files.</a></p>
-
+		<p>Accepted file formats are comma delimited, CSV, XLS, and XLSX. </p>
 	</div>
 </div>
 
