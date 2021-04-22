@@ -24,7 +24,7 @@ class EAVDataInput extends DataInput
         $this->delete = $delete;
         $this->serviceInterface = new ServiceInterface();
 
-        $this->configuration = ['subject_id_column' => 'pseudonym',
+        $this->configuration = ['subject_id_column' => 'subject_id',
                                 'grouping_policy' => 0, // 0 -> separate all columns with <group_end>, 1 -> custom: define <group_end> positions
                                 'group_end_positions' => []
         ];
@@ -223,7 +223,7 @@ class EAVDataInput extends DataInput
                 $rc++;
             }
         }
-        
+
         return $rc;
     }
 
