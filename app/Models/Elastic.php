@@ -89,7 +89,7 @@ class Elastic extends Model{
 
     /**
      * VCF Wrap - We have finished inserting data for a VCF file and it is time to update the status table. 
-     *
+     * @deprecated
      * @param string $file   - The name of the file
      * @param int $source_id - The id of the source
      * @return N/A 
