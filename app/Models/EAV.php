@@ -114,7 +114,7 @@ class EAV extends Model{
 
     public function getORPHATerms(int $source_id)
     {
-        $this->builder = $this->db->table('eavs');
+        $this->builder = $this->db->table($this->table);
         $this->builder->select('subject_id, attribute, value');
         $this->builder->where('attribute', "Phenotype_ORPHA"); //Diagnosis
         $this->builder->where('source_id', $source_id);
@@ -164,7 +164,7 @@ class EAV extends Model{
 
     public function getHPOTermsForSources(array $source_ids)
     { 
-        $this->builder = $this->db->table('eavs');
+        $this->builder = $this->db->table($this->table);
         $this->builder->select('value');
         $this->builder->distinct();
         $this->builder->whereIn('source_id', $source_ids);
@@ -178,4 +178,51 @@ class EAV extends Model{
 		}
 		return $hpo_terms;
 	}
+
+    public function getUniqueAttributesAndValuesByFileIdAndSourceId(int $file_id, int $source_id)
+    {
+        $this->builder = $this->db->table($this->table);
+
+        $this->builder->select("attribute, value, count(*) AS count");
+        $this->builder->where("source_id", $source);
+        $this->builder->where("fileName",$file);
+        $this->builder->groupBy(["attribute","value"]);
+
+        $query = $this->builder->get()->getResultArray();
+
+        $data = [];
+        $attributeValueArray = [];
+
+        foreach ($query as $row) {
+            $data[] = $row;
+        }
+
+        $currAtt = "";
+        for ($i=0; $i < count($data); $i++) { 
+            if ($data[$i]["attribute"] != $currAtt){
+                $currAtt = $data[$i]["attribute"];
+                $attributeValueArray[$data[$i]["attribute"]] = array();
+                $attributeValueArray[$data[$i]["attribute"]][$data[$i]['value']] = $data[$i]['count'];
+            }
+            else {
+                $attributeValueArray[$data[$i]["attribute"]][$data[$i]['value']] = $data[$i]['count'];
+            }
+        }
+
+        return $attributeValueArray;
+    }
+
+    public function deleteRecordsBySourceId(int $source_id)
+    {
+        $this->builder = $this->db->table($this->table);
+        $this->builder->where('source_id', $source_id);
+        $this->builder->delete();
+    }
+
+    public function deleteRecordsByFileId(int $file_id)
+    {
+        $this->builder = $this->db->table($this->table);
+        $this->builder->where('fileName', $file_id);
+        $this->builder->delete();
+    }
 }
