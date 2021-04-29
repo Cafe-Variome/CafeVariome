@@ -21,13 +21,13 @@ class PhenoPacketDataInput extends DataInput
     private $meta;
     private $id;
 
-    private $overwrite;
+    private $delete;
     private $serviceInterface;
 
-    public function __construct(int $source_id, bool $overwrite)
+    public function __construct(int $source_id, int $delete)
     {
         parent::__construct($source_id);
-        $this->overwrite = $overwrite;
+        $this->delete = $delete;
         $this->serviceInterface = new ServiceInterface();
     }
 
@@ -44,11 +44,14 @@ class PhenoPacketDataInput extends DataInput
                 $fileContent = $this->fileMan->Read($file);
                 $this->data = json_decode($fileContent, true);
     
-                if ($this->overwrite) {
-                    $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data');
-
-                    $this->uploadModel->phenoPacketClear($this->sourceId, $file_id);
-                    $this->uploadModel->clearErrorForFile($file_id);
+                if ($this->delete == UPLOADER_DELETE_ALL && !$this->deleted) {		
+                    $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the source');
+                    $this->eavModel->deleteRecordsBySourceId($this->sourceId);
+                    $this->deleted = true;
+                }
+                else if($this->delete == UPLOADER_DELETE_FILE){
+                    $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
+                    $this->eavModel->deleteRecordsByFileId($this->sourceId);
                 }
 
                 $this->meta = null;
@@ -135,8 +138,8 @@ class PhenoPacketDataInput extends DataInput
         $this->sourceModel->updateSource(['record_count' => $totalRecordCount], ['source_id' => $this->sourceId]);
 
         // update status table to class current file as inserted to database
-        $this->uploadModel->insertStatistics($file_id, $this->sourceId);
-        $this->uploadModel->bigInsertWrap($file_id, $this->sourceId);
+        $this->dumpAttributesAndValues($file_id);
+        $this->uploadModel->markEndOfUpload($file_id, $this->sourceId);
 
         $this->sourceModel->unlockSource($this->sourceId);
 
