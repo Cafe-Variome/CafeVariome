@@ -24,6 +24,7 @@ use App\Models\Neo4j;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\DataStream;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\EAVDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\PhenoPacketDataInput;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\UniversalDataInput;
 use CodeIgniter\Config;
 
@@ -43,7 +44,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * @param string $source - Name of source update should be performed for
      * @return N/A
      */
-    public function phenoPacketInsertBySourceId(int $source_id, bool $overwrite = false) {
+    public function phenoPacketInsertBySourceId(int $source_id, int $overwrite = UPLOADER_DELETE_NONE) {
               
         $uploadModel = new Upload();
         $sourceModel = new Source();
@@ -74,7 +75,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * @param string $source - Name of source update should be performed for
      * @return N/A
      */
-    public function phenoPacketInsertByFileId(int $file_id, bool $overwrite = false) {
+    public function phenoPacketInsertByFileId(int $file_id, int $overwrite = UPLOADER_DELETE_FILE) {
               
         $uploadModel = new Upload();
         $sourceModel = new Source();
@@ -90,7 +91,6 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         } catch (\Exception $ex) {
             error_log($ex->getMessage());
         }
-
     }
 
     /**
@@ -121,12 +121,11 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         $title = $elasticModel->getTitlePrefix();
 
         for ($t=0; $t < count($vcf); $t++) { 
-            error_log("now doing ".$vcf[$t]['FileName']);
-            $index_name = $title."_".$source_id."_".strtolower($vcf[$t]['patient'])."";
+            $index_name = $title."_".$source_id."_".strtolower($vcf[$t]['patient']);
             if ($vcf[$t]['tissue']) {
                 $index_name = $index_name."_".strtolower($vcf[$t]['tissue']);
             }
-             error_log("Index name: ".$index_name);
+
             $params['index'] = $index_name;
             // return;
             if ($elasticClient->indices()->exists($params)){
@@ -185,11 +184,11 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                         $link = md5(uniqid());
                         // create parent document
                         //$bulk['body'][] = ["index"=>["_index"=>$index_name, "_type"=>"subject","_id"=>$link]];
-                        //$bulk['body'][] = ["record_id"=>$patient, "patient_id"=>$patient, "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_vcf"];
-                        $bulk_body_head = ["index"=>["_index"=>$index_name],"_id"=>$link];
-                        $bulk_body_tail = ["record_id"=>$patient, "patient_id"=>$patient, "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_vcf"];
+                        //$bulk['body'][] = ["patient_id"=>$patient, "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_vcf"];
+                        $bulk['body'][] = ["index"=>["_index"=>$index_name],"_id"=>$link];
+                        $bulk['body'][] = ["patient_id"=>$patient, "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_vcf"];
                         
-                        $bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
+                        //$bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
 
                         $counter++;
                         // Every thousand documents perform a bulk operation to ElasticSearch
@@ -208,12 +207,12 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                                     if (in_array($v[0], $config)) {
                                         $id = md5(uniqid());
                                         //$bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "routing"=>$link,"_id"=>$id]];
-                                        //$bulk['body'][] = ["record_id"=>$values[2], "patient_id"=> $patient,"attribute"=>$v[0],"value"=>$v[1], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                        //$bulk['body'][] = ["patient_id"=> $patient,"attribute"=>$v[0],"value"=>$v[1], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
                                         $bulk['routing'] = $link;
-                                        $bulk_body_head = ["index"=>["_index"=>$index_name],"_id"=>$id];
-                                        $bulk_body_tail = ["record_id"=>$values[2], "patient_id"=>$patient, "attribute"=>$v[0],"value"=>$v[1], "eav_rel"=>["name"=>"eav"], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                        $bulk['body'][] = ["index"=>["_index"=>$index_name],"_id"=>$id];
+                                        $bulk['body'][] = ["patient_id"=>$patient, "attribute"=>$v[0],"value"=>$v[1], "eav_rel"=>["name"=>"eav"], "type"=>"eav", "source"=>$source_name."_vcf"];
                                         
-                                        $bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
+                                        //$bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
 
                                         $counter++;	
                                         if ($counter % $chunkSize == 0) {      
@@ -231,12 +230,12 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                             else {
                                 $id = md5(uniqid());
                                 //$bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "routing"=>$link,"_id"=>$id]];
-                                //$bulk['body'][] = ["record_id"=>$patient, "patient_id"=> $patient,"attribute"=>$headers[$i],"value"=>$values[$i], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                //$bulk['body'][] = ["patient_id"=> $patient,"attribute"=>$headers[$i],"value"=>$values[$i], "eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
                                 $bulk['routing'] = $link;
-                                $bulk_body_head = ["index"=>["_index"=>$index_name],"_id"=>$id];
-                                $bulk_body_tail = ["record_id"=>$patient, "patient_id"=>$patient,"attribute"=>$headers[$i],"value"=>$values[$i],"eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
+                                $bulk['body'][] = ["index"=>["_index"=>$index_name],"_id"=>$id];
+                                $bulk['body'][] = ["patient_id"=>$patient,"attribute"=>$headers[$i],"value"=>$values[$i],"eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
                                 
-                                $bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);  
+                                //$bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);  
                                 
                                 $counter++;		
                                 if ($counter % $chunkSize == 0) {      
@@ -265,6 +264,38 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         }	
         error_log("toggling source lock on: ".$source_id);
         $sourceModel->unlockSource($source_id); 		      
+    }
+
+
+    public function vcfInsertBySourceId(int $source_id, int $overwrite = UPLOADER_DELETE_NONE)
+    {
+        $uploadModel = new Upload();
+        $vcfFiles = $uploadModel->getVCFFilesBySourceId($source_id);
+        $inputPipeLine = new VCFDataInput($source_id, $overwrite);
+
+        for ($i=0; $i < count($vcfFiles); $i++) { 
+            $file_id = $vcfFiles[$i]['ID'];
+
+            $inputPipeLine->absorb($file_id);
+            $inputPipeLine->save($file_id);
+        }
+    }
+
+    public function vcfInsertByFileId(int $file_id, int $overwrite = UPLOADER_DELETE_FILE)
+    {
+        $uploadModel = new Upload();
+        $sourceModel = new Source();
+
+        $source_id = $uploadModel->getSourceIdByFileId($file_id);
+
+        $inputPipeLine = new VCFDataInput($source_id, $overwrite);
+
+        try {
+            $inputPipeLine->absorb($file_id);
+            $inputPipeLine->save($file_id);
+        } catch (\Exception $ex) {
+            error_log($ex->getMessage());
+        }
     }
 
     /**
