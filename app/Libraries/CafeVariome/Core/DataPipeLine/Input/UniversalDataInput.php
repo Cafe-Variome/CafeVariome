@@ -38,7 +38,7 @@ class UniversalDataInput extends DataInput
                 $this->uploadModel->clearErrorForFile($fileId);
         
                 if ($this->delete == 1) {		
-                    $this->sourceModel->deleteSourceFromEAVs($this->sourceId);
+                    $this->eavModel->deleteRecordsBySourceId($this->sourceId);
                 }
                 
                 $this->filePath = $this->basePath . $file;
@@ -57,6 +57,6 @@ class UniversalDataInput extends DataInput
 
         $cmd = getcwd() . DIRECTORY_SEPARATOR . CV_CONVERT_BIN . ' -s ' . getcwd() . DIRECTORY_SEPARATOR . CV_CONVERT_SETTINGS_DIR . "'$this->settingFile' -i '$this->filePath' --source-id  $this->sourceId --log db -o db --db-config mysql://$mysql_username:$mysql_password@$mysql_host:$mysql_port/$mysql_database";
         $this->universalUploaderShellHelperInstance->runAsync($cmd);
-        $this->uploadModel->bigInsertWrap($file_id, $this->sourceId);
+        $this->uploadModel->markEndOfUpload($file_id, $this->sourceId);
     }
 }
