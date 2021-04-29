@@ -95,7 +95,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
     /**
      * VCF Elastic - Insert into ElasticSearch VCF Files
-     *
+     * @deprecated
      * Imported from elastic controller by Mehdi Mehtarizadeh (06/08/2019)
      *
      * 08/2019 Removal of mapping types 
