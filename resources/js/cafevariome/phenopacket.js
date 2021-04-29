@@ -64,8 +64,7 @@ $(document).ready(function() {
 							if (flag) {
 								counter = 0;
                                 id = $('#source_id').val();
-
-								$("#load").append('<div class="loading">Loading&#8230;</div>');
+								$('#uploadSpinner').show();
 								for (i = 0; i < $('#jsonFile')[0].files.length; i++) {
 									if (flag) {
 										var formData = new FormData();
@@ -113,8 +112,8 @@ $(document).ready(function() {
 											processData: false, 
 											success: function(response)  {
 												if (response == "Green") {
-													$("#load").empty();
-								      				$.notify({
+													$('#uploadSpinner').hide();
+													$.notify({
 								                        // options
 								                        message: 'Upload Complete. Now inserting into MySQL.'
 								                      },{
@@ -138,5 +137,5 @@ $(document).ready(function() {
 
 $('#jsonFile').on('change',function(){
     var files = $(this).prop('files');
-    $(this).next('.custom-file-label').html(files.length.toString() + ' files selected.');
+    $(this).next('.custom-file-label').html(files.length.toString() + ' file(s) selected.');
 })
