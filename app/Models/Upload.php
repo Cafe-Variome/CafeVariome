@@ -64,6 +64,11 @@ use CodeIgniter\Database\ConnectionInterface;
         return $query; 
     }
 
+    public function getFileById(int $file_id)
+    {
+        return $this->getFiles(null, ['ID' => $file_id]);
+    }
+
     /**
      * createUpload - Perform Initial insert into UploadDataStatus table
      * to keep track of uploaded file
@@ -269,23 +274,6 @@ use CodeIgniter\Database\ConnectionInterface;
     }
 
     /**
-     * Pheno Packet Clear - Delete any data for given source_id/file_name combo in eavs table
-     * Aimed at PhenoPacket Data
-     *
-     * @param int $source_id - The source_id we want to delete from
-     * @param string $file   - The File name we want to delte from
-     * @return N/A
-     */
-    public function phenoPacketClear($source_id,$file){
-
-        $this->builder = $this->db->table('eavs');
-
-        $this->builder->where('source_id', $source_id);
-        $this->builder->where('fileName', $file);
-        $this->builder->delete();
-    }
-
-    /**
      * Clear Error For File - Remove any errors for a file which has been reuploaded so that
      * we produce a list which is relevant only for that upload
      *
@@ -434,6 +422,7 @@ use CodeIgniter\Database\ConnectionInterface;
 
     /**
      * Moved to upload model by Mehdi Mehtarizadeh (02/08/2019)
+     * @deprecated
      */
     public function insertStatistics($file, $source) {
         $this->builder = $this->db->table('eavs');
@@ -481,32 +470,20 @@ use CodeIgniter\Database\ConnectionInterface;
      * 
      * @param string $file   - The file we just finished uploading
      * @param int $source_id - The ID of the source we have uploaded to
-     * @return N/A
+     * @return void
      */
-    public function bigInsertWrap($file, $source_id) {
-        #This function updates the UploadDataStatus table once the sql insert is complete
+    public function markEndOfUpload(int $file_id, int $source_id, string $status = 'Success') {
 
         $this->builder = $this->db->table($this->table);
-        $query = $this->builder->get()->getResultArray();
-        #set sql entries
-        $now = date('Y-m-d H:i:s');
-        $uploadEnd = $now;
-        $Status = "Success";
+
+        $uploadEnd = date('Y-m-d H:i:s');
         $data = [
-            'uploadEnd' => $now,
-            'Status' => $Status,
+            'uploadEnd' => $uploadEnd,
+            'Status' => $status,
             'elasticStatus' => 'Fresh'];
-        $this->builder = $this->db->table($this->table);
-        $this->builder->where('ID', $file);
+
+        $this->builder->where('ID', $file_id);
         $this->builder->update($data);
-
-        $this->builder = $this->db->table('sources');
-
-        $data = [
-            'elastic_status' => 1];
-        $this->builder->where('source_id', $source_id);
-        $this->builder->update($data);
-
     }
 
     /**
@@ -616,6 +593,28 @@ use CodeIgniter\Database\ConnectionInterface;
         else {
             return false;
         }    	
+    }
+
+    /**
+     * getVCFFilesBySourceId - Get a list of all pending VCF files to add to MySQL for a given source
+     *
+     * @param int $source_id - The id of the source
+     * @return array $query    - Full details needed for all VCF Files
+     */
+    function getVCFFilesBySourceId(int $source_id, bool $pending = true)
+    {
+        $this->builder = $this->db->table($this->table);
+        $this->builder->select('ID, FileName, tissue, patient');
+        $this->builder->like('FileName', '.vcf', 'before'); 
+        $this->builder->where('source_id', $source_id);
+
+        if ($pending) {
+            $this->builder->where('Status', 'Pending');
+        }
+
+        $query = $this->builder->get()->getResultArray();
+
+        return $query;
     }
 
     public function getSourceIdByFileId(int $file_id): int
