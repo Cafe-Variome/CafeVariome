@@ -25,11 +25,14 @@ $(document).ready(function() {
 		var ajaxData = new FormData(this);
 		size = 0;
 		file_names = [];
-		for (i = 0; i < $('#vcfFile')[0].files.length; i++) {
-		  size = size + $('#vcfFile')[0].files[i].size;
-		  file_names.push($('#vcfFile')[0].files[i].name);
+		for (i = 0; i < $('#dataFile')[0].files.length; i++) {
+		  size = size + $('#dataFile')[0].files[i].size;
+		  file_names.push($('#dataFile')[0].files[i].name);
 		} 
 		id = $('#source_id').val();
+		user_id =  $('#user_id').val();
+		selected = $('input[name="fAction[]"]:checked').val(); 
+
 		param = "source_id="+id+"&size="+size;
 		$cfile = $("#config")[0].files[0];
 		$.ajax({
@@ -49,7 +52,7 @@ $(document).ready(function() {
 				}
 				else {
 					// var ajaxData = new FormData(this);
-					$("#load").append('<div class="loading">Loading&#8230;</div>');
+					$('#uploadSpinner').show();
 					var formData = new FormData();
 					formData.append("source_id", id);
 					formData.append("files", file_names);
@@ -65,7 +68,6 @@ $(document).ready(function() {
 						processData: false,       
 			      		success: function(response)  {
 			      			data = $.parseJSON(response);
-			      			$("#load").empty();
 			      			if (data.status == "Overload") {
 			      				alert(data.message);
 			      			}
@@ -80,25 +82,25 @@ $(document).ready(function() {
 			      					else {
 			      						$('#vcf_errors').append('<p style="background-color:lightpink; text-align:center;">'+data.message[i]+'</p>');
 			      					}
-			                        
 			                    }
 			      			}
 			      			else if (data.status == "Duplicate") {
 			      				confirmvcf(data);		
 			      			}
 			      			else if (data.status == "Green") {
+								id = $('#source_id').val();
 			      				counter = 0;
-								$("#load").append('<div class="loading">Loading&#8230;</div>');
 								flag = true;
-								for (i = 0; i < $('#vcfFile')[0].files.length; i++) {
+								for (i = 0; i < $('#dataFile')[0].files.length; i++) {
 									// console.log("Success");
 									if (flag) {
 										var formData = new FormData();
 										formData.append("source_id", id);
 										formData.append("uid", data.uid);
+										formData.append('user_id', user_id);
 										flag = false;
 									}
-									formData.append("userfile[]", $('#vcfFile')[0].files[i]);
+									formData.append("userfile[]", $('#dataFile')[0].files[i]);
 									counter++;
 									if (counter%20 == 0) {
 										flag = true;
@@ -126,22 +128,30 @@ $(document).ready(function() {
 									contentType: false,
 									processData: false,
 									success: function(response)  {
-										param = "source_id="+id+"&uid="+data.uid;
+										var formData = new FormData();
+										formData.append("source_id", id);
+										formData.append("uid", data.uid);
+										formData.append('user_id', user_id);
+										formData.append('fAction', selected);
 										$.ajax({
 											type: "POST",   
 								      		url: baseurl+'AjaxApi/vcfStart',
-								      		data: param,
-								      		dataType: "json", 
+								      		data: formData,
+											cache: false,
+											contentType: false,
+											processData: false,
 											success: function(response)  {
-												if (response == "Green") {
-													$("#load").empty();
-								      				$.notify({
+												console.log(response);
+												if (JSON.parse(response) == "Green") {
+													$('#uploadSpinner').hide();
+													$.notify({
 								                        // options
 								                        message: 'Upload Complete. Now inserting into ElasticSearch.'
 								                      },{
 								                        // settings
 								                        timer: 200
 							                      	});
+													reloadTable($('#source_id').val(),false);
 												}	
 											}
 									  	});
@@ -155,8 +165,6 @@ $(document).ready(function() {
       	});
 	});
 })
-
-
 
 function confirmvcf(data) {
 	counter = 0;
@@ -189,7 +197,6 @@ function confirmvcf(data) {
 
 
 function proceedVcf() {
-	// console.log("proceeding");
 	var $boxes = $('input[name="chk[]"]:checked');
 	done = JSON.parse(sessionStorage.getItem('done'));
 	for (var i = 0; i < $boxes.length; i++) {
@@ -286,29 +293,33 @@ function batchVcf() {
 	$('#confirmVcf').modal('hide');
 	$('#vcfTable').dataTable().fnDestroy();
 	id = $('#source_id').val();
-	$("#load").append('<div class="loading">Loading&#8230;</div>');
+	user_id =  $('#user_id').val();
+	selected = $('input[name="fAction[]"]:checked').val(); 
+
+	$('#uploadSpinner').show();
 	flag = true;
 	uid = sessionStorage.getItem('uid');
 	done = JSON.parse(sessionStorage.getItem('done'));
 	sessionStorage.clear();
-	for (i = 0; i < $('#vcfFile')[0].files.length; i++) {
+	for (i = 0; i < $('#dataFile')[0].files.length; i++) {
 		// console.log("Success");
-		file = $('#vcfFile')[0].files[i];
+		file = $('#dataFile')[0].files[i];
 		if (flag) {
 			var formData = new FormData();
 			formData.append("source_id", id);
 			formData.append("uid", uid);
+			formData.append('user_id', user_id);
 			flag = false;
 		}
 		if (done.includes(file.name)) {
-			formData.append("userfile[]", $('#vcfFile')[0].files[i]);
+			formData.append("userfile[]", $('#dataFile')[0].files[i]);
 			counter++;
 		}		
 		if (counter%20 == 0) {
 			flag = true;
 			$.ajax({
 				type: "POST",  
-				url: baseurl+'Upload/vcfBatch',
+				url: baseurl+'AjaxApi/vcfBatch',
 				contentType: 'multipart/form-data',
 				data: formData,
 				cache: false,
@@ -323,22 +334,31 @@ function batchVcf() {
 	}
 	$.ajax({
 		type: "POST",  
-		url: baseurl+'upload/vcfBatch',
+		url: baseurl+'AjaxApi/vcfBatch',
 		contentType: 'multipart/form-data',
 		data: formData,
 		cache: false,
 		contentType: false,
 		processData: false,
 		success: function(response)  {
-			param = "source_id="+id+"&uid="+uid;
+			source_id = $('#source_id').val();
+
+			var formData = new FormData();
+			formData.append("source_id", source_id);
+			formData.append("uid", uid);
+			formData.append('user_id', user_id);
+			formData.append('fAction', selected);
 			$.ajax({
 				type: "POST",   
-	      		url: baseurl+'upload/vcfStart',
-	      		data: param,
-	      		dataType: "json", 
+	      		url: baseurl+'AjaxApi/vcfStart',
+				data: formData,
+				processData: false,
+				cache: false,
+				contentType: false,
 				success: function(response)  {
-					if (response == "Green") {
-						$("#load").empty();
+					console.log(response)
+					if (JSON.parse(response) == "Green") {
+						$('#uploadSpinner').hide()
 	      				$.notify({
 	                        // options
 	                        message: 'Upload Complete. Now inserting into ElasticSearch.'
@@ -346,6 +366,7 @@ function batchVcf() {
 	                        // settings
 	                        timer: 200
                       	});
+						reloadTable($('#source_id').val(),false);
 					}	
 				}
 		  	});
@@ -388,38 +409,13 @@ $('#confirmVcf').on('hidden', function () {
     $('#vcfTable').dataTable().fnDestroy();
 })
 
+$('#dataFile').on('change',function(){
+	var files = $(this).prop('files');
+    $(this).next('.custom-file-label').html(files.length.toString() + ' file(s) selected.');
+})
 
-
-function fileUploadInterval() {
-    if (!fileIntervalActive) {
-        fileIntervalActive = true;
-        fileInterval = setInterval(function() {
-            $.ajax({url: baseurl + 'upload/checkUploadJobs',
-                type: 'POST',
-                success: function (data) {
-					param = $('#source_id').val();
-
-					reloadTable(param,false);
-                    data = $.parseJSON(data);
-                    // console.log(data);
-                    if (!data.Status) {
-                        fileIntervalActive = false;  
-                        clearInterval(fileInterval);  
-                        return; 
-                    }
-                    if (data.Message.length > 0) {
-                        for (var i = 0; i < data.Message.length; i++) {
-                            $.notify({
-                                message: 'The Source: '+data.Message[i]+' has finished with its database operation (Upload Or Regenerate). Please refer to the status page for that source to see more details.'
-                              },{
-                                // settings
-                                timer: 2000000
-                            });
-                        }
-                    }                
-                }
-            });
-        }, 5000)
-    }
-}
-
+$('#config').on('change',function(){
+    var fullFileName = $(this).val();
+    var fileName = fullFileName.split('\\')[fullFileName.split('\\').length - 1];
+    $(this).next('.custom-file-label').html(fileName);
+})
