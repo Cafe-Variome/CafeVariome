@@ -1,5 +1,4 @@
 var tooltipObj;
-var appendAllowed = window.location.href.split('/').indexOf('Phenopacket') < 0; //If the user is in Phenopacket uploader appending data to the source is the same as reprocessing.
 
 $(document).ready(function() {
 
@@ -84,7 +83,7 @@ function reloadTable(param,first) {
 
                 actionStr = "<td id='action-" + response.Files[i].ID + "'><a href='#' data-toggle='tooltip' data-placement='top' title='Remove Records and Re-process File' class='reprocess' onclick='processFile(" + response.Files[i].ID + ", 1)'><i class='fa fa-redo-alt text-info'></i></a>";
                 
-                if(appendAllowed){
+                if(!response.Files[i].FileName.toString().toLowerCase().includes('.vcf') && !response.Files[i].FileName.toString().toLowerCase().includes('.phenopacket')){
                     actionStr += " <a href='#' data-toggle='tooltip' data-placement='top' title='Re-process File and Append Records' class='append' onclick='processFile(" + response.Files[i].ID + ", 0)'><i class='fa fa-sync-alt text-warning'></i></a>";
                 } 
 
