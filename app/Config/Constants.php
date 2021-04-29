@@ -117,7 +117,12 @@ define('STATUS_ERROR', 0);
 define('STATUS_INFO', 2);
 define('STATUS_WARNING', 3);
 
-// PHP INI Values
+//Uploader Actions
+define('UPLOADER_DELETE_NONE', 00);
+define('UPLOADER_DELETE_ALL', 1);
+define('UPLOADER_DELETE_FILE', 2);
 
+
+// PHP INI Values
 ini_set('memory_limit', "1G");
 
