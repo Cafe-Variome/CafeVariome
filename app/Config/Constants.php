@@ -95,6 +95,7 @@ define('CSS','resources/css/');
 define('UPLOAD','upload' . DIRECTORY_SEPARATOR);
 define('UPLOAD_DATA','UploadData' . DIRECTORY_SEPARATOR);
 define('UPLOAD_JSON','json' . DIRECTORY_SEPARATOR);
+define('UPLOAD_PAIRINGS', 'pairings'. DIRECTORY_SEPARATOR);
 define('VENDOR','vendor/');
 
 define('RESOURCES_DIR', "resources". DIRECTORY_SEPARATOR);
