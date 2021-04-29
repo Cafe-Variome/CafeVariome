@@ -414,46 +414,67 @@ use CodeIgniter\Config\Services;
     
     public function vcf_upload() {
 
-        $spreadsheet =  \PhpOffice\PhpSpreadsheet\IOFactory::load($_FILES['config']['tmp_name']);
+        $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
+        $pairingsPath = FCPATH . UPLOAD . UPLOAD_PAIRINGS;
+
+        $fileMan = new UploadFileMan($basePath);
+
+        $response_array = array('status' => "",'message' => []);
+
+        if ($fileMan->countFiles() == 1){ 
+            // Only one config file is allowed to be uploaded at the moment.
+            $configFile = $fileMan->getFiles()[0];
+            $configFileName = $configFile->getName();
+            $configFileExtension = $configFile->getExtension();
+            $configFileTempPath = $configFile->getTempPath();
+        }
+        else {
+            $response_array['status'] = "Cancel";
+            $response_array['message'] = "Config file is either not uploaded or is missing.";
+
+            return json_encode($response_array);
+        }
+
+        $source_id = $this->request->getVar('source_id');
+        $fileNames = $this->request->getVar('files'); // Name of VCF files that will be uploaded pending they meet conditions.
+        $fileNamesArray = explode(",", $fileNames); // Array of the file names above
+
+        $spreadsheet =  \PhpOffice\PhpSpreadsheet\IOFactory::load($configFileTempPath);
         $worksheet = $spreadsheet->getActiveSheet();
         $highestRow = $worksheet->getHighestRow(); 
         $highestColumn = $worksheet->getHighestColumn(); 
         $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
-
-        $_POST['files'] = explode(",", $_POST['files']);
 
         $headers = [];
         $dup_files = [];
         $dup_elastic = [];
         $pairings = [];
         $types = [];
-        $source_id = $this->request->getVar('source_id');
 
         array_push($headers, "");
-        $response_array = array('status' => "",
-                                        'message' => []);
 
-        $file_parts = pathinfo($_FILES['config']['name']);
+        $filesCount = count($fileNamesArray);
 
-        $count = count($_POST['files']);
-        if ($count > 200) {
+        if ($filesCount > 200) {
             error_log("overload");
             $response_array['status'] = "Overload";
             $response_array['message'] = "You are trying to upload more than 200 files. Please limit your upload to 200 files or less.";
-            echo json_encode($response_array);
-            return;
+
+            return json_encode($response_array);
         }
-        if ($file_parts['extension'] == "csv" || $file_parts['extension'] == "xls") {
+
+        if ($configFileExtension == "csv" || $configFileExtension == "xls") {
             for ($row = 1; $row <= $highestRow; ++$row) {
                 for ($col = 1; $col <= $highestColumnIndex; ++$col) {
+                    
                     if ($row == 1) {
                         $value = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
+
                         if (!preg_match("/filename|patient|tissue/", strtolower($value))) {
-                            error_log("failure on ".$value);
-                            $message = "Headers in ".$_FILES['config']['name']." not in FileName,Patient,Tissue format.";
+                            $message = "Headers in " . $configFileName . " not in FileName,Patient,Tissue format.";
                             array_push($response_array['message'], $message);
-                            echo json_encode($response_array);
-                            return;
+
+                            return json_encode($response_array);
                         }
                         else {	    					
                             array_push($headers, strtolower($value));
@@ -465,22 +486,23 @@ use CodeIgniter\Config\Services;
                         switch ($key) {
                             case 'filename' :
                                 $flag = 0;						      
-                                if (is_array($_POST['files'])) {
-                                    if (in_array($value, $_POST['files'])) $flag = 1;
+                                if (is_array($fileNamesArray)) {
+                                    if (in_array($value, $fileNamesArray)) $flag = 1;
                                 }
                                 else {
-                                    if ($value == $_POST['files']) $flag = 1;
+                                    if ($value == $fileNamesArray) $flag = 1;
                                 }	
                                 if (!$flag) {
-                                    $message = "File: ".$value." not found in list of Uploaded Files from config file: ". $_FILES['config']['name'];
+                                    $message = "File: ".$value." not found in list of Uploaded Files from config file: ". $configFileName;
                                     array_push($response_array['message'], $message);			
                                 }
                                 if (!preg_match("/\.vcf$|\.vcf\.gz$/", $value)) {
                                     $message = "File: ".$value." is not a vcf file.";
                                     array_push($response_array['message'], $message);
                                 }
-                                $file_path = FCPATH."upload/UploadData/".$source_id."/".$value;
-                                if (file_exists($file_path)) {
+
+                                $file_path = $source_id . DIRECTORY_SEPARATOR . $value;
+                                if ($fileMan->Exists($file_path)) {
                                     array_push($dup_files, $value);
                                 }
                                 $file = $value;
@@ -505,147 +527,155 @@ use CodeIgniter\Config\Services;
                 $pairings[$file][] = $tissue;
                 $pairings[$file][] = $patient;
             }
-                if (!empty($response_array['message'])) {
-                    $response_array['status'] = "Cancel";
-                    if (!empty($dup_files)) {
-                        $response_array['files'] = $dup_files;
-                    }
-                    if (!empty($dup_elastic)) {
-                        $response_array['elastic'] = $dup_elastic;
-                    }
-                }	
-                else if (empty($dup_files) && empty($dup_elastic)) {
-                    $response_array['status'] = "Green";
-                    $response_array['message'] = "no errors";
+            if (!empty($response_array['message'])) {
+                $response_array['status'] = "Cancel";
+                if (!empty($dup_files)) {
+                    $response_array['files'] = $dup_files;
                 }
-                else if (!empty($dup_files) && !empty($dup_elastic)) {
-                    $response_array['status'] = "Duplicate";
-                    $both = array_intersect($dup_files, $dup_elastic);
-                    if ($both) {
-                        $dup_files = array_diff($dup_files, $both);
-                        $dup_elastic = array_diff($dup_elastic, $both);
-                        $response_array['both'] = $both;
-                        array_push($types, "both");
-                        if ($dup_files) {
-                            $dup_files = array_values($dup_files);
-                            $response_array['files'] = $dup_files;
-                            array_push($types, "files");
-                        }
-                        if ($dup_elastic) {
-                            $dup_elastic = array_values($dup_elastic);
-                            $response_array['elastic'] = $dup_elastic;
-                            array_push($types, "elastic");
-                        }		         		
-                    } 
-                    else {
-                        $response_array['elastic'] = $dup_elastic;
+                if (!empty($dup_elastic)) {
+                    $response_array['elastic'] = $dup_elastic;
+                }
+            }	
+            else if (empty($dup_files) && empty($dup_elastic)) {
+                $response_array['status'] = "Green";
+                $response_array['message'] = "no errors";
+            }
+            else if (!empty($dup_files) && !empty($dup_elastic)) {
+                $response_array['status'] = "Duplicate";
+                $both = array_intersect($dup_files, $dup_elastic);
+                if ($both) {
+                    $dup_files = array_diff($dup_files, $both);
+                    $dup_elastic = array_diff($dup_elastic, $both);
+                    $response_array['both'] = $both;
+                    array_push($types, "both");
+                    if ($dup_files) {
+                        $dup_files = array_values($dup_files);
                         $response_array['files'] = $dup_files;
-                        array_push($types, "elastic");
                         array_push($types, "files");
-                    }		
-                }
+                    }
+                    if ($dup_elastic) {
+                        $dup_elastic = array_values($dup_elastic);
+                        $response_array['elastic'] = $dup_elastic;
+                        array_push($types, "elastic");
+                    }		         		
+                } 
                 else {
-                    $response_array['status'] = "Duplicate";
-                    if (!empty($dup_files)) {
-                        $response_array['files'] = $dup_files;
-                        array_push($types, "files");
-                    }
-                    if (!empty($dup_elastic)) {
-                        $response_array['elastic'] = $dup_elastic;
-                        array_push($types, "elastic");
-                    }
-                }        	
+                    $response_array['elastic'] = $dup_elastic;
+                    $response_array['files'] = $dup_files;
+                    array_push($types, "elastic");
+                    array_push($types, "files");
+                }		
+            }
+            else {
+                $response_array['status'] = "Duplicate";
+                if (!empty($dup_files)) {
+                    $response_array['files'] = $dup_files;
+                    array_push($types, "files");
+                }
+                if (!empty($dup_elastic)) {
+                    $response_array['elastic'] = $dup_elastic;
+                    array_push($types, "elastic");
+                }
+            }        	
         }
         else {
             $response_array['status'] = "Cancel";
             array_push($response_array['message'], "Config file is not in correct format. Cannot be read.");
-            echo json_encode($response_array);
-            return;		
+
+            return json_encode($response_array);		
         }
-        $source_path = FCPATH."upload/UploadData/$source_id";
-        if (!file_exists($source_path)) mkdir($source_path);
-        $source_path = FCPATH."upload/pairings/";
-        if (!file_exists($source_path)) mkdir($source_path); 
+
+        if (!$fileMan->Exists($source_id))
+        {
+            $fileMan->CreateDirectory($source_id);
+        }
+
+        $fileMan = new UploadFileMan($pairingsPath);
+        
         $uid = md5(uniqid(rand(),true));  
-        file_put_contents($source_path.$uid.".json", json_encode($pairings));
+
+        $fileMan->Write($uid.".json", json_encode($pairings));
+
         $response_array['uid'] = $uid;
         $response_array['types'] = $types;
-        echo json_encode($response_array);
-        return;
+        
+        return json_encode($response_array);
     }
 
     public function vcfBatch() {
 
+        $basePath = FCPATH . UPLOAD;
+        $fileMan = new UploadFileMan($basePath);
+
         $source_id = $this->request->getVar('source_id'); 
         $uid = $this->request->getVar('uid');
+        $user_id = $this->request->getVar('user_id');
 
-        $pairings = json_decode(file_get_contents(FCPATH."upload/pairings/$uid.json"), true);
-        $source_path = FCPATH."upload/UploadData/".$source_id."/";	
+        if ($fileMan->Exists(UPLOAD_PAIRINGS . $uid . ".json")) {
+            $pairings = json_decode($fileMan->Read(UPLOAD_PAIRINGS . $uid . ".json"), true);
 
-        // Params for the upload type		
-        $config = array(
-            'upload_path' => $source_path,
-            'allowed_types' => "*",
-            'overwrite' => TRUE,
-            'max_size' => "2048000" // Can be set to particular file size , here it is 2 MB(2048 Kb)
-        );
+            $source_path = UPLOAD_DATA . $source_id . DIRECTORY_SEPARATOR;	
+    
+            // Check the number of files we are uploading
+            $filesCount = $fileMan->countFiles();
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+    
+            $userFiles = $fileMan->getFiles();
+            
+            for($i = 0; $i < $filesCount; $i++){     
+                // Check the mime and extension for the file we are currently uploading
+                $fileName = $userFiles[$i]->getName();
+                $mime = $userFiles[$i]->getType();
+                $extension = $userFiles[$i]->getExtension();
 
-        // Check the number of files we are uploading
-        $filesCount = count($_FILES['userfile']['name']);
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-
-        $userFile = $this->request->getFiles();
-
-        for($i = 0; $i < $filesCount; $i++){     
-            // Check the mime and extension for the file we are currently uploading
-            $mime = finfo_file($finfo, $_FILES['userfile']['tmp_name'][$i]);
-            $file_parts = pathinfo($_FILES['userfile']['name'][$i]);
-            if ($mime != "text/plain" && $file_parts['extension'] == "json") {
-                error_log("failure");
-            }   
-
-            if($userFile['userfile'][$i]->move($source_path. "/", $_FILES['userfile']['name'][$i]))
-            {   
-                // 13/08/2019 POTENTIAL BUG 
-                // The value for patient must be specified as it is always set to 0 (false)
-                $this->uploadModel->createUpload($_FILES['userfile']['name'][$i], $source_id, $user_id, $pairings[$_FILES['userfile']['name'][$i]][0],$pairings[$_FILES['userfile']['name'][$i]][1]);
+                if ($mime != "text/vcard" &&  $xtension == "json") {
+                    error_log("failure");
+                }   
+    
+                if($fileMan->Save($userFiles[$i], $source_path))
+                {   
+                    // 13/08/2019 POTENTIAL BUG 
+                    // The value for patient must be specified as it is always set to 0 (false)
+                    $this->uploadModel->createUpload($fileName, $source_id, $user_id, $pairings[$fileName][0],$pairings[$fileName][1]);
+                }
+                else {
+                    // if it failed to upload report error
+                    // TODO: Make it return failure and reflect in JS for this eventuality
+                }
             }
-            else {
-                // if it failed to upload report error
-                // TODO: Make it return failure and reflect in JS for this eventuality
-                error_log($mime);
-            }
+
+            return json_encode("Green");
         }
-        echo json_encode("Green");
     }
 
     public function vcfStart() {
+
+        $pairingsPath = FCPATH . UPLOAD . UPLOAD_PAIRINGS;
+        $fileMan = new UploadFileMan($pairingsPath);
+
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
         $uid = $this->request->getVar('uid');
-
-        // Get ID for source and lock it so further updates and uploads cannot occur
-        // Until update is finished
-
+        $overwrite = $this->request->getVar('fAction');
+        
+        // Get ID for source and lock it so further updates and uploads cannot occur until update is finished
         $this->sourceModel->lockSource($source_id);
-        $uid = md5(uniqid(rand(),true));
-        $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
-        $path = FCPATH."upload/pairings/".$uid.".json";
-        try {
-            if( $this->delete_file($path) === true ) {
-                error_log(" delete success");	    	
-            }
+        $this->uploadModel->addUploadJobRecord($source_id, $uid, $user_id);
+
+        $path = $uid.".json";
+
+        if($fileMan->Exists($path)) {
+            $fileMan->Delete($path);
         }
-        catch (\Exception $e) {
-            error_log($e->getMessage()); // will print Exception message defined above.
+
+        if ($overwrite == "overwrite") {
+            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task vcfInsertBySourceId " . $source_id . " " . UPLOADER_DELETE_ALL);
         }
-        // Create thread to begin SQL insert in the background
-        error_log("calling vcfElastic");
-        echo json_encode("Green");
-        shell_exec("php " . getcwd() . "/index.php Task vcfElastic ". $source_id);
-        
-        // Report to front end that the process has now begun
-        
+        elseif ($overwrite == "append") {
+            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task vcfInsertBySourceId " . $source_id . " " . UPLOADER_DELETE_NONE);
+        }
+
+        return json_encode("Green");
     }
 
     /**
@@ -788,10 +818,15 @@ use CodeIgniter\Config\Services;
         switch ($uploader) {
             case 'bulk':
                 $method = 'bulkUploadInsert';
+                $overwriteFlag = $overwrite ? UPLOADER_DELETE_ALL : UPLOADER_DELETE_NONE;
                 break;
             case 'phenopacket':
                 $method = 'phenoPacketInsertByFileId';
+                $overwriteFlag = UPLOADER_DELETE_FILE;
                 break;
+            case 'vcf':
+                $method = 'vcfInsertByFileId';
+                $overwriteFlag = UPLOADER_DELETE_FILE;
             default:
                 return json_encode(0);
                 break;
@@ -800,14 +835,7 @@ use CodeIgniter\Config\Services;
         $uploadModel = new Upload();
         $uploadModel->resetFileStatus($fileId);
 
-        $uriSegments = $this->request->uri->getSegments();
-
-        if ($overwrite) {
-            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fileId . " 1");
-        }
-        else{
-            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fileId . " 00"); //Don't change 00 to 0 as it won't be detected on Windows machines.
-        }
+        $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fileId . " " . $overwriteFlag);
 
         return json_encode(1);
     }
