@@ -69,6 +69,18 @@
         return $line;
     }
 
+    public function ReadLine(string $path, int $length = -1, $isRelative = true)
+    {
+        $readMode = 'r';
+
+        if (!$this->handle || $this->mode != $readMode || $this->filePath != $path) {
+            $this->getHandle($path, $readMode, $isRelative);
+        }
+        $line = ($length != -1) ? fgets($this->handle, $length) : fgets($this->handle);
+
+        return $line;
+    }
+
     public function Write(string $path, string $content, bool $append = false, int $length = -1): int
     {
         $writeOrAppend = $append ? 'a+' : 'w+';
