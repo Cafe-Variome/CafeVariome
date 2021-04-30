@@ -184,8 +184,8 @@ class EAV extends Model{
         $this->builder = $this->db->table($this->table);
 
         $this->builder->select("attribute, value, count(*) AS count");
-        $this->builder->where("source_id", $source);
-        $this->builder->where("fileName",$file);
+        $this->builder->where("source_id", $source_id);
+        $this->builder->where("fileName",$file_id);
         $this->builder->groupBy(["attribute","value"]);
 
         $query = $this->builder->get()->getResultArray();
