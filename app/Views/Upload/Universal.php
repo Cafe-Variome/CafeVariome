@@ -40,7 +40,7 @@
 <div class="form-group row">
 	<div class="col-6">
 		<div class="custom-file">
-			<input type="file" class="custom-file-input" name='userfile' id="dataFile" aria-describedby="dataFile" required>
+			<input type="file" class="custom-file-input" name='userfile' id="dataFile" accept=".csv, .xls, .xlsx" aria-describedby="dataFile" required>
 			<label class="custom-file-label" for="dataFile">Choose file</label>
 		</div>
 
@@ -90,9 +90,6 @@
 	<tr>
 		<th>File-name</th>
 		<th>User</th>
-		<th>Upload Start</th>
-		<th>Upload End</th>
-		<th>Errors</th>
 		<th>Status</th>
 		<th>Action</th>
 	</tr>
