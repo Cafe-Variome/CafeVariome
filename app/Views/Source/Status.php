@@ -15,20 +15,17 @@
 </div>
 <input type="hidden" value="<?php echo $source_id ?>" name="source_id" id="source_id">
 
-<table class="table table-bordered table-striped table-hover" id="file_table">
-	<thead>
-		<tr>
-			<th>File-name</th>
-			<th>User</th>
-			<th>Upload Start</th>
-			<th>Upload End</th>
-			<th>Errors</th>
-			<th>Status</th>
-			<th>Action</th>
-		</tr>
-	</thead>
-	<tbody id="file_grid">
-	</tbody>
+<table class="table table-bordered table-striped table-hover" id="file_table" width="100%" cellspacing="0">
+  <thead>
+	<tr>
+		<th>File-name</th>
+		<th>User</th>
+		<th>Status</th>
+		<th>Action</th>
+	</tr>
+  </thead>
+  <tbody id="file_grid">
+  </tbody>
 </table>
 
 <?= $this->endSection() ?>
