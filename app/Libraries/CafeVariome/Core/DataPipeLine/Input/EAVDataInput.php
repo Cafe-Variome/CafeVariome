@@ -184,12 +184,13 @@ class EAVDataInput extends DataInput
 
         $this->reader->close();
 
-        $totalRecordCount = $this->sourceModel->countSourceEntries($this->sourceId);
-
-        $this->sourceModel->updateSource(['record_count' => $totalRecordCount], ['source_id' => $this->sourceId]);
-        
         $this->db->transComplete();
+
+        $totalRecordCount = $this->sourceModel->countSourceEntries($this->sourceId);
+        $this->sourceModel->updateSource(['record_count' => $totalRecordCount], ['source_id' => $this->sourceId]);
+
         $this->dumpAttributesAndValues($file_id);
+
         $this->uploadModel->markEndOfUpload($file_id, $this->sourceId);
         $this->uploadModel->clearErrorForFile($file_id);
         $this->sourceModel->unlockSource($this->sourceId);	
