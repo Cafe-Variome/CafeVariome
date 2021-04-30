@@ -827,6 +827,7 @@ use CodeIgniter\Config\Services;
             case 'vcf':
                 $method = 'vcfInsertByFileId';
                 $overwriteFlag = UPLOADER_DELETE_FILE;
+                break;
             default:
                 return json_encode(0);
                 break;
