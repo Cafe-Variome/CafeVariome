@@ -44,7 +44,7 @@
 	<div class="form-group row">
 		<div class="col-6">
 			<div class="custom-file">
-				<input type="file" class="custom-file-input" name='jsonFile[]' id="jsonFile" aria-describedby="jsonFile" multiple required>
+				<input type="file" class="custom-file-input" name='jsonFile[]' id="jsonFile" accept=".phenopacket, .json" aria-describedby="jsonFile" multiple required>
 				<label class="custom-file-label" for="jsonFile">Choose file(s)</label>
 			</div>
 		</div>
