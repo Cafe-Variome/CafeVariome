@@ -632,10 +632,7 @@ class Query extends CafeVariome{
 
             // if just orpha
             if($r == 1 && $s == 100 && $hpo == 'false'){
-                error_log("EXACT MATCH ORPHA");
-                $neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})-[:PHENOTYPE_OF]-(s) where s.source = \"" . $source . "\" return s.subjectid as subjectid";
-                // error_log($neo_query);
-
+                $neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})<-[:IS_A*0..20]-(:ORPHATerm)-[:PHENOTYPE_OF]-(s) where s.source = \"" . $source . "\" return s.subjectid as subjectid";
                 $result = $neo4jClient->run($neo_query);
                 $records = $result->getRecords();
                 $pat_ids = [];
