@@ -41,5 +41,39 @@ class Setting extends CVUI_Controller{
     }
 
 
+    private function processPost(array $settings)
+    {
+        $errorFlag = false;
+        foreach ($settings as $s) {
+            $settingName = $s['setting_name'];
+            $settingKey = $s["setting_key"];
+            $settingVal = trim($this->request->getVar($settingKey));
+            if ($settingVal != $this->setting->settingData[$s["setting_key"]]) {
+                if ($settingKey == 'installation_key') {
+                    $settingVal = trim($settingVal);
+                }
+                if ($settingKey == 'auth_server') {
+                    $settingVal = trim($settingVal);
+                    $valLen = strlen($settingVal);
+                    if(substr($settingVal, $valLen-1, $valLen) != '/'){
+                        $settingVal = $settingVal . '/';
+                    }
+                }
+                if ($this->setting->settingData[$s["setting_key"]] == 'on' || $this->setting->settingData[$s["setting_key"]] == 'off') {
+                    $settingVal = $settingVal == null ? 'off' : 'on';
+                }
+                try {
+                    $this->settingModel->updateSettings(['value' => $settingVal], ['setting_key' =>  $settingKey]);
+                } catch (\Exception $ex) {
+                    $errorFlag = true;
+                    $this->setStatusMessage("There was a problem updating '$settingName'.", STATUS_ERROR);
+                }
+            }
+        }
+
+        if (!$errorFlag) {
+            $this->setStatusMessage("Settings were updated.", STATUS_SUCCESS);
+        }        
+    }
 
 }
