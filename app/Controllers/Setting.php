@@ -103,6 +103,27 @@ class Setting extends CVUI_Controller{
         return view($this->viewDirectory. '/Endpoint', $data);
     }
 
+    public function Main()
+    {
+        $uidata = new UIData();
+        $uidata->title = "Main System Settings";
+        $uidata->stickyFooter = false;
+
+        $this->settingModel = Settings::getInstance();
+
+        $settings =  $this->settingModel->getSettingsByGroup('main');
+        $uidata->data['settings'] = $settings;
+
+        if ($this->request->getPost()) {
+            $this->processPost($settings);
+
+            return redirect()->to(base_url($this->controllerName.'/Main'));
+        }
+
+        $data = $this->wrapData($uidata);
+        return view($this->viewDirectory. '/Main', $data);
+    }
+
     private function processPost(array $settings)
     {
         $errorFlag = false;
