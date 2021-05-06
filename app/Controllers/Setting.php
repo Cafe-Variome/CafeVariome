@@ -124,6 +124,27 @@ class Setting extends CVUI_Controller{
         return view($this->viewDirectory. '/Main', $data);
     }
 
+    public function Elasticsearch()
+    {
+        $uidata = new UIData();
+        $uidata->title = "Elastic Search Settings";
+        $uidata->stickyFooter = false;
+
+        $this->settingModel = Settings::getInstance();
+
+        $settings =  $this->settingModel->getSettingsByGroup('elasticsearch');
+        $uidata->data['settings'] = $settings;
+
+        if ($this->request->getPost()) {
+            $this->processPost($settings);
+
+            return redirect()->to(base_url($this->controllerName.'/Elasticsearch'));
+        }
+
+        $data = $this->wrapData($uidata);
+        return view($this->viewDirectory. '/Elasticsearch', $data);
+    }
+    
     private function processPost(array $settings)
     {
         $errorFlag = false;
