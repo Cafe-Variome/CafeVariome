@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Apr 13, 2021 at 02:13 PM
+-- Generation Time: May 06, 2021 at 04:05 PM
 -- Server version: 5.7.33-0ubuntu0.18.04.1
 -- PHP Version: 7.4.14
 
@@ -174,11 +174,12 @@ INSERT INTO `pages` (`id`, `Title`, `Content`, `Author`, `Active`, `Removable`) 
 --
 
 CREATE TABLE `settings` (
-  `setting_id` int(10) NOT NULL,
+  `setting_id` int(11) NOT NULL,
   `setting_key` varchar(50) NOT NULL,
   `value` varchar(100) NOT NULL,
   `setting_name` varchar(50) DEFAULT NULL,
   `info` text NOT NULL,
+  `setting_group` varchar(50) DEFAULT NULL,
   `validation_rules` varchar(100) NOT NULL DEFAULT 'required|xss_clean'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
@@ -186,32 +187,31 @@ CREATE TABLE `settings` (
 -- Dumping data for table `settings`
 --
 
-INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `info`, `validation_rules`) VALUES
-(1, 'site_title', 'Cafe Variome 2', 'Site Title', '', 'required'),
-(2, 'site_description', 'Cafe Variome - Description', 'Site Description', '', 'required'),
-(3, 'site_author', 'Bioinformatics Research Group - University of Leicester', 'Site Author', '', 'required'),
-(4, 'site_keywords', 'healthcare data discovery, bioinformatics', 'Keywords', '', 'required'),
-(5, 'email', 'admin@cafevariome.org', 'Administrator Email', '', 'required'),
-(23, 'allow_registrations', 'on', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'required'),
-(29, 'discovery_requires_login', 'off', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'required'),
-(30, 'show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'required'),
-(32, 'auth_server', 'http://localhost/cvnet/', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'required'),
-(33, 'installation_key', 'e9dc0637853ae6748b4d3983630710b8', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'required'),
-(65, 'logo', 'cafevariome_full.png', 'Main Logo', 'Main Logo', 'required|xss_clean'),
-(50, 'oidc_uri', 'https://www423.lamp.le.ac.uk/auth', 'OpenID Server Address', 'URI for keycloak authentication server', 'required'),
-(51, 'oidc_realm', 'ERN', 'Realm Name', '', 'required'),
-(52, 'oidc_client_id', 'my-client', 'Client ID', '', 'required'),
-(53, 'oidc_client_secret', '65301ba7-ddfe-4844-a5b4-ddb1e37861ac', 'Client Secret', '', 'required'),
-(54, 'oidc_login_uri', 'http://localhost/cv/auth/login', 'Login URI', '', 'required'),
-(56, 'oidc_port', '80', 'Port', '', 'required'),
-(57, 'elastic_url', 'http://localhost:9200', 'Elasticsearch Address', 'Elastic search address', 'required'),
-(58, 'key_cloak_admin_id', 'f02288f5-1c48-4be0-9868-179028a77f8a', 'Keycloak Admin Id', 'Admin user id within key cloak server', 'required'),
-(59, 'key_cloak_admin_username', 'admin', 'Keycloak Admin Username', 'Admin user username within key cloak server', 'required'),
-(60, 'key_cloak_admin_password', ' ', 'Keycloak Admin Password', 'Admin user password within key cloak server.', 'required'),
-(63, 'neo4j_username', 'neo4j', 'Neo4J Username', '', 'required'),
-(62, 'neo4j_port', '7474', 'Neo4J Port', '', 'required'),
-(61, 'neo4j_server', 'http://localhost', 'Neo4J Server', '', 'required'),
-(64, 'neo4j_password', 'neo4j123', 'Neo4J Password', '', 'required');
+INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `info`, `setting_group`, `validation_rules`) VALUES
+(1, 'site_title', 'Cafe Variome 2', 'Site Title', 'Title as it appears in the web browser and on top left side of all pages.', 'main', 'required'),
+(2, 'site_description', 'Cafe Variome - Description', 'Site Description', 'Description of the website that appears as metadata in the structure of public pages.', 'main', 'required'),
+(3, 'site_author', 'Bioinformatics Research Group - University of Leicester', 'Site Author', 'Name of the owner of the website, whether a person or an organisation, that appears as metadata on public pages.', 'main', 'required'),
+(4, 'site_keywords', 'healthcare data discovery, bioinformatics', 'Keywords', 'Keywords explaining activity of the website that appear as metadata on public pages. They help search engines find this website.', 'main', 'required'),
+(5, 'email', 'admin@cafevariome.org', 'Administrator Email', 'Email of the person or group of people responsible for the website.', 'main', 'required'),
+(6, 'allow_registrations', 'on', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'authentication', 'required'),
+(7, 'discovery_requires_login', 'on', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'discovery', 'required'),
+(8, 'show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'discovery', 'required'),
+(9, 'auth_server', 'http://localhost/cvnet/', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main', 'required'),
+(10, 'installation_key', 'e9dc0637853ae6748b4d3983630710b8', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'main', 'required'),
+(11, 'logo', 'cafevariome_full.png', 'Main Logo', 'Main logo that appears on top left side of the public pages. The file must be located in resources/images/logos/', 'main', 'required|xss_clean'),
+(12, 'oidc_uri', 'https://auth.discoverynexus.org/auth', 'OpenID URL', 'URL (or IP address) of the OpenID provider authentication endpoint.', 'authentication', 'required'),
+(13, 'oidc_realm', 'ERN', 'Realm Name', 'Some OpenID providers, like KeyCloak, have a realm that acts as a subspace separating users.', 'authentication', 'required'),
+(14, 'oidc_client_id', 'my-client', 'Client ID', 'Client ID of the OpenID provider.', 'authentication', 'required'),
+(15, 'oidc_client_secret', '65301ba7-ddfe-4844-a5b4-ddb1e37861ac', 'Client Secret', 'Client secret of the OpenID provider.', 'authentication', 'required'),
+(17, 'oidc_port', '80', 'Port', 'If the OpenID provider uses any port other than 80 or 443, please specify the numeric value.', 'authentication', 'required'),
+(18, 'elastic_url', 'http://localhost:9200', 'Elasticsearch Address', 'Elastic search address', 'elasticsearch', 'required'),
+(19, 'neo4j_server', 'http://localhost', 'Neo4J Server', 'The URL of the Neo4J REST API.', 'neo4j', 'required'),
+(20, 'neo4j_port', '7474', 'Neo4J Port', 'The port that the Neo4J REST API is running on. BY default it is 7474.', 'neo4j', 'required'),
+(21, 'neo4j_username', 'neo4j', 'Neo4J Username', 'Username that is used to communicate with Neo4J REST API.', 'neo4j', 'required'),
+(22, 'neo4j_password', 'neo4j123', 'Neo4J Password', 'Password that is used to communicate with Neo4J REST API.', 'neo4j', 'required'),
+(23, 'hpo_autocomplete_url', 'https://www185.lamp.le.ac.uk/EpadGreg/hpo/query/', 'HPO Auto-complete', 'HPO Auto-complete', 'endpoint', 'required'),
+(24, 'orpha_autocomplete_url', '', 'ORPHA Auto-complete', 'HPO Auto-complete', 'endpoint', 'required'),
+(25, 'snomed_autocomplete_url', '', 'SNOMED Autocomplete ', 'SNOMED Autocomplete ', 'endpoint', 'required');
 
 -- --------------------------------------------------------
 
@@ -320,7 +320,8 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `email`, `activation_selector`, `activation_code`, `forgotten_password_selector`, `forgotten_password_code`, `forgotten_password_time`, `remember_selector`, `remember_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`, `is_admin`, `token`, `remote`) VALUES
-(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1610638048, 1, 'Admin', 'Admin', 'Brookes Lab', '', 1, NULL, 0);
+(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1620305709, 1, 'Admin', 'Admin', 'Brookes Lab', '', 1, NULL, 0),
+(2, '127.0.0.1', 'mm917@leicester.ac.uk', '$2y$10$Zzi8zkVbzOkrzd1h2wztW.ouTysqcgbsuZYejkq.MVHH5megGANTO', 'mm917@leicester.ac.uk', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1606824165, 1606824304, 1, 'Test', 'Test', 'UOL', NULL, 0, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -340,6 +341,7 @@ CREATE TABLE `users_groups` (
 
 INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
 (1, 1, 1),
+(2, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -546,7 +548,7 @@ ALTER TABLE `pages`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `setting_id` int(10) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=66;
+  MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
 
 --
 -- AUTO_INCREMENT for table `sources`
