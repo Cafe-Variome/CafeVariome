@@ -40,6 +40,26 @@ class Setting extends CVUI_Controller{
         $this->settingModel = Settings::getInstance();
     }
 
+    function Authentication()
+    {
+        $uidata = new UIData();
+        $uidata->title = "Authentication Settings";
+        $uidata->stickyFooter = false;
+
+        $this->settingModel = Settings::getInstance();
+
+        $settings =  $this->settingModel->getSettingsByGroup('authentication');
+        $uidata->data['settings'] = $settings;
+
+        if ($this->request->getPost()) {
+            $this->processPost($settings);
+
+            return redirect()->to(base_url($this->controllerName.'/Authentication'));
+        }
+
+        $data = $this->wrapData($uidata);
+        return view($this->viewDirectory. '/Authentication', $data);
+    }
 
     private function processPost(array $settings)
     {
