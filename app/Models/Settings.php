@@ -86,6 +86,11 @@ class Settings extends Model{
         return $query; 
     }
 
+    public function getSettingsByGroup(string $group)
+    {
+        return $this->getSettings(null, ['setting_group' => $group]);
+    }
+
     public function updateSettings(array $data, array $conds) {
       $this->builder = $this->db->table($this->table);
       if ($conds) {
@@ -154,6 +159,9 @@ class Settings extends Model{
         return $this->settingData["oidc_client_secret"];
     }
 
+    /**
+     * @deprecated
+     */
     public function getOpenIDRedirectUri()
     {
         return $this->settingData["oidc_login_uri"];
