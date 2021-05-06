@@ -61,6 +61,27 @@ class Setting extends CVUI_Controller{
         return view($this->viewDirectory. '/Authentication', $data);
     }
 
+    public function Discovery()
+    {
+        $uidata = new UIData();
+        $uidata->title = "Discovery Settings";
+        $uidata->stickyFooter = false;
+
+        $this->settingModel = Settings::getInstance();
+
+        $settings =  $this->settingModel->getSettingsByGroup('discovery');
+        $uidata->data['settings'] = $settings;
+
+        if ($this->request->getPost()) {
+            $this->processPost($settings);
+
+            return redirect()->to(base_url($this->controllerName.'/Discovery'));
+        }
+
+        $data = $this->wrapData($uidata);
+        return view($this->viewDirectory. '/Discovery', $data);
+    }
+
     private function processPost(array $settings)
     {
         $errorFlag = false;
