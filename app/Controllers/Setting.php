@@ -144,7 +144,28 @@ class Setting extends CVUI_Controller{
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Elasticsearch', $data);
     }
-    
+
+    public function Neo4J()
+    {
+        $uidata = new UIData();
+        $uidata->title = "Neo4J Settings";
+        $uidata->stickyFooter = false;
+
+        $this->settingModel = Settings::getInstance();
+
+        $settings =  $this->settingModel->getSettingsByGroup('neo4j');
+        $uidata->data['settings'] = $settings;
+
+        if ($this->request->getPost()) {
+            $this->processPost($settings);
+
+            return redirect()->to(base_url($this->controllerName.'/Neo4J'));
+        }
+
+        $data = $this->wrapData($uidata);
+        return view($this->viewDirectory. '/Neo4J', $data);
+    }
+
     private function processPost(array $settings)
     {
         $errorFlag = false;
