@@ -42,7 +42,7 @@ abstract class OpenIDAuthenticator extends Authenticator
         $this->networkAdapterConfig = config('NetworkAdapter');
         $this->proxyDetails = $this->networkAdapterConfig->proxyDetails;
 
-        $this->loginURI = $this->setting->getOpenIDRedirectUri();
+        $this->loginURI = base_url('auth/login');//$this->setting->getOpenIDRedirectUri();
     }
 
     protected function configureProxy(){
