@@ -24,9 +24,9 @@ class KeyCloak extends OpenIDAuthenticator /*implements IAuthenticator*/{
     public function __construct(){
         parent::__construct();
 
-        $this->adminId = $this->setting->settingData["key_cloak_admin_id"];
-        $this->adminUsername = $this->setting->settingData["key_cloak_admin_username"];
-        $this->adminPassword = $this->setting->settingData["key_cloak_admin_password"];
+        // $this->adminId = $this->setting->settingData["key_cloak_admin_id"];
+        // $this->adminUsername = $this->setting->settingData["key_cloak_admin_username"];
+        // $this->adminPassword = $this->setting->settingData["key_cloak_admin_password"];
 
         $this->options =  [
             'authServerUrl'         => $this->serverURI,
