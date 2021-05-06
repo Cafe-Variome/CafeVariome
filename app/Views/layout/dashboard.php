@@ -186,14 +186,19 @@
                 System
             </div>
 
-            <li class="nav-item <?= $uriSegments->methodName == 'settings' ? 'active' : ''?>">
+            <li class="nav-item <?= $controllerName == 'Setting' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSet" aria-expanded="true" aria-controls="collapseSet">
                 <i class="fas fa-fw fa-cog"></i>
                     <span>Settings</span>
                 </a>
-                <div id="collapseSet" class="collapse <?= $uriSegments->methodName == 'settings' ? 'show' : ''?>" aria-labelledby="headingSet" data-parent="#accordionSidebar">
+                <div id="collapseSet" class="collapse <?= $controllerName == 'Setting' ? 'show' : ''?>" aria-labelledby="headingSet" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="<?= base_url('Admin/Settings') ?>">System Settings</a>
+                    <a class="collapse-item" href="<?= base_url('Setting/Main') ?>">System Settings</a>
+                    <a class="collapse-item" href="<?= base_url('Setting/Authentication') ?>">Authentication Settings</a>
+                    <a class="collapse-item" href="<?= base_url('Setting/Elasticsearch') ?>">Elastic Search Settings</a>
+                    <a class="collapse-item" href="<?= base_url('Setting/Neo4J') ?>">Neo4J Settings</a>
+                    <a class="collapse-item" href="<?= base_url('Setting/Discovery') ?>">Discovery Settings</a>
+                    <a class="collapse-item" href="<?= base_url('Setting/Endpoint') ?>">Endpoint Settings</a>
                     </div>
                 </div>
             </li>
