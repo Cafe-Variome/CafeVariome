@@ -82,6 +82,27 @@ class Setting extends CVUI_Controller{
         return view($this->viewDirectory. '/Discovery', $data);
     }
 
+    public function Endpoint()
+    {
+        $uidata = new UIData();
+        $uidata->title = "Endpoint Settings";
+        $uidata->stickyFooter = false;
+
+        $this->settingModel = Settings::getInstance();
+
+        $settings =  $this->settingModel->getSettingsByGroup('endpoint');
+        $uidata->data['settings'] = $settings;
+
+        if ($this->request->getPost()) {
+            $this->processPost($settings);
+
+            return redirect()->to(base_url($this->controllerName.'/Endpoint'));
+        }
+
+        $data = $this->wrapData($uidata);
+        return view($this->viewDirectory. '/Endpoint', $data);
+    }
+
     private function processPost(array $settings)
     {
         $errorFlag = false;
