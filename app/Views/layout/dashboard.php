@@ -188,7 +188,7 @@
 
             <li class="nav-item <?= $uriSegments->methodName == 'settings' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSet" aria-expanded="true" aria-controls="collapseSet">
-                <i class="fas fa-fw fa-user"></i>
+                <i class="fas fa-fw fa-cog"></i>
                     <span>Settings</span>
                 </a>
                 <div id="collapseSet" class="collapse <?= $uriSegments->methodName == 'settings' ? 'show' : ''?>" aria-labelledby="headingSet" data-parent="#accordionSidebar">
