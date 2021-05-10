@@ -62,6 +62,9 @@
 				<a href="<?php echo base_url($controllerName. '/Status'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Source File Status">
 					<i class="fa fa-info-circle text-primary"></i>
 				</a>
+				<a href="<?php echo base_url($controllerName. '/Data'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Data Attributes and Values">
+					<i class="fa fa-database text-info"></i>
+				</a>
 			</td>
 			<td>
 			<?php if ( $source['status'] == "online" ): ?>
@@ -83,7 +86,7 @@
 
 <div id="sourceDisplay"></div>
 
-<br />
+<br/>
 
 <div class="row">
 	<div class="col">
@@ -92,6 +95,8 @@
 		</a>
 	</div>
 </div>
+
+<br/>
 
 <div id="addVariantsModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="addVariantsModalLabel" aria-hidden="true">
 	<div class="modal-dialog" role="document">
