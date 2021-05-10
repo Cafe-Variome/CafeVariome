@@ -952,4 +952,25 @@ use CodeIgniter\Config\Services;
         // rebuild the json list for interface
         $phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateFederatedPhenotypeAttributeValueList $source_id $add");
     }
+
+    public function getAttributeValueFromFile()
+    {
+        if ($this->request->isAJAX()) {       
+            $source_id = $this->request->getVar('source_id');
+
+            $path = FCPATH . UPLOAD . UPLOAD_DATA . $source_id . DIRECTORY_SEPARATOR;
+            $fileMan = new SysFileMan($path);
+
+            $attributeValueData = [];
+            foreach ($fileMan->getFiles() as $file) {
+                if (strpos($file, '_uniq.json')) {
+                    $attributeValueData[$file] = $fileMan->Read($file);
+                }
+            }
+
+            $attributeValueDataJson = json_encode($attributeValueData);
+
+            return $attributeValueDataJson;
+        }
+    }
  }
