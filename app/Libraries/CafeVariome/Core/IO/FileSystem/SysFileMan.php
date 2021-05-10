@@ -21,12 +21,14 @@
         $this->loadFiles();
     }
 
-    private function loadFiles(string $path = null)
+    private function loadFiles(string $path = '')
     {
-        $this->files = scandir($this->getFullPath() . $path);
+        if ($this->Exists($path)) {
+            $this->files = scandir($this->getFullPath() . $path);
+        }
     }
 
-    public function getFiles(string $path = null): array
+    public function getFiles(string $path = ''): array
     {
         if (count($this->files) == 0 || $path != null) {
             $this->loadFiles($path);
