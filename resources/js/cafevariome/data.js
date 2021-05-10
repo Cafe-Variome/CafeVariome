@@ -62,7 +62,7 @@ $(document).ready(function() {
             trow += "</tr>"
         })
 
-        $('#valueModalLabel').text('List of Unique Value for: ' + attribute)
+        $('#valueModalLabel').text('List of Unique Values for: ' + attribute)
 
         $('#valuestable tbody').append(trow);
         if ($('#valuestable').length) {
