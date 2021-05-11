@@ -270,11 +270,18 @@ class Query extends CafeVariome{
     	$api = json_decode($json_string, 1);
 
     	if(json_last_error() !== JSON_ERROR_NONE) {
-    		header('Content-Type: application/json');
-	        echo $this->error_codes['400'];
-	        return;
+
+        }
+
+        if (!isset($api['query']) || empty($api['query'])) {
+            $this->makeQuery($api);
+            // $this->matchAllSubjects('testsrc', true);
+        }
+
+		if(!isset($api['logic']) || empty($api['logic'])) {
+			$this->makeLogic($api); // no logic section provided
 		}
-		
+
 		$this->api = $api;
 
         $installation_key = $this->setting->settingData['installation_key'];
@@ -282,7 +289,6 @@ class Query extends CafeVariome{
     	$user_id = ($session->get('user_id') != null) ? $session->get('user_id') : $user_id;
 
         // fetch sources for which the user has source display access       
-        // Localised the function (Mehdi Mehtarizadeh 21/08/2019)
         $sdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, (int)$network_key, 'source_display');
 
         $sdg_ids = [];
@@ -293,7 +299,6 @@ class Query extends CafeVariome{
         }
         
         // fetch sources for which the user has data display access (count display group)
-        //Localised the function (Mehdi Mehtarizadeh 21/08/2019)
         $cdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, (int)$network_key, 'count_display');
         $cdg_ids = [];
 		if(!array_key_exists('error', $cdg_arr)) {
@@ -307,10 +312,6 @@ class Query extends CafeVariome{
 
         $sources = $sourceModel->getSources('source_id, name, description', array('type !=' => 'federated')); // this and the above needs replacing with a sources model function to get all the data from local databases (need greg's new code)
 		//end fetching sources
-
-		if(!isset($api['logic']) || empty($api['logic'])) {
-			$this->makeLogic($api); // no logic section provided
-		}
 		
 		$result = $this->decouple($api['logic']); // convert to ORs(AND, AND)
 		error_log("Decouple result : ".$result);
@@ -449,6 +450,31 @@ class Query extends CafeVariome{
 		    
 		}
 		return $outids;
+    }
+
+    public function matchAll_query(string $source, bool $iscount = TRUE)
+    {
+        $elasticModel = new Elastic();
+        $sourceModel = new Source();
+
+        $sourceId = $sourceModel->getSourceIDByName($source);
+        $es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;
+        $esQuery = ['index' => $es_index];
+        $esQuery['body']['query']['exists']['field'] = 'subject_id';
+        $esQuery['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>500000];
+
+        $esJson = json_encode($esQuery);
+        $results = $this->elasticClient->search($esQuery);
+
+        $result = 0;
+        if ($iscount){
+            $result = $results['hits']['total'] > 0 && count($results['aggregations']['punique']['buckets']) > 0 ? count($results['aggregations']['punique']['buckets']) : 0;
+        }
+        else{
+            $result = array_column($results['aggregations']['punique']['buckets'], 'key');
+        }
+
+        return $result;
     }
     
     public function eav_query($lookup,$source, $iscount = TRUE){
@@ -613,23 +639,13 @@ class Query extends CafeVariome{
         ->addConnection('default', 'http://'. $neo4jUsername . ':' .$neo4jPassword .'@'.$baseNeo4jAddress.':'.$neo4jPort)
         ->setDefaultTimeout(60)
         ->build();	
-        // $source = "testsrc";
-        // $lookup = [];
-        // $lookup['r'] = .1;
-        // $lookup['s'] = .1;
-        // $lookup['hpo'] = TRUE;
+
 		if (array_key_exists('r',$lookup)){
             $r = $lookup['r'];
             $s = $lookup['s'];
             $hpo = $lookup['HPO'];
-            // $id_str = '';
-			// foreach ($lookup['ids'] as $id) {$id_str .= "n.hpoid=\"" . $id . "\" or "; }
-			// $id_str = trim($id_str, ' or ');
+            $orpha_id = $lookup['id'][0];
             
-
-            $orpha_id = $lookup['id'];//"ORPHA:33069";
-            error_log(print_r($lookup,1));
-
             // if just orpha
             if($r == 1 && $s == 100 && $hpo == 'false'){
                 $neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})<-[:IS_A*0..20]-(:ORPHAterm)-[:PHENOTYPE_OF]-(s) where s.source = \"" . $source . "\" return s.subjectid as subjectid";
@@ -648,7 +664,7 @@ class Query extends CafeVariome{
                 }
             }
             else{
-                // prepare
+               // prepare
                 error_log("PREPARE");
                 $neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})-[ob:PHENOTYPE_OF]-(oh:HPOterm) optional match (oh)-[:IS_A*0..100]->(ah:HPOterm)-[:IS_A]->(ab:HPOterm {hpoid:\"HP:0000118\"}) with collect(distinct(oh)) as coh,o,count(distinct(oh.hpoid)) as ohids, count(distinct(ah.hpoid)) as ahids, ob.frequencycode as fc, collect(distinct(ah.hpoid)) as ahs unwind coh as oh return  o.orphaid as ORPHA,fc as FrequencyCode,ohids as HPO, ahids as PA_Branches, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC, ahs order by ORPHA";
                 error_log($neo_query);
@@ -842,9 +858,6 @@ class Query extends CafeVariome{
      
 
         }
-
-		// if (array_key_exists('r',$lookup)){	} // add code for jaccard	
-
     }
     
     public function sim_query($lookup,$source, $count = TRUE){
@@ -1026,6 +1039,11 @@ class Query extends CafeVariome{
 			}
 		}
     }
+
+    public function makeQuery(&$api)
+    {
+		$api['query']['components']['matchAll'][0] = [];
+    }
     
     function decouple($arr, $type = false) {
 		reset($arr); $type = key($arr); 
@@ -1095,5 +1113,6 @@ class Query extends CafeVariome{
         elseif ($type == "subjectVariant") return $this->sv_query($lookup, $source, $iscount);
         elseif ($type == "ordo") return $this->orpha_query($lookup, $source, $iscount);
         elseif ($type == "mutation") return $this->mutation_query($lookup, $source, $iscount);
+        elseif ($type == "matchAll") return $this->matchAll_query($source, $iscount);
 	}
 }
