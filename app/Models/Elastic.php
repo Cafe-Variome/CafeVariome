@@ -124,24 +124,6 @@ class Elastic extends Model{
     }
 
     /**
-     * getUnaddedEAVs 
-     * For a given source check whether there is any data in MySQL which isnt in ElasticSearch
-     *
-     * @param string $source_id  - The name of the source
-     * @return int $noOfRecords    - Count of how many records there are which arent in ElasticSearch
-     */
-    function getUnaddedEAVs($source_id) {
-
-        $this->builder = $this->db->table('eavs');
-
-        $this->builder->where('elastic', 0);
-        $this->builder->where('source_id', $source_id);
-
-        $count = $this->builder->countAllResults();
-        return $count;
-    }
-
-    /**
      * setElasticFlagForSource
      * Set elastic_status flag to 1 for a source.
      *
@@ -170,39 +152,6 @@ class Elastic extends Model{
         $this->builder->where('source_id', $source_id);
         $query = $this->builder->get()->getResult();
         return ($query) ? $query[0]->elastic_status : -1;
-    }
-
-    /**
-     * Get Eavs Count - Count number of records for given source where elastic boolean is false
-     *
-     * @param int $source_id  - The id of the source
-     * @return long $count  - The count of the records 
-     */
-    function getEAVsCountForSource(int $source_id): int{
-        $this->builder = $this->db->table('eavs');
-
-        $this->builder->where('source_id',$source_id);
-        $this->builder->where('elastic',0);
-
-        $count = $this->builder->countAllResults();
-        return $count;
-    }
-
-    /**
-     * resetElasticFlagForSourceEAVs
-     * Set Elastic boolean to false for all data in a given source
-     *
-     * @param int $source_id  - The id of the source
-     * @return N/A
-     */
-    function resetElasticFlagForSourceEAVs(int $source_id) {
-        $this->builder = $this->db->table('eavs');
-
-        $data = array(
-                'elastic' => 0
-        );
-        $this->builder->where('source_id', $source_id);
-        $this->builder->update($data);
     }
 
     /**
