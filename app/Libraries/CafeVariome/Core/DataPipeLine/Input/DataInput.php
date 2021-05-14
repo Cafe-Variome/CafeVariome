@@ -18,6 +18,7 @@ use App\Models\Settings;
 use App\Models\EAV;
 use App\Models\Neo4j;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
+use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use CodeIgniter\Config;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
@@ -70,6 +71,18 @@ abstract class DataInput
         $fileNameWithoutExtension = preg_replace("/\.json|\.phenopacket|\.csv|\.xlsx|\.xls/", '', $fileName);
 
         $this->fileMan->Write($fileNameWithoutExtension . "_uniq.json", json_encode($attributeValueList));
+    }
+
+    public function removeAttribuesAndValuesFiles()
+    {
+        $path = FCPATH . UPLOAD . UPLOAD_DATA . $this->sourceId . DIRECTORY_SEPARATOR;
+        $fileMan = new SysFileMan($path);
+
+        foreach ($fileMan->getFiles() as $file) {
+            if (strpos($file, '_uniq.json')) {
+                $fileMan->Delete($file);
+            }
+        }
     }
 
 }
