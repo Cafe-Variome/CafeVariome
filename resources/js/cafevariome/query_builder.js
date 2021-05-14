@@ -1,3 +1,95 @@
+$('#reset_query').click(function() {
+    location.reload();
+});
+
+$( function() {
+    $( "#age-range" ).slider({
+        range: true,
+        min: 0,
+        max: 99,
+        values: [ 0, 99 ],
+        slide: function( event, ui ) {
+            $("#age-value").val(ui.values[0] + " - " + ui.values[1]);
+        }
+    });
+
+    $("#age-value").val($("#age-range").slider("values", 0) + " - " + $("#age-range").slider("values", 1));
+
+    $( "#age-diagnosis-range" ).slider({
+        range: true,
+        min: 0,
+        max: 99,
+        values: [ 0, 99 ],
+        slide: function( event, ui ) {
+            $("#age-diagnosis-value").val(ui.values[0] + " - " + ui.values[1]);
+        }
+    });
+
+    $("#age-diagnosis-value").val($("#age-diagnosis-range").slider("values", 0) + " - " + $("#age-diagnosis-range").slider("values", 1));
+
+    $( "#age-first-symptoms-range" ).slider({
+        range: true,
+        min: 0,
+        max: 99,
+        values: [ 0, 99 ],
+        slide: function( event, ui ) {
+            $("#age-first-symptoms-value").val(ui.values[0] + " - " + ui.values[1]);
+        }
+    });
+
+    $("#age-first-symptoms-value").val($("#age-first-symptoms-range").slider("values", 0) + " - " + $("#age-first-symptoms-range").slider("values", 1));
+
+    $( "#similarity-rel-range" ).slider({
+        range: "min",
+        min: 0,
+        max: 1,
+        value: 1,
+        step: 0.05
+    });
+
+    $( "#similarity-rel-range-ordo" ).slider({
+        range: "min",
+        min: 0,
+        max: 1,
+        value: 1,
+        step: 0.05
+    });
+
+    $( "#match-scale-ordo" ).slider({
+        range: "min",
+        min: 0,
+        max: 100,
+        value: 100,
+        step: 1
+    });
+
+    var handle = $( "#sr-handle" );
+
+    $( "#similarity-range" ).slider({
+        range: "min",
+        min: 0,
+        max: 0,
+        value: 1,
+        step: 1,
+        create: function() {
+            if ($(this).slider("value") != 0) {
+                handle.text($(this).slider("value"));
+            }
+        },
+        slide: function( event, ui ) {
+            handle.text( ui.value );
+        }
+    });
+
+    $( "#similarity-range" ).slider('disable');
+
+    $( "[type=radio]" ).checkboxradio({
+        icon: false
+    });
+
+});
+
+
 $(function() {
     // urls object
     const urls = {'qb_config': baseurl + 'resources/js/config.json',
@@ -80,7 +172,7 @@ $(function() {
         data: null,
         success: function(data){
             hpo_json = data;
-            init_hpotree(hpo_json);
+            // init_hpotree(hpo_json);
         }
     });
 
@@ -119,6 +211,68 @@ $(function() {
         })
         $val.select2({ allowClear: true, placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
     })
+
+    $('button.btnRemove').click(() => {
+        $("#similarity-range").slider('disable');
+        var max_val = $("#similarity-range").slider( "option", "max" );
+        var items_count = 0;
+        $('#values_phen_right :selected').each((key, el) => {
+            var txt = $(el).val();
+            $("#values_phen_right option[value='" + txt + "']").remove();
+            items_count++;
+        });
+        $('#values_phen_right').filterByText($('#search_filter_phen_right'));
+        $("#similarity-range").slider( "option", "max", max_val - items_count );
+
+        if (max_val - items_count > 0) {
+            $("#similarity-range").slider('enable');
+        }
+        else{
+            $("#similarity-range").slider( "option", "min", 0);
+            $("#similarity-range").slider( "option", "max", 0);
+            $("#similarity-range").slider( "option", "value", 1);
+        }
+        if ($("#similarity-range").slider('values', 0) != 0) {
+            $("#sr-handle").text($("#similarity-range").slider('values', 0));
+        }
+        else{
+            $("#sr-handle").text('');
+        }
+    });
+
+    $('button.btnAdd').click(() => {
+        $("#similarity-range").slider('disable');
+        var max_val = $("#similarity-range").slider( "option", "max" ); // 1 at start
+        var items_count = 0;
+        $('#values_phen_left :selected').each((key, el) => {
+            var txt = $(el).text();
+            if ($("#values_phen_right option[value='" + txt + "']").length == 0) {
+                $('#values_phen_right').append($("<option></option>").attr("value", txt).text(txt));    
+                items_count++;
+            }
+        });
+
+        $('#values_phen_right').filterByText($('#search_filter_phen_right'));
+
+        if ((max_val + items_count) == 1) {
+            $("#similarity-range").slider( "option", "min", 0);
+            $("#similarity-range").slider( "option", "value", 1);
+            $("#similarity-range").slider( "option", "max", items_count + max_val);
+        }
+        else if (max_val ==  $("#similarity-range").slider( "option", "value")) {
+            $("#similarity-range").slider( "option", "max", items_count + max_val);
+            $("#similarity-range").slider( "option", "min", 1);
+            $("#similarity-range").slider( "option", "value", items_count + max_val);
+            $("#similarity-range").slider('enable');
+        }
+        else{
+            $("#similarity-range").slider( "option", "min", 1);
+            $("#similarity-range").slider( "option", "max", items_count + max_val);
+            $("#similarity-range").slider('enable');
+        }
+        $( "#sr-handle" ).text($("#similarity-range").slider('values', 0));
+    });
+
 
 
     function logic_eav(rule, eav, logic) {
@@ -173,7 +327,7 @@ $(function() {
             // });
             // if(logic_haplo.length > 1) {logic['-AND'].push({'-OR': logic_haplo})}
 
-            var phenLogic = $('#phen_logic a.active').html();
+            var phenLogic = 'SIM';
             logic_phen = [];
 
             sim = [];
@@ -181,23 +335,14 @@ $(function() {
                 terms = [];
                 $("#values_phen_right option").each(function() { terms.push($(this).val().split(' ')[0].replace(/[()]/g, ''))})
 
-                    if($('#rel').is(':checked')) {
-                        sim[0] = {
-                            'r': $('#r').val(),
-                            's': $('#s').val(),
-                            'ids': terms
-                        }
-                    }
-
-                    if($('#jc').is(':checked')) {
-                        sim[0] = {
-                            'j': $('#j').val(),
-                            'ids': terms
-                        }
+                    sim[0] = {
+                        'r': $( "#similarity-rel-range" ).slider('values', 0),
+                        's': $( "#similarity-range" ).slider('values', 0),
+                        'ORPHA': $('#includeORPHA').prop( "checked"),
+                        'ids': terms
                     }
                     logic['-AND'].push('/query/components/sim/0')
             } else {
-                // $("#jstree_hpo").jstree("get_selected").forEach(function(term) {
                 $("#values_phen_right option").each(function() { 
                     var term = $(this).val().split(' ')[0].replace(/[()]/g, '')
 
@@ -211,7 +356,7 @@ $(function() {
                 });
                 if(logic_phen.length > 1 && phenLogic === 'OR') {logic['-AND'].push({'-OR': logic_phen})}    
             }
-
+            
             
             var genLogic = 'AND'; //$('#gen_logic a.active').html();
             var logic_gen = [];
@@ -232,12 +377,25 @@ $(function() {
                     }
                 }
             });
+
+            if($("#ordoSelect").val().length == 1){
+                ordo[0] = {
+                    'r': $("#similarity-rel-range-ordo").slider('values', 0),
+                    's': $("#match-scale-ordo").slider('values', 0),
+                    'id': [$("#ordoSelect").val()[0].split(' ')[0]],
+                    'HPO': $('#includeHPO').prop( "checked")
+                }
+                logic['-AND'].push("/query/components/ordo/" + (ordo.length-1))
+            }
+
             if(logic_gen.length > 1 && genLogic === 'OR') {logic['-AND'].push({'-OR': logic_gen})}
 
             jsonAPI['query']['components']['eav'] = eav;
             jsonAPI['query']['components']['subjectVariant'] = gen;
             jsonAPI['query']['components']['phenotype'] = phe;
             jsonAPI['query']['components']['sim'] = sim;
+            jsonAPI['query']['components']['ordo'] = ordo;
+
             jsonAPI['logic'] = logic;
 
             $.ajax({url: baseurl + 'AjaxApi/query/' + $('#network_key').val(),
@@ -264,18 +422,24 @@ $(function() {
                                 if (val1 != "Access Denied") {
                                         if (val1.length > 0) {
                                             var ic = 1;
+                                            var resRow = '';
                                             $.each(val1, function (rkey, rval) {
-                                                $('#resTbl tbody').append('<tr><td>' + ic + '</td><td>' + rval + '</td></tr>');
+                                                resRow += '<tr><td>' + ic + '</td><td>' + rval + '</td></tr>'
                                                 ic++;
                                             })
+
+                                            $('#resTbl tbody').append(resRow);
                                             trow += '<td><a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal">' + Object.keys(val1).length + '</a></td>';
                                         }
                                         else if( Object.keys(val1).length > 0){
                                             var ic = 1;
+                                            var resRow = '';
                                             $.each(val1, function (rkey, rval) {
-                                                $('#resTbl tbody').append('<tr><td>' + ic + '</td><td>' + rval + '</td></tr>');
+                                                resRow += '<tr><td>' + ic + '</td><td>' + rval + '</td></tr>'
                                                 ic++;
                                             })
+                                            
+                                            $('#resTbl tbody').append(resRow);
                                             trow += '<td><a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal">' + Object.keys(val1).length + '</a></td>';
                                         }
                                         else{
@@ -300,18 +464,6 @@ $(function() {
             })
         }).fail(()=> alert(error['load_json']));
     })
-
-    setTimeout(() => {$('#isPhenotype').trigger('click')}, 200)
-    setTimeout(() => {$('#isGenotype').trigger('click')}, 200)
-    setTimeout(() => {$('#isDemographic').trigger('click')}, 200)
-    setTimeout(() => {$('#ishaplogroup').trigger('click')}, 200)
-    setTimeout(() => {$('#istissue').trigger('click')}, 200)
-    setTimeout(() => {$('#isPatient').trigger('click')}, 200)
-
-    $(document).on('click', ".hover_test", function (e) {
-        e.preventDefault()
-        
-    });
 
     // Bootstrap notify plugin
     function notify(title, msg, type) { 
@@ -407,4 +559,25 @@ $(function() {
         }
     });
 
+});
+
+$(document).ready(function() {
+    var optionData = [];
+    load_Ordo();
+    function load_Ordo() {
+        $.ajax({ url: baseurl + 'AjaxApi/loadOrpha'  })
+        .done((d)=>{ 
+            d.forEach( (item)=>{
+                optionData.push(item);
+            })
+             $('#ordoSelect').select2({
+                placeholder: 'Choose Ordo term',
+                allowClear: false,
+                width: '100%',
+                maximumSelectionLength: 1,
+                minimumInputLength: 2 ,
+                data:optionData
+            });
+        })
+    }
 });
