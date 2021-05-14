@@ -115,19 +115,24 @@ class Discover extends CVUI_Controller{
         }
 
         $uidata->title = "Discover - Query Builder";
-        $uidata->css = array(VENDOR.'vakata/jstree/dist/themes/default/style.css', VENDOR.'components/jqueryui/themes/base/jquery-ui.css', CSS.'jquery.querybuilder.css', VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');  
+        $uidata->css = array(//VENDOR.'vakata/jstree/dist/themes/default/style.css',
+                             VENDOR.'components/jqueryui/themes/base/jquery-ui.css',
+                             CSS.'query_builder.css', 
+                             VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');  
 
         $uidata->stickyFooter = false;
 
-        $uidata->javascript = array(VENDOR.'vakata/jstree/dist/jstree.js',
+        $uidata->javascript = array(//VENDOR.'vakata/jstree/dist/jstree.js',
                                     VENDOR.'components/jqueryui/jquery-ui.js',
                                     JS.'bootstrap-notify.js',
                                     JS.'mustache.min.js',
                                     JS.'query_builder_config.js', 
-                                    JS.'cafevariome/query_builder_tree.js',
+                                    //JS.'cafevariome/query_builder_tree.js',
                                     JS.'cafevariome/query_builder.js'
                                 );
+
         $data = $this->wrapData($uidata);
+        
         return view($this->viewDirectory. '/Query_Builder', $data);
     }
 
