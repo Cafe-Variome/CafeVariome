@@ -25,8 +25,8 @@
 <!-- Patient Characteristics -->
 <div class="row mb-2">
     <div class="col">
-        <div class="card">
-            <h5 class="card-header">PATIENT CHARACTERISTICS</h5>
+        <div class="card border-secondary">
+            <h5 class="card-header border-secondary">PATIENT CHARACTERISTICS</h5>
             <div class="card-body" id="pat_container">
                 <div class="row rule mb-1">
                     <div class="col">
@@ -73,8 +73,8 @@
 <!-- VARIANT -->
 <div class="row mb-2">
     <div class="col">
-        <div class="card">
-            <h5 class="card-header">VARIANT</h5>
+        <div class="card border-secondary">
+            <h5 class="card-header border-secondary">VARIANT</h5>
             <div class="card-body" id="gen_container">
                 <div class="row rule mb-1">
                     <div class="col">
@@ -114,8 +114,142 @@
         </div>    
     </div>
 </div>
-<!-- Phenotype and HPO Tree -->
+
+
 <div class="row mb-2">
+    <div class="col">
+        <div class="card border-secondary">
+            <h5 class="card-header border-secondary">HPO</h5>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                                <div class="input-group-text"><i class="fa fa-search"></i></div>
+                            </div>
+                            <input class="form-control" id="search_filter_phen_left" type="text" placeholder="filter by keyword" style="text-align: center;" />
+                        </div>  
+                        <select id='values_phen_left' class="form-control" size="10"></select>
+                        <button class="btnAdd btn btn-secondary btn-block">Add</button>
+                    </div>
+                    <div class="col">
+                        <div class="input-group mb-2">
+                            <div class="input-group-prepend">
+                            <div class="input-group-text"><i class="fa fa-search"></i></div>
+                            </div>
+                            <input class="form-control" id="search_filter_phen_right" type="text" placeholder="filter by keyword" style="text-align: center;">
+                        </div> 
+                        <select id="values_phen_right" class="form-control" size="10"></select>
+                        <button class="btnRemove btn btn-secondary btn-block">Remove</button>
+                    </div>
+                </div>
+                <hr/>
+                <div class="row mb-3">
+                    <div class="col-4">HPO Term Pairwise Similarity:</div>
+                    <div class="col-2 text-right">
+                        Minimum
+                    </div>
+                    <div class="col-4">
+                        <div id="similarity-rel-range" class="mt-2">
+                            <div id="srr-handle" class="ui-slider-handle"></div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        Exact
+                    </div>                 
+                </div>
+                <div class="row mb-3">
+                    <div class="col">Minimum Matched Terms:</div>
+                    <div class="col-2 text-right">
+                        Any
+                    </div>
+                    <div class="col">
+                        <div id="similarity-range" class="mt-2">
+                            <div id="sr-handle" class="ui-slider-handle"></div>
+                        </div>
+                    </div> 
+                    <div class="col-2">
+                        All
+                    </div>                 
+                </div> 
+                <div class="row mb-3">
+                    <div class="col-5">
+                        Include ORPHA:
+                    </div>
+                    <div class="col-5">
+                        <input type="checkbox" class="custom-control-input" id="includeORPHA">
+                        <label class="custom-control-label" for="includeORPHA"></label>
+                    </div>
+                </div>                         
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ORDO -->
+
+<div class="row mb-2">
+    <div class="col">
+        <div class="card border-secondary">
+            <h5 class="card-header border-secondary">ORDO</h5>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-1 pt-2"> ORDO:</div>
+                    <div class="col-11">
+                            <select class=" form-control" multiple="multiple" tabindex="-1" id="ordoSelect">
+                            <option></option>
+                        </select>
+                    </div>
+                </div>
+                <hr/>
+                <div class="row mb-3">
+                    <div class="col-4">HPO Term Pairwise Similarity:</div>
+                    <div class="col-2 text-right">
+                        Minimum
+                    </div>
+                    <div class="col-4">
+                        <div id="similarity-rel-range-ordo" class="mt-2">
+                            <div id="srr-handle" class="ui-slider-handle"></div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        Exact
+                    </div>                 
+                </div>
+                <hr/>
+                <div class="row mb-3">
+                    <div class="col-4">ORDO Match Scale</div>
+                    <div class="col-2 text-right">
+                        Minimum
+                    </div>
+                    <div class="col-4">
+                        <div id="match-scale-ordo" class="mt-2">
+                            <div id="srr-handle" class="ui-slider-handle"></div>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        Exact
+                    </div>                 
+                </div>
+                <hr/>
+                <div class="row mb-3">
+                    <div class="col-5">
+                        Include HPO:
+                    </div>
+                    <div class="col-5">
+                        <input type="checkbox" class="custom-control-input" id="includeHPO">
+                        <label class="custom-control-label" for="includeHPO"></label>
+                    </div>
+                </div>                  
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Phenotype and HPO Tree -->
+<!-- <div class="row mb-2">
     <div class="col">
         <div class="card">
             <h5 class="card-header">Phenotype</h5>
@@ -172,7 +306,7 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <input type="hidden" value="<?php echo $network_key;?>" id="network_key"/>
 <input type="hidden" value="<?php echo $user_id;?>" id="user_id"/>
