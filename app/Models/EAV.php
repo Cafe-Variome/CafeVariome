@@ -238,4 +238,13 @@ class EAV extends Model{
         $this->builder->update($data);
     }
 
+    public function setElasticFlag(int $source_id)
+    {
+        $this->builder = $this->db->table($this->table);
+        $data = ['elastic' => 1];
+
+        $this->builder->where('source_id', $source_id);
+        $this->builder->update($data);
+    }
+
 }
