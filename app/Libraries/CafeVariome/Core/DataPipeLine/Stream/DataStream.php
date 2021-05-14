@@ -102,7 +102,6 @@ class DataStream
                 }
             } catch (\Exception $ex) {
                 var_dump($ex);
-                exit;
             }
         }
     }
@@ -331,7 +330,7 @@ class DataStream
         }   
 
         $sourceModel->unlockSource($source_id);	
-        $eavModel->updateEAVs(["elastic"=>1], ['source_id'=> $source_id]) ;     
+        $eavModel->setElasticFlag($source_id);     
 
     }
 
