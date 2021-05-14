@@ -247,4 +247,24 @@ class EAV extends Model{
         $this->builder->update($data);
     }
 
+    /**
+     * countUnaddedEAVs 
+     * For a given source check whether there is any data in MySQL which isnt in ElasticSearch
+     *
+     * @param int $source_id  - The name of the source
+     * @return int $noOfRecords    - Count of how many records there are which arent in ElasticSearch
+     */
+    public function countUnaddedEAVs(int $source_id):int
+    {
+        $this->builder = $this->db->table($this->table);
+
+        $this->builder->where('elastic', 0);
+        $this->builder->where('source_id', $source_id);
+
+        $count = 0;
+        $count = $this->builder->countAllResults();
+
+        return $count;
+    }
+    
 }
