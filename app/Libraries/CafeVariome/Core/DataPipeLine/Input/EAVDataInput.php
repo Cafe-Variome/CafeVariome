@@ -47,7 +47,6 @@ class EAVDataInput extends DataInput
         
                 if ($this->delete == 1) {		
                     $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data');
-
                     $this->eavModel->deleteRecordsBySourceId($this->sourceId);
                 }
                 
@@ -189,6 +188,10 @@ class EAVDataInput extends DataInput
         $totalRecordCount = $this->sourceModel->countSourceEntries($this->sourceId);
         $this->sourceModel->updateSource(['record_count' => $totalRecordCount], ['source_id' => $this->sourceId]);
 
+        if ($this->delete == 1) {		
+            $this->removeAttribuesAndValuesFiles();
+        }
+        
         $this->dumpAttributesAndValues($file_id);
 
         $this->uploadModel->markEndOfUpload($file_id, $this->sourceId);
