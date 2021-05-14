@@ -77,7 +77,7 @@ class EAV extends Model{
     {
         $subjectHPOWithNegatedArray = [];
 
-        $uidSubjectIds = $this->getEAVs('uid, subject_id', ['source_id' => $source_id, 'elastic' => 0], true);
+        $uidSubjectIds = $this->getEAVs('uid, subject_id', ['source_id' => $source_id], true);
         $uids = [];
         foreach ($uidSubjectIds as $uid_sid) {
             $uids[$uid_sid['uid']] = $uid_sid['subject_id'];
@@ -118,7 +118,6 @@ class EAV extends Model{
         $this->builder->select('subject_id, attribute, value');
         $this->builder->where('attribute', "Phenotype_ORPHA"); //Diagnosis
         $this->builder->where('source_id', $source_id);
-        //$this->builder->where('elastic', 0);
 
         $query = $this->builder->get()->getResultArray();
         $data = [];
@@ -142,7 +141,6 @@ class EAV extends Model{
         $this->builder->where('attribute !=', 'ancestor_hpo_id'); // attribute != "ancestor_hpo_id"
         $this->builder->where('attribute !=', 'classOfOnset_id'); // attribute != 'classOfOnset_id'
         $this->builder->like('value', 'hp:', 'after');
-        $this->builder->where('elastic', 0);
 
         $data = $this->builder->get()->getResultArray();
 
@@ -155,7 +153,6 @@ class EAV extends Model{
         $this->builder->select('uid, value');
         $this->builder->where('source_id', $source_id);
         $this->builder->where('attribute', 'negated');
-        $this->builder->where('elastic', 0);
 
         $data = $this->builder->get()->getResultArray();
 
