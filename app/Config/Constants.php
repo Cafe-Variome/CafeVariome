@@ -101,6 +101,9 @@ define('VENDOR','vendor/');
 define('RESOURCES_DIR', "resources". DIRECTORY_SEPARATOR);
 define('JSON_DATA_DIR', RESOURCES_DIR . "phenotype_lookup_data" . DIRECTORY_SEPARATOR);
 define('CV_BIN', RESOURCES_DIR . 'bin' . DIRECTORY_SEPARATOR);
+define('STATIC_DIR', 'static' . DIRECTORY_SEPARATOR);
+define('ORPHATERMS_SOURCE', 'orphaterms.txt');
+
 
 define('CV_CONVERT_BIN', CV_BIN . 'cv-convert');
 define('CV_CONVERT_SETTINGS_DIR', UPLOAD . 'settings' . DIRECTORY_SEPARATOR);
