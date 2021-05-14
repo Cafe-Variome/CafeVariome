@@ -630,11 +630,13 @@ class Source extends CVUI_Controller{
         $uidata = new UIData();
         $uidata->title = "Data Attributes";
 
-        if($this->sourceModel->getSource($source_id) == null){
+        $source = $this->sourceModel->getSource($source_id);
+        if($source == null){
             $this->setStatusMessage('Source was not found.', STATUS_ERROR);
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
 
+        $uidata->data['sourceName'] = $source['name'];
         $uidata->data['source_id'] = $source_id;
 
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');

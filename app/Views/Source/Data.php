@@ -7,7 +7,12 @@
 	</div>	
 </div>
 <hr>
-
+<div class="row">
+	<div class="col">
+		<h4>List of unique attributes and values of <?= $sourceName ?></h3>
+	</div>
+</div>
+<hr>
 <div class="alert alert-danger" id="erroralert" style="display:none">
 	<div class="row">
 		<div class="col-9">
@@ -21,8 +26,6 @@
 		</div>
 	</div>
 </div>
-
-
 
 <input type="hidden" value="<?php echo $source_id ?>" name="source_id" id="source_id">
 
