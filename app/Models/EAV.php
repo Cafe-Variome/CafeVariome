@@ -222,4 +222,20 @@ class EAV extends Model{
         $this->builder->where('fileName', $file_id);
         $this->builder->delete();
     }
+
+    /**
+     * resetElasticFlag
+     * Set Elastic boolean to false for all data in a given source
+     *
+     * @param int $source_id  - The id of the source
+     * @return N/A
+     */
+    function resetElasticFlag(int $source_id) {
+        $this->builder = $this->db->table($this->table);
+        $data = ['elastic' => 0];
+
+        $this->builder->where('source_id', $source_id);
+        $this->builder->update($data);
+    }
+
 }
