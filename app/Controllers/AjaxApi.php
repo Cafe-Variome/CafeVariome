@@ -21,6 +21,7 @@ use App\Models\Settings;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 use App\Libraries\CafeVariome\Net\HPONetworkInterface;
+use App\Models\EAV;
 use App\Models\Source;
 use App\Models\Network;
 use App\Models\Elastic;
@@ -886,6 +887,7 @@ use CodeIgniter\Config\Services;
     public function elastic_check() {	   
             
         $elasticModel = new \App\Models\Elastic(); 
+        $eavModel = new EAV();
 
         $data = json_decode($this->request->getVar('u_data'));
         $force = $data->force;
@@ -896,33 +898,30 @@ use CodeIgniter\Config\Services;
 
         if (!$unprocessedFilesCount) {
             $result = ['Status' => 'Empty'];
-            echo json_encode($result);
-            return;
+            return json_encode($result);
         }
         if ($add) {
-            $unaddedEAVsCount = $elasticModel->getUnaddedEAVs($source_id);
-            if (!$unaddedEAVsCount) {
+            $unaddedEAVsCount = $eavModel->countUnaddedEAVs($source_id);
+            if ($unaddedEAVsCount == 0) {
                 $result = ['Status' => 'Fully Updated'];
-                echo json_encode($result);
-                return;
+                return json_encode($result);
             }
             else {
                 $time = $unaddedEAVsCount/2786;
                 $result = ['Status' => 'Success','Time'=> $time];
-                echo json_encode($result);
+                return json_encode($result);
             }
         }
         else {
             if ($force) {
-                $count = $elasticModel->getEAVsCountForSource($source_id);
+                $count = $eavModel->countUnaddedEAVs($source_id);
                 $time = $count/2786;
                 $result = ['Status' => 'Success','Time'=> $time];
-                echo json_encode($result);
-
+                return json_encode($result);
             }
             else {
                 $result = ['Status' => 'Fully Updated'];
-                echo json_encode($result);
+                return json_encode($result);
             }
         } 	
     }
@@ -937,7 +936,7 @@ use CodeIgniter\Config\Services;
      * @return N/A
      */
     public function elastic_start() {
-        $elasticModel = new \App\Models\Elastic(); 
+        $eavModel = new \App\Models\EAV(); 
         $phpshellHelperInstance = new PHPShellHelper();
         $data = json_decode($this->request->getVar('u_data'));
         $force = $data->force;
@@ -946,12 +945,32 @@ use CodeIgniter\Config\Services;
 
         if ($force) {
             // if the regenerate was forced set the elastic state for all eav data rows
-            $elasticModel->resetElasticFlagForSourceEAVs($source_id);
+            $eavModel->resetElasticFlag($source_id);
         }
         
         // rebuild the json list for interface
         $phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateFederatedPhenotypeAttributeValueList $source_id $add");
     }
+
+    function loadOrpha(){
+        $this->response->setHeader("Content-Type", "application/json");
+
+        $path = FCPATH . RESOURCES_DIR . STATIC_DIR;
+        $fileMan = new SysFileMan($path);
+        $terms = [];
+        if ($fileMan->Exists(ORPHATERMS_SOURCE)) {
+            while (($line = $fileMan->ReadLine(ORPHATERMS_SOURCE)) != false) {
+                $termPair = $line;
+                $termPair = str_replace('"', "", $termPair);
+                $termPair = str_replace("\n", "", $termPair);
+                $termPairArr = explode(",", $termPair);
+
+                array_push($terms, $termPairArr[0] . ' ' . $termPairArr[1]); 
+            }
+        }
+        
+		return json_encode($terms);
+	}
 
     public function getAttributeValueFromFile()
     {
