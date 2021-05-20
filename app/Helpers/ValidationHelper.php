@@ -43,4 +43,33 @@ class ValidationHelper{
         return in_array($delimiter, $valid_delimiters);
     }
 
+    public function subject_id_required_with(string $str, string $fields, array $data, & $err): bool
+    {
+        $err = null;
+
+        if ($data[$fields] == SUBJECT_ID_IN_FILE_NAME) {
+            return true;
+        }
+
+        if ($data[$fields] == SUBJECT_ID_WITHIN_FILE ) {
+
+            if ($str == '' && $str == null) {
+                $err = "Subject ID Attribute Name cannot be empty.";
+                return false;
+
+            }
+            else{
+                $regexp = "/^[a-zA-Z0-9-_]+$/";
+
+                if (preg_match($regexp, $str, $matches)) {
+                    return true;
+                }
+                
+                $err = "The only valid input for {field} is alphanumeric characters, dashes, and underscores.";
+            }
+        }
+
+        return false;
+    }
+
 }
