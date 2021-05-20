@@ -129,3 +129,11 @@ define('UPLOADER_DELETE_FILE', 2);
 // PHP INI Values
 ini_set('memory_limit', "1G");
 
+//Data Pipeline
+define('SUBJECT_ID_WITHIN_FILE', 0);
+define('SUBJECT_ID_IN_FILE_NAME', 1);
+define('GROUPING_COLUMNS_ALL', 0);
+define('GROUPING_COLUMNS_CUSTOM', 1);
+
+
+
