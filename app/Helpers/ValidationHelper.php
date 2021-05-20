@@ -72,4 +72,37 @@ class ValidationHelper{
         return false;
     }
 
+    public function group_columns_required_with(string $str, string $fields, array $data, & $err): bool
+    {
+        $err = null;
+
+        if ($data[$fields] == GROUPING_COLUMNS_ALL) {
+            return true;
+        }
+
+        if ($data[$fields] == GROUPING_COLUMNS_CUSTOM) {
+
+            if ($str == null || $str == '') {
+                $err = 'Group Columns cannot be empty when custom grouping is selected.';
+                return false;
+            }
+            else {
+                if(strpos($str, ',')){
+                    $items = explode(',', $str);
+
+                    foreach ($items as $item) {
+                        if (intval($item) == 0) {
+                            $err = 'Group Columns should be a comma separated list of numbers.';
+                            return false;
+                        }
+                    }
+
+                    return true;
+                }
+            }
+        }
+
+
+        return false;
+    }
 }
