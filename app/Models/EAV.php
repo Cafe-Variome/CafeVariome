@@ -296,4 +296,37 @@ class EAV extends Model{
 
         return $count;
     }
+
+    /**
+     * Check Negated for HPO - For given list of HPO terms check if the group they belong to has a
+     * negated = false flag. Then return only those
+     *
+     * @param array $hpo    - List of HPO terms to check
+     * @param int $file_id  - the file id where these HPO terms have come from
+     * @return array $final - List of HPO terms which have negated=0
+     */
+    public function checkNegatedForHPO(int $hpo, int $file_id) {
+
+        $this->builder = $this->db->table($this->table);
+
+        $final =[];
+        for ($i=0; $i < count($hpo); $i++) { 
+
+            $this->builder->select('uid');
+            $this->builder->where('value', $hpo[$i]);
+            $this->builder->where('fileName', $file_id);
+            $query = $this->builder->get()->getResultArray();
+            $this->builder->select('value');
+            $this->builder->where('uid', $query[0]['uid']);
+            $this->builder->where('attribute', "negated");
+            $query = $this->builder->get()->getResultArray();
+            if ($query[0]['value'] == 0) {
+                array_push($final, $hpo[$i]);
+            }
+        }
+
+        return $final;
+    }
+
+    
 }
