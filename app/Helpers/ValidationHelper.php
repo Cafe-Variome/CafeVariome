@@ -15,8 +15,9 @@ class ValidationHelper{
     private $db;
 
 
-    function __construct(){
-        $this->db = \Config\Database::connect();
+    function __construct()
+    {
+
     }
 
     /**
@@ -29,8 +30,17 @@ class ValidationHelper{
      * @author Mehdi Mehtarizadeh
      */
     
-    function unique_network_group_name_check(string $group_name, string $network_key): bool {
-        $networkGroupModel = new \App\Models\NetworkGroup($this->db);
+    function unique_network_group_name_check(string $group_name, string $network_key): bool 
+    {
+        $networkGroupModel = new \App\Models\NetworkGroup();
         return ($networkGroupModel->getNetworkGroups('', array('network_key' => $network_key, 'name' => $group_name)) ? false : true);
     }
+
+    public function valid_delimiter(string $delimiter): bool
+    {
+        $valid_delimiters = [',', '/', ';', ':', '|', '*', '&', '%', '$', '!', '~', '#', '-', '_', '+', '=', '^'];
+
+        return in_array($delimiter, $valid_delimiters);
+    }
+
 }
