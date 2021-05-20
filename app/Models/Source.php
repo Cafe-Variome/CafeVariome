@@ -375,19 +375,38 @@ use CodeIgniter\Database\ConnectionInterface;
     }
 
     /**
-     * setElasticFlagForSource
+     * setElasticFlag
      * Set elastic_status flag to 1 for a source.
      *
      * @param int $source_id - The name of the source
      * @return N/A
      */
-    function setElasticFlagForSource(int $source_id) 
+    function setElasticFlag(int $source_id) 
     {
         $this->builder = $this->db->table($this->table);
 
         $data = array('elastic_status' => 1);
         $this->builder->where('source_id', $source_id);
         $this->builder->update($data);
+    }
+
+    /**
+     * getElasticFlag
+     * get elastic_status for a source from sources table
+     *
+     * @param int $source_id - The name of the source
+     * @return array $query       - All columns for all files which are fresh
+     */
+    function getElasticFlag(int $source_id):int 
+    {
+        $this->builder = $this->db->table($this->table);
+
+        $this->builder->select('elastic_status');
+        $this->builder->where('source_id', $source_id);
+
+        $query = $this->builder->get()->getResult();
+
+        return ($query) ? $query[0]->elastic_status : -1;
     }
     
  }
