@@ -64,6 +64,36 @@ class EAV extends Model{
         return $query; 
     }
 
+    /**
+     * Json Insert - Taking the data from recursivePacket we add to our MySQL transaction
+     * Adding to eavs table
+     *
+     * Moved to upload model by Mehdi Mehtarizadeh (02/08/2019)
+     * @param string $uid   - The md5 ID linking groups together
+     * @param int $source   - The ID of the source we are linking this data to - sources
+     * @param int $file     - The ID of the file we have generated this data from - UploadDataStatus
+     * @param string $id    - The subject id of the current phenoPacket
+     * @param string $key   - The attribute column for given datapoint
+     * @param string $value - The value column for given datapoint
+     * 
+     * @return void
+     */
+    public function createEAV(string $uid, int $source, int $file, string $id, string $key, string $value) 
+    {
+        $this->builder = $this->db->table($this->table);
+
+        $data = [
+            'uid'        =>  $uid,
+            'source_id'     => $source,
+            'fileName'   => $file,
+            'subject_id' => $id,
+            'attribute'  => $key,
+            'value'      => $value
+        ];
+
+        $this->builder->insert($data);
+    }
+
     public function updateEAVs(array $data, array $conds = null)
     {
         $this->builder = $this->db->table($this->table);
@@ -266,5 +296,4 @@ class EAV extends Model{
 
         return $count;
     }
-    
 }
