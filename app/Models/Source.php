@@ -94,8 +94,6 @@ use CodeIgniter\Database\ConnectionInterface;
         return $query; 
     }
 
-
-
     /**
      * 
      */
@@ -374,6 +372,22 @@ use CodeIgniter\Database\ConnectionInterface;
                 ));
         $query = $this->builder->get()->getResultArray();
         return $query;
+    }
+
+    /**
+     * setElasticFlagForSource
+     * Set elastic_status flag to 1 for a source.
+     *
+     * @param int $source_id - The name of the source
+     * @return N/A
+     */
+    function setElasticFlagForSource(int $source_id) 
+    {
+        $this->builder = $this->db->table($this->table);
+
+        $data = array('elastic_status' => 1);
+        $this->builder->where('source_id', $source_id);
+        $this->builder->update($data);
     }
     
  }
