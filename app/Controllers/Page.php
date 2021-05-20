@@ -289,24 +289,28 @@ class Page extends CVUI_Controller
         ]);
 
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {      
-            $pageId = $this->request->getVar('page_id');     
-            try {
-                $page = $pageModel->getPages('Title, Removable', ['id' => $page_id]);
-                if (count($page) == 1) {
-                    $pageTitle = $page[0]['Title'];
-                    if ($page[0]['Removable']) {
-                        $pageModel->deletePage($page_id);
-                        $this->setStatusMessage("Page '$pageTitle' was deleted.", STATUS_SUCCESS);
+            $pageId = $this->request->getVar('page_id'); 
+            $confirm = $this->request->getVar('confirm');
+
+            if ($confirm == 'yes') {
+                try {
+                    $page = $pageModel->getPages('Title, Removable', ['id' => $page_id]);
+                    if (count($page) == 1) {
+                        $pageTitle = $page[0]['Title'];
+                        if ($page[0]['Removable']) {
+                            $pageModel->deletePage($page_id);
+                            $this->setStatusMessage("Page '$pageTitle' was deleted.", STATUS_SUCCESS);
+                        }
+                        else {
+                            $this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
+                        }
                     }
-                    else {
-                        $this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
+                    else{
+                        $this->setStatusMessage("Page does not exist.", STATUS_ERROR);
                     }
+                } catch (\Exception $ex) {
+                    $this->setStatusMessage("There was a problem deleting the page.", STATUS_ERROR);
                 }
-                else{
-                    $this->setStatusMessage("Page does not exist.", STATUS_ERROR);
-                }
-            } catch (\Exception $ex) {
-                $this->setStatusMessage("There was a problem deleting the page.", STATUS_ERROR);
             }
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
