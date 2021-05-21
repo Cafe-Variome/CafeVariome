@@ -156,7 +156,7 @@ class EAVDataInput extends DataInput
                             $value = $row[$val];
                             if ($value == "") continue;     
                             if (is_a($value, 'DateTime')) $value = $value->format('Y-m-d H:i:s');
-                            $this->uploadModel->jsonInsert($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
+                            $this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
                             $counter++;                            
                             if ($counter % 800 == 0) {
                                 $error = $this->sendBatch();   
