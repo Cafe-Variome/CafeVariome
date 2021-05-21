@@ -524,5 +524,21 @@ use CodeIgniter\Database\ConnectionInterface;
         return count($query) == 1 ? $query[0]['source_id'] : -1;
     }
 
+    /**
+     * getUnprocessedFilesForSource
+     * For a given source get the number of files whose data has not been added to ElasticSearch
+     *
+     * @param int $source_id - The name of the source
+     * @return int      - Count of how many Files there are which arent in ElasticSearch
+     */
+    function getElasticsearchUnprocessedFilesBySourceId(int $source_id): int 
+    {
+        $this->builder = $this->db->table($this->table);
+
+        $this->builder->where('source_id', $source_id);
+        $count = $this->builder->countAllResults(); 
+        return $count;
+    }
+
  }
  
