@@ -84,6 +84,19 @@
                 Data
             </div>
 
+            <li class="nav-item <?= $controllerName == 'Pipeline' ? 'active' : ''?>">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePipeline" aria-expanded="true" aria-controls="collapsePipeline">
+                <i class="fas fa-fw fa-grip-lines-vertical"></i>
+                <span>Pipelines</span>
+                </a>
+                <div id="collapsePipeline" class="collapse <?= $controllerName == 'Pipeline' ? 'show' : ''?>" aria-labelledby="headingPipeline" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <a class="collapse-item" href="<?= base_url('Pipeline/Create') ?>">Create a Pipeline</a>
+                        <a class="collapse-item" href="<?= base_url('Pipeline/List') ?>">View Pipelines</a>
+                    </div>
+                </div>
+            </li>
+
             <li class="nav-item <?= $controllerName == 'Source' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSource" aria-expanded="true" aria-controls="collapseSource">
                 <i class="fas fa-fw fa-database"></i>
