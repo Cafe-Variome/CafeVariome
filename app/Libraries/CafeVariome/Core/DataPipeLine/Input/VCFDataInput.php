@@ -73,7 +73,7 @@ class VCFDataInput extends DataInput
                             foreach ($val as $v) {
                                 if (in_array($v[0], $config)) {    
                                     array_push($this->records, ['uid' => $uid, 'attribute' => $v[0], 'value' => $v[1]]);                      
-                                    //$this->uploadModel->jsonInsert($uid, $this->sourceId, $file_id, $this->subject_id, $v[0], $v[1]);
+                                    //$this->eavModel->createEAV($uid, $this->sourceId, $file_id, $this->subject_id, $v[0], $v[1]);
                                 }
                             }
                         }
@@ -82,7 +82,7 @@ class VCFDataInput extends DataInput
                         }		              
                         else {
                             array_push($this->records, ['uid' => $uid, 'attribute' => $this->headers[$i], 'value' => $values[$i]]);                      
-                            //$this->uploadModel->jsonInsert($uid, $this->sourceId, $file_id, $this->subject_id, $this->headers[$i], $values[$i]);
+                            //$this->eavModel->createEAV($uid, $this->sourceId, $file_id, $this->subject_id, $this->headers[$i], $values[$i]);
                         }
                     }
                 }
@@ -100,7 +100,7 @@ class VCFDataInput extends DataInput
         $this->db->transStart();	
 
         foreach ($this->records as $record) {
-            $this->uploadModel->jsonInsert($record['uid'], $this->sourceId, $file_id, $this->subject_id, $record['attribute'], $record['value']);
+            $this->eavModel->createEAV($record['uid'], $this->sourceId, $file_id, $this->subject_id, $record['attribute'], $record['value']);
             $this->serviceInterface->ReportProgress($file_id, $recordsProcessed, $recordCount, 'bulkupload');
             $recordsProcessed ++;
         }
