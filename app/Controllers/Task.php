@@ -51,7 +51,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         $inputPipeLine = new PhenoPacketDataInput($source_id, $overwrite);
 
         // get a list of json files just uploaded to this source
-        $files = $uploadModel->getPhenoPacketFiles($source_id, !$overwrite);
+        $files = $uploadModel->getPhenoPacketFilesBySourceId($source_id, !$overwrite);
 
         for ($t=0; $t < count($files); $t++) {
 
