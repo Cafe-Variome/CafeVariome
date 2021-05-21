@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 06, 2021 at 04:05 PM
--- Server version: 5.7.33-0ubuntu0.18.04.1
+-- Generation Time: May 21, 2021 at 10:02 AM
+-- Server version: 5.7.34-0ubuntu0.18.04.1
 -- PHP Version: 7.4.14
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -36,7 +36,7 @@ CREATE TABLE `eavs` (
   `attribute` varchar(50) NOT NULL,
   `value` varchar(200) DEFAULT NULL,
   `elastic` bit(1) NOT NULL DEFAULT b'0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -79,11 +79,11 @@ CREATE TABLE `login_attempts` (
 
 CREATE TABLE `menu_items` (
   `id` int(11) NOT NULL,
-  `Position` int(11) NOT NULL,
-  `Title` varchar(64) NOT NULL,
-  `Url` varchar(256) DEFAULT NULL,
-  `Page_Id` int(11) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+  `position` int(11) NOT NULL,
+  `title` varchar(64) NOT NULL,
+  `url` varchar(256) DEFAULT NULL,
+  `page_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -93,9 +93,9 @@ CREATE TABLE `menu_items` (
 
 CREATE TABLE `networks` (
   `network_key` int(11) NOT NULL,
-  `network_name` text NOT NULL,
+  `network_name` mediumtext NOT NULL,
   `network_type` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -110,7 +110,7 @@ CREATE TABLE `network_groups` (
   `network_key` int(11) NOT NULL,
   `group_type` varchar(50) NOT NULL,
   `url` varchar(256) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -122,9 +122,9 @@ CREATE TABLE `network_groups_sources` (
   `id` int(11) UNSIGNED NOT NULL,
   `source_id` int(11) UNSIGNED NOT NULL,
   `group_id` int(11) UNSIGNED NOT NULL,
-  `installation_key` varchar(32) NOT NULL,
+  `installation_key` varchar(32) CHARACTER SET latin1 NOT NULL,
   `network_key` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -136,13 +136,13 @@ CREATE TABLE `network_requests` (
   `id` int(10) NOT NULL,
   `network_key` int(11) NOT NULL,
   `installation_key` varchar(100) NOT NULL,
-  `url` text NOT NULL,
-  `justification` text NOT NULL,
+  `url` mediumtext NOT NULL,
+  `justification` mediumtext NOT NULL,
   `email` varchar(50) NOT NULL,
-  `ip` text NOT NULL,
+  `ip` mediumtext NOT NULL,
   `token` varchar(32) NOT NULL,
   `status` tinyint(4) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -153,11 +153,11 @@ CREATE TABLE `network_requests` (
 CREATE TABLE `pages` (
   `id` int(11) NOT NULL,
   `Title` varchar(50) NOT NULL,
-  `Content` text NOT NULL,
+  `Content` mediumtext NOT NULL,
   `Author` int(11) UNSIGNED NOT NULL,
   `Active` bit(1) NOT NULL,
   `Removable` bit(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `pages`
@@ -170,6 +170,26 @@ INSERT INTO `pages` (`id`, `Title`, `Content`, `Author`, `Active`, `Removable`) 
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `pipeline`
+--
+
+CREATE TABLE `pipeline` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `subject_id_location` tinyint(3) NOT NULL DEFAULT '0',
+  `subject_id_attribute_name` varchar(100) NOT NULL,
+  `grouping` tinyint(4) NOT NULL DEFAULT '0',
+  `group_columns` varchar(200) DEFAULT NULL,
+  `dateformat` tinyint(4) DEFAULT NULL,
+  `hpo_attribute_name` varchar(100) DEFAULT NULL,
+  `negated_hpo_attribute_name` varchar(100) DEFAULT NULL,
+  `orpha_attribute_name` varchar(100) DEFAULT NULL,
+  `internal_delimiter` char(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `settings`
 --
 
@@ -178,10 +198,10 @@ CREATE TABLE `settings` (
   `setting_key` varchar(50) NOT NULL,
   `value` varchar(100) NOT NULL,
   `setting_name` varchar(50) DEFAULT NULL,
-  `info` text NOT NULL,
+  `info` mediumtext NOT NULL,
   `setting_group` varchar(50) DEFAULT NULL,
   `validation_rules` varchar(100) NOT NULL DEFAULT 'required|xss_clean'
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `settings`
@@ -193,7 +213,7 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 (3, 'site_author', 'Bioinformatics Research Group - University of Leicester', 'Site Author', 'Name of the owner of the website, whether a person or an organisation, that appears as metadata on public pages.', 'main', 'required'),
 (4, 'site_keywords', 'healthcare data discovery, bioinformatics', 'Keywords', 'Keywords explaining activity of the website that appear as metadata on public pages. They help search engines find this website.', 'main', 'required'),
 (5, 'email', 'admin@cafevariome.org', 'Administrator Email', 'Email of the person or group of people responsible for the website.', 'main', 'required'),
-(6, 'allow_registrations', 'on', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'authentication', 'required'),
+(6, 'allow_registrations', 'off', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'authentication', 'required'),
 (7, 'discovery_requires_login', 'on', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'discovery', 'required'),
 (8, 'show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'discovery', 'required'),
 (9, 'auth_server', 'http://localhost/cvnet/', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main', 'required'),
@@ -205,9 +225,9 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 (15, 'oidc_client_secret', '65301ba7-ddfe-4844-a5b4-ddb1e37861ac', 'Client Secret', 'Client secret of the OpenID provider.', 'authentication', 'required'),
 (17, 'oidc_port', '80', 'Port', 'If the OpenID provider uses any port other than 80 or 443, please specify the numeric value.', 'authentication', 'required'),
 (18, 'elastic_url', 'http://localhost:9200', 'Elasticsearch Address', 'Elastic search address', 'elasticsearch', 'required'),
-(19, 'neo4j_server', 'http://localhost', 'Neo4J Server', 'The URL of the Neo4J REST API.', 'neo4j', 'required'),
+(19, 'neo4j_username', 'neo4j', 'Neo4J Username', 'Username that is used to communicate with Neo4J REST API.', 'neo4j', 'required'),
 (20, 'neo4j_port', '7474', 'Neo4J Port', 'The port that the Neo4J REST API is running on. BY default it is 7474.', 'neo4j', 'required'),
-(21, 'neo4j_username', 'neo4j', 'Neo4J Username', 'Username that is used to communicate with Neo4J REST API.', 'neo4j', 'required'),
+(21, 'neo4j_server', 'http://localhost', 'Neo4J Server', 'The URL of the Neo4J REST API.', 'neo4j', 'required'),
 (22, 'neo4j_password', 'neo4j123', 'Neo4J Password', 'Password that is used to communicate with Neo4J REST API.', 'neo4j', 'required'),
 (23, 'hpo_autocomplete_url', 'https://www185.lamp.le.ac.uk/EpadGreg/hpo/query/', 'HPO Auto-complete', 'HPO Auto-complete', 'endpoint', 'required'),
 (24, 'orpha_autocomplete_url', '', 'ORPHA Auto-complete', 'HPO Auto-complete', 'endpoint', 'required'),
@@ -221,12 +241,12 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 
 CREATE TABLE `sources` (
   `source_id` int(11) UNSIGNED NOT NULL,
-  `owner_name` text NOT NULL,
-  `email` text NOT NULL,
+  `owner_name` mediumtext NOT NULL,
+  `email` mediumtext NOT NULL,
   `name` varchar(30) NOT NULL,
-  `uri` text NOT NULL,
-  `description` text NOT NULL,
-  `long_description` text NOT NULL,
+  `uri` mediumtext NOT NULL,
+  `description` mediumtext NOT NULL,
+  `long_description` mediumtext NOT NULL,
   `status` varchar(15) NOT NULL,
   `type` varchar(30) NOT NULL DEFAULT 'mysql',
   `date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -235,7 +255,7 @@ CREATE TABLE `sources` (
   `elastic_lock` tinyint(1) DEFAULT '0',
   `elastic_data` tinyint(1) DEFAULT '0',
   `neo4j_data` tinyint(1) DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -244,7 +264,7 @@ CREATE TABLE `sources` (
 --
 
 CREATE TABLE `uploaddatastatus` (
-  `FileName` varchar(40) NOT NULL,
+  `FileName` varchar(100) NOT NULL,
   `uploadStart` datetime NOT NULL,
   `uploadEnd` datetime DEFAULT NULL,
   `Status` varchar(20) NOT NULL,
@@ -254,8 +274,9 @@ CREATE TABLE `uploaddatastatus` (
   `ID` int(11) UNSIGNED NOT NULL,
   `patient` varchar(50) DEFAULT NULL,
   `tissue` varchar(50) DEFAULT NULL,
+  `pipeline_id` int(11) DEFAULT NULL,
   `setting_file` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -269,7 +290,7 @@ CREATE TABLE `upload_error` (
   `message` varchar(500) NOT NULL,
   `error_code` int(5) NOT NULL,
   `source_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -282,7 +303,7 @@ CREATE TABLE `upload_jobs` (
   `source_id` int(11) NOT NULL,
   `user_id` mediumint(8) UNSIGNED NOT NULL,
   `linking_id` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -320,9 +341,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `email`, `activation_selector`, `activation_code`, `forgotten_password_selector`, `forgotten_password_code`, `forgotten_password_time`, `remember_selector`, `remember_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`, `is_admin`, `token`, `remote`) VALUES
-(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1620305709, 1, 'Admin', 'Admin', 'Brookes Lab', '', 1, NULL, 0),
-(2, '127.0.0.1', 'mm917@leicester.ac.uk', '$2y$10$Zzi8zkVbzOkrzd1h2wztW.ouTysqcgbsuZYejkq.MVHH5megGANTO', 'mm917@leicester.ac.uk', NULL, NULL, NULL, NULL, NULL, NULL, NULL, 1606824165, 1606824304, 1, 'Test', 'Test', 'UOL', NULL, 0, NULL, 0);
-
+(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1620741180, 1, 'Admin', 'Admin', 'Brookes Lab', '', 1, NULL, 0);
 -- --------------------------------------------------------
 
 --
@@ -340,8 +359,7 @@ CREATE TABLE `users_groups` (
 --
 
 INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
-(1, 1, 1),
-(2, 2, 2);
+(1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -355,7 +373,7 @@ CREATE TABLE `users_groups_networks` (
   `group_id` int(11) UNSIGNED NOT NULL,
   `installation_key` varchar(100) NOT NULL,
   `network_key` int(15) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Indexes for dumped tables
@@ -393,7 +411,7 @@ ALTER TABLE `login_attempts`
 --
 ALTER TABLE `menu_items`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `Page_FK` (`Page_Id`);
+  ADD KEY `Page_FK` (`page_id`);
 
 --
 -- Indexes for table `networks`
@@ -433,6 +451,12 @@ ALTER TABLE `pages`
   ADD KEY `Author_FK` (`Author`);
 
 --
+-- Indexes for table `pipeline`
+--
+ALTER TABLE `pipeline`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `settings`
 --
 ALTER TABLE `settings`
@@ -451,7 +475,8 @@ ALTER TABLE `sources`
 -- Indexes for table `uploaddatastatus`
 --
 ALTER TABLE `uploaddatastatus`
-  ADD PRIMARY KEY (`ID`);
+  ADD PRIMARY KEY (`ID`),
+  ADD KEY `Pipeline_Id_FK` (`pipeline_id`);
 
 --
 -- Indexes for table `upload_error`
@@ -545,6 +570,12 @@ ALTER TABLE `pages`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
+-- AUTO_INCREMENT for table `pipeline`
+--
+ALTER TABLE `pipeline`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
@@ -578,13 +609,13 @@ ALTER TABLE `upload_jobs`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users_groups`
 --
 ALTER TABLE `users_groups`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users_groups_networks`
@@ -600,7 +631,7 @@ ALTER TABLE `users_groups_networks`
 -- Constraints for table `menu_items`
 --
 ALTER TABLE `menu_items`
-  ADD CONSTRAINT `Page_FK` FOREIGN KEY (`Page_Id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `Page_FK` FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `network_groups_sources`
@@ -620,6 +651,12 @@ ALTER TABLE `network_requests`
 --
 ALTER TABLE `pages`
   ADD CONSTRAINT `Author_FK` FOREIGN KEY (`Author`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `uploaddatastatus`
+--
+ALTER TABLE `uploaddatastatus`
+  ADD CONSTRAINT `Pipeline_Id_FK` FOREIGN KEY (`pipeline_id`) REFERENCES `pipeline` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `users_groups`
