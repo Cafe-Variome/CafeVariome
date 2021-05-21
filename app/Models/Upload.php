@@ -256,7 +256,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param int $source_id - The source_id we are checking
      * @return array empty if no files | with elements of file names
      */
-    public function getPhenoPacketFiles(int $source_id, bool $pending = true) {
+    public function getPhenoPacketFilesBySourceId(int $source_id, bool $pending = true) {
 
         $this->builder = $this->db->table($this->table);
 
@@ -286,35 +286,6 @@ use CodeIgniter\Database\ConnectionInterface;
 
         $this->builder->where('error_id', $file_id);
         $this->builder->delete();
-    }
-
-    /**
-     * Check Negated for HPO - For given list of HPO terms check if the group they belong to has a
-     * negated = false flag. Then return only those
-     *
-     * @param array $hpo    - List of HPO terms to check
-     * @param int $file_id  - the file id where these HPO terms have come from
-     * @return array $final - List of HPO terms which have negated=0
-     */
-    public function checkNegatedForHPO($hpo,$file_id) {
-
-        $this->builder = $this->db->table('eavs');
-        $final =[];
-        for ($i=0; $i < count($hpo); $i++) { 
-
-            $this->builder->select('uid');
-            $this->builder->where('value', $hpo[$i]);
-            $this->builder->where('fileName', $file_id);
-            $query = $this->builder->get()->getResultArray();
-            $this->builder->select('value');
-            $this->builder->where('uid', $query[0]['uid']);
-            $this->builder->where('attribute', "negated");
-            $query = $this->builder->get()->getResultArray();
-            if ($query[0]['value'] == 0) {
-                array_push($final, $hpo[$i]);
-            }
-        }
-        return $final;
     }
 
     /**
@@ -349,40 +320,8 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->where('source_id', $source_id);
         $this->builder->delete();
     }
-    
+
     /**
-     * Json Insert - Taking the data from recursivePacket we add to our MySQL transaction
-     * Adding to eavs table
-     *
-     * Moved to upload model by Mehdi Mehtarizadeh (02/08/2019)
-     * @param string $uid   - The md5 ID linking groups together
-     * @param int $source   - The ID of the source we are linking this data to - sources
-     * @param int $file     - The ID of the file we have generated this data from - UploadDataStatus
-     * @param string $id    - The subject id of the current phenoPacket
-     * @param string $key   - The attribute column for given datapoint
-     * @param string $value - The value column for given datapoint
-     * @param boolean $test - Optional parameter if you wish to error log the created data array
-     * 						  Pass in true in this location
-     * @return N/A
-     */
-    public function jsonInsert($uid,$source,$file,$id,$key,$value, $test=false) {
-
-        $this->builder = $this->db->table('eavs');
-
-        $data = array(
-            'uid'        =>  $uid,
-            'source_id'     => $source,
-            'fileName'   => $file,
-            'subject_id' => $id,
-            'attribute'  => $key,
-            'value'      => $value);
-        if ($test) {
-            error_log(print_r($data,1));
-        }
-        $this->builder->insert($data);
-    }
-
-        /**
      * Error Insert - During our upload we have encountered an error 
      * Adding to upload_error table
      *
@@ -419,49 +358,6 @@ use CodeIgniter\Database\ConnectionInterface;
             $this->builder->update($data);
         }
     }
-
-    /**
-     * Moved to upload model by Mehdi Mehtarizadeh (02/08/2019)
-     * @deprecated
-     */
-    public function insertStatistics($file, $source) {
-        $this->builder = $this->db->table('eavs');
-
-        $this->builder->select("attribute, value, count(*) AS count");
-        $this->builder->where("source_id", $source);
-        $this->builder->where("fileName",$file);
-        $this->builder->groupBy(["attribute","value"]);
-
-        $query = $this->builder->get()->getResultArray();
-        //$query = $this->db->query('SELECT attribute, value, count(*) AS count FROM eavs WHERE source = "'.$source.'" AND fileName="'.$file.'" GROUP BY attribute,value');
-        foreach ($query as $row) {
-            $data[] = $row;
-        }
-        $data = json_decode(json_encode($data),true);
-        // error_log(print_r($data));
-        $currAtt = "";
-        for ($i=0; $i <count($data) ; $i++) { 
-            if ($data[$i]["attribute"] != $currAtt){
-                $currAtt = $data[$i]["attribute"];
-                $final[$data[$i]["attribute"]] = array();
-                $final[$data[$i]["attribute"]][$data[$i]['value']] = $data[$i]['count'];
-            }
-            else {
-                $final[$data[$i]["attribute"]][$data[$i]['value']] = $data[$i]['count'];
-            }
-        }
-        $final = json_encode($final);
-
-        $sourceModel = new Source($this->db);
-
-        $fileName = $this->getFileName($file);
-        //$sourceName = $sourceModel->getSourceNameByID($source);
-        $file_name = preg_replace("/\.json|\.phenopacket|\.csv|\.xlsx|\.xls/", '', $fileName);
-        $wr = write_file(getcwd() . "/upload/UploadData/".$source."/".$file_name."_uniq.json", $final );
-        if ( ! $wr){
-            var_dump( 'Unable to write the file'.$wr);
-        }
-    } 
         
     /**
      * Big Insert Wrap - Fill in the status table on the success of the upload
