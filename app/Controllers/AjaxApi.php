@@ -886,7 +886,7 @@ use CodeIgniter\Config\Services;
      */
     public function elastic_check() {	   
             
-        $elasticModel = new \App\Models\Elastic(); 
+        $uploadModel = new \App\Models\Upload(); 
         $eavModel = new EAV();
 
         $data = json_decode($this->request->getVar('u_data'));
@@ -894,7 +894,7 @@ use CodeIgniter\Config\Services;
         $source_id = $data->id;
         $add = $data->add;
 
-        $unprocessedFilesCount = $elasticModel->getUnprocessedFilesForSource($source_id);
+        $unprocessedFilesCount = $uploadModel->getElasticsearchUnprocessedFilesBySourceId($source_id);
 
         if (!$unprocessedFilesCount) {
             $result = ['Status' => 'Empty'];
