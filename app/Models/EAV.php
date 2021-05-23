@@ -305,7 +305,7 @@ class EAV extends Model{
      * @param int $file_id  - the file id where these HPO terms have come from
      * @return array $final - List of HPO terms which have negated=0
      */
-    public function checkNegatedForHPO(int $hpo, int $file_id) {
+    public function checkNegatedForHPO(array $hpo, int $file_id) {
 
         $this->builder = $this->db->table($this->table);
 
