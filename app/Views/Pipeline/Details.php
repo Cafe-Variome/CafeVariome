@@ -37,6 +37,12 @@
                     <?php endif; ?>
                 </td>
             </tr>
+            </tr>
+                <th>Subject ID Attribute Name</th>
+                <td>
+                    <?= $pipeline['subject_id_attribute_name'] ?>
+                </td>
+            </tr>
             <tr>
                 <th>Grouping</th>
                 <td>
