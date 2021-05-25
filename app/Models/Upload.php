@@ -76,7 +76,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param string $source  - The source the file was added to
      * @return int $insert_id - The ID of updated/inserted row
      */
-    public function createUpload(string $file, int $source_id, int $user_id, $tissue=false, $patient=false, $settingFile = null) {
+    public function createUpload(string $file, int $source_id, int $user_id, $tissue=false, $patient=false, $settingFile = null, int $pipeline_id =0) {
         // Get table
         $this->builder = $this->db->table($this->table);
 
@@ -93,6 +93,7 @@ use CodeIgniter\Database\ConnectionInterface;
             'tissue' => $tissue,
             'patient' => $patient,
             'setting_file' => $settingFile,
+            'pipeline_id' => $pipeline_id,
             'Status' => 'Pending');
             $this->builder->where('source_id', $source_id);
             $this->builder->where('FileName', $file);
@@ -334,7 +335,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * 						      Pass in true in this location
      * @param boolean $continue - Optional parameter if we are adding an error but not aborting rest of 
      *  						  upload
-     * @return N/A
+     * @return void
      */
     public function errorInsert($file_id, $source_id, $message, $error_code, $test=false,$continue=false) {
         $this->builder = $this->db->table('upload_error');

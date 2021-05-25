@@ -53,6 +53,7 @@ $("#uploadBulk").submit(function(event) {
                     uploadData.append('user_id', $('#user_id').val());
                     uploadData.append('files', $('#dataFile')[0].files[0]);
                     uploadData.append('fAction', selected);
+                    uploadData.append('pipeline_id', $('#pipeline').val());
                     $.ajax({
                         //Send the form through to do_upload
                         type: "POST",  

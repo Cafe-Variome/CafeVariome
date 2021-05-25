@@ -67,6 +67,18 @@
 		</div>
 	</div>
 </div>
+
+<div class="form-group row">
+	<div class="col-6">
+		<select name="pipeline" id="pipeline" class="form-control">
+			<option value="-1" selected>Please select a pipeline...</option>
+			<?php foreach($pipelines as $pipeline): ?>
+				<option value="<?= $pipeline['id'] ?>"><?= $pipeline['name'] ?></option>
+			<?php endforeach; ?>
+		</select>
+	</div>
+	<div class="col-6"></div>
+</div>
 </form>
 
 <hr>

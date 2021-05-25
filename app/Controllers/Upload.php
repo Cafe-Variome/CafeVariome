@@ -12,6 +12,7 @@
 
 use App\Models\UIData;
 use App\Models\Source;
+use App\Models\Pipeline;
 use CodeIgniter\Config\Services;
 
 
@@ -87,7 +88,6 @@ use CodeIgniter\Config\Services;
     }
 
     function Bulk(int $source_id) {
-        // Check whether the user is either an admin or a curator that has the required permissions to do this action
 
         $uidata = new UIData();
         $uidata->title = "Bulk Import";
@@ -105,6 +105,10 @@ use CodeIgniter\Config\Services;
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js', JS.'cafevariome/status.js', JS.'cafevariome/upload_bulk.js'];
 
+        $piplineModel = new Pipeline();
+        $pipelines = $piplineModel->getPipelines();
+
+        $uidata->data['pipelines'] = $pipelines;
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/Bulk', $data);
