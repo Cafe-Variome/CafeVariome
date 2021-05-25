@@ -691,7 +691,8 @@ use CodeIgniter\Config\Services;
 
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
-
+        $pipeline_id = $this->request->getVar('pipeline_id');
+        
         $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
         $fileMan = new UploadFileMan($basePath);
 
@@ -717,7 +718,7 @@ use CodeIgniter\Config\Services;
             }
             if ($fileMan->Save($file, $source_path)) {
                 
-                $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id);
+                $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
 
                 // Begin background insert to MySQL
 
