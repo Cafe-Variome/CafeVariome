@@ -538,5 +538,31 @@ use CodeIgniter\Database\ConnectionInterface;
         return $count;
     }
 
+    public function getFileExtensionById(int $file_id)
+    {
+        $this->builder = $this->db->table($this->table);
+
+        $this->builder->select('FileName');
+        $this->builder->where('ID', $file_id);
+
+        $query = $this->builder->get()->getResultArray();
+
+        $extension = null;
+
+        if (count($query) == 1) {
+            $file_name = $query[0]['FileName'];
+            if (strpos($file_name, '.')) {
+                $file_name_array = explode('.', $file_name);
+                $extension = $file_name_array[count($file_name_array) - 1];
+
+                if ($extension === $file_name) {
+                    $extension = null;
+                }
+            }
+        }
+
+        return $extension;
+    }
+
  }
  
