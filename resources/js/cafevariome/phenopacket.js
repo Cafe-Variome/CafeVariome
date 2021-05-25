@@ -14,6 +14,7 @@ $(document).ready(function() {
 		} 
 		//file_names = JSON.stringify(file_names); 
 		user_id = $('#user_id').val();
+		pipeline_id = $('#pipeline').val();
 		id = $('#source_id').val();
 		param = "source_id="+id+"&size="+size;
 		console.log(param);
@@ -70,6 +71,7 @@ $(document).ready(function() {
 										var formData = new FormData();
 										formData.append("source_id", id);
 										formData.append("user_id", user_id);
+										formData.append("pipeline_id", pipeline_id);
 										flag = false;
 									}
 									formData.append("userfile[]", $('#jsonFile')[0].files[i]);
