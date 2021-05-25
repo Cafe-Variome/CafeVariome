@@ -13,7 +13,7 @@
 
 class HPONetworkInterface extends AbstractNetworkInterface
 {
-    public function __construct(string $targetUri = 'https://www240.lamp.le.ac.uk/') {
+    public function __construct(string $targetUri = 'https://www592.lamp.le.ac.uk/') {
         parent::__construct($targetUri);
 
         $curlOptions = [CURLOPT_RETURNTRANSFER => TRUE,
