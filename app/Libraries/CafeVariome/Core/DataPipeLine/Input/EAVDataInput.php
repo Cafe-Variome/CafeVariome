@@ -30,7 +30,7 @@ class EAVDataInput extends DataInput
 
     public function absorb(int $file_id){
 
-        $this->registerProcess($file_id, 1, 'bulkupload', "Starting");
+        $this->registerProcess($file_id);
 
         $files = $this->getSourceFiles($file_id); //Get a list of files for source
 
