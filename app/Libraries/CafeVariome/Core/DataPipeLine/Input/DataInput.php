@@ -17,6 +17,7 @@ use App\Models\Elastic;
 use App\Models\Settings;
 use App\Models\EAV;
 use App\Models\Neo4j;
+use App\Models\Pipeline;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use CodeIgniter\Config;
@@ -35,7 +36,9 @@ abstract class DataInput
     protected $elasticModel;
     protected $eavModel;
     protected $neo4jModel;
-
+    protected $pipelineModel;
+    protected $pipeline_id;
+    protected $fileName;
     protected $reader;
 
     public function __construct(int $source_id)
@@ -48,6 +51,7 @@ abstract class DataInput
         $this->uploadModel = new Upload();
         $this->sourceModel = new Source();
         $this->eavModel = new EAV();
+        $this->pipelineModel = new Pipeline();
         $this->fileMan = new FileMan($this->basePath);
     }
 
@@ -57,10 +61,10 @@ abstract class DataInput
     protected function getSourceFiles(int $fileId = -1)
     {
         if ($fileId != -1) {
-            return $this->uploadModel->getFiles('FileName', ['id' => $fileId]);
+            return $this->uploadModel->getFiles('FileName, pipeline_id', ['id' => $fileId]);
         }
         else{
-            return $this->uploadModel->getFiles('', ['source_id' => $this->sourceId]);
+            return $this->uploadModel->getFiles('FileName, pipeline_id', ['source_id' => $this->sourceId]);
         }
     }
 
