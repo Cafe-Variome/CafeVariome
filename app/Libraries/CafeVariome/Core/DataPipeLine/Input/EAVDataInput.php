@@ -32,20 +32,18 @@ class EAVDataInput extends DataInput
 
         $this->registerProcess($file_id);
 
-        $files = $this->getSourceFiles($file_id); //Get a list of files for source
-
-        foreach ($files as $key => $fname) {
-
-            $fileId = $file_id != -1 ? $file_id : $key;
-            $file = $fname['FileName'];
+        $fileRecord = $this->getSourceFiles($file_id); //Get a list of files for source
+        
+        if (count($fileRecord) == 1) {
+            $file = $fileRecord[0]['FileName'];
             $this->fileName = $file;
-            if (array_key_exists('pipeline_id', $fname)) {
-                $this->pipeline_id = $fname['pipeline_id'];
+            if (array_key_exists('pipeline_id', $fileRecord[0])) {
+                $this->pipeline_id = $fileRecord[0]['pipeline_id'];
                 $this->applyPipeline($this->pipeline_id);
             }
 
             if ($this->fileMan->Exists($file)) {
-                $this->uploadModel->clearErrorForFile($fileId);
+                $this->uploadModel->clearErrorForFile($file_id);
                 $this->sourceModel->lockSource($this->sourceId);	
         
                 if ($this->delete == 1) {		
@@ -63,8 +61,8 @@ class EAVDataInput extends DataInput
                         $return_data['result_flag'] = 0;
                         $return_data['error'] = $message;
                         $error_code = 1;
-                        $this->uploadModel->errorInsert($fileId, $this->sourceId, $message, $error_code, true);
-                        return $return_data;
+                        $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
+                        //return $return_data;
                     }
                     else {
                         $delimiter = $matches[1];
@@ -84,8 +82,8 @@ class EAVDataInput extends DataInput
                     $return_data['error'] = "File did not conform to allowed types";   
                     $message = "File did not conform to allowed types.";
                     $error_code = 2;
-                    $this->uploadModel->errorInsert($fileId, $message, $error_code, true);         
-                    return $return_data;
+                    $this->uploadModel->errorInsert($file_id, $message, $error_code, true);         
+                    //return $return_data;
                 }
         
                 $this->reader->open($filePath);
@@ -184,7 +182,7 @@ class EAVDataInput extends DataInput
         $this->sourceModel->updateSource(['record_count' => $totalRecordCount], ['source_id' => $this->sourceId]);
 
         if ($this->delete == 1) {		
-            $this->removeAttribuesAndValuesFiles();
+            $this->removeAttribuesAndValuesFiles($this->fileName);
         }
         
         $this->dumpAttributesAndValues($file_id);
