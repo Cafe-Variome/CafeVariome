@@ -42,7 +42,11 @@ class PhenoPacketDataInput extends DataInput
 
         if (count($fileRecord) == 1) {
             $file = $fileRecord[0]['FileName'];
-
+            if (array_key_exists('pipeline_id', $fileRecord[0])) {
+                $this->pipeline_id = $fileRecord[0]['pipeline_id'];
+                $this->applyPipeline($this->pipeline_id);
+            }
+            
             if ($this->fileMan->Exists($file)) {
                 $fileContent = $this->fileMan->Read($file);
                 $this->data = json_decode($fileContent, true);
