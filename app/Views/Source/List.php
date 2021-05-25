@@ -68,15 +68,9 @@
 			</td>
 			<td>
 			<?php if ( $source['status'] == "online" ): ?>
-			<div class="custom-control custom-switch">
-				<input type="checkbox" class="custom-control-input" id="<?php echo $source['name']; ?>" checked>
-				<label class="custom-control-label" for="<?php echo $source['name']; ?>">Status</label>				
-			</div>
+				Online
 			<?php elseif ( $source['status'] == "offline" ): ?>
-			<div class="custom-control custom-switch">
-				<input type="checkbox" class="custom-control-input" id="<?php echo $source['name']; ?>" unchecked>
-				<label class="custom-control-label" for="<?php echo $source['name']; ?>">Status</label>				
-			</div>
+				Offline
 			<?php endif; ?>
 			</td>
 		</tr>		
