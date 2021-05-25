@@ -127,15 +127,10 @@ class EAVDataInput extends DataInput
                         $subject_id = $row[0];
                     }
                     if ($subject_id == ""){
-                        $point = $row;
-                        $return_data['result_flag'] = 0;
-                        $return_data['status'] = "error";
-                        $return_data['error'] = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
                         $message = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
                         $error_code = 3;
                         $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
                         $this->sourceModel->unlockSource($this->sourceId);
-                        return $return_data;
                     }
                     foreach ($attgroups as $group){
                         $uid = md5(uniqid(rand(),true));                           
