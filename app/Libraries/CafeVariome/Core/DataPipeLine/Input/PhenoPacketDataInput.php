@@ -14,13 +14,14 @@ use App\Libraries\CafeVariome\Net\CellBaseNetworkInterface;
 use App\Libraries\CafeVariome\Net\VariantValidatorNetworkInterface;
 use App\Libraries\CafeVariome\Net\HPONetworkInterface;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4J;
 
 class PhenoPacketDataInput extends DataInput
 {
     private $data;
     private $meta;
     private $id;
-
+    protected $configuration;
     private $delete;
     private $serviceInterface;
 
@@ -29,6 +30,8 @@ class PhenoPacketDataInput extends DataInput
         parent::__construct($source_id);
         $this->delete = $delete;
         $this->serviceInterface = new ServiceInterface();
+
+        $this->initializeConfiguration();
     }
 
     public function absorb(int $file_id)
@@ -44,14 +47,14 @@ class PhenoPacketDataInput extends DataInput
                 $fileContent = $this->fileMan->Read($file);
                 $this->data = json_decode($fileContent, true);
     
-                if ($this->delete == UPLOADER_DELETE_ALL && !$this->deleted) {		
+                if ($this->delete == UPLOADER_DELETE_ALL) {		
                     $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the source');
                     $this->eavModel->deleteRecordsBySourceId($this->sourceId);
-                    $this->deleted = true;
+                    $this->delete = true;
                 }
                 else if($this->delete == UPLOADER_DELETE_FILE){
                     $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
-                    $this->eavModel->deleteRecordsByFileId($this->sourceId);
+                    $this->eavModel->deleteRecordsByFileId($file_id);
                 }
 
                 $this->meta = null;
@@ -67,9 +70,13 @@ class PhenoPacketDataInput extends DataInput
                     }		
                 }
     
-                preg_match("/(.*)\./", $file, $matches);
-                $this->data['id'] = $matches[1];
-                $this->id = $this->data['id'];
+                if($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE){
+                    $this->id = $this->data['subject']['id'];
+                }
+                else if($this->configuration['subject_id_location'] == SUBJECT_ID_IN_FILE_NAME){
+                    preg_match("/(.*)\./", $file, $matches);
+                    $this->id = $matches[1];
+                }
             }
         }
     }
@@ -78,6 +85,7 @@ class PhenoPacketDataInput extends DataInput
     {
         $steps = 3;
         $HPOApi = new HPONetworkInterface();
+        $neo4jInterface = new Neo4J();
 
         $this->sourceModel->lockSource($this->sourceId);
 
@@ -99,13 +107,13 @@ class PhenoPacketDataInput extends DataInput
         $output = [];
         $hits = [];
         $matches = array_unique($this->arrSearch($this->data, $output));
-        $matches = $this->uploadModel->checkNegatedForHPO($matches, $file_id);
+        $matches = $this->eavModel->checkNegatedForHPO($matches, $file_id);
         for ($i=0; $i < count($matches); $i++) { 
-            $result = $HPOApi->getAncestor($matches[$i]);
-            if (property_exists($result, 'ancestor')) {
-                foreach ($result->ancestor as $key => $value) {
-                    if (!array_key_exists($value->id, $hits)) {
-                        $hits[$value->id] = $value->label;
+            $result = $neo4jInterface->GetAncestors($matches[$i]);
+            if (count($result) > 0) {
+                foreach ($result as $key => $value) {
+                    if (!array_key_exists($key, $hits)) {
+                        $hits[$key] = $value;
                     }
                 }
             }						
@@ -215,7 +223,7 @@ class PhenoPacketDataInput extends DataInput
                     $uid = md5(uniqid(rand(),true));
                     $one_group = true;
                     $done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
-                    if (!in_array($type, $done['type'])) {
+                    if (is_array($type) && !in_array($type, $done['type'])) {
                         $this->eavModel->createEAV($uid,$source,$file,$id,'type',$type);
                         array_push($done['type'], $type);
                     }	
@@ -544,4 +552,24 @@ class PhenoPacketDataInput extends DataInput
         return true;
     }
        
+
+    protected function initializeConfiguration()
+    {
+        $this->configuration = ['subject_id_location' => SUBJECT_ID_WITHIN_FILE,
+                                'subject_id_attribute_name' => 'id',
+        ];
+    }
+
+    protected function applyPipeline(int $pipeline_id)
+    {
+        $pipeline = $this->pipelineModel->getPipeline($pipeline_id);
+
+        if ($pipeline != null) {
+            $this->configuration['subject_id_location'] = $pipeline['subject_id_location'];
+
+            if ($pipeline['subject_id_location'] == SUBJECT_ID_WITHIN_FILE && $pipeline['subject_id_attribute_name'] != null && $pipeline['subject_id_attribute_name'] != '') {
+                $this->configuration['subject_id_attribute_name'] = $pipeline['subject_id_attribute_name'];
+            }            
+        }
+    }
 }
