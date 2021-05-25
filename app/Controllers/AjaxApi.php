@@ -332,6 +332,7 @@ use CodeIgniter\Config\Services;
         
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
+        $pipeline_id = $this->request->getVar('pipeline_id');
 
         $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
         // Create the source upload directory if it doesnt exist
@@ -357,7 +358,7 @@ use CodeIgniter\Config\Services;
 
             if($fileMan->Save($file, $source_path))
             {     
-                $this->uploadModel->createUpload($file->getName(),$source_id, $user_id);
+                $this->uploadModel->createUpload($file->getName(),$source_id, $user_id, false, false, null, $pipeline_id);
             }
             else
             {
@@ -813,12 +814,17 @@ use CodeIgniter\Config\Services;
     {
         $fileId = $this->request->getVar('fileId');
         $overwrite = $this->request->getVar('overwrite');
-        $uploader = $this->request->getVar('uploader');
+
+        $uploadModel = new Upload();
+        $extension = $uploadModel->getFileExtensionById($fileId);
 
         $method = '';
-
-        switch ($uploader) {
-            case 'bulk':
+        $overwriteFlag = UPLOADER_DELETE_FILE;
+        
+        switch (strtolower($extension)) {
+            case 'csv':
+            case 'xls':
+            case 'xlsx':
                 $method = 'bulkUploadInsert';
                 $overwriteFlag = $overwrite ? UPLOADER_DELETE_ALL : UPLOADER_DELETE_NONE;
                 break;
