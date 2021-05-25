@@ -50,20 +50,20 @@
 				?>
 			</td>
 			<td>
-				<a data-toggle="modal" data-target="#addVariantsModal" data-id="<?= $source['source_id'] ?>" data-placement="top" title="Import Records" id="ImportRecordsBtn">
-					<i class="fa fa-plus text-success"></i>
+				<a data-toggle="modal" data-target="#addVariantsModal" data-id="<?= $source['source_id'] ?>" data-srcname="<?= $source['name']; ?>" data-placement="top" title="Import Records" id="ImportRecordsBtn">
+					<i class="fa fa-upload text-success"></i>
 				</a>
 				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Source">
 					<i class="fa fa-edit text-warning"></i>
-				</a>
-				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] . "/" . $source['name']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Source">
-					<i class="fa fa-trash text-danger"></i>
 				</a>
 				<a href="<?php echo base_url($controllerName. '/Status'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Source File Status">
 					<i class="fa fa-info-circle text-primary"></i>
 				</a>
 				<a href="<?php echo base_url($controllerName. '/Data'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Data Attributes and Values">
 					<i class="fa fa-database text-info"></i>
+				</a>
+				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] . "/" . $source['name']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Source">
+					<i class="fa fa-trash text-danger"></i>
 				</a>
 			</td>
 			<td>
@@ -108,49 +108,28 @@
 				</button>
 			</div>
 			<div class="modal-body">
-				<div class="row">
+				<div class="row mb-2">
 					<div class="col">
 						<a id="bulkImport" class="btn btn-small btn-primary">
-							<i class="fa fa-plus"></i> Bulk import records
+							<i class="fa fa-file-upload"></i> Upload Spreadsheet Files
 						</a>
 					</div>				
 				</div>
-				<div class="row">
-					<div class="col">
-						<p>
-							<i>Use a bulk import tool to upload multiple records at once (various formats accepted).</i>
-						</p>
-					</div>
-				</div>
-				<div class="row">
+				<div class="row mb-2">
 					<div class="col">
 						<a id="phenoPacketsImport" class="btn btn-small btn-primary">
-							<i class="fa fa-plus"></i> Import PhenoPackets
+							<i class="fa fa-file-upload"></i> Upload PhenoPacket Files
 						</a>
 					</div>		
 				</div>	
-				<div class="row">
-					<div class="col">
-						<p>
-							<i>Use a bulk import tool to upload multiple PhenoPackets at once.</i>
-						</p>
-					</div>
-				</div>	
-				<div class="row">
+				<div class="row mb-2">
 					<div class="col">
 						<a id="VCFImport" class="btn btn-small btn-primary">
-							<i class="fa fa-plus"></i> Import VCF
+							<i class="fa fa-file-upload"></i> Upload VCF Files
 						</a>
 					</div>		
 				</div>	
-				<div class="row">
-					<div class="col">
-						<p>
-							<i>Import VCF files</i>
-						</p>
-					</div>
-				</div>
-				<div class="row">
+				<!-- <div class="row">
 					<div class="col">
 						<a id="UniversalImport" class="btn btn-small btn-primary">
 							<i class="fa fa-plus"></i> Universal Import
@@ -163,7 +142,7 @@
 							<i>Import any files</i>
 						</p>
 					</div>
-				</div>	
+				</div>	 -->
 			</div>
 			<div class="modal-footer">
 			<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
