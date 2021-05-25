@@ -49,7 +49,7 @@ use CodeIgniter\Config\Services;
 
         // data for hidden input for source
         $uidata = new UIData();
-        $uidata->title = "Upload JSON (Bulk Import)";
+        $uidata->title = "Upload Phenopacket Files";
         $uidata->data['user_id'] = $user_id;
         $uidata->data['source_id'] = $source_id;
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
@@ -87,10 +87,10 @@ use CodeIgniter\Config\Services;
         return view($this->viewDirectory . '/VCF', $data);
     }
 
-    function Bulk(int $source_id) {
+    function Spreadsheet(int $source_id) {
 
         $uidata = new UIData();
-        $uidata->title = "Bulk Import";
+        $uidata->title = "Upload Spreadsheet Files";
 
         // Since this is a shared function for curators and admin check that the curator is a curator for this source
         $user_id = $this->authAdapter->getUserID();
@@ -111,7 +111,7 @@ use CodeIgniter\Config\Services;
         $uidata->data['pipelines'] = $pipelines;
 
         $data = $this->wrapData($uidata);
-        return view($this->viewDirectory . '/Bulk', $data);
+        return view($this->viewDirectory . '/Spreadsheet', $data);
     }
 
     public function Universal(int $source_id) {
