@@ -76,7 +76,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param string $source  - The source the file was added to
      * @return int $insert_id - The ID of updated/inserted row
      */
-    public function createUpload(string $file, int $source_id, int $user_id, $tissue=false, $patient=false, $settingFile = null, int $pipeline_id =0) {
+    public function createUpload(string $file, int $source_id, int $user_id, $tissue=false, $patient=false, $settingFile = null, int $pipeline_id = 0) {
         // Get table
         $this->builder = $this->db->table($this->table);
 
@@ -116,6 +116,7 @@ use CodeIgniter\Database\ConnectionInterface;
                 'Status' => 'Pending',
                 'patient' => $patient,
                 'setting_file' => $settingFile,
+                'pipeline_id' => $pipeline_id,
                 'tissue' => $tissue);		
             $this->builder->insert($data);
             $insert_id = $this->db->insertID();
@@ -232,22 +233,18 @@ use CodeIgniter\Database\ConnectionInterface;
 
     /**
      * Is Duplicate File - Check if the given file/source combo already exists
-     * 
      *
      * @param string $file - The File name we are checking
      * @param int $source  - The source Id we are checking
      * @return int 0 if new| 1 if duplicate
      */
-    public function isDuplicateFile($file, $source_id) {
+    public function isDuplicateFile(string $file, int $source_id) {
         $this->builder = $this->db->table($this->table);
 
         $this->builder->where('source_id', $source_id);
         $this->builder->where('FileName', $file);
         $query = $this->builder->countAllResults(); 
         return $query;
-        // Takes a filename and source id argument
-        // if returned value is 0 then it is new
-        // if returned value is 1 then it is duplicate
     }
 
     /**
