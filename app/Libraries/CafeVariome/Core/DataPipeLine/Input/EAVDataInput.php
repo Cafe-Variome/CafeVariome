@@ -152,6 +152,9 @@ class EAVDataInput extends DataInput
                                     $this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
                                 }
                             }
+                            else {
+                                $this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
+                            }
 
                             $counter++;                            
                             if ($counter % 800 == 0) {
