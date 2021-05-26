@@ -10,7 +10,7 @@
 <?php if(count($networks) == 0): ?>
 <div class="row">
     <div class="col">
-        <h4>This installation is not part of any networks</h4>
+        <h4>Either this installation or your user account is not in any network. <a href= <?php echo base_url("/Network/Create")?>>Create</a> or <a href= <?php echo base_url("/Network/Join")?>> join </a> a network to continue. </h4>
     <div>
 </div>
 <?php else: ?>
