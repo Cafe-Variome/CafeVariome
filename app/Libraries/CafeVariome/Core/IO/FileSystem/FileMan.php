@@ -35,7 +35,7 @@
         unlink($this->getFullPath() . $path);
     }
 
-    public function Exists(string $path): bool
+    public function Exists(string $path = ''): bool
     {
         return file_exists($this->getFullPath() . $path);
     }
@@ -151,7 +151,7 @@
                     return false;
                 }
             }
-            $this->destroyHandle();
+            //$this->destroyHandle();
             return true;
         }
         elseif ($fExt === 'phenopacket' ) {
