@@ -1004,7 +1004,7 @@ use CodeIgniter\Config\Services;
     {
         $path = $this->request->getVar('lookup_dir');
 
-        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx']);
+        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket']);
         $file_count = count($fileMan->getFiles());
         
         return json_encode($file_count);
@@ -1018,7 +1018,7 @@ use CodeIgniter\Config\Services;
         $user_id = $this->request->getVar('user_id');
 
         
-        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx']);
+        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket']);
         $unsaved_files = $fileMan->getFiles();
         $files_count = count($unsaved_files);
 
@@ -1037,7 +1037,17 @@ use CodeIgniter\Config\Services;
                     $file_name = $file->getName();
                     $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
                     unset($unsaved_files[$key]);
-                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00 $source_id");
+
+                    switch (strtolower($files->getExtension())) {
+                        case 'csv':
+                        case 'xls':
+                        case 'xlsx':
+                            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00");
+                            break;
+                        case 'phenopacket':
+                            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertByFileId $file_id " . UPLOADER_DELETE_FILE);
+                            break;
+                    }
                 }
             }
         }
