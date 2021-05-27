@@ -103,7 +103,7 @@ class EAV extends Model{
         $this->builder->update($data);
     }
 
-    public function getHPOTermsWithNegatedBySourceId(int $source_id) 
+    public function getHPOTermsWithNegatedBySourceId(int $source_id, array $hpo_attribute_names = [], array $negated_hpo_attribute_names = []) 
     {
         $subjectHPOWithNegatedArray = [];
 
@@ -113,14 +113,14 @@ class EAV extends Model{
             $uids[$uid_sid['uid']] = $uid_sid['subject_id'];
         }
 
-        $uidHPOTerms = $this->getHPOTermsBySourceId($source_id);
+        $uidHPOTerms = $this->getHPOTermsBySourceId($source_id, $hpo_attribute_names);
 
         $uidHPOArray = [];
         foreach ($uidHPOTerms as $hpo) {
             $uidHPOArray[$hpo['uid']] = $hpo['value'];
         }
 
-        $negatedHPOTerms = $this->getNegatedHPOTermsBySourceId($source_id);
+        $negatedHPOTerms = $this->getNegatedHPOTermsBySourceId($source_id, $negated_hpo_attribute_names);
 
         $uidNegatedHPOArray = [];
         foreach ($negatedHPOTerms as $negated_hpo) {
@@ -142,11 +142,17 @@ class EAV extends Model{
         return $subjectHPOWithNegatedArray;
     }
 
-    public function getORPHATerms(int $source_id)
+    public function getORPHATerms(int $source_id, array $orpha_attribute_names = [])
     {
         $this->builder = $this->db->table($this->table);
         $this->builder->select('subject_id, attribute, value');
-        $this->builder->where('attribute', "Phenotype_ORPHA"); //Diagnosis
+        if (count($orpha_attribute_names) > 0) {
+            $this->builder->whereIn('attribute', $orpha_attribute_names); 
+        }
+        else {
+            $this->builder->where('value', "orpha:"); //Diagnosis
+        }
+
         $this->builder->where('source_id', $source_id);
 
         $query = $this->builder->get()->getResultArray();
@@ -163,39 +169,57 @@ class EAV extends Model{
         return $data;
     }
 
-    public function getHPOTermsBySourceId(int $source_id)
+    public function getHPOTermsBySourceId(int $source_id, array $hpo_attribute_names = [])
     {
         $this->builder = $this->db->table($this->table);
         $this->builder->select('uid, value');
         $this->builder->where('source_id', $source_id);
         $this->builder->where('attribute !=', 'ancestor_hpo_id'); // attribute != "ancestor_hpo_id"
         $this->builder->where('attribute !=', 'classOfOnset_id'); // attribute != 'classOfOnset_id'
-        $this->builder->like('value', 'hp:', 'after');
+
+        if (count($hpo_attribute_names) > 0) {
+            $this->builder->whereIn('attribute', $hpo_attribute_names);
+        }
+        else {
+            $this->builder->like('value', 'hp:', 'after');
+        }
 
         $data = $this->builder->get()->getResultArray();
 
         return $data;
     }
 
-    public function getNegatedHPOTermsBySourceId(int $source_id)
+    public function getNegatedHPOTermsBySourceId(int $source_id, array $negated_hpo_attribute_names = [])
     {
         $this->builder = $this->db->table($this->table);
         $this->builder->select('uid, value');
         $this->builder->where('source_id', $source_id);
-        $this->builder->where('attribute', 'negated');
+
+        if (count($negated_hpo_attribute_names) > 0) {
+            $this->builder->whereIn('attribute', $negated_hpo_attribute_names);
+        }
+        else {
+            $this->builder->where('attribute', 'negated');
+        }
 
         $data = $this->builder->get()->getResultArray();
 
         return $data;
     }
 
-    public function getHPOTermsForSources(array $source_ids)
+    public function getHPOTermsForSources(array $source_ids, array $hpo_attribute_names = [])
     { 
         $this->builder = $this->db->table($this->table);
         $this->builder->select('value');
         $this->builder->distinct();
         $this->builder->whereIn('source_id', $source_ids);
-        $this->builder->like('value', 'HP:', 'after');
+
+        if (count($hpo_attribute_names) > 0) {
+            $this->builder->whereIn('attribute', $hpo_attribute_names);
+        }
+        else {
+            $this->builder->like('value', 'hp:', 'after');
+        }
 
         $terms = $this->builder->get()->getResultArray();
 
