@@ -129,11 +129,11 @@ class EAV extends Model{
 
         foreach ($uids as $uid => $subject_id) {
             if (array_key_exists($uid, $uidHPOArray)) {
-                if (array_key_exists($uid, $negatedHPOTerms)) {
+                if (array_key_exists($uid, $uidNegatedHPOArray)) {
                     $subjectHPOWithNegatedArray[$subject_id][] = ['hpo' => $uidHPOArray[$uid], 'negated' => $uidNegatedHPOArray[$uid]];
                 }
                 else {
-                    $subjectHPOWithNegatedArray[$subject_id][] = ['hpo' => $uidHPOArray[$uid], 'negated' => 0];
+                    $subjectHPOWithNegatedArray[$subject_id][] = ['hpo' => $uidHPOArray[$uid], 'negated' => null];
                 }
             }
 
