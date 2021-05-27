@@ -468,7 +468,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * Checks if the directory to upload to exists
      *
      * Moved by Mehdi Mehtarizadeh 07/08/2019
-     * 
+     * @deprecated
      * @param string $source_id    - The source id we will be uploading to
      * @param string $file_name - The file we are uploading
      * @param string $tmp       - The file path for where the file is stored in /tmp
