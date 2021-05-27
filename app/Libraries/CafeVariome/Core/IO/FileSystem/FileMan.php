@@ -216,4 +216,22 @@
     {
         return bin2hex($bin);
     }
+
+    public function getExtension(string $path = '')
+    {
+        $file_name = $path;
+        if (strpos($path, DIRECTORY_SEPARATOR)) {
+            $path_array = explode(DIRECTORY_SEPARATOR, $path);
+            $file_name = $path_array[count($path_array) - 1];
+        }
+
+        $extension = $file_name;
+        if (strpos($file_name, '.')) {
+            $file_name_array = explode('.', $file_name);
+            $extension = $file_name_array[count($file_name_array) - 1];
+        }
+
+        return strtolower($extension);
+    }
+
  }
