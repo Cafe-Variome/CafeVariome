@@ -6,7 +6,7 @@ use App\Models\Page;
 class Home extends CVUI_Controller
 {
 
-	public function Index($page_id = 0)
+	public function Index(int $page_id = 0)
 	{
 		$uidata = new UIData();
 		$uidata->title = 'Home';
