@@ -76,4 +76,13 @@ class Pipeline
         $this->builder->delete();
     }
 
+    public function getPipelinesByIds(array $ids)
+    {
+        $this->builder->select();
+        $this->builder->whereIn('id', $ids);
+
+        $query = $this->builder->get()->getResultArray();
+        return $query;
+    }
+
 }
