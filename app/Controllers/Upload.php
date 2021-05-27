@@ -119,6 +119,28 @@ use CodeIgniter\Config\Services;
         return view($this->viewDirectory . '/Spreadsheet', $data);
     }
 
+    public function Import(int $source_id)
+    {
+        $uidata = new UIData();
+        $uidata->title = "Import Files";
+        $user_id = $this->authAdapter->getUserId();
+
+        $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
+        $uidata->data['user_id'] = $user_id;
+        $uidata->data['source_id'] = $source_id;
+
+        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
+        $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js', JS.'cafevariome/import.js', JS.'cafevariome/status.js'];
+
+        $piplineModel = new Pipeline();
+        $pipelines = $piplineModel->getPipelines();
+
+        $uidata->data['pipelines'] = $pipelines;
+
+        $data = $this->wrapData($uidata);
+        return view($this->viewDirectory . '/Import', $data);
+    }
+
     public function Universal(int $source_id) {
 
         $uidata = new UIData();
