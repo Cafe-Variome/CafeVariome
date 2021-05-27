@@ -81,5 +81,10 @@
 
         return $this->files;
     }
+
+    public function Save(File $file, string $path = '') : bool
+    {
+        return copy($file->getTempPath(), $this->getFullPath() . $path . basename($file->getName()));
+    }
  }
  
