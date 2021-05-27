@@ -132,8 +132,9 @@ class EAVDataInput extends DataInput
                     }
                     foreach ($attgroups as $group){
                         $uid = md5(uniqid(rand(),true));                           
-                        foreach ($group as $att => $val){                          
-                            $value = $row[$val];
+                        foreach ($group as $att => $val){ 
+                            $att = strtolower(preg_replace('/\s+/', '_', $att));                  
+                            $value = strtolower($row[$val]);
                             if ($value == "") continue;     
                             if (is_a($value, 'DateTime')) $value = $value->format('Y-m-d H:i:s');
 
