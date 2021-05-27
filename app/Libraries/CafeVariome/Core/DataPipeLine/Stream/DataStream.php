@@ -18,6 +18,7 @@ use App\Models\Source;
 use App\Models\EAV;
 use App\Models\Neo4j;
 use App\Models\Phenotype;
+use App\Models\Pipeline;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 
@@ -339,10 +340,20 @@ class DataStream
         $neo4jModel = new Neo4j();
         $eavModel = new EAV();
         $sourceModel = new Source();
+        $pipelineModel = new Pipeline();
+        $uploadModel = new Upload();
+
+        $pipeline_ids = $uploadModel->getPipelineIdsBySourceId($source_id);
+        $pipelines = $pipelineModel->getPipelinesByIds($pipeline_ids);
+        //'hpo_attribute_name, negated_hpo_attribute_name, orpha_attribute_name'
+
+        $hpo_attribute_names = $this->getHPOAttributeNames($pipelines);
+        $negated_hpo_attribute_names = $this->getNegatedHPOAttributeNames($pipelines);
+        $orpha_attribute_names = $this->getORPHAAttributeNames($pipelines);
 
         $batch = md5(uniqid(rand(),true));	
-        $HPOData = $eavModel->getHPOTermsWithNegatedBySourceId($source_id); 
-        $ORPHAData = $eavModel->getORPHATerms($source_id); 
+        $HPOData = $eavModel->getHPOTermsWithNegatedBySourceId($source_id, $hpo_attribute_names, $negated_hpo_attribute_names); 
+        $ORPHAData = $eavModel->getORPHATerms($source_id, $orpha_attribute_names); 
         $source_name = $sourceModel->getSourceNameByID($source_id);
 
         if ($source_name != null) {
@@ -352,11 +363,42 @@ class DataStream
             $neo4jModel->ConnectSubjects($HPOData, 'HPOterm', 'hpoid', 'hpo', $this->source_id);
             $neo4jModel->ConnectSubjects($ORPHAData, 'ORPHAterm', 'orphaid', 'orpha', $this->source_id);
         }
-
-        $this->serviceInterface->ReportProgress($source_id, 1, 1, 'elasticsearchindex', 'Finished', true);
-
     }
 
+    public function Finalize(int $source_id)
+    {
+        $this->serviceInterface->ReportProgress($source_id, 1, 1, 'elasticsearchindex', 'Finished', true);
+    }
+
+    private function getHPOAttributeNames(array $pipelines) : array
+    {
+        $names = [];
+        foreach ($pipelines as $pipeline) {
+            $names[] = $pipeline['hpo_attribute_name'];
+        }
+
+        return $names;
+    }
+
+    private function getNegatedHPOAttributeNames(array $pipelines) : array
+    {
+        $names = [];
+        foreach ($pipelines as $pipeline) {
+            $names[] = $pipeline['negated_hpo_attribute_name'];
+        }
+
+        return $names;
+    }
+
+    public function getORPHAAttributeNames(array $pipelines) : array
+    {
+        $names = [];
+        foreach ($pipelines as $pipeline) {
+            $names[] = $pipeline['orpha_attribute_name'];
+        }
+
+        return $names;
+    }
 
     function createDocByAttribute(string $index_name, string $attribute, bool $range_exist) {
         $values = [];
