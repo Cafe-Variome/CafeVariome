@@ -234,4 +234,14 @@
         return strtolower($extension);
     }
 
+    public function getMimeType(string $path = ''): string
+    {
+        $mimetype = mime_content_type($this->getFullPath() . $path);
+
+        if ($mimetype != false) {
+            return $mimetype;
+        }
+
+        return '';
+    }
  }
