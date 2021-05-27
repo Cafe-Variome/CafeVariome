@@ -6,13 +6,12 @@
 	</div>	
 </div>
 <hr>
-<div class="row">
+<div class="row mt-2">
 	<div class="col">
-		<h4>Import records for <?php echo $source_name; ?></h3>
+		<h4>Upload a spreadsheet file for '<?php echo $source_name; ?>'</h3>
 		<p>Accepted file formats are comma delimited, CSV, XLS, and XLSX. </p>
 	</div>
 </div>
-
 <?php if (!is_writable(FCPATH . UPLOAD)):?>
 <div class="alert alert-danger alert-dismissible fade show">
 	<div class="row">
@@ -32,54 +31,54 @@
 </div>
 <?php endif ?>
 
-
 <form enctype="multipart/form-data" method="post" id="uploadBulk">
-  <input type="hidden" id="source_id" name="source_id" value="<?php echo $source_id ?>">
-  <input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
-  <input type="hidden" name="uploader" id="uploader" value="bulk" />
+	<input type="hidden" id="source_id" name="source_id" value="<?= $source_id ?>">
+	<input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
+	<input type="hidden" name="uploader" id="uploader" value="bulk" />
 
-<div class="form-group row">
-	<div class="col-6">
-		<div class="custom-file">
-			<input type="file" class="custom-file-input" name='userfile' id="dataFile" accept=".csv, .xls, .xlsx" aria-describedby="dataFile" required>
-			<label class="custom-file-label" for="dataFile">Choose file</label>
+	<div class="form-group row">
+		<div class="col-6">
+			<div class="custom-file">
+				<input type="file" class="custom-file-input" name='userfile' id="dataFile" accept=".csv, .xls, .xlsx" aria-describedby="dataFile" required>
+				<label class="custom-file-label" for="dataFile">Choose file</label>
+			</div>
 		</div>
-	</div>
-	<div class="col-2">
-		<div class="custom-control custom-radio">
-			<input type="radio" id="fActionOverwrite" name="fAction[]" value="overwrite" class="custom-control-input">
-			<label class="custom-control-label" for="fActionOverwrite" data-toggle="tooltip" data-placement="right" title="By selecting this option you will delete all data currently in this source.">Overwrite</label>
+		<div class="col-2">
+			<div class="custom-control custom-radio">
+				<input type="radio" id="fActionOverwrite" name="fAction[]" value="overwrite" class="custom-control-input">
+				<label class="custom-control-label" for="fActionOverwrite" data-toggle="tooltip" data-placement="right" title="By selecting this option you will delete all data currently in this source.">Overwrite</label>
+			</div>
+			<div class="custom-control custom-radio">
+				<input type="radio" id="fActionAppend" name="fAction[]" value="append" class="custom-control-input" checked>
+				<label class="custom-control-label" for="fActionAppend" data-toggle="tooltip" data-placement="right" title="By selecting this option you will not impact any prior data already within the source.">Append</label>
+			</div>
 		</div>
-		<div class="custom-control custom-radio">
-			<input type="radio" id="fActionAppend" name="fAction[]" value="append" class="custom-control-input" checked>
-			<label class="custom-control-label" for="fActionAppend" data-toggle="tooltip" data-placement="right" title="By selecting this option you will not impact any prior data already within the source.">Append</label>
+
+		<div class="col-2">
+			<button class="btn btn-large btn-primary bg-gradient-primary" id="uploadBtn" type="submit">
+				<span class="fa fa-upload"></span> Upload File
+			</button>
+		</div>
+		<div class="col-2">
+			<div class="spinner-border text-warning" id="uploadSpinner" role="status" style="display:none;">
+				<span class="sr-only">Loading...</span>
+			</div>
 		</div>
 	</div>
 
-	<div class="col-2">
-		<button class="btn btn-large btn-primary bg-gradient-primary" id="uploadBtn" type="submit">
-			<span class="fa fa-upload"></span> Upload File
-		</button>
-	</div>
-	<div class="col-2">
-		<div class="spinner-border text-warning" id="uploadSpinner" role="status" style="display:none;">
-			<span class="sr-only">Loading...</span>
+	<div class="form-group row">
+		<div class="col-6">
+			<select name="pipeline" id="pipeline" class="form-control">
+				<option value="-1" selected>Please select a pipeline...</option>
+				<?php foreach($pipelines as $pipeline): ?>
+					<option value="<?= $pipeline['id'] ?>"><?= $pipeline['name'] ?></option>
+				<?php endforeach; ?>
+			</select>
 		</div>
+		<div class="col-6"></div>
 	</div>
-</div>
-
-<div class="form-group row">
-	<div class="col-6">
-		<select name="pipeline" id="pipeline" class="form-control">
-			<option value="-1" selected>Please select a pipeline...</option>
-			<?php foreach($pipelines as $pipeline): ?>
-				<option value="<?= $pipeline['id'] ?>"><?= $pipeline['name'] ?></option>
-			<?php endforeach; ?>
-		</select>
-	</div>
-	<div class="col-6"></div>
-</div>
 </form>
+
 
 <hr>
 
