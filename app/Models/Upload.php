@@ -564,5 +564,26 @@ use CodeIgniter\Database\ConnectionInterface;
         return $extension;
     }
 
+    public function getFileIdsBySourceId(int $source_id): array
+    {
+        $ids = [];
+        $files_ids = $this->getFiles('ID', ['source_id' => $source_id]);
+
+        foreach ($files_ids as $f_id) {
+            $ids[] = $f_id['ID'];
+        }
+    }
+
+    public function getPipelineIdsBySourceId(int $source_id): array
+    {
+        $pids = [];
+        $pipeline_ids = $this->getFiles('pipeline_id', ['source_id' => $source_id]);
+
+        foreach ($pipeline_ids as $p_id) {
+            $pids[] = $p_id['pipeline_id'];
+        }
+
+        return $pids;
+    }
  }
  
