@@ -956,7 +956,7 @@ use CodeIgniter\Config\Services;
         }
         
         // rebuild the json list for interface
-        $phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateFederatedPhenotypeAttributeValueList $source_id $add");
+        $phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchAndNeo4JIndex $source_id $add");
     }
 
     function loadOrpha(){

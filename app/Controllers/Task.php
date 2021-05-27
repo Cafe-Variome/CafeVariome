@@ -327,7 +327,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         }
     }
 
-    public function regenerateFederatedPhenotypeAttributeValueList(int $source_id, $add)
+    public function regenerateElasticsearchAndNeo4JIndex(int $source_id, $add)
     {
         try {
             $dataStream = new DataStream($source_id);
