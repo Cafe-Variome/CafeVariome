@@ -130,10 +130,18 @@ class Neo4j extends Model{
         foreach ($keys as $subject_id) {
             for ($i=0; $i < count($data[$subject_id]); $i++) { 
                 $data_element = strtolower($data_type) == 'hpo' ? $data[$subject_id][$i]['hpo'] : $data[$subject_id][$i]['orpha'];
-                if (strtolower($data_type) == 'hpo' && $data[$subject_id][$i]['negated']) {
-                    $this->ConnectSubject($subject_id, $node_type, $node_key,  $data_element, 'NOT_PHENOTYPE_OF');
+                if (strtolower($data_type) == 'hpo') {
+                    $negated_element = $data[$subject_id][$i]['negated'];
+
+                    if($negated_element != null){
+                        $this->ConnectSubject($subject_id, $node_type, $node_key, $data_element, 'PHENOTYPE_OF');
+                        $this->ConnectSubject($subject_id, $node_type, $node_key, $negated_element, 'NOT_PHENOTYPE_OF');
+                    }
+                    else{
+                        $this->ConnectSubject($subject_id, $node_type, $node_key, $data_element, 'PHENOTYPE_OF');
+                    }
                 }
-                else {
+                else if(strtolower($data_type) == 'orpha') {
                     $this->ConnectSubject($subject_id, $node_type, $node_key, $data_element, 'PHENOTYPE_OF');
                 }
             }
