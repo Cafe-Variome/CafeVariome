@@ -999,4 +999,16 @@ use CodeIgniter\Config\Services;
             return $attributeValueDataJson;
         }
     }
+
+    public function lookupDirectory()
+    {
+        $path = $this->request->getVar('lookup_dir');
+
+        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx']);
+        $file_count = count($fileMan->getFiles());
+        
+        return json_encode($file_count);
+    }
+
+
  }
