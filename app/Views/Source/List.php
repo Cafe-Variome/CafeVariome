@@ -53,6 +53,9 @@
 				<a data-toggle="modal" data-target="#addVariantsModal" data-id="<?= $source['source_id'] ?>" data-srcname="<?= $source['name']; ?>" data-placement="top" title="Import Records" id="ImportRecordsBtn">
 					<i class="fa fa-upload text-success"></i>
 				</a>
+				<a href="<?php echo base_url('Upload/Import'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Import Files">
+					<i class="fa fa-file-import text-primary"></i>
+				</a>
 				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Source">
 					<i class="fa fa-edit text-warning"></i>
 				</a>
