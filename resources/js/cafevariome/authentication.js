@@ -5,7 +5,7 @@
  * @date 28/06/2019
  * 
  * This file contains javascript code for authentication procedures.
- * 
+ * @deprecated
  */
 
 function login_user() {
