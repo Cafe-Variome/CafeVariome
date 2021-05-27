@@ -1010,5 +1010,44 @@ use CodeIgniter\Config\Services;
         return json_encode($file_count);
     }
 
+    public function importFromDirectory()
+    {
+        $path = $this->request->getVar('lookup_dir');
+        $source_id = $this->request->getVar('source_id');
+        $pipeline_id = $this->request->getVar('pipeline_id');
+        $user_id = $this->request->getVar('user_id');
 
+        
+        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx']);
+        $unsaved_files = $fileMan->getFiles();
+        $files_count = count($unsaved_files);
+
+        $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
+        $fileMan = new SysFileMan($basePath);
+
+        foreach ($unsaved_files as $key => $file) {
+            if ($fileMan->isValid($file)) {
+                $source_path = $source_id . DIRECTORY_SEPARATOR;
+                
+                if (!$fileMan->Exists($source_id)) {
+                    $fileMan->CreateDirectory($source_id);
+                }
+
+                if ($fileMan->Save($file, $source_path)) {
+                    $file_name = $file->getName();
+                    $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
+                    unset($unsaved_files[$key]);
+                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00 $source_id");
+                }
+            }
+        }
+
+        $unsaved_files_count = count($unsaved_files);
+
+        $result = ["unsaved_count" => $unsaved_files_count,
+                   "saved_count" =>  $files_count - $unsaved_files_count];
+        
+        return json_encode($result);
+
+    }
  }
