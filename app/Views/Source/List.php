@@ -50,7 +50,7 @@
 				?>
 			</td>
 			<td>
-				<a data-toggle="modal" data-target="#addVariantsModal" data-id="<?= $source['source_id'] ?>" data-srcname="<?= $source['name']; ?>" data-placement="top" title="Import Records" id="ImportRecordsBtn">
+				<a data-toggle="modal" data-target="#addVariantsModal" data-id="<?= $source['source_id'] ?>" data-srcname="<?= $source['name']; ?>" data-placement="top" title="Upload Data Files" id="ImportRecordsBtn">
 					<i class="fa fa-upload text-success"></i>
 				</a>
 				<a href="<?php echo base_url('Upload/Import'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Import Files">
