@@ -1004,7 +1004,7 @@ use CodeIgniter\Config\Services;
     {
         $path = $this->request->getVar('lookup_dir');
 
-        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket']);
+        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket', 'json']);
         $file_count = count($fileMan->getFiles());
         
         return json_encode($file_count);
@@ -1018,7 +1018,7 @@ use CodeIgniter\Config\Services;
         $user_id = $this->request->getVar('user_id');
 
         
-        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket']);
+        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket', 'json']);
         $unsaved_files = $fileMan->getFiles();
         $files_count = count($unsaved_files);
 
