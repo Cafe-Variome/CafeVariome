@@ -154,7 +154,7 @@
             //$this->destroyHandle();
             return true;
         }
-        elseif ($fExt === 'phenopacket' ) {
+        elseif ($fExt === 'phenopacket' || $fExt === 'json') {
             $this->getHandle($path, 'r', false);
 
             $fcontent = $this->Read($path, -1, false);
