@@ -80,6 +80,9 @@ class EAV extends Model{
      */
     public function createEAV(string $uid, int $source, int $file, string $id, string $key, string $value) 
     {
+        $key = str_replace(['\\', chr(39), chr(34), '/', '’'], '', $key);
+        $value = str_replace(['\\', chr(39), chr(34), '/', '’'], '', $value);
+        
         $this->builder = $this->db->table($this->table);
 
         $data = [
