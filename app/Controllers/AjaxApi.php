@@ -1044,9 +1044,9 @@ use CodeIgniter\Config\Services;
                         case 'xlsx':
                             $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00");
                             break;
-                            case 'phenopacket':
-                            case 'json':
-                                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertByFileId $file_id " . UPLOADER_DELETE_NONE);
+                        case 'phenopacket':
+                        case 'json':
+                            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertByFileId $file_id " . UPLOADER_DELETE_NONE);
                             break;
                     }
                 }
