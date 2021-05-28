@@ -1046,7 +1046,7 @@ use CodeIgniter\Config\Services;
                             break;
                             case 'phenopacket':
                             case 'json':
-                                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertByFileId $file_id " . UPLOADER_DELETE_FILE);
+                                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertByFileId $file_id " . UPLOADER_DELETE_NONE);
                             break;
                     }
                 }
