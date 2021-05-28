@@ -1038,7 +1038,7 @@ use CodeIgniter\Config\Services;
                     $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
                     unset($unsaved_files[$key]);
 
-                    switch (strtolower($files->getExtension())) {
+                    switch (strtolower($file->getExtension())) {
                         case 'csv':
                         case 'xls':
                         case 'xlsx':
