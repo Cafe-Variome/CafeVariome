@@ -46,9 +46,13 @@ class EAVDataInput extends DataInput
                 $this->uploadModel->clearErrorForFile($file_id);
                 $this->sourceModel->lockSource($this->sourceId);	
         
-                if ($this->delete == 1) {		
+                if ($this->delete == UPLOADER_DELETE_ALL) {		
                     $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data');
                     $this->eavModel->deleteRecordsBySourceId($this->sourceId);
+                }
+                elseif ($this->delete == UPLOADER_DELETE_FILE) {
+                    $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
+                    $this->eavModel->deleteRecordsByFileId($file_id);
                 }
                 
                 $filePath = $this->basePath . $file;
