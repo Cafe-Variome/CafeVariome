@@ -846,6 +846,51 @@ use CodeIgniter\Config\Services;
         return json_encode(1);
     }
 
+    public function processFiles()
+    {
+        $fileIds = $this->request->getVar('fileIds');
+
+        $fids = [];
+        if (strpos($fileIds, ',')) {
+            $fids = explode(',', $fileIds);
+        }
+        else {
+            $fids[] = intval($fileIds);
+        }
+
+        foreach ($fids as $fid) {
+            $uploadModel = new Upload();
+            $extension = $uploadModel->getFileExtensionById($fid);
+    
+            $method = '';
+            $overwriteFlag = UPLOADER_DELETE_FILE;
+            
+            switch (strtolower($extension)) {
+                case 'csv':
+                case 'xls':
+                case 'xlsx':
+                    $method = 'bulkUploadInsert';
+                    break;
+                case 'phenopacket':
+                    $method = 'phenoPacketInsertByFileId';
+                    break;
+                case 'vcf':
+                    $method = 'vcfInsertByFileId';
+                    break;
+                default:
+                    return json_encode(0);
+                    break;
+            }
+    
+            $uploadModel = new Upload();
+            $uploadModel->resetFileStatus($fid);
+    
+            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fid . " " . $overwriteFlag);
+        }
+
+        return json_encode(1);
+    }
+
     public function getSourceCounts()
     {
         $sourceModel = new Source();
