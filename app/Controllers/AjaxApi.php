@@ -828,6 +828,7 @@ use CodeIgniter\Config\Services;
                 $method = 'bulkUploadInsert';
                 break;
             case 'phenopacket':
+            case 'json':
                 $method = 'phenoPacketInsertByFileId';
                 break;
             case 'vcf':
@@ -872,6 +873,7 @@ use CodeIgniter\Config\Services;
                     $method = 'bulkUploadInsert';
                     break;
                 case 'phenopacket':
+                case 'json':
                     $method = 'phenoPacketInsertByFileId';
                     break;
                 case 'vcf':
