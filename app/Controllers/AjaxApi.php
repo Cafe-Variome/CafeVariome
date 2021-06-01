@@ -826,15 +826,12 @@ use CodeIgniter\Config\Services;
             case 'xls':
             case 'xlsx':
                 $method = 'bulkUploadInsert';
-                $overwriteFlag = $overwrite ? UPLOADER_DELETE_ALL : UPLOADER_DELETE_NONE;
                 break;
             case 'phenopacket':
                 $method = 'phenoPacketInsertByFileId';
-                $overwriteFlag = UPLOADER_DELETE_FILE;
                 break;
             case 'vcf':
                 $method = 'vcfInsertByFileId';
-                $overwriteFlag = UPLOADER_DELETE_FILE;
                 break;
             default:
                 return json_encode(0);
@@ -1038,17 +1035,17 @@ use CodeIgniter\Config\Services;
                     $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
                     unset($unsaved_files[$key]);
 
-                    switch (strtolower($file->getExtension())) {
-                        case 'csv':
-                        case 'xls':
-                        case 'xlsx':
-                            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00");
-                            break;
-                        case 'phenopacket':
-                        case 'json':
-                            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertByFileId $file_id " . UPLOADER_DELETE_NONE);
-                            break;
-                    }
+                    // switch (strtolower($file->getExtension())) {
+                    //     case 'csv':
+                    //     case 'xls':
+                    //     case 'xlsx':
+                    //         $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00");
+                    //         break;
+                    //     case 'phenopacket':
+                    //     case 'json':
+                    //         $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertByFileId $file_id " . UPLOADER_DELETE_NONE);
+                    //         break;
+                    // }
                 }
             }
         }
