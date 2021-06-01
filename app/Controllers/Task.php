@@ -306,7 +306,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * @param string $source      - The name of the source we are uploading to
      * @return array $return_data - Basic information on the status of the upload
      */
-    public function bulkUploadInsert(int $fileId, int $overwrite) {
+    public function bulkUploadInsert(int $fileId,  int $overwrite = UPLOADER_DELETE_FILE) {
         $uploadModel = new Upload();
         $sourceModel = new Source();
 
