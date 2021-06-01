@@ -1,9 +1,13 @@
 var tooltipObj;
+var isImport = false;
+var filesDtPage = 0;
+
+selectd_fileids = [];
 
 $(document).ready(function() {
-
+    isImport = window.location.href.split('/').indexOf('Import') == 5;
     param = $('#source_id').val();
-    reloadTable(param,true);
+    reloadTable(param,true, isImport);
 
     let eventSource = new EventSource(baseurl + "ServiceApi/pollUploadedFiles");
 
@@ -41,7 +45,7 @@ $(document).ready(function() {
 
 })
 
-function reloadTable(param,first) {
+function reloadTable(param,first, chkBox = false) {
     if ($('.dataTables_filter input').is(":focus")) {
         return;
     }
@@ -59,7 +63,17 @@ function reloadTable(param,first) {
             $('#fActionOverwrite').prop('disabled', response.Files.length == 0);
 
         	for (var i = 0; i < response.Files.length; i++) {
-        		$("#file_grid").append("<tr id='file_"+ response.Files[i].ID + "'><td>" + response.Files[i].FileName + "</td><td>" + response.Files[i].email + "</td></tr>");
+
+                var checkBoxStr = "";
+                if (chkBox) {
+                    checkBoxStr = "<td>";
+                    //if (response.Files[i].Status == 'Pending') {
+                        checkBoxStr += "<input type='checkbox' class='fileChkBx' data-fileid='" + response.Files[i].ID + "' onclick='updateFileIDs(event)'></input>";
+                    //}
+                    checkBoxStr += "</td>";
+                }
+
+        		$("#file_grid").append("<tr id='file_"+ response.Files[i].ID + "'>" + checkBoxStr + "<td>" + response.Files[i].FileName + "</td><td>" + response.Files[i].email + "</td></tr>");
 
                 if (response.Files[i].Status == 'Pending') {
                     $('#file_' + response.Files[i].ID).append("<td><div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + response.Files[i].ID + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100'>0%</div></div><p id='statusmessage-" + response.Files[i].ID + "' style='font-size: 10px'></p></td>");
@@ -83,9 +97,9 @@ function reloadTable(param,first) {
 
                 actionStr = "<td id='action-" + response.Files[i].ID + "'><a href='#' data-toggle='tooltip' data-placement='top' title='Remove Records and Re-process File' class='reprocess' onclick='processFile(" + response.Files[i].ID + ", 1)'><i class='fa fa-redo-alt text-info'></i></a>";
                 
-                if(!response.Files[i].FileName.toString().toLowerCase().includes('.vcf') && !response.Files[i].FileName.toString().toLowerCase().includes('.phenopacket')){
-                    actionStr += " <a href='#' data-toggle='tooltip' data-placement='top' title='Re-process File and Append Records' class='append' onclick='processFile(" + response.Files[i].ID + ", 0)'><i class='fa fa-sync-alt text-warning'></i></a>";
-                } 
+                // if(!response.Files[i].FileName.toString().toLowerCase().includes('.vcf') && !response.Files[i].FileName.toString().toLowerCase().includes('.phenopacket')){
+                //     actionStr += " <a href='#' data-toggle='tooltip' data-placement='top' title='Re-process File and Append Records' class='append' onclick='processFile(" + response.Files[i].ID + ", 0)'><i class='fa fa-sync-alt text-warning'></i></a>";
+                // } 
 
                 actionStr += "</td>";
 
@@ -102,16 +116,124 @@ function reloadTable(param,first) {
 
 function filesDt() {
     if ($('#file_table').length) {
-        $('#file_table').dataTable( {
-        "sDom": "<'row'<'col 'l><'col'f>r>t<'row'<'col 'i><'col'p>>",
-        //"sPaginationType": "bootstrap",
-        "oLanguage": {
-            "sLengthMenu": "_MENU_ records per page"
-        }//, 
-        //"aLengthMenu": [[5, 10, 25, 50, 100, 200, -1], [5, 10, 25, 50, 100, 200, "All"]]
-        } );        
+        var table = $('#file_table').dataTable( {
+            "sDom": "<'row'<'col 'l><'col'f>r>t<'row'<'col 'i><'col'p>>",
+            "columnDefs": [{ targets: 0, orderable: false }],
+            "oLanguage": {
+                "sLengthMenu": "_MENU_ records per page"
+            }, 
+            "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+        } );  
+        
+        table.fnPageChange(filesDtPage);
+
+        $('#file_table').on( 'page.dt', function () {
+            $('#file_table thead .chkBxMaster').prop('checked', false);
+                    var rowsPerPage = $('#file_table tbody tr').length;
+                    var currentPage = $('#file_table').DataTable().page();
+                    var startingPoint = currentPage * rowsPerPage;
+            var allRowsChecked = true;
+            for (var rc = currentPage * rowsPerPage; rc < startingPoint + rowsPerPage; rc++){
+                var rowChkBox = $($('#file_table').DataTable().cell({row:rc, column:0}).data());
+                if(!rowChkBox.prop('checked')){
+                    allRowsChecked = false;
+                }
+            }
+            $('#file_table thead .chkBxMaster').prop('checked', allRowsChecked);
+        });
+        
+        $('#file_table thead .chkBxMaster').change(function (){
+            checkOrUncheck = $(this).prop('checked');
+            fileCount = (parseInt($('#batchProcessBtn span').html()) < 0 && checkOrUncheck) ? 0 : parseInt($('#batchProcessBtn span').html());
+            chkBxCount = fileCount;
+    
+            var rowsPerPage = $('#file_table tbody tr').length;
+            var currentPage = $('#file_table').DataTable().page();
+            var startingPoint = currentPage * rowsPerPage;
+            for (var rc = currentPage * rowsPerPage; rc < startingPoint + rowsPerPage; rc++){
+
+                var rowChkBox = $($('#file_table').DataTable().cell({row:rc, column:0}).data());
+
+                if (rowChkBox.length > 0) {
+                    
+                
+                    var rowChkBoxHtml;
+                    var alreadyChecked = (rowChkBox.prop('checked') && checkOrUncheck) || (!rowChkBox.prop('checked') && !checkOrUncheck);
+                    if (rowChkBox.prop('checked') == false && checkOrUncheck){
+                        rowChkBoxHtml = rowChkBox.attr('checked', checkOrUncheck).prop('outerHTML');
+                    }
+                    else if (rowChkBox.prop('checked') && !checkOrUncheck){
+                        rowChkBoxHtml = rowChkBox.attr('checked', checkOrUncheck).prop('outerHTML');
+                    }
+                    else{
+                        rowChkBoxHtml = rowChkBox.prop('outerHTML');
+                    }
+        
+                    $('#file_table').DataTable().cell({row:rc, column:0}).data(rowChkBoxHtml);
+                    if (!alreadyChecked){
+                        updateFileIDs($($('#file_table').DataTable().cell({row:rc, column:0}).data()));
+                        checkOrUncheck ? chkBxCount++ : chkBxCount--;
+                    }
+                }
+            }
+
+            fileCount = chkBxCount < 0 ? 0 : chkBxCount;
+
+        });
     }
 }
+
+function updateFileIDs(elem){
+
+	var chkBoxElem;
+	var rowIndex;
+
+	if ('target' in elem){
+		chkBoxElem = $(elem.target);
+		rowIndex = $(elem.target.parentElement.parentElement).index();
+	}
+	else if(elem.length > 0 && 'type' in elem[0] && elem[0].type == 'checkbox'){
+		chkBoxElem = elem;
+		rowIndex = -1;
+	}
+
+    if (chkBoxElem == undefined) {
+        return;
+    }
+
+    var fileCount = parseInt($('#batchProcessBtn span').html());
+    var checkedOrUnchecked = chkBoxElem.prop('checked');
+	if(rowIndex != -1){
+        var rowsPerPage = $('#file_table tbody tr').length;
+        var currentPage = $('#file_table').DataTable().page();
+		var elemRow = (rowsPerPage * currentPage) + rowIndex;
+
+		var rowChkBox = $($('#file_table').DataTable().cell({row:elemRow, column:0}).data());
+		var rowChkBoxHtml = rowChkBox.attr('checked', checkedOrUnchecked).prop('outerHTML');
+		$('#file_table').DataTable().cell({row:elemRow, column:0}).data(rowChkBoxHtml);
+	}
+
+    checkedOrUnchecked ? fileCount++ : fileCount--;
+    $('#batchProcessBtn span').html(fileCount.toString());
+    if (fileCount <= 0) {
+        $('#batchProcessBtn').prop('disabled', true);
+    }
+    var selectedFId = chkBoxElem.data('fileid');
+
+    if(checkedOrUnchecked){
+        selectd_fileids.push(selectedFId);
+    }
+    else{
+        var index = selectd_fileids.indexOf(selectedFId);
+        if (index !== -1) {
+            selectd_fileids.splice(index, 1);
+        }
+    }
+
+    if(selectd_fileids.length > 0){
+        $('#batchProcessBtn').prop('disabled', false);
+    }
+ }
 
 function processFile(fileId, overwrite) {
 
@@ -137,7 +259,49 @@ function processFile(fileId, overwrite) {
             });
             id = $('#source_id').val();
             $('[data-toggle="tooltip"]').tooltip('hide');
-            reloadTable(id,false);
+            reloadTable(id,false, isImport);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $.notify({
+                // options
+                message: 'There was an error.'
+              },{
+                // settings
+                timer: 200
+            });
+        }
+    });
+}
+
+function processFiles() {
+    if (selectd_fileids.length == 0) {
+        return;
+    }
+    var fileData = new FormData();
+    fileData.append('fileIds', selectd_fileids);
+
+    $.ajax({
+        type: "POST",  
+        url: baseurl+'AjaxApi/processFiles',
+        data: fileData,
+        dataType: "json", 
+        contentType: false,
+        processData: false,   
+        success: function(response)  {
+            $.notify({
+                // options
+                message: 'Tasks started.'
+              },{
+                // settings
+                timer: 200
+            });
+
+            selectd_fileids = [];
+			$('#file_table thead .chkBxMaster').prop('checked', false);
+			$('#file_table thead .chkBxMaster').change();
+
+            id = $('#source_id').val();
+            reloadTable(id,false, isImport);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             $.notify({

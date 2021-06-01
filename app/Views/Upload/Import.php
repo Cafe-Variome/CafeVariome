@@ -56,6 +56,7 @@
 <table class="table table-bordered table-striped table-hover" id="file_table" width="100%" cellspacing="0">
   <thead>
 	<tr>
+        <th><input type="checkbox" class="chkBxMaster"></th>
 		<th>File-name</th>
 		<th>User</th>
 		<th>Status</th>
@@ -65,5 +66,8 @@
   <tbody id="file_grid">
   </tbody>
 </table>
+<button class="btn btn-primary" id="batchProcessBtn" onclick="processFiles()" disabled>
+    <i class="fa fa-redo-alt"></i> Process Files <span class="badge badge-light">0</span>
+</buttton>
 
 <?= $this->endSection() ?>
