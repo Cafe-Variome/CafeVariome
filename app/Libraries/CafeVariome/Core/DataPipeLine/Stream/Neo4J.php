@@ -75,6 +75,7 @@ class Neo4J
     public function GetAncestors(string $hpoTerm): array
     {
         $pars = [];
+        $parents = [];
         $termname = '';
         $matchedTerms = $this->MatchHPO_IS_A($hpoTerm);
 
