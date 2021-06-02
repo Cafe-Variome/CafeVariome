@@ -225,11 +225,11 @@ class IonAuth
 				$this->ionAuthModel->triggerEvents(['post_account_creation', 'post_account_creation_successful']);
 
 				//Send email confirmation
-				$emailAdapter = \Config\Services::email();
+				// $emailAdapter = \Config\Services::email();
 
-				$credEmailInstance = EmailFactory::createCredentialsEmail($emailAdapter);
-				$credEmailInstance->setCredentials($email, $password);
-				$credEmailInstance->send();
+				// $credEmailInstance = EmailFactory::createCredentialsEmail($emailAdapter);
+				// $credEmailInstance->setCredentials($email, $password);
+				// $credEmailInstance->send();
 
 				return $id;
 			}
