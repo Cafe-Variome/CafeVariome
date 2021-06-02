@@ -72,7 +72,7 @@ class KeyCloak extends OpenIDAuthenticator /*implements IAuthenticator*/{
     public function register(string $email, string $username, string $password, array $additionaldata, array $groups){
         $ionAuth = new IonAuth();
         $result = $ionAuth->register($username, $email, $password, $additionaldata, $groups);
-        if ($result){
+        //if ($result){
             //Assuming $result is user_id
             // if( $groups ){
             //     $networkModel = new Network($this->db);
@@ -87,24 +87,24 @@ class KeyCloak extends OpenIDAuthenticator /*implements IAuthenticator*/{
             // }
             // Create user in Keycloak H2 database 
 
-            $keyCloakApi = new KeyCloakApi($this);
-            if (!$keyCloakApi->userExists($email)) {
-                $first_name = $additionaldata['first_name'];
-                $last_name = $additionaldata['last_name'];
-                $keyCloakApi->createUser($email, $first_name, $last_name);
+            // $keyCloakApi = new KeyCloakApi($this);
+            // if (!$keyCloakApi->userExists($email)) {
+            //     $first_name = $additionaldata['first_name'];
+            //     $last_name = $additionaldata['last_name'];
+            //     $keyCloakApi->createUser($email, $first_name, $last_name);
                 
-                $user_id =  $keyCloakApi->getUserId($email);
-                $keyCloakApi->setPassword($user_id, $password);
-                $keyCloakApi->logout();
-                //Send email confirmation
-                $emailAdapter = \Config\Services::email();
+            //     $user_id =  $keyCloakApi->getUserId($email);
+            //     $keyCloakApi->setPassword($user_id, $password);
+            //     $keyCloakApi->logout();
+            //     //Send email confirmation
+            //     $emailAdapter = \Config\Services::email();
 
-                $credEmailInstance = EmailFactory::createCredentialsEmail($emailAdapter);
-                $credEmailInstance->setCredentials($email, $password);
-                $credEmailInstance->send();
-            }
+            //     $credEmailInstance = EmailFactory::createCredentialsEmail($emailAdapter);
+            //     $credEmailInstance->setCredentials($email, $password);
+            //     $credEmailInstance->send();
+            // }
 
-        }
+        //}
     }
 
     public function update(int $user_id, array $additionaldata, array $groups){
