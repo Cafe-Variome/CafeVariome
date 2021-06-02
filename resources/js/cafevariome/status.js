@@ -116,29 +116,31 @@ function reloadTable(param,first, chkBox = false) {
 
 function filesDt() {
     if ($('#file_table').length) {
-        var table = $('#file_table').dataTable( {
+        var table = $('#file_table').DataTable( {
             "sDom": "<'row'<'col 'l><'col'f>r>t<'row'<'col 'i><'col'p>>",
             "columnDefs": [{ targets: 0, orderable: false }],
             "oLanguage": {
                 "sLengthMenu": "_MENU_ records per page"
             }, 
-            "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+            "lengthMenu": [[25, 50, 100], [25, 50, 100]],
         } );  
         
-        table.fnPageChange(filesDtPage);
+        $('#file_table').DataTable().page(filesDtPage).draw('page');
 
         $('#file_table').on( 'page.dt', function () {
             $('#file_table thead .chkBxMaster').prop('checked', false);
-                    var rowsPerPage = $('#file_table tbody tr').length;
-                    var currentPage = $('#file_table').DataTable().page();
-                    var startingPoint = currentPage * rowsPerPage;
+            var rowsPerPage = $('#file_table tbody tr').length;
+            var currentPage = $('#file_table').DataTable().page();
+            var startingPoint = currentPage * rowsPerPage;
             var allRowsChecked = true;
+
             for (var rc = currentPage * rowsPerPage; rc < startingPoint + rowsPerPage; rc++){
                 var rowChkBox = $($('#file_table').DataTable().cell({row:rc, column:0}).data());
                 if(!rowChkBox.prop('checked')){
                     allRowsChecked = false;
                 }
             }
+            
             $('#file_table thead .chkBxMaster').prop('checked', allRowsChecked);
         });
         
@@ -258,6 +260,7 @@ function processFile(fileId, overwrite) {
                 timer: 200
             });
             id = $('#source_id').val();
+            filesDtPage = $('#file_table').DataTable().page()
             $('[data-toggle="tooltip"]').tooltip('hide');
             reloadTable(id,false, isImport);
         },
@@ -299,7 +302,7 @@ function processFiles() {
             selectd_fileids = [];
 			$('#file_table thead .chkBxMaster').prop('checked', false);
 			$('#file_table thead .chkBxMaster').change();
-
+            filesDtPage = $('#file_table').DataTable().page()
             id = $('#source_id').val();
             reloadTable(id,false, isImport);
         },
