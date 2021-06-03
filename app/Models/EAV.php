@@ -356,5 +356,19 @@ class EAV extends Model{
         return $final;
     }
 
+    public function countUniqueUIDs(int $source_id): int
+    {
+        $this->builder = $this->db->table($this->table);
+
+        $this->builder->select('uid, subject_id');
+        $this->builder->where('elastic', 0);
+        $this->builder->where('source_id', $source_id);
+        $this->builder->distinct();
+
+        $count = 0;
+        $count = $this->builder->countAllResults();
+
+        return $count;
+    }
     
 }
