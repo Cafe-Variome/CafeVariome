@@ -80,7 +80,7 @@ class EAV extends Model{
      */
     public function createEAV(string $uid, int $source, int $file, string $id, string $key, string $value) 
     {
-        $malicious_chars = ['\\', chr(39), chr(34), '/', '’', '<', '>', '&'];
+        $malicious_chars = ['\\', chr(39), chr(34), '/', '’', '<', '>', '&', ';'];
         $key = str_replace($malicious_chars, '', $key);
         $value = str_replace($malicious_chars, '', $value);
 

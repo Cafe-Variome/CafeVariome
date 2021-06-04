@@ -9,21 +9,32 @@ Options FollowSymLinks
 # FollowSymLinks must be enabled for this to work.
 <IfModule mod_rewrite.c>
 
-	Options +FollowSymlinks
 	RewriteEngine On
+	Options All -Indexes
+	Options +FollowSymlinks
 
 	# If you installed CodeIgniter in a subfolder, you will need to
 	# change the following line to match the subfolder you need.
 	# http://httpd.apache.org/docs/current/mod/mod_rewrite.html#rewritebase
-	# RewriteBase /
+	RewriteBase /
 
-	# Redirect Trailing Slashes...
-    RewriteRule ^(.*)/$ $1 [L,R=301]
+	RewriteRule ^index/(.+?)/$ index.php?page=$1 [L,QSA]
 
-	# Rewrite "www.example.com -> example.com"
-	RewriteCond %{HTTPS} !=on
-	RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-	RewriteRule ^ http://%1%{REQUEST_URI} [R=301,L]
+	# skip all files and directories from rules below
+    RewriteCond %{REQUEST_FILENAME} -d [OR]
+	RewriteCond %{REQUEST_FILENAME} -f [OR]
+	RewriteCond %{REQUEST_FILENAME} -l
+	RewriteRule ^ - [L]
+	
+	# Prevent loops
+	RewriteCond %{REQUEST_URI} !index\.php         [NC]
+	RewriteCond %{REQUEST_URI} ^/([^/]+)/([^/]+)/? [NC]
+	RewriteRule .*  %1/index.php?page=%2           [L]
+
+    # Preventing Mixed content from loading insecure stylesheet over HTTPS
+    Header always set Content-Security-Policy "upgrade-insecure-requests;"
+	RewriteCond %{SERVER_PORT} !^443$
+    RewriteRule ^/(.*) https://%{SERVER_NAME}/$1 [NC,R,L]
 
 	# Checks to see if the user is attempting to access a valid file,
     # such as an image or css document, if this isn't true it sends the
@@ -35,6 +46,18 @@ Options FollowSymLinks
 	# Ensure Authorization header is passed along
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Deny Access To Certain User Agents (bots)
+    #	RewriteCond %{HTTP_USER_AGENT} ^User\ Agent\ 1 [OR]
+    #	RewriteCond %{HTTP_USER_AGENT} ^Another\ Bot\ You\ Want\ To\ Block [OR]
+    #	RewriteCond %{HTTP_USER_AGENT} ^Another\ UA
+    #	RewriteRule ^.* - [F,L]
+
+	# Deny Access to Hidden Files and Directories
+	RewriteCond %{SCRIPT_FILENAME} -d [OR]
+	RewriteCond %{SCRIPT_FILENAME} -f
+	RewriteRule "(^|/)\." - [F]
+
 </IfModule>
 
 # Extra Security Headers
