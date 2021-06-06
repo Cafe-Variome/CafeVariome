@@ -993,11 +993,6 @@ use CodeIgniter\Config\Services;
         $force = $data->force;
         $source_id = $data->id;
         $add = (int)$data->add;
-
-        if ($force) {
-            // if the regenerate was forced set the elastic state for all eav data rows
-            $eavModel->resetElasticFlag($source_id);
-        }
         
         // rebuild the json list for interface
         $phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchAndNeo4JIndex $source_id $add");
