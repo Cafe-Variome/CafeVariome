@@ -8,7 +8,7 @@
  * @author Owen Lancaster
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- * 
+ * @deprecated
  * This class handles data operations on Phenotypes in EAVs table.
  * 
  */
