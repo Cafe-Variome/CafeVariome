@@ -317,7 +317,7 @@ class DataStream
 
         while ($offset < $eavsize){
             // Get current limit chunk of data
-            $eavdata = $eavModel->getEAVs('id,uid,subject_id,attribute,value', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], false, $batchSize, $offset);
+            $eavdata = $eavModel->getEAVs('id,uid,subject_id,attribute,value', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], false, $batchSize);
 
             // Loop through limit chunk
             foreach ($eavdata as $attribute_array){
@@ -450,8 +450,8 @@ class DataStream
         $batchSize = 100000;
 	    $seedJump = $batchSize;
 
-        for ($i=0; $i < $totalEAVRecords; $i+=$seedJump) { 
-            $data = $eavModel->getEAVsForSource($source_id, $batchSize, $i);
+        for ($i=0; $i < $totalEAVRecords; $i+=$batchSize) { 
+            $data = $eavModel->getEAVsForSource($source_id, $batchSize, $seedJump);
             $this->swapLocalPhenotypes($data, $tempLocalPhenotypes, $network_key);
             $seedJump = end($data)['id'];
             $recordsProcessed += count($data);
