@@ -272,7 +272,7 @@ class DataStream
 
         $offset = 0;
         $currId = 0;
-        $batchSize = 10000;
+        $batchSize = EAV_BATCH_SIZE;
         while ($offset < $uniqueIdsCount){
 
             $unique_ids = $eavModel->getEAVs('id,uid,subject_id', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], true, $batchSize);
@@ -313,7 +313,7 @@ class DataStream
         $bulk=[];
         $offset = 0;
         $currId = 0;
-        $batchSize = 10000;
+        $batchSize = EAV_BATCH_SIZE;
 
         while ($offset < $eavsize){
             // Get current limit chunk of data
@@ -447,7 +447,7 @@ class DataStream
             $this->serviceInterface->ReportProgress($source_id, $recordsProcessed, $totalEAVRecords, 'elasticsearchindex', 'Processing attributes and values for: ' . $source_name);
         }
 
-        $batchSize = 100000;
+        $batchSize = EAV_BATCH_SIZE;
 	    $seedJump = $batchSize;
 
         for ($i=0; $i < $totalEAVRecords; $i+=$batchSize) { 
