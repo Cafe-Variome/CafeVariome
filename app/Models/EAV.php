@@ -33,8 +33,10 @@ class EAV extends Model{
 
     public function getEAVsForSource(int $source_id, int $limit, int $offset){
         $this->builder = $this->db->table($this->table);
-        $this->builder->select('attribute,value');
+        $this->builder->select('id,attribute,value');
         $this->builder->where('source_id', $source_id);
+        $this->builder->where('id>=', $offset);
+
         $this->builder->limit($limit, $offset);
         $query = $this->builder->get()->getResultArray();
 
