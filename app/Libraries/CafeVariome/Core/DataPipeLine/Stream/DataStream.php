@@ -47,7 +47,6 @@ class DataStream
 
         $sourceModel = new Source();
         $networkModel = new Network();
-        $phenotypeModel = new Phenotype();
         $fileMan = new SysFileMan($jsonIndexPath);
 
         $sourceModel->lockSource($source_id);	
@@ -81,7 +80,7 @@ class DataStream
 
         foreach ($networkAssignedSources as $networkSourcePair) {
             try {
-                $sourceData = $phenotypeModel->localPhenotypesLookupValues($networkSourcePair['source_id'], $networkSourcePair['network_key']);
+                $sourceData = $this->loadSourceEAVData($networkSourcePair['source_id'], $networkSourcePair['network_key']);
 
                 $json_data = [];
                 $existing_data = [];
@@ -272,10 +271,11 @@ class DataStream
         $this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex', 'Generating Elasticsearch index');
 
         $offset = 0;
+        $currId = 0;
         $batchSize = 10000;
         while ($offset < $uniqueIdsCount){
 
-            $unique_ids = $eavModel->getEAVs('uid,subject_id', ["source_id"=>$source_id, "elastic"=>0], true, $batchSize);
+            $unique_ids = $eavModel->getEAVs('id,uid,subject_id', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], true, $batchSize);
 
             // start making all the parent documents in ElasticSearch
             foreach($unique_ids as $index_data){
@@ -293,6 +293,9 @@ class DataStream
                 }
             }
 
+            $lastRec = end($unique_ids);
+            $currId = $lastRec['id'];
+
             $offset += $batchSize;
         }
 
@@ -309,11 +312,12 @@ class DataStream
 
         $bulk=[];
         $offset = 0;
+        $currId = 0;
         $batchSize = 10000;
 
         while ($offset < $eavsize){
             // Get current limit chunk of data
-            $eavdata = $eavModel->getEAVs(null, ["source_id"=>$source_id, "elastic"=>0], false, $batchSize, $offset);
+            $eavdata = $eavModel->getEAVs('id,uid,subject_id,attribute,value', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], false, $batchSize, $offset);
 
             // Loop through limit chunk
             foreach ($eavdata as $attribute_array){
@@ -331,6 +335,10 @@ class DataStream
                     $this->serviceInterface->ReportProgress($source_id, $countparents + $counta, $totalRecords, 'elasticsearchindex');
                 }   
             }
+
+            $lastRec = end($unique_ids);
+            $currId = $lastRec['id'];
+
             // Update offset 
             $offset += $batchSize;
         }
@@ -409,6 +417,95 @@ class DataStream
         }
 
         return $names;
+    }
+
+
+    /**
+     * loadSourceEAVData
+     * 
+     * 
+     * @param int $source_id
+     * @param string $network_key
+     * 
+     * @return array localPhenoTypes
+     */
+    private function loadSourceEAVData(int $source_id, string $network_key) {
+
+        $eavModel = new EAV();
+        $sourceModel = new Source();
+
+        $eavCount = $eavModel->getEAVs('count(*) as totalEAVs', ['source_id' => $source_id]);
+        $totalEAVRecords = $eavCount[0]['totalEAVs'];
+
+        $source_name = $sourceModel->getSourceNameByID($source_id);
+        
+        $data = [];
+        $tempLocalPhenotypes = [];
+        $recordsProcessed = 0;
+
+        if ($totalEAVRecords > 0) {
+            $this->serviceInterface->ReportProgress($source_id, $recordsProcessed, $totalEAVRecords, 'elasticsearchindex', 'Processing attributes and values for: ' . $source_name);
+        }
+
+        $batchSize = 100000;
+	    $seedJump = $batchSize;
+
+        for ($i=0; $i < $totalEAVRecords; $i+=$seedJump) { 
+            $data = $eavModel->getEAVsForSource($source_id, $batchSize, $i);
+            $this->swapLocalPhenotypes($data, $tempLocalPhenotypes, $network_key);
+            $seedJump = end($data)['id'];
+            $recordsProcessed += count($data);
+            $this->serviceInterface->ReportProgress($source_id, $recordsProcessed, $totalEAVRecords, 'elasticsearchindex');
+        }
+
+        return $tempLocalPhenotypes;
+    }
+
+    private function swapLocalPhenotypes(array $data, & $tempLocalPhenotypes, int $network_key)
+    {
+        foreach ($data as $d) {
+
+            $attr = $d['attribute'];
+            $value = $d['value'];
+            
+            if(strlen($value) > 229) continue;
+
+            if(is_numeric($value)) {            
+                $sigs = 4;
+                if(is_float($value) && floatval($value)) {
+                    if($value < 0) {
+                        $value = round($value * -1, $sigs) * -1;
+                    } else {
+                        $value = round($value, $sigs);
+                    }
+                }
+            }
+
+            $value = (string)$value;      
+
+            $local_phenotypes = [];
+
+            foreach ($tempLocalPhenotypes as $tlp) {
+                if ($tlp['phenotype_attribute'] == $attr) {
+                    array_push($local_phenotypes, $tlp);
+                }
+            }
+            
+            if(count($local_phenotypes) > 0) {
+                $lastLP = array_pop($local_phenotypes);
+                if(in_array($value, explode("|" , $lastLP['phenotype_values'])) || (strpos($lastLP['phenotype_values'], 'Not all values displayed|') !== false)) continue;
+                else {
+                    // Allow displaying of all values
+                    $val = $lastLP['phenotype_values'] . $value . "|";
+                    $tempLocalPhenotypes[$attr]['phenotype_values'] = $val;
+                    $tempLocalPhenotypes[$attr]['phenotype_attribute'] = $attr;
+                }
+            } else {
+                $value = $value . "|";
+
+                $tempLocalPhenotypes[$attr] = ["network_key" => $network_key, "phenotype_attribute" => $attr, "phenotype_values" => $value];
+            }
+        }
     }
 
     function createDocByAttribute(string $index_name, string $attribute, bool $range_exist) {
