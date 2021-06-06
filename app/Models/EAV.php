@@ -37,7 +37,7 @@ class EAV extends Model{
         $this->builder->where('source_id', $source_id);
         $this->builder->where('id>=', $offset);
 
-        $this->builder->limit($limit, $offset);
+        $this->builder->limit($limit);
         $query = $this->builder->get()->getResultArray();
 
         return $query;
