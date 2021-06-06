@@ -125,7 +125,6 @@ define('UPLOADER_DELETE_NONE', 00);
 define('UPLOADER_DELETE_ALL', 1);
 define('UPLOADER_DELETE_FILE', 2);
 
-
 // PHP INI Values
 ini_set('memory_limit', "1G");
 
@@ -134,6 +133,8 @@ define('SUBJECT_ID_WITHIN_FILE', 0);
 define('SUBJECT_ID_IN_FILE_NAME', 1);
 define('GROUPING_COLUMNS_ALL', 0);
 define('GROUPING_COLUMNS_CUSTOM', 1);
+
+define('EAV_BATCH_SIZE', 30000);
 
 
 
