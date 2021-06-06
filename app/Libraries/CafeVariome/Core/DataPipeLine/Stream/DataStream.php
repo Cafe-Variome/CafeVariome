@@ -223,7 +223,7 @@ class DataStream
             if (!$add) {
                 $response = $elasticClient->indices()->delete($params);
                 $flag = true;
-                $eavModel->updateEAVs(["elastic"=>0], ['source_id'=> $source_id]) ;     // Reset elastic flag in eavs so that records appear in later selects
+                $eavModel->resetElasticFlag($source_id);     // Reset elastic flag in eavs so that records appear in later selects
             }      
         }
         else{
