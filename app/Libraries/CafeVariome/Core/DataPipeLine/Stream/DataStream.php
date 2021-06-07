@@ -216,6 +216,10 @@ class DataStream
         // ElasticSearch index name
         $params['index'] = $index_name;
 
+        if (!$add) {
+            $eavModel->resetElasticFlag($source_id);     // Reset elastic flag in eavs so that records appear in later selects
+        }
+
         // Check whether an Index already exists
         $flag = false;
         if ($elasticClient->indices()->exists($params)){
@@ -223,7 +227,6 @@ class DataStream
             if (!$add) {
                 $response = $elasticClient->indices()->delete($params);
                 $flag = true;
-                $eavModel->resetElasticFlag($source_id);     // Reset elastic flag in eavs so that records appear in later selects
             }      
         }
         else{
@@ -277,10 +280,17 @@ class DataStream
 
             $unique_ids = $eavModel->getEAVs('id,uid,subject_id', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], true, $batchSize);
 
+            $lastRec = end($unique_ids);
+            $currId = $lastRec['id'];
+            reset($unique_ids);
+
             // start making all the parent documents in ElasticSearch
-            foreach($unique_ids as $index_data){
-                $bulk['body'][] = ["index"=>[ "_id"=>$index_data['uid'],"_index"=>$index_name]];
-                $bulk['body'][] = ["subject_id"=>$index_data['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"sub", "source"=>$source_name."_eav"];    
+            $uid_count = count($unique_ids);
+            for ($i=0; $i < $uid_count; $i++) { 
+                $bulk['body'][] = ["index"=>[ "_id"=>$unique_ids[$i]['uid'],"_index"=>$index_name]];
+                $bulk['body'][] = ["subject_id"=>$unique_ids[$i]['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"sub", "source"=>$source_name."_eav"];    
+
+                unset($unique_ids[$i]);
 
                 $countparents++;
 
@@ -293,12 +303,8 @@ class DataStream
                 }
             }
 
-            $lastRec = end($unique_ids);
-            $currId = $lastRec['id'];
-
             $offset += $batchSize;
         }
-
 
 
         // Send the last parents through who didnt get finished in loop
@@ -319,12 +325,21 @@ class DataStream
             // Get current limit chunk of data
             $eavdata = $eavModel->getEAVs('id,uid,subject_id,attribute,value', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], false, $batchSize);
 
+            $eav_count = count($eavdata);
+
+            $lastRec = end($eavdata);
+            $currId = $lastRec['id'];
+            reset($eavdata);
+
             // Loop through limit chunk
-            foreach ($eavdata as $attribute_array){
-                $attribute_array['attribute'] = preg_replace('/\s+/', '_', $attribute_array['attribute']);
-                $bulk['routing'] = $attribute_array['uid'];
+            for ($i=0; $i < $eav_count; $i++) { 
+                $eavdata[$i]['attribute'] = preg_replace('/\s+/', '_', $eavdata[$i]['attribute']);
+                $bulk['routing'] = $eavdata[$i]['uid'];
                 $bulk['body'][] = ["index"=>["_index"=>$index_name]];
-                $bulk['body'][] = ["subject_id"=>$attribute_array['subject_id'],"attribute"=>$attribute_array['attribute'],"value"=>strtolower($attribute_array['value']), "eav_rel"=>["name"=>"eav","parent"=>$attribute_array['uid']], "type"=>"eav", "source"=>$source_name."_eav"];
+                $bulk['body'][] = ["subject_id"=>$eavdata[$i]['subject_id'],"attribute"=>$eavdata[$i]['attribute'],"value"=>strtolower($eavdata[$i]['value']), "eav_rel"=>["name"=>"eav","parent"=>$eavdata[$i]['uid']], "type"=>"eav", "source"=>$source_name."_eav"];
+                
+                unset($eavdata[$i]);
+                
                 $counta++;
                 // Every 500 documents bulk insert to ElasticSearch
                 if ($counta%500 == 0){
@@ -335,9 +350,6 @@ class DataStream
                     $this->serviceInterface->ReportProgress($source_id, $countparents + $counta, $totalRecords, 'elasticsearchindex');
                 }   
             }
-
-            $lastRec = end($unique_ids);
-            $currId = $lastRec['id'];
 
             // Update offset 
             $offset += $batchSize;
@@ -448,14 +460,14 @@ class DataStream
         }
 
         $batchSize = EAV_BATCH_SIZE;
-	    $seedJump = $batchSize;
+	    $currId = 0;
 
         for ($i=0; $i < $totalEAVRecords; $i+=$batchSize) { 
-            $data = $eavModel->getEAVsForSource($source_id, $batchSize, $seedJump);
+            $data = $eavModel->getEAVsForSource($source_id, $batchSize, $currId);
             $this->swapLocalPhenotypes($data, $tempLocalPhenotypes, $network_key);
-            $seedJump = end($data)['id'];
             $recordsProcessed += count($data);
             $this->serviceInterface->ReportProgress($source_id, $recordsProcessed, $totalEAVRecords, 'elasticsearchindex');
+            $currId = end($data)['id'];
         }
 
         return $tempLocalPhenotypes;
