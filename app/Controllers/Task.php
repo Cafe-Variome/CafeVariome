@@ -3,14 +3,14 @@
 /**
  * Task.php
  * Created 02/08/2019
- * 
+ *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
  * Formerly known as sqlinsert.php
- * 
+ *
  * This is controller is only accessible via the CLI.
  * It implements tasks that need to be run in the background.
- * 
+ *
  */
 
 use CodeIgniter\Controller;
@@ -38,14 +38,14 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     }
 
     /**
-     * Pheno Packet Insert - manages the loop to insert all recently uploaded json files sequentially 
+     * Pheno Packet Insert - manages the loop to insert all recently uploaded json files sequentially
      * into mysql for the given source.
      *
      * @param string $source - Name of source update should be performed for
      * @return N/A
      */
     public function phenoPacketInsertBySourceId(int $source_id, int $overwrite = UPLOADER_DELETE_NONE) {
-              
+
         $uploadModel = new Upload();
         $sourceModel = new Source();
         $inputPipeLine = new PhenoPacketDataInput($source_id, $overwrite);
@@ -69,16 +69,15 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     }
 
         /**
-     * Pheno Packet Insert - manages the loop to insert all recently uploaded json files sequentially 
+     * Pheno Packet Insert - manages the loop to insert all recently uploaded json files sequentially
      * into mysql for the given source.
      *
      * @param string $source - Name of source update should be performed for
      * @return N/A
      */
     public function phenoPacketInsertByFileId(int $file_id, int $overwrite = UPLOADER_DELETE_FILE) {
-              
+
         $uploadModel = new Upload();
-        $sourceModel = new Source();
 
         $source_id = $uploadModel->getSourceIdByFileId($file_id);
 
@@ -98,9 +97,9 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * @deprecated
      * Imported from elastic controller by Mehdi Mehtarizadeh (06/08/2019)
      *
-     * 08/2019 Removal of mapping types 
+     * 08/2019 Removal of mapping types
      * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/removal-of-types.html
-     * 
+     *
      * @param int $source_id - The source we are inserting into
      * @return N/A
      */
@@ -120,7 +119,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
         $title = $elasticModel->getTitlePrefix();
 
-        for ($t=0; $t < count($vcf); $t++) { 
+        for ($t=0; $t < count($vcf); $t++) {
             $index_name = $title."_".$source_id."_".strtolower($vcf[$t]['patient']);
             if ($vcf[$t]['tissue']) {
                 $index_name = $index_name."_".strtolower($vcf[$t]['tissue']);
@@ -146,23 +145,23 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                         "attribute":{"type":"keyword"},
                         "value":{"type":"text", "fields": {"raw":{"type": "keyword"},
                          "d":{"type": "long", "ignore_malformed": "true"},
-                         "dt":{"type": "date", "ignore_malformed": "true"}}}                              
-                    }    
+                         "dt":{"type": "date", "ignore_malformed": "true"}}}
+                    }
                 }
-            }'; 
+            }';
             $map2 = json_decode($map,1);
-            $params['body'] = $map2;		  
+            $params['body'] = $map2;
             //error_log("params: ".var_dump($params));
             $elasticClient->indices()->create($params);
             $source_name = $sourceModel->getSourceNameByID($source_id);
-            
+
             // Open file for reading
             $handle = fopen(FCPATH."upload/UploadData/".$source_id."/".$vcf[$t]['FileName'], "r");
             // The list of extra parameters we want to include in our insert
             $config = ["AF"];
             $headers = [];
             $counter = 0;
-            
+
             if ($handle) {
                 // Read file line by line
                 while (($line = fgets($handle)) !== false) {
@@ -178,7 +177,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                     // We have reached the data
                     else {
                         $patient = $vcf[$t]['patient'];
-                        // Each row is its own group so we need to create a link id 
+                        // Each row is its own group so we need to create a link id
                         // Explode our lines by tabs
                         $values = explode("\t", $line);
                         $link = md5(uniqid());
@@ -187,17 +186,17 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                         //$bulk['body'][] = ["patient_id"=>$patient, "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_vcf"];
                         $bulk['body'][] = ["index"=>["_index"=>$index_name],"_id"=>$link];
                         $bulk['body'][] = ["patient_id"=>$patient, "eav_rel"=>["name"=>"sub"], "type"=>"subject", "source"=>$source_name."_vcf"];
-                        
+
                         //$bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
 
                         $counter++;
                         // Every thousand documents perform a bulk operation to ElasticSearch
-                        if ($counter % $chunkSize == 0) {      
-                            $responses = $elasticClient->bulk($bulk);	
+                        if ($counter % $chunkSize == 0) {
+                            $responses = $elasticClient->bulk($bulk);
                             $bulk=[];
                             unset ($responses);
                         }
-                        for ($i=0; $i < 8; $i++) { 
+                        for ($i=0; $i < 8; $i++) {
                             if ($i == 7) {
                                 // go through format column and multidimensional array with each index
                                 // having two elements: [0] for alias and [1] for the value
@@ -211,22 +210,22 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                                         $bulk['routing'] = $link;
                                         $bulk['body'][] = ["index"=>["_index"=>$index_name],"_id"=>$id];
                                         $bulk['body'][] = ["patient_id"=>$patient, "attribute"=>$v[0],"value"=>$v[1], "eav_rel"=>["name"=>"eav"], "type"=>"eav", "source"=>$source_name."_vcf"];
-                                        
+
                                         //$bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
 
-                                        $counter++;	
-                                        if ($counter % $chunkSize == 0) {      
-                                            error_log($counter);          	
+                                        $counter++;
+                                        if ($counter % $chunkSize == 0) {
+                                            error_log($counter);
                                             $responses = $elasticClient->bulk($bulk);
                                             $bulk=[];
                                             unset ($responses);
                                         }
                                     }
                                 }
-                            } 
+                            }
                             else if ($i == 6) {
                                 continue;
-                            }		              
+                            }
                             else {
                                 $id = md5(uniqid());
                                 //$bulk['body'][] = ["index"=>["_index"=>$index_name,"_type"=>"subject", "routing"=>$link,"_id"=>$id]];
@@ -234,19 +233,19 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                                 $bulk['routing'] = $link;
                                 $bulk['body'][] = ["index"=>["_index"=>$index_name],"_id"=>$id];
                                 $bulk['body'][] = ["patient_id"=>$patient,"attribute"=>$headers[$i],"value"=>$values[$i],"eav_rel"=>["name"=>"eav","parent"=>$link], "type"=>"eav", "source"=>$source_name."_vcf"];
-                                
-                                //$bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);  
-                                
-                                $counter++;		
-                                if ($counter % $chunkSize == 0) {      
-                                    error_log($counter);          	
+
+                                //$bulk['body'] = json_encode($bulk_body_head) . "\r\n" . json_encode($bulk_body_tail);
+
+                                $counter++;
+                                if ($counter % $chunkSize == 0) {
+                                    error_log($counter);
                                     $responses = $elasticClient->bulk($bulk);
-                                    
+
                                     $bulk=[];
                                     unset ($responses);
                                 }
                             }
-                        }	                    
+                        }
                     }
                 }
                 fclose($handle);
@@ -255,15 +254,15 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                 // error_log($counter);
                 unset ($responses);
                 unset($params);
-                $bulk=[];  	
+                $bulk=[];
                 $elasticModel->vcfWrap($vcf[$t]['FileName'],$source_id);
             } else {
                 // error opening the file.
-            } 
+            }
 
-        }	
+        }
         error_log("toggling source lock on: ".$source_id);
-        $sourceModel->unlockSource($source_id); 		      
+        $sourceModel->unlockSource($source_id);
     }
 
 
@@ -273,7 +272,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         $vcfFiles = $uploadModel->getVCFFilesBySourceId($source_id);
         $inputPipeLine = new VCFDataInput($source_id, $overwrite);
 
-        for ($i=0; $i < count($vcfFiles); $i++) { 
+        for ($i=0; $i < count($vcfFiles); $i++) {
             $file_id = $vcfFiles[$i]['ID'];
 
             $inputPipeLine->absorb($file_id);
@@ -302,7 +301,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * bulkUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
      *
      * @param string $file        - The File We are uploading
-     * @param int $overwrite         - 0: We do not need to delete data from eavs | 1: We do need to 
+     * @param int $overwrite         - 0: We do not need to delete data from eavs | 1: We do need to
      * @param string $source      - The name of the source we are uploading to
      * @return array $return_data - Basic information on the status of the upload
      */
@@ -345,7 +344,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
      * univUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
      *
      * @param string $file        - The File We are uploading
-     * @param int $delete         - 0: We do not need to delete data from eavs | 1: We do need to 
+     * @param int $delete         - 0: We do not need to delete data from eavs | 1: We do need to
      * @param string $source      - The name of the source we are uploading to
      * @param string $settingsFile
      * @return array $return_data - Basic information on the status of the upload
