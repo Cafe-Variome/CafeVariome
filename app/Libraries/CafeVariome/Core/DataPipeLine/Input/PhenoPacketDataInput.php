@@ -96,22 +96,18 @@ class PhenoPacketDataInput extends DataInput
         $this->db->transStart();
         $this->serviceInterface->ReportProgress($file_id, 0, $steps, 'bulkupload', 'Importing data');
 
+		$done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
         // perform recursive insert for given file
-        $done = $this->recursivePacket($this->data, $this->meta, $this->id, $file_id, $this->sourceId, null, null, null, null);
+        $done = $this->recursivePacket($this->data, $this->meta, $this->id, $file_id, $this->sourceId, null, null, null, $done);
 
         $this->serviceInterface->ReportProgress($file_id, 1, $steps, 'bulkupload');
 
-        if (!$done['negated']['true'] && !empty($done['negated']['uid'])) {
-            $this->eavModel->createEAV($done['negated']['uid'], $this->sourceId, $file_id, $this->id, 'negated', 0);
-        }
-
         $this->serviceInterface->ReportProgress($file_id, 2, $steps, 'bulkupload');
-
 
         $output = [];
         $hits = [];
         $matches = array_unique($this->arrSearch($this->data, $output));
-        $matches = $this->eavModel->checkNegatedForHPO($matches, $file_id);
+        $matches = $this->eavModel->checkNegatedForHPO($matches, $file_id, $this->configuration['hpo_attribute_name']);
         for ($i=0; $i < count($matches); $i++) {
             $result = $neo4jInterface->GetAncestors($matches[$i]);
             if (count($result) > 0) {
@@ -174,7 +170,7 @@ class PhenoPacketDataInput extends DataInput
      *							   correctly add negated 0 if necessary
         * @return array $done       - See above
     */
-    private function recursivePacket($array,$meta,$id,$file,$source,$uid,$type,$one_group,$done) {
+    private function recursivePacket($array,$meta,$id,$file,$source,$uid,$type,$one_group,&$done) {
 
         foreach($array as $key => $value){
             if ($key == "id" && $value == $id) {
@@ -186,16 +182,13 @@ class PhenoPacketDataInput extends DataInput
                     // negated added to it. If it hasnt we need to add negated 0
                     // However we also need to make sure that the uid is present as this could be the
                     // very first group being created
-                    if (!$done['negated']['true'] && !empty($done['negated']['uid'])) {
-                        $this->eavModel->createEAV($done['negated']['uid'],$source,$file,$id,'negated',0);
-                    }
                     $uid = md5(uniqid(rand(),true));
                     // Since this is an array key all sub arrays remain part of the same group
                     // One group is set to true to ensure this
                     $one_group = true;
 
                     // reset done array to keep track of whether negated has been added and which meta rows have been added
-                    $done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
+
                     if (!in_array($type, $done['type'])) {
                         $this->eavModel->createEAV($uid,$source,$file,$id,'type',$type);
                         array_push($done['type'], $type);
@@ -221,12 +214,9 @@ class PhenoPacketDataInput extends DataInput
             else {
                 // We are making a group which wasnt in an indexed array
                 if (!$one_group) {
-                    if (!empty($done['negated']['uid']) && !$done['negated']['true']) {
-                        $this->eavModel->createEAV($done['negated']['uid'],$source,$file,$id,'negated',0);
-                    }
                     $uid = md5(uniqid(rand(),true));
                     $one_group = true;
-                    $done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
+                    //$done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
                     if (is_array($type) && !in_array($type, $done['type'])) {
                         $this->eavModel->createEAV($uid,$source,$file,$id,'type',$type);
                         array_push($done['type'], $type);
@@ -264,12 +254,6 @@ class PhenoPacketDataInput extends DataInput
                     }
                 }
             }
-        }
-        // This check is here for when we travel up at least two array levels
-        // This will add the negated 0 to those cases
-        if (!$done['negated']['true'] && !empty($done['negated']['uid'])) {
-            $done['negated']['true'] = 1;
-            $this->eavModel->createEAV($done['negated']['uid'],$source,$file,$id,'negated',0);
         }
         // Pass the current uid in use to the negated check to the array above so
         // we know which group to add negated 0 to (if applicable)
@@ -316,7 +300,7 @@ class PhenoPacketDataInput extends DataInput
      *							   correctly add negated 0 if necessary
     * @return array $done       - See above
     */
-    private function recursiveNumeric($array,$meta,$id,$file,$source,$uid,$type,$one_group,$done) {
+    private function recursiveNumeric($array,$meta,$id,$file,$source,$uid,$type,$one_group,&$done) {
         // prep for variants api call
         if ($type == "variants") {
             list( $assembly, $chrom, $coordinateSystem, $pos, $ref, $alt ) = array( "","","","","","");
@@ -356,6 +340,26 @@ class PhenoPacketDataInput extends DataInput
 
                     }
                 }
+				if ($type == $this->configuration['hpo_attribute_name'] && $key == 'type'){
+					if (array_key_exists('negated',$array)){
+						if ($array['negated'] == true){
+							$this->eavModel->createEAV($uid,$source,$file,$id,$this->configuration['negated_hpo_attribute_name'],$value['id']);
+						}
+						else{
+							$this->eavModel->createEAV($uid,$source,$file,$id,$this->configuration['hpo_attribute_name'],$value['id']);
+						}
+					}
+					else{
+						$this->eavModel->createEAV($uid,$source,$file,$id,$this->configuration['hpo_attribute_name'],$value['id']);
+					}
+
+					if (!in_array($type, $done['type'])) {
+						$this->eavModel->createEAV($uid,$source,$file,$id,'type',$type);
+						array_push($done['type'], $type);
+					}
+
+					return $done;
+				}
                 $done = $this->recursiveNumeric($value,$meta,$id,$file,$source,$uid,$type,$one_group,$done);
             }
             else {
@@ -389,20 +393,12 @@ class PhenoPacketDataInput extends DataInput
                         }
                     }
                 }
-                // Since we are combining type with the key for attribute
-                // For negated we would just like it on its own.
-                // Also set negated true as we have indeed added a negated row
-                if ($key == 'negated') {
-                    $string = $key;
-                    $done['negated']['true'] = 1;
-                    if ($value === false) {
-                        $value = 0;
-                    }
-                }
-                else {
-                    $string = $type."_".$key;
-                    // $string = $key;
-                }
+				if ($key == 'negated') {
+					return $done;
+				}
+
+				$string = $type."_".$key;
+
                 $this->eavModel->createEAV($uid,$source,$file,$id,$string,$value);
                 // Since we have just an id row we need to check its id group with our list of meta
                 // attributes (if applicable)
@@ -422,15 +418,6 @@ class PhenoPacketDataInput extends DataInput
                 }
             }
         }
-        // This check is here for when we travel up at least two array levels
-        // This will add the negated 0 to those cases
-        if (!$done['negated']['true'] && !empty($done['negated']['uid'])) {
-            $done['negated']['true'] = 1;
-            $this->eavModel->createEAV($done['negated']['uid'],$source,$file,$id,'negated',0);
-        }
-        // Pass the current uid in use to the negated check to the array above so
-        // we know which group to add negated 0 to (if applicable)
-        $done['negated']['uid'] = $uid;
         return $done;
     }
 
@@ -561,6 +548,8 @@ class PhenoPacketDataInput extends DataInput
     {
         $this->configuration = ['subject_id_location' => SUBJECT_ID_WITHIN_FILE,
                                 'subject_id_attribute_name' => 'id',
+								'hpo_attribute_name' => 'phenotype',
+								'negated_hpo_attribute_name' => 'negated_hpo'
         ];
     }
 
@@ -574,6 +563,14 @@ class PhenoPacketDataInput extends DataInput
             if ($pipeline['subject_id_location'] == SUBJECT_ID_WITHIN_FILE && $pipeline['subject_id_attribute_name'] != null && $pipeline['subject_id_attribute_name'] != '') {
                 $this->configuration['subject_id_attribute_name'] = $pipeline['subject_id_attribute_name'];
             }
+
+            if ($pipeline['hpo_attribute_name'] != null && $pipeline['hpo_attribute_name'] != ''){
+				$this->configuration['hpo_attribute_name'] = $pipeline['hpo_attribute_name'];
+			}
+
+			if ($pipeline['negated_hpo_attribute_name'] != null && $pipeline['negated_hpo_attribute_name'] != ''){
+				$this->configuration['negated_hpo_attribute_name'] = $pipeline['negated_hpo_attribute_name'];
+			}
         }
     }
 }
