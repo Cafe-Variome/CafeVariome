@@ -2,11 +2,11 @@
 
 /**
  * Name DataStream.php
- * 
+ *
  * Created 11/03/2020
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
- * 
+ *
  */
 
 use App\Models\Elastic;
@@ -48,7 +48,7 @@ class DataStream
         $networkModel = new Network();
         $fileMan = new SysFileMan($jsonIndexPath);
 
-        $sourceModel->lockSource($source_id);	
+        $sourceModel->lockSource($source_id);
 
         //Get network(s) source is assigned to
         $networks = $networkModel->getNetworksBySource($source_id);
@@ -63,13 +63,13 @@ class DataStream
                 $fArr = explode('.', $file);
                 $fExt = $fArr[count($fArr) - 1];
                 if (strtolower($fExt) == 'html' || strtolower($fExt) == 'htaccess') continue;
-                
+
                 foreach ($networks as $network_key) {
                     $redundantFile = ($file == $network_key . '.json' ||
                                      $file == $network_key . '_hpo_ancestry.json' ||
                                      $file == 'local_' . $network_key . '.json' ||
                                      $file == 'local_' . $network_key . '_hpo_ancestry.json');
-                    
+
                     if ($redundantFile && $fileMan->Exists($file)){
                         $fileMan->Delete($file);
                     }
@@ -140,7 +140,7 @@ class DataStream
                 foreach ($matchedTerms->getRecords() as $record) {
                     array_push($pars, $record->value('ph'));
                     $termname = $record->value('termname');
-                }  
+                }
                 $term .= ' (' . $termname . ')';
                 $ancestors = $this->collect_ids_neo4j('', $pars);
                 $hpo[$term] = $ancestors;
@@ -159,7 +159,7 @@ class DataStream
                             $termname = '';
                             foreach ($matchedTerms->getRecords() as $record) {
                                 array_push($pars, $record->value('ph'));
-                            } 
+                            }
                             $parents = array_merge($parents, $this->collect_ids_neo4j($ancestor, $pars));
                             $flag = false;
                         } else {
@@ -179,7 +179,7 @@ class DataStream
             }
 
             file_put_contents($jsonIndexPath . $network . "_hpo_ancestry.json", json_encode($hpo));
-        }   
+        }
     }
 
     function collect_ids_neo4j($ancestor, $data) {
@@ -191,11 +191,11 @@ class DataStream
     }
 
     /**
-     * generateElasticSearchIndex 
-     * 
-     * 
+     * generateElasticSearchIndex
+     *
+     *
      */
-    public function generateElasticSearchIndex(int $source_id, bool $add) 
+    public function generateElasticSearchIndex(int $source_id, bool $add)
     {
         $elasticModel = new Elastic();
 
@@ -226,7 +226,7 @@ class DataStream
             if (!$add) {
                 $response = $elasticClient->indices()->delete($params);
                 $flag = true;
-            }      
+            }
         }
         else{
             $flag = true;
@@ -234,29 +234,29 @@ class DataStream
 
         // If we need to - create a new index
         if ($flag) {
-            $map = '{  
+            $map = '{
                 "mappings":{
                     "properties":{
                         "eav_rel":{"type": "join", "relations": {"sub":"eav"}},
                         "type": { "type": "keyword" },
                         "subject_id": {"type": "keyword"},
-                        "source": {"type":"keyword"}, 
+                        "source": {"type":"keyword"},
                         "attribute":{"type":"keyword"},
                         "value":{
                             "type":"text",
-                            "fields": 
+                            "fields":
                                 {"raw":{"type": "keyword"},
                                 "d":{"type": "double", "ignore_malformed": "true"},
-                                "dt":{"type": "date", "ignore_malformed": "true", "format": "dateOptionalTime"}}}           
-                    }  
+                                "dt":{"type": "date", "ignore_malformed": "true", "format": "dateOptionalTime"}}}
+                    }
                 }
             }';
 
             $map2 = json_decode($map,1);
             $params['body'] = $map2;
             $response = $elasticClient->indices()->create($params);
-        }       
-        // Set the elastic state of data to stale  
+        }
+        // Set the elastic state of data to stale
         $sourceModel->updateSource(["elastic_status"=>0], ["source_id" => $source_id]);
 
         // Figure out how many documents we need to index
@@ -267,7 +267,6 @@ class DataStream
         $totalRecords = $eavsize + $uniqueIdsCount; //Total number of Elasticsearch documents to be created.
 
         $bulk = [];
-        $counta = 0;
         $countparents = 0;
 
         $this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex', 'Generating Elasticsearch index');
@@ -285,9 +284,9 @@ class DataStream
 
             // start making all the parent documents in ElasticSearch
             $uid_count = count($unique_ids);
-            for ($i=0; $i < $uid_count; $i++) { 
+            for ($i=0; $i < $uid_count; $i++) {
                 $bulk['body'][] = ["index"=>[ "_id"=>$unique_ids[$i]['uid'],"_index"=>$index_name]];
-                $bulk['body'][] = ["subject_id"=>$unique_ids[$i]['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"sub", "source"=>$source_name."_eav"];    
+                $bulk['body'][] = ["subject_id"=>$unique_ids[$i]['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"sub", "source"=>$source_name."_eav"];
 
                 unset($unique_ids[$i]);
 
@@ -317,6 +316,7 @@ class DataStream
 
         $bulk=[];
         $offset = 0;
+        $counta = 0;
         $currId = 0;
         $batchSize = EAV_BATCH_SIZE;
 
@@ -331,14 +331,14 @@ class DataStream
             reset($eavdata);
 
             // Loop through limit chunk
-            for ($i=0; $i < $eav_count; $i++) { 
+            for ($i=0; $i < $eav_count; $i++) {
                 $eavdata[$i]['attribute'] = preg_replace('/\s+/', '_', $eavdata[$i]['attribute']);
                 $bulk['routing'] = $eavdata[$i]['uid'];
                 $bulk['body'][] = ["index"=>["_index"=>$index_name]];
                 $bulk['body'][] = ["subject_id"=>$eavdata[$i]['subject_id'],"attribute"=>$eavdata[$i]['attribute'],"value"=>strtolower($eavdata[$i]['value']), "eav_rel"=>["name"=>"eav","parent"=>$eavdata[$i]['uid']], "type"=>"eav", "source"=>$source_name."_eav"];
-                
+
                 unset($eavdata[$i]);
-                
+
                 $counta++;
                 // Every 500 documents bulk insert to ElasticSearch
                 if ($counta%500 == 0){
@@ -347,10 +347,10 @@ class DataStream
                     unset ($responses);
 
                     $this->serviceInterface->ReportProgress($source_id, $countparents + $counta, $totalRecords, 'elasticsearchindex');
-                }   
+                }
             }
 
-            // Update offset 
+            // Update offset
             $offset += $batchSize;
         }
 
@@ -358,7 +358,7 @@ class DataStream
         if (!empty($bulk['body'])){
             $responses = $elasticClient->bulk($bulk);
             $this->serviceInterface->ReportProgress($source_id, $countparents + $counta, $totalRecords, 'elasticsearchindex');
-        }   
+        }
 
         $eavModel->setElasticFlag($source_id);
         $sourceModel->unlockSource($source_id);
@@ -375,25 +375,69 @@ class DataStream
 
         $pipeline_ids = $uploadModel->getPipelineIdsBySourceId($source_id);
         $pipelines = $pipelineModel->getPipelinesByIds($pipeline_ids);
-        //'hpo_attribute_name, negated_hpo_attribute_name, orpha_attribute_name'
 
         $hpo_attribute_names = $this->getHPOAttributeNames($pipelines);
         $negated_hpo_attribute_names = $this->getNegatedHPOAttributeNames($pipelines);
         $orpha_attribute_names = $this->getORPHAAttributeNames($pipelines);
+		$source_name = $sourceModel->getSourceNameByID($source_id);
 
-        $batch = md5(uniqid(rand(),true));	
-        $HPOData = $eavModel->getHPOTermsWithNegatedBySourceId($source_id, $hpo_attribute_names, $negated_hpo_attribute_names); 
-        $ORPHAData = $eavModel->getORPHATerms($source_id, $orpha_attribute_names); 
-        $source_name = $sourceModel->getSourceNameByID($source_id);
+        $batch = md5(uniqid(rand(),true));
 
-        if ($source_name != null) {
-            $neo4jModel->InsertSubjects($HPOData, $source_name, $batch);
-            $neo4jModel->InsertSubjects($ORPHAData, $source_name, $batch);
-            
-            $neo4jModel->ConnectSubjects($HPOData, 'HPOterm', 'hpoid', 'hpo', $this->source_id);
-            $neo4jModel->ConnectSubjects($ORPHAData, 'ORPHAterm', 'orphaid', 'orpha', $this->source_id);
-        }
-    }
+        $unaddedHPOTerms = $eavModel->countUnaddedRecordsByAttributeNames($source_id, $hpo_attribute_names);
+		$currId = 0;
+
+		$i = 0;
+        while ($i < $unaddedHPOTerms)
+		{
+			$HPOData = $eavModel->getHPOTermsBySourceId($source_id, $hpo_attribute_names, NEO4J_BATCH_SIZE, $currId);
+			$subject_ids = $this->extractSubjectIDs($HPOData);
+
+			if ($source_name != null) {
+				$neo4jModel->InsertSubjects($subject_ids, $source_name, $batch);
+				$neo4jModel->ConnectSubjects($HPOData, 'HPOterm', 'hpoid', 'hpo', $this->source_id);
+			}
+
+			$currId = end($HPOData)['id'];
+			$i += count($HPOData);
+		}
+
+		$unaddedNegatedHPOTerms = $eavModel->countUnaddedRecordsByAttributeNames($source_id, $negated_hpo_attribute_names);
+		$currId = 0;
+
+		$i = 0;
+		while ($i < $unaddedNegatedHPOTerms)
+		{
+			$NegatedHPOData = $eavModel->getNegatedHPOTermsBySourceId($source_id, $negated_hpo_attribute_names, NEO4J_BATCH_SIZE, $currId);
+			$subject_ids = $this->extractSubjectIDs($NegatedHPOData);
+
+			if ($source_name != null) {
+				$neo4jModel->InsertSubjects($subject_ids, $source_name, $batch);
+				$neo4jModel->ConnectSubjects($NegatedHPOData, 'HPOterm', 'hpoid', 'negated_hpo', $this->source_id);
+			}
+
+			$currId = end($NegatedHPOData)['id'];
+			$i += count($NegatedHPOData);
+		}
+
+		$currId = 0;
+		$unaddedOrphaTerms = $eavModel->countUnaddedRecordsByAttributeNames($source_id, $orpha_attribute_names);
+
+		$i = 0;
+		while ($i < $unaddedOrphaTerms)
+		{
+			$ORPHAData = $eavModel->getORPHATermsBySourceId($source_id, $orpha_attribute_names, NEO4J_BATCH_SIZE, $currId);
+			$subject_ids = $this->extractSubjectIDs($ORPHAData);
+
+			if ($source_name != null) {
+				$neo4jModel->InsertSubjects($subject_ids, $source_name, $batch);
+				$neo4jModel->ConnectSubjects($ORPHAData, 'ORPHAterm', 'orphaid', 'orpha', $this->source_id);
+			}
+
+			$currId = end($ORPHAData)['id'];
+			$i += count($ORPHAData);
+		}
+
+	}
 
     public function Finalize(int $source_id)
     {
@@ -433,11 +477,11 @@ class DataStream
 
     /**
      * loadSourceEAVData
-     * 
-     * 
+     *
+     *
      * @param int $source_id
      * @param string $network_key
-     * 
+     *
      * @return array localPhenoTypes
      */
     private function loadSourceEAVData(int $source_id, string $network_key) {
@@ -449,7 +493,7 @@ class DataStream
         $totalEAVRecords = $eavCount[0]['totalEAVs'];
 
         $source_name = $sourceModel->getSourceNameByID($source_id);
-        
+
         $data = [];
         $tempLocalPhenotypes = [];
         $recordsProcessed = 0;
@@ -461,7 +505,7 @@ class DataStream
         $batchSize = EAV_BATCH_SIZE;
 	    $currId = 0;
 
-        for ($i=0; $i < $totalEAVRecords; $i+=$batchSize) { 
+        for ($i=0; $i < $totalEAVRecords; $i+=$batchSize) {
             $data = $eavModel->getEAVsForSource($source_id, $batchSize, $currId);
             $this->swapLocalPhenotypes($data, $tempLocalPhenotypes, $network_key);
             $recordsProcessed += count($data);
@@ -478,10 +522,10 @@ class DataStream
 
             $attr = $d['attribute'];
             $value = $d['value'];
-            
+
             if(strlen($value) > 229) continue;
 
-            if(is_numeric($value)) {            
+            if(is_numeric($value)) {
                 $sigs = 4;
                 if(is_float($value) && floatval($value)) {
                     if($value < 0) {
@@ -492,7 +536,7 @@ class DataStream
                 }
             }
 
-            $value = (string)$value;      
+            $value = (string)$value;
 
             $local_phenotypes = [];
 
@@ -501,7 +545,7 @@ class DataStream
                     array_push($local_phenotypes, $tlp);
                 }
             }
-            
+
             if(count($local_phenotypes) > 0) {
                 $lastLP = array_pop($local_phenotypes);
                 if(in_array($value, explode("|" , $lastLP['phenotype_values'])) || (strpos($lastLP['phenotype_values'], 'Not all values displayed|') !== false)) continue;
@@ -536,10 +580,10 @@ class DataStream
         $uid = "";
         if ($range_exist) {
             $paramsnew = ['index' => $index_name, 'size' => 100];
-            $paramsnew['body']['query']['bool']['must'][0]['has_parent']['parent_type'] = "att"; 
+            $paramsnew['body']['query']['bool']['must'][0]['has_parent']['parent_type'] = "att";
             $paramsnew['body']['query']['bool']['must'][0]['has_parent']['query']['bool']['must'][0]['match']['attribute.raw'] = $attribute;
             $paramsnew['body']['query']['bool']['must'][1]['match']['type_of_doc'] = "range";
-            $hits = $this->elasticClient->search($paramsnew);   
+            $hits = $this->elasticClient->search($paramsnew);
             foreach ($hits['hits']['hits'] as $hit) {
                 if (empty($uid)) {
                     $uid = $hit['_routing'];
@@ -551,7 +595,7 @@ class DataStream
             }
         }
         $paramsnew = ['index' => $index_name, 'size' => 100];
-        $paramsnew['body']['query']['bool']['must'][0]['has_parent']['parent_type'] = "att"; 
+        $paramsnew['body']['query']['bool']['must'][0]['has_parent']['parent_type'] = "att";
         $paramsnew['body']['query']['bool']['must'][0]['has_parent']['query']['bool']['must'][0]['match']['attribute.raw'] = $attribute;
         $paramsnew['body']['query']['bool']['must'][1]['match']['type_of_doc'] = "value";
         $hits = $this->elasticClient->search($paramsnew);
@@ -570,7 +614,7 @@ class DataStream
                 'routing' => $uid,
                 'body' => ["value"=>$value,"type_of_doc"=>"overall", "eav_rel"=>["name"=>"val","parent"=>$uid]]
             ];
-    
+
             $response = $this->elasticClient->index($params);
         }
 
@@ -581,7 +625,7 @@ class DataStream
         $params = [];
         $params['index'] = $index_name;
 
-        $params['body']['query']['bool']['must'][0]['has_parent']['parent_type'] = "att"; 
+        $params['body']['query']['bool']['must'][0]['has_parent']['parent_type'] = "att";
         $params['body']['query']['bool']['must'][0]['has_parent']['query']['bool']['must'][0]['match']['attribute.raw'] = $attribute;
         $params['body']['query']['bool']['must'][1]['match']['type_of_doc'] = "overall";
 
