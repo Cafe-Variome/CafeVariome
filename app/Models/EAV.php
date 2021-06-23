@@ -204,18 +204,25 @@ class EAV extends Model{
         return $data;
     }
 
-    public function getNegatedHPOTermsBySourceId(int $source_id, array $negated_hpo_attribute_names = [])
+    public function getNegatedHPOTermsBySourceId(int $source_id, array $negated_hpo_attribute_names = [], int $limit = -1, int $offset = -1)
     {
         $this->builder = $this->db->table($this->table);
-        $this->builder->select('uid, value');
+		$this->builder->select('id, subject_id, value');
         $this->builder->where('source_id', $source_id);
 
+		if ($offset > 0){
+			$this->builder->where('id>', $offset);
+		}
         if (count($negated_hpo_attribute_names) > 0) {
             $this->builder->whereIn('attribute', $negated_hpo_attribute_names);
         }
         else {
             $this->builder->where('attribute', 'negated');
         }
+
+		if ($limit > 0) {
+			$this->builder->limit($limit);
+		}
 
         $data = $this->builder->get()->getResultArray();
 
