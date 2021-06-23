@@ -177,20 +177,27 @@ class EAV extends Model{
         return $query;
     }
 
-    public function getHPOTermsBySourceId(int $source_id, array $hpo_attribute_names = [])
+    public function getHPOTermsBySourceId(int $source_id, array $hpo_attribute_names = [], int $limit = -1, int $offset = -1)
     {
         $this->builder = $this->db->table($this->table);
-        $this->builder->select('uid, value');
+        $this->builder->select('id, subject_id, value');
         $this->builder->where('source_id', $source_id);
         $this->builder->where('attribute !=', 'ancestor_hpo_id'); // attribute != "ancestor_hpo_id"
         $this->builder->where('attribute !=', 'classOfOnset_id'); // attribute != 'classOfOnset_id'
 
+		if ($offset > 0){
+			$this->builder->where('id>', $offset);
+		}
         if (count($hpo_attribute_names) > 0) {
             $this->builder->whereIn('attribute', $hpo_attribute_names);
         }
         else {
             $this->builder->like('value', 'hp:', 'after');
         }
+
+        if ($limit > 0) {
+			$this->builder->limit($limit);
+		}
 
         $data = $this->builder->get()->getResultArray();
 
