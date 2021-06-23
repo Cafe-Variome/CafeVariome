@@ -3,7 +3,7 @@
 /**
  * Source.php
  * Created 22/07/2019
- * 
+ *
  * This class offers CRUD operation for data sources.
  * @author Owen Lancaster
  * @author Gregory Warren
@@ -11,7 +11,7 @@
  */
 
 use App\Models\UIData;
-use App\Models\Neo4j;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4j;
 use \App\Models\Elastic;
 use \App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use CodeIgniter\Config\Services;
@@ -60,10 +60,10 @@ class Source extends CVUI_Controller{
             $source_ids_array[] = $source['source_id'];
         }
 
-        // Create pipe separated string of source IDs to post to API call 
+        // Create pipe separated string of source IDs to post to API call
         $source_ids = implode("|", $source_ids_array);
 
-		// Pass all the source IDs for this install to auth server in one call and get all the network groups for each source 
+		// Pass all the source IDs for this install to auth server in one call and get all the network groups for each source
 
         $networkModel = new \App\Models\Network($this->db);
         $source_ids_exploded = explode('|', $source_ids);
@@ -83,8 +83,8 @@ class Source extends CVUI_Controller{
             if (!empty($selected_groups)) { // If there's groups assigned to this source then pass to the view
                 $uidata->data['source_network_groups'][$source_id] = $selected_groups;
             }
-        }        
-                                   
+        }
+
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = array(JS.'cafevariome/source.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
@@ -130,26 +130,26 @@ class Source extends CVUI_Controller{
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ],            
+            ],
             'desc' => [
                 'label'  => 'Source Description',
                 'rules'  => 'required',
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ], 
+            ],
             'long_description' => [
                 'label'  => 'Long Source Description',
                 'rules'  => 'string',
 
-            ],  
+            ],
             'status' => [
                 'label'  => 'Source Status',
                 'rules'  => 'required',
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ]                             
+            ]
         ]
         );
 
@@ -171,7 +171,7 @@ class Source extends CVUI_Controller{
         }
         $uidata->data['srcDSPGroups'] = $srcDisplayGroups;
         $uidata->data['countDSPGroups'] = $countDisplayGroups;
-                
+
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             $name = strtolower(str_replace(' ', '_', $this->request->getVar('name'))); // Convert the source name to lowercase and replace whitespace with underscore
             $uri = $this->request->getVar('uri');
@@ -194,7 +194,7 @@ class Source extends CVUI_Controller{
                     }
                     $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
                 }
-    
+
                 if ($this->request->getVar('count_display')) {
                     $group_data_array = array();
                     foreach ($this->request->getVar('count_display') as $count_group_data) {
@@ -278,7 +278,7 @@ class Source extends CVUI_Controller{
 
             $uidata->data['selected_source_display'] = $this->request->getVar('source_display') ? $this->request->getVar('source_display') :[];
             $uidata->data['selected_count_display'] = $this->request->getVar('count_display') ? $this->request->getVar('count_display') :[];
-            
+
             $uidata->javascript = array(JS.'cafevariome/components/transferbox.js', JS.'cafevariome/source.js');
 
             $data = $this->wrapData($uidata);
@@ -336,29 +336,29 @@ class Source extends CVUI_Controller{
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ],            
+            ],
             'desc' => [
                 'label'  => 'Source Description',
                 'rules'  => 'required',
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ], 
+            ],
             'long_description' => [
                 'label'  => 'Long Source Description',
                 'rules'  => 'string'
-            ],   
+            ],
             'status' => [
                 'label'  => 'Source Status',
                 'rules'  => 'required',
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ]                             
+            ]
         ]
         );
 
-        
+
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             //check to see if we are creating the user
             //redirect them back to the admin page
@@ -388,10 +388,10 @@ class Source extends CVUI_Controller{
                         $group_data_array[] = $count_group_data;
                     }
                 }
-                if (count($group_data_array) > 0) {           
+                if (count($group_data_array) > 0) {
                     $group_post_data = implode("|", $group_data_array);
                     $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],$group_post_data);
-    
+
                 }
                 else {
                     $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],null);
@@ -403,7 +403,7 @@ class Source extends CVUI_Controller{
             }
 
             return redirect()->to(base_url($this->controllerName.'/List'));
-            
+
         } else {
 
             // Get all the network groups that this source from this installation is currently in so that these can be pre selected in the multiselect list
@@ -422,7 +422,7 @@ class Source extends CVUI_Controller{
 
             $uidata->data['selected_source_display'] = $selected_source_display ? $selected_source_display :[];
             $uidata->data['selected_count_display'] = $selected_count_display ? $selected_count_display :[];
-            
+
             // Get all the data for this source
             $source_data = $this->sourceModel->getSource($source_id);
 
@@ -496,7 +496,7 @@ class Source extends CVUI_Controller{
             else {
                 $this->setStatusMessage("Source was not found.", STATUS_WARNING);
                 return redirect()->to(base_url($this->controllerName.'/List'));
-            }   
+            }
         }
     }
 
@@ -516,7 +516,7 @@ class Source extends CVUI_Controller{
                     'required' => '{field} is required.'
                 ]
             ],
-            
+
                 'source' => [
                     'label'  => 'Source Name',
                     'rules'  => 'required|alpha_dash',
@@ -524,10 +524,10 @@ class Source extends CVUI_Controller{
                         'required' => '{field} is required.',
                         'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                     ]
-                ]            
+                ]
             ]);
 
-        
+
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             $error_flag = false;
             if ($this->request->getVar('confirm') == 'yes') {
@@ -550,11 +550,11 @@ class Source extends CVUI_Controller{
                     $this->setStatusMessage("There was an error in deleting Elasticsearch index.", STATUS_ERROR);
                     $error_flag = true;
                 }
-                
+
                 //delete the associated node from neo4j database
                 try {
-                    $neo4jModel = new Neo4j();
-                    $neo4jModel->deleteSource($source_id);
+                    $neo4jInterface = new Neo4j();
+                    $neo4jInterface->deleteSource($source_id);
                 } catch (\Exception $ex) {
                     $this->setStatusMessage("There was an error in deleting Neo4J data of the source.", STATUS_ERROR, true);
                     $error_flag = true;
@@ -583,11 +583,11 @@ class Source extends CVUI_Controller{
                     }
                 }
             }
-        }   
+        }
         else
         {
             $source = $this->sourceModel->getSource($source_id);
-            if ($source) {       
+            if ($source) {
                 $uidata->data['source_id'] = $source_id;
                 $uidata->data['source_name'] = $source['name'];
                 $data = [
@@ -611,7 +611,7 @@ class Source extends CVUI_Controller{
         return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-    public function Status(int $source_id = null) {  
+    public function Status(int $source_id = null) {
         if (!$source_id) {
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
