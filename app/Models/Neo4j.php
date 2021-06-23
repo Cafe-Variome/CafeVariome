@@ -10,7 +10,7 @@
  * @author Owen Lancaster
  *
  * This class handles operations for Neo4j database.
- *
+ * @deprecated
  */
 
 use CodeIgniter\Model;
