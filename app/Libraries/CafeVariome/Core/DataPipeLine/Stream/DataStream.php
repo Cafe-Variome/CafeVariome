@@ -17,7 +17,6 @@ use App\Models\Upload;
 use App\Models\Source;
 use App\Models\EAV;
 use App\Models\Neo4j;
-use App\Models\Phenotype;
 use App\Models\Pipeline;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
