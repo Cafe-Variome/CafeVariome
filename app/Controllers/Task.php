@@ -20,7 +20,6 @@ use App\Models\Source;
 use App\Models\Elastic;
 use App\Models\Settings;
 use App\Models\EAV;
-use App\Models\Neo4j;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\DataStream;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\EAVDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\PhenoPacketDataInput;
