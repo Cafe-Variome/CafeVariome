@@ -32,7 +32,7 @@ class Neo4J
 
         $this->neo4jUsername = $this->setting->getNeo4JUserName();
         $this->neo4jPassword = $this->setting->getNeo4JPassword();
-        $this->neo4jAddress = $this->setting-> getNeo4JUri();
+        $this->neo4jAddress = $this->setting->getNeo4JUri();
         $this->neo4jPort = $this->setting->getNeo4JPort();
 
         $this->neo4jClient = $this->getClient();
