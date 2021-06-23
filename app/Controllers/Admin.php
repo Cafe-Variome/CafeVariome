@@ -3,7 +3,7 @@
 /**
  * Admin.php
  * Created 18/07/2019
- * 
+ *
  * @author Owen Lancaster
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
@@ -15,10 +15,9 @@ use App\Models\Network;
 use App\Models\Source;
 use App\Models\User;
 use App\Libraries\ElasticSearch;
-use App\Libraries\Neo4J;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4J;
 use App\Libraries\CafeVariome\Auth\KeyCloak;
 use App\Models\NetworkRequest;
-use App\Helpers\AuthHelper;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Config\Services;
@@ -61,9 +60,9 @@ class Admin extends CVUI_Controller{
         $networkInterface = new NetworkInterface();
         $userModel = new User();
         $networkRequestModel = new NetworkRequest();
-        
+
         $elasticSearch = new ElasticSearch(array($this->setting->getElasticSearchUri()));
-        $neo4j = new Neo4J($this->setting->getNeo4JUserName(), $this->setting->getNeo4JPassword(), $this->setting->getNeo4JUri(), $this->setting->getNeo4JPort());
+        $neo4j = new Neo4J();
         $keyCloak = new KeyCloak();
         $service = new ServiceInterface();
 
@@ -85,7 +84,7 @@ class Admin extends CVUI_Controller{
             }
 
             $sourceCountList[$source['name']] = 0;
-            
+
             $sc++;
         }
 
@@ -113,7 +112,7 @@ class Admin extends CVUI_Controller{
             $uidata->data['elasticMsg'] = "Elasticsearch is not running. The query interface is not accessible. Please ask the server administrator to start it.";
         }
 
-        $neo4jStatus = $neo4j->ping(); 
+        $neo4jStatus = $neo4j->ping();
         $uidata->data['neo4jStatus'] = $neo4jStatus;
         $uidata->data['neo4jMsg'] = null;
         if (!$neo4jStatus) {
@@ -124,7 +123,7 @@ class Admin extends CVUI_Controller{
         $uidata->data['serviceStatus'] = $service->ping();
 
 
-        
+
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Index', $data);
     }
@@ -154,7 +153,7 @@ class Admin extends CVUI_Controller{
 
         $this->validation->setRules($validationRules);
         */
-        
+
         if ($this->request->getPost() /*&& $this->validation->withRequest($this->request)->run()*/) {
             $errorFlag = false;
             foreach ($settings as $s) {
