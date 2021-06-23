@@ -520,6 +520,18 @@ class DataStream
         }
     }
 
+	private function extractSubjectIDs(array $data): array
+	{
+		$subject_ids = [];
+		for ($i = 0; $i < count($data); $i++){
+			if (!in_array($data[$i]['subject_id'], $subject_ids)){
+				array_push($subject_ids, $data[$i]['subject_id']);
+			}
+		}
+
+		return $subject_ids;
+    }
+
     function createDocByAttribute(string $index_name, string $attribute, bool $range_exist) {
         $values = [];
         $uid = "";
