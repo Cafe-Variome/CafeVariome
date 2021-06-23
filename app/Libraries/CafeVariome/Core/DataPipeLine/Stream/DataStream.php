@@ -109,7 +109,7 @@ class DataStream
     {
         $eavModel = new EAV();
         $networkModel = new Network();
-        $neo4jModel = new Neo4j();
+        $neo4jInterface = new Neo4j();
 
         $results = $networkModel->getNetworkSourcesForCurrentInstallation($source_id);
         $sourceslist = []; // NEED to DO THIS per NETWORK!!!!
@@ -134,7 +134,7 @@ class DataStream
             }
 
             foreach ($hpo_terms as $term){
-                $matchedTerms = $neo4jModel->MatchHPO($term);
+                $matchedTerms = $neo4jInterface->MatchHPO_IS_A($term);
                 $pars = [];
                 $termname = '';
                 foreach ($matchedTerms->getRecords() as $record) {
@@ -154,7 +154,7 @@ class DataStream
                         $t = end($temp);
 
                         if($t !== 'HP:0000001') {
-                            $matchedTerms = $neo4jModel->MatchHPO($t);
+                            $matchedTerms = $neo4jInterface->MatchHPO_IS_A($t);
                             $pars = [];
                             $termname = '';
                             foreach ($matchedTerms->getRecords() as $record) {
@@ -367,7 +367,7 @@ class DataStream
 
     public function Neo4JInsert(int $source_id)
     {
-        $neo4jModel = new Neo4j();
+        $neo4jInterface = new Neo4j();
         $eavModel = new EAV();
         $sourceModel = new Source();
         $pipelineModel = new Pipeline();
@@ -393,8 +393,8 @@ class DataStream
 			$subject_ids = $this->extractSubjectIDs($HPOData);
 
 			if ($source_name != null) {
-				$neo4jModel->InsertSubjects($subject_ids, $source_name, $batch);
-				$neo4jModel->ConnectSubjects($HPOData, 'HPOterm', 'hpoid', 'hpo', $this->source_id);
+				$neo4jInterface->InsertSubjects($subject_ids, $source_name, $batch);
+				$neo4jInterface->ConnectSubjects($HPOData, 'HPOterm', 'hpoid', 'hpo', $this->source_id);
 			}
 
 			$currId = end($HPOData)['id'];
@@ -411,8 +411,8 @@ class DataStream
 			$subject_ids = $this->extractSubjectIDs($NegatedHPOData);
 
 			if ($source_name != null) {
-				$neo4jModel->InsertSubjects($subject_ids, $source_name, $batch);
-				$neo4jModel->ConnectSubjects($NegatedHPOData, 'HPOterm', 'hpoid', 'negated_hpo', $this->source_id);
+				$neo4jInterface->InsertSubjects($subject_ids, $source_name, $batch);
+				$neo4jInterface->ConnectSubjects($NegatedHPOData, 'HPOterm', 'hpoid', 'negated_hpo', $this->source_id);
 			}
 
 			$currId = end($NegatedHPOData)['id'];
@@ -429,8 +429,8 @@ class DataStream
 			$subject_ids = $this->extractSubjectIDs($ORPHAData);
 
 			if ($source_name != null) {
-				$neo4jModel->InsertSubjects($subject_ids, $source_name, $batch);
-				$neo4jModel->ConnectSubjects($ORPHAData, 'ORPHAterm', 'orphaid', 'orpha', $this->source_id);
+				$neo4jInterface->InsertSubjects($subject_ids, $source_name, $batch);
+				$neo4jInterface->ConnectSubjects($ORPHAData, 'ORPHAterm', 'orphaid', 'orpha', $this->source_id);
 			}
 
 			$currId = end($ORPHAData)['id'];
