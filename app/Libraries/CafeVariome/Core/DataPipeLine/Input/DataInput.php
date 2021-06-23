@@ -2,11 +2,11 @@
 
 /**
  * Name DataInput.php
- * 
+ *
  * Created 11/03/2020
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
- * 
+ *
  */
 
 use CodeIgniter\Controller;
@@ -16,7 +16,6 @@ use App\Models\Source;
 use App\Models\Elastic;
 use App\Models\Settings;
 use App\Models\EAV;
-use App\Models\Neo4j;
 use App\Models\Pipeline;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
@@ -27,7 +26,7 @@ abstract class DataInput
 {
 
     protected $sourceId;
-    
+
     protected $basePath;
     protected $db;
     protected $fileMan;
