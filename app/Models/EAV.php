@@ -151,31 +151,30 @@ class EAV extends Model{
         return $subjectHPOWithNegatedArray;
     }
 
-    public function getORPHATerms(int $source_id, array $orpha_attribute_names = [])
+    public function getORPHATerms(int $source_id, array $orpha_attribute_names = [], int $limit = -1, int $offset = -1)
     {
         $this->builder = $this->db->table($this->table);
-        $this->builder->select('subject_id, attribute, value');
+        $this->builder->select('id, subject_id, value');
+		$this->builder->where('source_id', $source_id);
+
+		if ($offset > 0){
+			$this->builder->where('id>', $offset);
+		}
+
         if (count($orpha_attribute_names) > 0) {
-            $this->builder->whereIn('attribute', $orpha_attribute_names); 
+            $this->builder->whereIn('attribute', $orpha_attribute_names);
         }
         else {
-            $this->builder->where('value', "orpha:"); //Diagnosis
+            $this->builder->like('value', "orpha:", 'after'); //Diagnosis
         }
 
-        $this->builder->where('source_id', $source_id);
+		if ($limit > 0) {
+			$this->builder->limit($limit);
+		}
 
-        $query = $this->builder->get()->getResultArray();
-        $data = [];
-        foreach ($query as $record) {
-            if (array_key_exists($record['subject_id'], $data)) {
-                $data[$record['subject_id']][] = ['orpha' => $record['value']];
-            }
-            else {
-                $data[$record['subject_id']] = [['orpha' => $record['value']]];
-            }
-        }
+		$query = $this->builder->get()->getResultArray();
 
-        return $data;
+        return $query;
     }
 
     public function getHPOTermsBySourceId(int $source_id, array $hpo_attribute_names = [])
