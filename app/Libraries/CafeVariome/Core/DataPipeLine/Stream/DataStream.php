@@ -361,8 +361,8 @@ class DataStream
             $this->serviceInterface->ReportProgress($source_id, $countparents + $counta, $totalRecords, 'elasticsearchindex');
         }   
 
-        $sourceModel->unlockSource($source_id);	
-        $eavModel->setElasticFlag($source_id);     
+        $eavModel->setElasticFlag($source_id);
+        $sourceModel->unlockSource($source_id);
 
     }
 
