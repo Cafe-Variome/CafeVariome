@@ -1,12 +1,12 @@
 <?php namespace App\Models;
 
 /**
- * EAV.php 
- * 
+ * EAV.php
+ *
  * Created: 09/08/2019
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
+ *
  * This class handles data operations for Entity Attribute Values in EAVs table as well as other dependant tables.
  */
 
@@ -63,7 +63,7 @@ class EAV extends Model{
         }
 
         $query = $this->builder->get()->getResultArray();
-        return $query; 
+        return $query;
     }
 
     /**
@@ -77,10 +77,10 @@ class EAV extends Model{
      * @param string $id    - The subject id of the current phenoPacket
      * @param string $key   - The attribute column for given datapoint
      * @param string $value - The value column for given datapoint
-     * 
+     *
      * @return void
      */
-    public function createEAV(string $uid, int $source, int $file, string $id, string $key, string $value) 
+    public function createEAV(string $uid, int $source, int $file, string $id, string $key, string $value)
     {
         $malicious_chars = ['\\', chr(39), chr(34), '/', '’', '<', '>', '&', ';'];
         $key = str_replace($malicious_chars, '', $key);
@@ -151,7 +151,7 @@ class EAV extends Model{
         return $subjectHPOWithNegatedArray;
     }
 
-    public function getORPHATerms(int $source_id, array $orpha_attribute_names = [], int $limit = -1, int $offset = -1)
+    public function getORPHATermsBySourceId(int $source_id, array $orpha_attribute_names = [], int $limit = -1, int $offset = -1)
     {
         $this->builder = $this->db->table($this->table);
         $this->builder->select('id, subject_id, value');
@@ -230,7 +230,7 @@ class EAV extends Model{
     }
 
     public function getHPOTermsForSources(array $source_ids, array $hpo_attribute_names = [])
-    { 
+    {
         $this->builder = $this->db->table($this->table);
         $this->builder->select('value');
         $this->builder->distinct();
@@ -271,7 +271,7 @@ class EAV extends Model{
         }
 
         $currAtt = "";
-        for ($i=0; $i < count($data); $i++) { 
+        for ($i=0; $i < count($data); $i++) {
             if ($data[$i]["attribute"] != $currAtt){
                 $currAtt = $data[$i]["attribute"];
                 $attributeValueArray[$data[$i]["attribute"]] = array();
@@ -324,7 +324,7 @@ class EAV extends Model{
     }
 
     /**
-     * countUnaddedEAVs 
+     * countUnaddedEAVs
      * For a given source check whether there is any data in MySQL which isnt in ElasticSearch
      *
      * @param int $source_id  - The name of the source
