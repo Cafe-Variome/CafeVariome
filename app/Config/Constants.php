@@ -84,9 +84,9 @@ defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // highest auto
 *--------------------------------------------------------------------------
 * @author Mehdi Mehtarizadeh
 * date 11/06/2019
-* This section contains base folder paths for running Cafe Variome user interface. 
+* This section contains base folder paths for running Cafe Variome user interface.
 * The code is extracted from the Cafe Variome 2.
-* 
+*
 */
 
 define('IMAGES','resources/images/');
@@ -134,7 +134,9 @@ define('SUBJECT_ID_IN_FILE_NAME', 1);
 define('GROUPING_COLUMNS_ALL', 0);
 define('GROUPING_COLUMNS_CUSTOM', 1);
 
+//Data stream batch sizes
 define('EAV_BATCH_SIZE', 30000);
+define('NEO4J_BATCH_SIZE', 30000);
 
 
 
