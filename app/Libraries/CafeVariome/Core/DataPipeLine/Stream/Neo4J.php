@@ -3,16 +3,17 @@
 /**
  * Neo4J.php
  * Created: 18/02/2020
- * 
+ *
  * @author Mehdi Mehtarizadeh
+ * @author Gregory Warren
  */
 
-use CodeIgniter\Database\ConnectionInterface;
+use App\Models\Source;
 use GraphAware\Neo4j\Client\ClientBuilder;
 use App\Models\Settings;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 
-class Neo4J 
+class Neo4J
 {
     private $neo4jClient;
     private $status = false;
@@ -26,7 +27,7 @@ class Neo4J
     private $transactionStack;
 
     public function __construct() {
-        
+
         $this->setting =  Settings::getInstance();
 
         $this->neo4jUsername = $this->setting->getNeo4JUserName();
@@ -62,7 +63,7 @@ class Neo4J
         ->addConnection('default', 'http://'. $this->neo4jUsername . ':' .$this->neo4jPassword .'@'.$baseNeo4jAddress.':'.$this->neo4jPort)
         ->setDefaultTimeout(60)
         ->build();
-        
+
         return $client;
     }
 
@@ -83,7 +84,7 @@ class Neo4J
             array_push($pars, $record->value('ph'));
             $termname = $record->value('termname');
             $parents[$record->value('ph')] = $record->value('termname');
-        }  
+        }
 
         $last_ancestor = '';
         $i = 0;
@@ -99,7 +100,7 @@ class Neo4J
                         $processed_ancestor_key = array_search($ancestor, $pars);
                         unset($pars[$processed_ancestor_key]);
                         $i ++;
-                    } 
+                    }
                 }
                 else {
                     $parents[$ancestor] = 'All';
@@ -110,76 +111,76 @@ class Neo4J
         return $parents;
     }
 
-    public function InsertSubject(string $subject_id, string $source_name, string $batch, bool $allow_duplicate = false)
-    {
-        $this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
-        if (!$allow_duplicate) {
-            $query = 'MATCH (n:Subject{subjectid:"'.$subject_id.'"}) RETURN n.subjectid as id';
-            $result = $this->neo4jClient->run($query);
-            $exists = count($result->records()) > 0 ? true : false;
-            if ($exists) {
-                return;
-            }
-        }
-        $this->transactionStack->push("CREATE (n:Subject{ subjectid: '".$subject_id."', source: '".$source_name."', batch: '".$batch."' })");
-    }
 
-    public function ConnectSubject(string $subject_id, string $node_type, string $node_key, string $node_id, string $relationship_label)
-    {
-        $this->transactionStack->push("MATCH (a:Subject),(b:" . $node_type . ") WHERE a.subjectid = '" . $subject_id . "' AND b." . $node_key . " = '" . $node_id . "' CREATE (a)<-[r:" . $relationship_label . "]-(b)");
-    }
+	public function InsertSubject(string $subject_id, string $source_name, string $batch, bool $allow_duplicate = false)
+	{
+		$this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
+		if (!$allow_duplicate) {
+			$query = 'MATCH (n:Subject{subjectid:"'.$subject_id.'"}) RETURN n.subjectid as id';
+			$result = $this->neo4jClient->run($query);
+			$exists = count($result->records()) > 0 ? true : false;
+			if ($exists) {
+				return;
+			}
+		}
+		$this->transactionStack->push("CREATE (n:Subject{ subjectid: '".$subject_id."', source: '".$source_name."', batch: '".$batch."' })");
+	}
 
-    public function InsertSubjects(array $data, string $source_name, string $batch)
-    {
-        $serviceInterface = new ServiceInterface();
-        $sourceModel = new Source();
+	public function ConnectSubject(string $subject_id, string $node_type, string $node_key, string $node_id, string $relationship_label)
+	{
+		$this->transactionStack->push("MATCH (a:Subject),(b:" . $node_type . ") WHERE a.subjectid = '" . $subject_id . "' AND b." . $node_key . " = '" . $node_id . "' CREATE (a)<-[r:" . $relationship_label . "]-(b)");
+	}
 
-        $keys = array_keys($data);
+	public function InsertSubjects(array $data, string $source_name, string $batch)
+	{
+		$serviceInterface = new ServiceInterface();
+		$sourceModel = new Source();
 
-        $source_id = $sourceModel->getSourceIDByName($source_name);
-        $this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
+		$source_id = $sourceModel->getSourceIDByName($source_name);
+		$this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
 
-        $subjectsAdded = 0;
-        if (count($keys) > 0) {
-            $serviceInterface->ReportProgress($source_id, $subjectsAdded, count($keys), 'elasticsearchindex', 'Adding subjects to Neo4J');
-        }
+		$subjectsAdded = 0;
+		if (count($data) > 0) {
+			$serviceInterface->ReportProgress($source_id, $subjectsAdded, count($data), 'elasticsearchindex', 'Adding subjects to Neo4J');
+		}
 
-        foreach ($keys as $subject_id) {
-            $this->InsertSubject($subject_id, $source_name, $batch);
-            $serviceInterface->ReportProgress($source_id, $subjectsAdded++, count($keys), 'elasticsearchindex');
-        }
-        $this->commitTransaction(true);
-    }
+		for ($i = 0; $i < count($data); $i++) {
+			$this->InsertSubject($data[$i], $source_name, $batch);
+			$serviceInterface->ReportProgress($source_id, $subjectsAdded++, count($data), 'elasticsearchindex');
+		}
+		$this->commitTransaction(true);
+	}
 
-    public function ConnectSubjects(array $data, string $node_type, string $node_key, string $data_type, int $source_id)
-    {
-        $serviceInterface = new ServiceInterface();
+	public function ConnectSubjects(array $data, string $node_type, string $node_key, string $data_type, int $source_id)
+	{
+		$serviceInterface = new ServiceInterface();
 
-        $keys = array_keys($data);
+		$this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
 
-        $this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
+		$subjectsConnected = 0;
+		if (count($data) > 0) {
+			$serviceInterface->ReportProgress($source_id, $subjectsConnected, count($data), 'elasticsearchindex', 'Connecting subjects in Neo4J');
+		}
 
-        $subjectsConnected = 0;
-        if (count($keys) > 0) {
-            $serviceInterface->ReportProgress($source_id, $subjectsConnected, count($keys), 'elasticsearchindex', 'Connecting subjects in Neo4J');
-        }
+		$relationship_label = '';
+		switch (strtolower($data_type)){
+			case 'hpo':
+			case 'orpha':
+				$relationship_label = 'PHENOTYPE_OF';
+				break;
+			case 'negated_hpo':
+				$relationship_label = 'NOT_PHENOTYPE_OF';
+				break;
+		}
 
-        foreach ($keys as $subject_id) {
-            for ($i=0; $i < count($data[$subject_id]); $i++) { 
-                $data_element = strtolower($data_type) == 'hpo' ? $data[$subject_id][$i]['hpo'] : $data[$subject_id][$i]['orpha'];
-                if (strtolower($data_type) == 'hpo' && $data[$subject_id][$i]['negated']) {
-                    $this->ConnectSubject($subject_id, $node_type, $node_key,  $data_element, 'NOT_PHENOTYPE_OF');
-                }
-                else {
-                    $this->ConnectSubject($subject_id, $node_type, $node_key, $data_element, 'PHENOTYPE_OF');
-                }
-            }
+		for ($i = 0; $i < count($data); $i++) {
+			$this->ConnectSubject($data[$i]['subject_id'], $node_type, $node_key, strtoupper($data[$i]['value']), $relationship_label);
+			$subjectsConnected++;
+			$serviceInterface->ReportProgress($source_id, $subjectsConnected, count($data), 'elasticsearchindex');
+		}
 
-            $subjectsConnected++;
-            $serviceInterface->ReportProgress($source_id, $subjectsConnected, count($keys), 'elasticsearchindex');
-        }
-        $this->commitTransaction(true);
-    }
+		$this->commitTransaction(true);
+	}
 
     public function deleteSource(int $source_id) {
 
