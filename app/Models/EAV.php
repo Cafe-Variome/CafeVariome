@@ -109,7 +109,10 @@ class EAV extends Model{
         $this->builder->update($data);
     }
 
-    public function getHPOTermsWithNegatedBySourceId(int $source_id, array $hpo_attribute_names = [], array $negated_hpo_attribute_names = []) 
+    /*
+     * @deprecated
+     */
+    public function getHPOTermsWithNegatedBySourceId(int $source_id, array $hpo_attribute_names = [], array $negated_hpo_attribute_names = [])
     {
         $subjectHPOWithNegatedArray = [];
 
