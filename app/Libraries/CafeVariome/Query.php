@@ -32,9 +32,9 @@ class Query extends CafeVariome{
     /**
      * @deprecated
      */
-    
+
     function parse($query) {
-        
+
         $query_data = array();
         $query_data = $query['query'];
 
@@ -50,7 +50,7 @@ class Query extends CafeVariome{
                     $start = $element['start'];
                     $stop = $element['stop'];
                     $type = $element['reference_type'];
-                    
+
                     if($element['operator'] == "exact") {
                         if($type == "genome") {
                             $query_array[$element['querySegmentID']] = "(genome_chr:" . $chr . " OR genome_chr:chr" . $chr . ") AND genome_build:" . $build . " AND genome_start_d:" . $start . " AND genome_stop_d:" . $stop;
@@ -81,7 +81,7 @@ class Query extends CafeVariome{
                         } else {
                             $query_array[$element['querySegmentID']] = "accession_ref:" . $element['reference']['id'] . " AND accession_start_d:>=" . $start . " AND accession_stop_d:<=" . $stop;
                         }
-                    } else if($element['operator'] == "only_begin_between") { 
+                    } else if($element['operator'] == "only_begin_between") {
                         if($type == "genome") {
                             $query_array[$element['querySegmentID']] = "(genome_chr:" . $chr . " OR genome_chr:chr" . $chr . ") AND genome_build:" . $build . " AND genome_start_d:>=" . $start . " AND genome_start_d:<=" . $stop . " AND genome_stop_d:>" . $stop;
                         } else {
@@ -221,7 +221,7 @@ class Query extends CafeVariome{
         foreach ($query_array as $statement_id => $query_element) {
             // only for epad
             if(strpos($query_element, "Age_\\[by_start_of_this_year\\]_d") !== FALSE)
-            { 
+            {
                 if(strpos($query_element, "_d:>=") !== FALSE) {
                     $splits = explode("_d:>=", $query_element);
                     $splits[1] = date("Y") - $splits[1] - 1;
@@ -240,7 +240,7 @@ class Query extends CafeVariome{
                     $query_element = implode("_d:<", $splits);
                 }
             }
-            
+
             $statement_id = "##" . $statement_id . "##";
             $query_element = "##(" . $query_element . ")##";
             $query_stmt = preg_replace("/$statement_id/", "$query_element", $query_stmt);
@@ -288,7 +288,7 @@ class Query extends CafeVariome{
 
     	$user_id = ($session->get('user_id') != null) ? $session->get('user_id') : $user_id;
 
-        // fetch sources for which the user has source display access       
+        // fetch sources for which the user has source display access
         $sdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, (int)$network_key, 'source_display');
 
         $sdg_ids = [];
@@ -297,7 +297,7 @@ class Query extends CafeVariome{
 				$sdg_ids[$s['source_id']] = $s['source_id'];
 			}
         }
-        
+
         // fetch sources for which the user has data display access (count display group)
         $cdg_arr = $sourceModel->getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo($user_id, $installation_key, (int)$network_key, 'count_display');
         $cdg_ids = [];
@@ -305,14 +305,14 @@ class Query extends CafeVariome{
 			foreach ($cdg_arr as $s) {
 				$cdg_ids[$s['source_id']] = $s['source_id'];
 			}
-		}		
+		}
 
 		// Fetch all source id part of the network for this installation
         $network_sources = $networkModel->getSourcesForNetworkPartOfGroup($installation_key, $network_key);
 
         $sources = $sourceModel->getSources('source_id, name, description', array('type !=' => 'federated')); // this and the above needs replacing with a sources model function to get all the data from local databases (need greg's new code)
 		//end fetching sources
-		
+
 		$result = $this->decouple($api['logic']); // convert to ORs(AND, AND)
 		error_log("Decouple result : ".$result);
 
@@ -327,7 +327,7 @@ class Query extends CafeVariome{
                 $source_id = $source_array['source_id'];
                 if(!in_array($source_id, $network_sources)) continue; //as above
                 $es5_counts[$source_array['name']] = "Access Denied"; // not sure if this correct, yes if they are not in sg then access denied, but if in should get counts
-    
+
                 if (array_key_exists($source_id, $sdg_ids))
                 {
                     $es5_counts[$source_array['name']] = $this->process_query($source_array['name'], $pointer_query);
@@ -344,7 +344,6 @@ class Query extends CafeVariome{
     }
 
     public function process_query($source, $pointer_array) {
-
         $sourceModel = new Source();
         $sourceId = $sourceModel->getSourceIDByName($source);
         $countCache = [];
@@ -352,7 +351,7 @@ class Query extends CafeVariome{
         // $notop = "/value:-/"; //needed to detech a NOT query
 		$element = [];
     	$orarray = explode(") OR (", $pointer_array); //given that we convert all querys into a series of ors we can start by splitting them. (A and (B or c) = (A and B) or (A and C))
-    	
+
     	// first step is to create counts for each core component search (the bits in '[]') so we know which order to collect IDs as this will reduce memory use or scan and scroll in ES
 		$numor = 0; // which or we are processing, start at first element in array
 		error_log("Getting Counts");
@@ -408,11 +407,11 @@ class Query extends CafeVariome{
                         $andids = array_intersect($andids, $ids);
                         if (count($andids) == 0){
                             $noids = 1;
-                        }					
+                        }
                     }
                     else{
 						$andids = $ids;
-					}					
+					}
 				}
 			}
 
@@ -435,11 +434,11 @@ class Query extends CafeVariome{
 					}else{
                         $eavModel = new EAV($this->db);
 
-                        $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $sourceId, 'elastic' => 1], true);	
+                        $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $sourceId, 'elastic' => 1], true);
                         $uniqueSubjectIds = [];
                         foreach ($uniqueSubjectIdsArray as $uid) {
                             array_push($uniqueSubjectIds, $uid['subject_id']);
-                        }		
+                        }
 						$andids = array_values(array_diff($uniqueSubjectIds, $ids));
 					}
 				}
@@ -447,7 +446,7 @@ class Query extends CafeVariome{
 
 
 		    $outids = array_unique(array_merge($outids,$andids), SORT_REGULAR);
-		    
+
 		}
 		return $outids;
     }
@@ -463,7 +462,6 @@ class Query extends CafeVariome{
         $esQuery['body']['query']['exists']['field'] = 'subject_id';
         $esQuery['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>500000];
 
-        $esJson = json_encode($esQuery);
         $results = $this->elasticClient->search($esQuery);
 
         $result = 0;
@@ -476,19 +474,19 @@ class Query extends CafeVariome{
 
         return $result;
     }
-    
+
     public function eav_query($lookup,$source, $iscount = TRUE){
         $elasticModel = new Elastic($this->db);
         $sourceModel = new Source($this->db);
-        
+
 		// $lookup = $this->getVal($this->api, $pointer);
 		// if ($lookup['operator'] === '!=') $lookup['operator'] = 'is not';
-		$isnot = ($iscount == TRUE && (substr($lookup['operator'],0,6) === 'is not' || $lookup['operator'] === '!=')) ? TRUE : FALSE; 
+		$isnot = ($iscount == TRUE && (substr($lookup['operator'],0,6) === 'is not' || $lookup['operator'] === '!=')) ? TRUE : FALSE;
 
         $paramsnew = [];
         $sourceId = $sourceModel->getSourceIDByName($source);
         $es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;
-        
+
 		//$paramsnew = ['index' => $es_index, 'size' => 0, 'type' => 'subject'];
 		$paramsnew = ['index' => $es_index];
         $paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source . "_eav"; // for source
@@ -527,15 +525,15 @@ class Query extends CafeVariome{
 				$tmp[]['range'] = ['value.dt' => [ 'lte' => $lookup['value']]];
                 break;
 
-		}	
-		$arr = [];		
+		}
+		$arr = [];
 		$arr['has_child']['type'] = 'eav';
-		$arr['has_child']['query']['bool']['must'] = $tmp;	
+		$arr['has_child']['query']['bool']['must'] = $tmp;
         $paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
         $paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
-        
+
         $jp = json_encode($paramsnew);
-        
+
 		$esquery = $this->elasticClient->search($paramsnew);
 
         if ($iscount){
@@ -544,14 +542,14 @@ class Query extends CafeVariome{
         else{
             $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
         }
-		if ($isnot){ 
+		if ($isnot){
             $eavModel = new EAV($this->db);
-            $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $sourceId, 'elastic' => 1], true);	
+            $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $sourceId, 'elastic' => 1], true);
             $uniqueSubjectIds = [];
             foreach ($uniqueSubjectIdsArray as $uid) {
                 array_push($uniqueSubjectIds, $uid['subject_id']);
-            }	
-            
+            }
+
             $all_ids = ($iscount==TRUE) ? count($uniqueSubjectIds) : $uniqueSubjectIds;
             $result = $iscount==TRUE ? $all_ids - $result : array_diff($all_ids,$result) ;
 
@@ -566,7 +564,7 @@ class Query extends CafeVariome{
 
 		error_log("PHENOTYPE QUERY");
 
-		$isnot = ($iscount == TRUE && substr($lookup['operator'],0,6) === 'is not') ? TRUE : FALSE; 
+		$isnot = ($iscount == TRUE && substr($lookup['operator'],0,6) === 'is not') ? TRUE : FALSE;
 
 		switch($lookup['operator']) {
 			case 'is': case 'is not': case '=':
@@ -580,7 +578,7 @@ class Query extends CafeVariome{
         $paramsnew = [];
         $sourceId = $sourceModel->getSourceIDByName($source);
         $es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;
-        
+
 		// Elasticsearch query
         //$paramsnew = ['index' => $es_index, 'size' => 0, 'type' => 'subject'];
         $paramsnew = ['index' => $es_index];
@@ -590,7 +588,7 @@ class Query extends CafeVariome{
 		$paramsnew['body']['query']['bool']['must'][1]['has_child']['query']['bool']['must'] = $tmp;
 
 		$negop = 'must_not';
-		
+
 		if (array_key_exists('negated',$lookup) && $lookup['negated'] == 'True') $negop = 'must'; //need to add negated to phenotype component
 		error_log($negop);
 		$paramsnew['body']['query']['bool'][$negop][0]['has_child']['type'] = 'eav';
@@ -603,328 +601,430 @@ class Query extends CafeVariome{
 		//error_log("es5_count: " . json_encode($esquery));
 		if ($iscount) $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
 		else $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
-		if ($isnot){ 
+		if ($isnot){
             $eavModel = new EAV($this->db);
-            $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $sourceId, 'elastic' => 1], true);	
+            $uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $sourceId, 'elastic' => 1], true);
             $uniqueSubjectIds = [];
             foreach ($uniqueSubjectIdsArray as $uid) {
                 array_push($uniqueSubjectIds, $uid['subject_id']);
-            }	
+            }
             $all_ids = ($iscount==TRUE) ? count($uniqueSubjectIds) : $uniqueSubjectIds;
             $result = $iscount==TRUE ? $all_ids - $result : array_diff($all_ids,$result) ;
 		}
 		// end ES
 
         return $result;
-		
-
     }
 
-    public function orpha_query($lookup,$source, $count = TRUE){
-        error_log("ORPHA_QUERY");
-        $neo4jUsername = $this->setting->settingData['neo4j_username'];
-        $neo4jPassword = $this->setting->settingData['neo4j_password'];
-        $neo4jAddress = $this->setting->settingData['neo4j_server'];
-        $neo4jPort = $this->setting->settingData['neo4j_port'];
+	public function sim_query($lookup,$source, $count = TRUE){
+		// NEED TO ADD CODE FOR WHEN ORPHA == TRUE
 
-        $baseNeo4jAddress = $neo4jAddress;
-        if (strpos($baseNeo4jAddress, 'http://') !== false) {
-            $baseNeo4jAddress = str_replace("http://","",$baseNeo4jAddress);
-        }
-        if (strpos($baseNeo4jAddress, 'https://') !== false) {
-            $baseNeo4jAddress = str_replace("https://","",$baseNeo4jAddress);
-        }
+		$neo4jUsername = $this->setting->getNeo4JUserName();
+		$neo4jPassword = $this->setting->getNeo4JPassword();
+		$neo4jAddress = $this->setting->getNeo4JUri();
+		$neo4jPort = $this->setting->getNeo4JPort();
 
-        $neo4jClient =  \GraphAware\Neo4j\Client\ClientBuilder::create()
-        ->addConnection('default', 'http://'. $neo4jUsername . ':' .$neo4jPassword .'@'.$baseNeo4jAddress.':'.$neo4jPort)
-        ->setDefaultTimeout(60)
-        ->build();	
+		$baseNeo4jAddress = $neo4jAddress;
+		if (strpos($baseNeo4jAddress, 'http://') !== false) {
+			$baseNeo4jAddress = str_replace("http://","",$baseNeo4jAddress);
+		}
+		if (strpos($baseNeo4jAddress, 'https://') !== false) {
+			$baseNeo4jAddress = str_replace("https://","",$baseNeo4jAddress);
+		}
 
-		if (array_key_exists('r',$lookup)){
-            $r = $lookup['r'];
-            $s = $lookup['s'];
-            $hpo = $lookup['HPO'];
-            $orpha_id = $lookup['id'];//[0];
-            
-            // if just orpha
-            if($r == 1 && $s == 100 && $hpo == 'false'){
-                $neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})<-[:IS_A*0..20]-(:ORPHAterm)-[:PHENOTYPE_OF]-(s) where s.source = \"" . $source . "\" return s.subjectid as subjectid";
-                $result = $neo4jClient->run($neo_query);
-                $records = $result->getRecords();
-                $pat_ids = [];
-                foreach ($records as $record) {
-                    $pat_ids[] = $record->value('subjectid');
-                }
-                // error_log(print_r($pat_ids,1));
-
-                if($count === true) {
-                    return count($pat_ids);
-                } else {
-                    return $pat_ids;
-                }
-            }
-            else{
-
-                $ids = [];
-
-                foreach ($lookup['id'] as $orpha_id) {
-
-                    $neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})-[ob:PHENOTYPE_OF]-(oh:HPOterm) optional match (oh)-[:IS_A*0..100]->(ah:HPOterm)-[:IS_A]->(ab:HPOterm {hpoid:\"HP:0000118\"}) with collect(distinct(oh)) as coh,o,count(distinct(oh.hpoid)) as ohids, count(distinct(ah.hpoid)) as ahids, ob.frequencycode as fc, collect(distinct(ah.hpoid)) as ahs unwind coh as oh return  o.orphaid as ORPHA,fc as FrequencyCode,ohids as HPO, ahids as PA_Branches, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC, ahs order by ORPHA";
-                    $result = $neo4jClient->run($neo_query);
-                    $records = $result->getRecords();
-                    $orphatotals = [];
-                    $orphasubjects = [];
-                    $hposubjects = [];
-
-                    foreach ($records as $record) {
-                        $orphatotals[$record->value('FrequencyCode')] = ['hpo' => $record->value('HPO'), 
-                        'branches' => $record->value('PA_Branches'), 
-                        'omimic' => $record->value('OMIM_IC'), 
-                        'orphaic' => $record->value('ORPHA_IC'), 
-                        'branch_hpos' => $record->value('ahs')];
-                    }
-
-                    //hpo subjects
-                    if($r == 1 && $hpo == 'true'){
-                        error_log("NO SIM HPO");
-                        $neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})-[ob:PHENOTYPE_OF]-(oh:HPOterm) 
-                                        Optional Match (oh)-[:IS_A*0..100]->(ah:HPOterm)-[:IS_A]->(ab:HPOterm {hpoid:\"HP:0000118\"}) 
-                                        with oh,ah,ob 
-                                        Match (oh)<-[:IS_A*0..20]-()-[:PHENOTYPE_OF]-(s:Subject) 
-                                        where s.source = \"" . $source . "\"
-                                        with s, collect(distinct(oh)) as coh, count(distinct(oh.hpoid)) as ohids, count(distinct(ah.hpoid)) as ahids, ob.frequencycode as fc, collect(distinct(ah.hpoid)) as ahs
-                                        unwind coh as oh 
-                                        return  s.subjectid as subjectid,fc as FrequencyCode, ohids as HPO,ahids as PA_Branches, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC, ahs order by FrequencyCode,HPO desc";
-                        $result = $neo4jClient->run($neo_query);
-                        $records = $result->getRecords();
-                        foreach ($records as $record) {
-                            $hposubjects[$record->value('subjectid')][$record->value('FrequencyCode')] = ['hpo' => $record->value('HPO'), 
-                            'branches' => $record->value('PA_Branches'), 
-                            'omimic' => $record->value('OMIM_IC'), 
-                            'orphaic' => $record->value('ORPHA_IC'), 
-                            'hpop' => $record->value('HPO')/$orphatotals[$record->value('FrequencyCode')]['hpo'], 
-                            'branchesp' => $record->value('PA_Branches')/$orphatotals[$record->value('FrequencyCode')]['branches'], 
-                            'orphaicp' => $record->value('ORPHA_IC')/$orphatotals[$record->value('FrequencyCode')]['orphaic'], 
-                            'branch_hpos' => $record->value('ahs')];
-
-                        }
-                    }
-                    //orpha subjects
-                    if($r == 1){
-                        error_log("NO SIM ORPHA");
-                        $neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})-[ob:PHENOTYPE_OF]-(oh:HPOterm) 
-                                        Optional Match (oh)-[:IS_A*0..100]->(ah:HPOterm)-[:IS_A]->(ab:HPOterm {hpoid:\"HP:0000118\"}) 
-                                        with oh,ah,ob 
-                                        Match (oh)<-[:IS_A*0..20]-()-[:PHENOTYPE_OF]-(s:ORPHAterm)-[:PHENOTYPE_OF]-(os:Subject) 
-                                        where os.source = \"" . $source . "\"
-                                        with s, collect(distinct(oh)) as coh, count(distinct(oh.hpoid)) as ohids, count(distinct(ah.hpoid)) as ahids, ob.frequencycode as fc, os.subjectid as subjectid, collect(distinct(ah.hpoid)) as ahs
-                                        unwind coh as oh 
-                                        return  subjectid,s.orphaid as ORPHA,fc as FrequencyCode, ohids as HPO,ahids as PA_Branches, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC, ahs order by FrequencyCode,HPO desc";
-                        $result = $neo4jClient->run($neo_query);
-                        $records = $result->getRecords();
-                        foreach ($records as $record) {
-                            $orphasubjects[$record->value('subjectid')][$record->value('FrequencyCode')] = ['hpo' => $record->value('HPO'), 
-                            'branches' => $record->value('PA_Branches'), 
-                            'omimic' => $record->value('OMIM_IC'), 
-                            'orphaic' => $record->value('ORPHA_IC'), 
-                            'hpop' => $record->value('HPO')/$orphatotals[$record->value('FrequencyCode')]['hpo'], 
-                            'branchesp' => $record->value('PA_Branches')/$orphatotals[$record->value('FrequencyCode')]['branches'], 
-                            'orphaicp' => $record->value('ORPHA_IC')/$orphatotals[$record->value('FrequencyCode')]['orphaic'],
-                            'branch_hpos' => $record->value('ahs')];
-
-                        }
-                    }
-
-                    //hpo subjects-sim
-                    if($r < 1 && $hpo == 'true'){
-                        error_log("SIM HPO");
-                        $neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})-[ob:PHENOTYPE_OF]-(oh:HPOterm) 
-                                        Optional Match (oh)-[:IS_A*0..100]->(ah:HPOterm)-[:IS_A]->(ab:HPOterm {hpoid:\"HP:0000118\"}) 
-                                        with oh,ah,ob 
-                                        Match (oh)-[:REPLACED_BY*0..1]->(rep)<-[:IS_A*0..20]-(isa)-[:SIM_AS*0..10]->()-[r:SIMILARITY]-(j)
-                                        with j, oh, ah, rep, isa,r,ob
-                                        Match (j)<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-(last)-[r2:PHENOTYPE_OF]-(s:Subject) 
-                                        where s.source = \"" . $source . "\" and (r.rel >=  $r or last.hpoid in [oh.hpoid,rep.hpoid,isa.hpoid])
-                                        with s, collect(distinct(oh)) as coh, count(distinct(oh.hpoid)) as ohids, count(distinct(ah.hpoid)) as ahids, ob.frequencycode as fc, collect(distinct(ah.hpoid)) as ahs
-                                        unwind coh as oh 
-                                        return  s.subjectid as subjectid,fc as FrequencyCode, ohids as HPO,ahids as PA_Branches, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC, ahs order by FrequencyCode,HPO desc";
-                        $result = $neo4jClient->run($neo_query);
-                        $records = $result->getRecords();
-                        foreach ($records as $record) {
-                            $hposubjects[$record->value('subjectid')][$record->value('FrequencyCode')] = ['hpo' => $record->value('HPO'), 
-                            'branches' => $record->value('PA_Branches'), 
-                            'omimic' => $record->value('OMIM_IC'), 
-                            'orphaic' => $record->value('ORPHA_IC'), 
-                            'hpop' => $record->value('HPO')/$orphatotals[$record->value('FrequencyCode')]['hpo'], 
-                            'branchesp' => $record->value('PA_Branches')/$orphatotals[$record->value('FrequencyCode')]['branches'], 
-                            'orphaicp' => $record->value('ORPHA_IC')/$orphatotals[$record->value('FrequencyCode')]['orphaic'], 
-                            'branch_hpos' => $record->value('ahs')];
-                        }
-                    }
-
-                    //orpha subjects-sim
-                    if($r < 1){
-                        error_log("SIM ORPHA");
-                        $neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})-[ob:PHENOTYPE_OF]-(oh:HPOterm) Optional Match (oh)-[:IS_A*0..100]->(ah:HPOterm)-[:IS_A]->(ab:HPOterm {hpoid:\"HP:0000118\"})  with oh,ah,ob  Match (oh)-[:REPLACED_BY*0..1]->(rep)<-[:IS_A*0..20]-(isa)-[:SIM_AS*0..10]->()-[r:SIMILARITY]-(j) with j, oh, ah, rep, isa,r,ob Match (j)<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-(last)-[r2:PHENOTYPE_OF]-(s:ORPHAterm)-[:PHENOTYPE_OF]-(os:Subject)  where os.source = \"" . $source . "\" and (r.rel >=  $r or last.hpoid in [oh.hpoid,rep.hpoid,isa.hpoid]) with s, collect(distinct(oh)) as coh, count(distinct(oh.hpoid)) as ohids, count(distinct(ah.hpoid)) as ahids, ob.frequencycode as fc, os.subjectid as subjectid, collect(distinct(ah.hpoid)) as ahs unwind coh as oh return  subjectid,s.orphaid as ORPHA,fc as FrequencyCode, ohids as HPO,ahids as PA_Branches, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC, ahs,collect(oh.hpoid) as imps order by FrequencyCode,HPO desc";
-                        // error_log($neo_query);
-                        $result = $neo4jClient->run($neo_query);
-                        $records = $result->getRecords();
-                        // error_log(print_r($records,1));
-                        foreach ($records as $record) {
-                            $orphasubjects[$record->value('subjectid')][$record->value('FrequencyCode')] = ['hpo' => $record->value('HPO'), 
-                            'branches' => $record->value('PA_Branches'), 
-                            'omimic' => $record->value('OMIM_IC'), 
-                            'orphaic' => $record->value('ORPHA_IC'), 
-                            'hpop' => $record->value('HPO')/$orphatotals[$record->value('FrequencyCode')]['hpo'], 
-                            'branchesp' => $record->value('PA_Branches')/$orphatotals[$record->value('FrequencyCode')]['branches'], 
-                            'orphaicp' => $record->value('ORPHA_IC')/$orphatotals[$record->value('FrequencyCode')]['orphaic'],
-                            'branch_hpos' => $record->value('ahs'),
-                            'IMPS' => $record->value('imps')];
-                        }
-                    }
-
-                    //process ids
-                    if (array_key_exists('OB',$orphatotals)){
-                        foreach ($hposubjects as $key => $sub){
-                            if (!array_key_exists('OB', $sub) OR $sub['OB']['hpop'] < 1){
-                                unset($hposubjects[$key]);
-                            }
-                        }
-                        foreach ($orphasubjects as $key => $sub){
-                            if (!array_key_exists('OB', $sub) OR $sub['OB']['hpop'] < 1){
-                                unset($hposubjects[$key]);
-                            }
-                        }
-                    }                
-                    if (array_key_exists('EX',$orphatotals)){
-                        foreach ($hposubjects as $key => $sub){
-                            if (array_key_exists('EX', $sub)){
-                                unset($hposubjects[$key]);
-                            }
-                        }
-                        foreach ($orphasubjects as $key => $sub){
-                            if (array_key_exists('EX', $sub)){
-                                unset($hposubjects[$key]);
-                            }
-                        }
-                    }
-                    $totic = 0;
-                    // $totbran = [];
-                    foreach ($orphatotals as $hpo){
-                        error_log($hpo['orphaic']);
-                        $totic = $totic + $hpo['orphaic'];
-                    }
-                
-                    foreach ($hposubjects as $key => $sub){
-                        $sumic = 0;
-                        foreach($sub as $su){
-                            $sumic = $sumic + $su['orphaic'];
-                        }
-                        if (($sumic/$totic)*100 >= $s){
-                            array_push($ids,$key);
-                        }
-                    }
-                    foreach ($orphasubjects as $key => $sub){
-                        $sumic = 0;
-                        foreach($sub as $su){
-                            error_log($su['orphaic']);
-                            $sumic = $sumic + $su['orphaic'];
-                        }
-                        
-                        if (($sumic/$totic)*100 >= $s){
-                            array_push($ids,$key);
-                        }
-                    }
-                }
-
-                $pat_ids = array_unique($ids);
-
-                if($count === true)
-                {
-                    return count($pat_ids);
-                } 
-                else
-                {
-                    return $pat_ids;
-                }                
-            }
-     
-
-        }
-    }
-    
-    public function sim_query($lookup,$source, $count = TRUE){
-        // NEED TO ADD CODE FOR WHEN ORPHA == TRUE
-        $neo4jUsername = $this->setting->settingData['neo4j_username'];
-        $neo4jPassword = $this->setting->settingData['neo4j_password'];
-        $neo4jAddress = $this->setting->settingData['neo4j_server'];
-        $neo4jPort = $this->setting->settingData['neo4j_port'];
-
-        $baseNeo4jAddress = $neo4jAddress;
-        if (strpos($baseNeo4jAddress, 'http://') !== false) {
-            $baseNeo4jAddress = str_replace("http://","",$baseNeo4jAddress);
-        }
-        if (strpos($baseNeo4jAddress, 'https://') !== false) {
-            $baseNeo4jAddress = str_replace("https://","",$baseNeo4jAddress);
-        }
-
-        $neo4jClient =  \GraphAware\Neo4j\Client\ClientBuilder::create()
-        ->addConnection('default', 'http://'. $neo4jUsername . ':' .$neo4jPassword .'@'.$baseNeo4jAddress.':'.$neo4jPort)
-        ->setDefaultTimeout(60)
-        ->build();	
+		$neo4jClient =  \GraphAware\Neo4j\Client\ClientBuilder::create()
+			->addConnection('default', 'http://'. $neo4jUsername . ':' .$neo4jPassword .'@'.$baseNeo4jAddress.':'.$neo4jPort)
+			->setDefaultTimeout(60)
+			->build();
 
 		if (array_key_exists('r',$lookup)){
-            $r = $lookup['r'];
-            $s = $lookup['s'];
-            error_log("ORPHA CODE");
-            error_log($lookup['ORPHA']);
-            $orpha = $lookup['ORPHA'];
-            $id_str = '';
-			foreach ($lookup['ids'] as $id) {$id_str .= "n.hpoid=\"" . $id . "\" or "; }
+			$r = $lookup['r'];
+			$s = $lookup['s'];
+			error_log("ORPHA CODE");
+			error_log($lookup['ORPHA']);
+			$orpha = $lookup['ORPHA'];
+			$id_str = '';
+			foreach ($lookup['ids'] as $id) {
+				$id = strtoupper($id);
+				$id_str .= "n.hpoid=\"" . $id . "\" or ";
+			}
 			$id_str = trim($id_str, ' or ');
-            
-            //Do not remove the below line. It's the older way of retrieving similarity data from Neo4J
-            //$neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel > $r and m.source = \"" . $source . "\" and (" . $id_str . " ) with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, n.hpoid as hpoid with omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > $s return omimid, subjectid, summax ORDER BY summax DESC";
-        
-            //The following way matches the new query builder UI
-            if ($r == 1) {
-                $neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()<-[:IS_A*0..20]-()-[r2:PHENOTYPE_OF]->(m) ";
-                if ($orpha == 'true'){
-                    $neo_query = $neo_query . "where (" . $id_str . ") and (m.source = \"" . $source . "\" or exists(m.orphaid)) ";
-                }else{
-                    $neo_query = $neo_query . "where (" . $id_str . ") and m.source = \"" . $source . "\" ";
-                }
-                $neo_query = $neo_query . "Match (m)-[:PHENOTYPE_OF*0..1]-(s:Subject) where s.source = \"" . $source . "\" with s.subjectid as subjectid, n.hpoid as hpoid with subjectid as subjectid, count(distinct(hpoid)) as hpoid where hpoid >=  $s  return subjectid, hpoid";
-                // $neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()<-[:IS_A*0..20]-()-[r2:PHENOTYPE_OF]->(m) where (" . $id_str . ") and m.source = \"" . $source . "\" with m.subjectid as subjectid, n.hpoid as hpoid with subjectid as subjectid, count(distinct(hpoid)) as hpoid where hpoid >=  $s  return subjectid, hpoid";
-            }
-            else {
-                $neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->(rep)<-[:IS_A*0..20]-(isa)-[:SIM_AS*0..10]->()-[r:SIMILARITY]-(j) with n, j, r,rep, isa Match (j)<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-(last)-[r2:PHENOTYPE_OF]->(m) ";
-                if ($orpha == 'true'){
-                    $neo_query = $neo_query . "where (r.rel >  $r or last.hpoid in [n.hpoid,rep.hpoid,isa.hpoid]) and (" . $id_str . ") and (m.source = \"" . $source . "\" or exists(m.orphaid)) ";
-                }else{
-                    $neo_query = $neo_query . "where (r.rel >  $r or last.hpoid in [n.hpoid,rep.hpoid,isa.hpoid]) and (" . $id_str . ") and m.source = \"" . $source . "\" ";
-                }      
-                
-                $neo_query = $neo_query . "Match (m)-[:PHENOTYPE_OF*0..1]-(s:Subject) where s.source = \"" . $source . "\" with s.omimid as omimid, s.subjectid as subjectid, count(distinct(n.hpoid)) as hpoid where hpoid >=  $s with hpoid as hpoid, omimid as omimid, subjectid as subjectid return omimid, subjectid, hpoid ORDER BY hpoid DESC";
-            }
-            error_log($neo_query);
-            $result = $neo4jClient->run($neo_query);
-            $records = $result->getRecords();
-            // error_log(print_r($records,1));
-            if($count === true) {
-                return count($records);
-            } else {
-                $pat_ids = [];
-                foreach ($records as $record) {
-                    $pat_ids[] = $record->value('subjectid');
-                }
-                return $pat_ids;
-            }
+
+			//Do not remove the below line. It's the older way of retrieving similarity data from Neo4J
+			//$neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()-[:SIM_AS*0..10]->()-[r:SIMILARITY]-()<-[:SIM_AS*0..10]-()<-[:REPLACED_BY*0..1]-()-[r2:PHENOTYPE_OF]->(m) where r.rel > $r and m.source = \"" . $source . "\" and (" . $id_str . " ) with m.omimid as omimid, m.subjectid as subjectid, max(r.rel) as maxicm, n.hpoid as hpoid with omimid as omimid, subjectid as subjectid, sum(maxicm) as summax where summax > $s return omimid, subjectid, summax ORDER BY summax DESC";
+
+			//The following way matches the new query builder UI
+
+			$neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[:PHENOTYPE_OF]->(s:Subject) ";
+			if ($orpha == 'true'){
+				$neo_query = $neo_query . "where (" . $id_str . ") and s.source = \"" . $source . "\" and (link:HPOterm or link:ORPHAterm) ";
+			}
+			else{
+				$neo_query = $neo_query . "where (" . $id_str . ") and s.source = \"" . $source . "\" and (link:HPOterm) ";
+			}
+			$neo_query = $neo_query . "with s.subjectid as subjectid, n.hpoid as hpoid with subjectid as subjectid, count(distinct(hpoid)) as hpoid where hpoid >=  $s  return subjectid, hpoid";
+			// $neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()<-[:IS_A*0..20]-()-[r2:PHENOTYPE_OF]->(m) where (" . $id_str . ") and m.source = \"" . $source . "\" with m.subjectid as subjectid, n.hpoid as hpoid with subjectid as subjectid, count(distinct(hpoid)) as hpoid where hpoid >=  $s  return subjectid, hpoid";
+			$pat_ids = [];
+
+			$result = $neo4jClient->run($neo_query);
+			$records = $result->getRecords();
+
+			foreach ($records as $record) {
+				$pat_ids[] = $record->value('subjectid');
+			}
+
+			if ($r < 1) {
+				$neo_query = "Match (n:HPOterm)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY]-(j:HPOterm) Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[r2:PHENOTYPE_OF]->(s:Subject) ";
+				if ($orpha == 'true'){
+					$neo_query = $neo_query . "where r.rel >  $r and (" . $id_str . ") and (s.source = \"" . $source . "\" and (link:HPOterm or link:ORPHAterm)) ";
+				}
+				else{
+					$neo_query = $neo_query . "where r.rel >  $r and (" . $id_str . ") and (s.source = \"" . $source . "\" and (link:HPOterm)) ";
+				}
+
+				$neo_query = $neo_query . " with s.subjectid as subjectid, count(distinct(n.hpoid)) as hpoid where hpoid >= $s with hpoid as hpoid, subjectid as subjectid return subjectid, hpoid ORDER BY hpoid DESC";
+			}
+			error_log($neo_query);
+			$result = $neo4jClient->run($neo_query);
+			$records = $result->getRecords();
+			// error_log(print_r($records,1));
+			$pat_ids = [];
+			foreach ($records as $record) {
+				$pat_ids[] = $record->value('subjectid');
+			}
+
+			$pat_ids = array_unique($pat_ids);
+
+
+			if($count === true) {
+				return count($records);
+			} else {
+				return $pat_ids;
+			}
+		}
+    }
+
+	private function create_neo(string $source, string $orpha_id, $r=1, $ICLIM=0, $hpo=false, $total=true, $IC=false)
+	{
+		$neo_query ="";
+		if ($IC==false){
+			//branches + IC
+			$neo_query = $neo_query . 'Match (oo:ORPHAterm{orphaid:"' . $orpha_id . '"})<-[:IS_A*0..20]-(o:ORPHAterm)<-[ob:PHENOTYPE_OF]-(oh:HPOterm) with collect(distinct(oh)) as coh, o, ob unwind coh as oh match (oh)-[:IS_A*0..100]->(ah:HPOterm)-[:IS_A]->(ab:HPOterm {hpoid:"HP:0000118"}) ';
+
+			if ($total == false){
+				$neo_query = $neo_query . "with o,oh,ah,ob ";
+
+				if ($r == 1 && $hpo == true){
+					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[:PHENOTYPE_OF]->(s:Subject) where s.source = "' . $source . '" and (link:HPOterm or link:ORPHAterm) ';
+				}
+				elseif ($r == 1 && $hpo == false){
+					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[:PHENOTYPE_OF]->(s:Subject) where s.source = "' . $source . '" ';
+				}
+				elseif ($r < 1 && $hpo == true){
+					$neo_query = $neo_query . 'Match (oh)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY]-(j:HPOterm) with o,j, oh, ah,r,ob Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[r2:PHENOTYPE_OF]->(s:Subject) where r.rel >= ' . $r . ' and s.source = "' . $source . '" and (link:HPOterm or link:ORPHAterm) ';
+				}
+				elseif ($r < 1 && $hpo == false){
+					$neo_query = $neo_query . 'Match (oh)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY]-(j:HPOterm) with o,j, oh, ah,r,ob Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[r2:PHENOTYPE_OF]->(s:Subject) where r.rel >= ' . $r . ' and s.source = "' . $source . '" ';
+				}
+
+				$neo_query = $neo_query . 'with o,s, collect(distinct(oh)) as coh, count(distinct(oh)) as ohn, ob.frequencycode as fc,collect(distinct([oh.hpoid,ob.frequencycode,oh.ICvsOMIM, oh.ICvsORPHA,link.hpoid, link.orphaid])) as hlink, collect(distinct(ah.hpoid)) as cah unwind coh as oh with  o,s.subjectid as subjectid,hlink,fc as FrequencyCode, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC,cah, ohn with o,subjectid, collect(hlink) as link, collect([FrequencyCode,OMIM_IC, ORPHA_IC]) as FrequencyCode, sum(OMIM_IC) as OMIM_IC, sum(ORPHA_IC) as ORPHA_IC,collect(cah) as hcah, sum(ohn) as ohn where ORPHA_IC > ' . $ICLIM . ' unwind link as hlink unwind hlink as olink unwind hcah as cah unwind cah as ah with o.orphaid as oid,subjectid, collect(distinct(olink)) as olink, FrequencyCode, ORPHA_IC, OMIM_IC, collect(distinct(ah)) as cah, ohn, count(distinct(ah)) as ccah optional match (fs:Subject)<-[:PHENOTYPE_OF]-(sh:HPOterm) where fs.subjectid in [subjectid] return oid as ORPHA,subjectid, olink as LINK, FrequencyCode, ORPHA_IC, OMIM_IC, cah as ahs, ohn as MATCHN, ccah as PA_Branches, collect([sh.hpoid, sh.ICvsOMIM, sh.ICvsORPHA]) as SHPO';
+			}
+			else{
+				$neo_query = $neo_query . 'with o, collect(distinct(oh)) as coh, count(distinct(oh)) as ohn, ob.frequencycode as fc,collect(distinct([oh.hpoid,ob.frequencycode,oh.ICvsOMIM, oh.ICvsORPHA])) as hlink, collect(distinct(ah.hpoid)) as cah unwind coh as oh with  o,hlink,fc as FrequencyCode, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC,cah, ohn with o, collect(hlink) as link, collect([FrequencyCode,OMIM_IC, ORPHA_IC]) as FrequencyCode, sum(OMIM_IC) as OMIM_IC, sum(ORPHA_IC) as ORPHA_IC,collect(cah) as hcah, sum(ohn) as ohn unwind link as hlink unwind hlink as olink unwind hcah as cah unwind cah as ah return o.orphaid as ORPHA, collect(distinct(olink)) as LINK, FrequencyCode, ORPHA_IC, OMIM_IC, collect(distinct(ah)) as ahs, ohn as MATCHN, count(distinct(ah)) as PA_Branches';
+			}
         }
+		else{
+			//IC (might not need hpos)
+			$neo_query = $neo_query . 'Match (oo:ORPHAterm{orphaid:"' . $orpha_id . '"})<-[:IS_A*0..20]-(o:ORPHAterm)<-[ob:PHENOTYPE_OF]-(oh:HPOterm) ';
 
-		// if (array_key_exists('r',$lookup)){	} // add code for jaccard	
+			if ($total == False){
+				$neo_query = $neo_query . "with o,oh,ob ";
 
+				if ($r == 1 && $hpo == true){
+					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[:PHENOTYPE_OF]->(s:Subject)
+                                                        where s.source = "' . $source . '" and (link:HPOterm or link:ORPHAterm) ';
+				}
+				elseif ($r == 1 and $hpo == false){
+					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[:PHENOTYPE_OF]->(s:Subject) where s.source = "' . $source . '" ';
+				}
+				elseif ($r < 1 and $hpo == true){
+					$neo_query = $neo_query . 'Match (oh)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY|SELF]-(j:HPOterm)
+                                                        with o,j, oh,r,ob
+                                                        Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[r2:PHENOTYPE_OF]->(s:Subject)
+                                                        where r.rel >= ' . $r . ' and s.source = "' . $source . '" and (link:HPOterm or link:ORPHAterm) ';
+				}
+				elseif ($r < 1 && $hpo == false){
+					$neo_query = $neo_query . 'Match (oh)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY|SELF]-(j:HPOterm)
+                                                        with o,j, oh,r,ob
+                                                        Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[r2:PHENOTYPE_OF]->(s:Subject)
+                                                        where r.rel >= ' . $r . ' and s.source = "' . $source . '" ';
+				}
+				$neo_query = $neo_query . 'with o,s, collect(distinct(oh)) as coh, count(distinct(oh)) as ohn, ob.frequencycode as fc,collect(distinct([oh.hpoid,ob.frequencycode,oh.ICvsOMIM, oh.ICvsORPHA,link.hpoid, link.orphaid])) as hlink
+                                        unwind coh as oh
+                                        with  o,s.subjectid as subjectid,hlink,fc as FrequencyCode, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC, ohn
+                                        with o,subjectid, collect(hlink) as link, collect([FrequencyCode,OMIM_IC, ORPHA_IC]) as FrequencyCode, sum(OMIM_IC) as OMIM_IC, sum(ORPHA_IC) as ORPHA_IC, sum(ohn) as ohn
+                                        where ORPHA_IC > ' . $ICLIM . '
+                                        unwind link as hlink
+                                        unwind hlink as olink
+                                        with o.orphaid as oid,subjectid, collect(distinct(olink)) as olink, FrequencyCode, ORPHA_IC, OMIM_IC, ohn
+                                        optional match (fs:Subject)<-[:PHENOTYPE_OF]-(sh:HPOterm)
+                                        where fs.subjectid in [subjectid]
+                                        return oid as ORPHA,subjectid, olink as LINK, FrequencyCode, ORPHA_IC, OMIM_IC, ohn as MATCHN, collect([sh.hpoid, sh.ICvsOMIM, sh.ICvsORPHA]) as SHPO ';
+
+
+			}else{
+				$neo_query = $neo_query . 'with o, collect(distinct(oh)) as coh, count(distinct(oh)) as ohn, ob.frequencycode as fc,collect(distinct([oh.hpoid,ob.frequencycode,oh.ICvsOMIM, oh.ICvsORPHA])) as hlink
+                                        unwind coh as oh
+                                        with  o,hlink,fc as FrequencyCode, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC, ohn
+                                        with o, collect(hlink) as link, collect([FrequencyCode,OMIM_IC, ORPHA_IC]) as FrequencyCode, sum(OMIM_IC) as OMIM_IC, sum(ORPHA_IC) as ORPHA_IC, sum(ohn) as ohn
+                                        unwind link as hlink
+                                        unwind hlink as olink
+                                        return o.orphaid as ORPHA, collect(distinct(olink)) as LINK, FrequencyCode, ORPHA_IC, OMIM_IC, ohn as MATCHN';
+			}
+		}
+		return $neo_query;
 	}
+
+	public function orpha_query($lookup,$source, $count = true){
+		error_log("ORPHA_QUERY");
+		$neo4jUsername = $this->setting->settingData['neo4j_username'];
+		$neo4jPassword = $this->setting->settingData['neo4j_password'];
+		$neo4jAddress = $this->setting->settingData['neo4j_server'];
+		$neo4jPort = $this->setting->settingData['neo4j_port'];
+		$baseNeo4jAddress = $neo4jAddress;
+		if (strpos($baseNeo4jAddress, 'http://') !== false) {
+			$baseNeo4jAddress = str_replace("http://","",$baseNeo4jAddress);
+		}
+		if (strpos($baseNeo4jAddress, 'https://') !== false) {
+			$baseNeo4jAddress = str_replace("https://","",$baseNeo4jAddress);
+		}
+		$neo4jClient =  \GraphAware\Neo4j\Client\ClientBuilder::create()
+			->addConnection('default', 'http://'. $neo4jUsername . ':' .$neo4jPassword .'@'.$baseNeo4jAddress.':'.$neo4jPort)
+			->setDefaultTimeout(60)
+			->build();
+
+		if (array_key_exists('r',$lookup)){
+			$r = $lookup['r'];
+			$s = $lookup['s'];
+			$hpo = $lookup['HPO'];
+			$orpha_id = $lookup['id'][0];
+
+			// if just orpha
+			if($r == 1 && $s == 100 && $hpo == 'false'){
+				$neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})<-[:IS_A*0..20]-(:ORPHAterm)-[:PHENOTYPE_OF]-(s) where s.source = \"" . $source . "\" return s.subjectid as subjectid";
+				$result = $neo4jClient->run($neo_query);
+				$records = $result->getRecords();
+				$pat_ids = [];
+				foreach ($records as $record) {
+					$pat_ids[] = $record->value('subjectid');
+				}
+				// error_log(print_r($pat_ids,1));
+				if($count === true) {
+					return count($pat_ids);
+				} else {
+					return $pat_ids;
+				}
+			}
+			else{
+				$ids = [];
+				$orphatotals = [];
+				$subjects = [];
+				$IC = False;
+
+				//get totals
+				$neo_query = $this->create_neo($source, $orpha_id, 1, 0, false, true, false);
+				$result = $neo4jClient->run($neo_query);
+				$records = $result->getRecords();
+				foreach ($records as $record) {
+					$orphatotals[$record->value('ORPHA')] = [
+						'hpo' => $record->value('LINK'),
+						'FC' => $record->value('FrequencyCode'),
+						'branches' => $record->value('PA_Branches'),
+						'omimic' => $record->value('OMIM_IC'),
+						'orphaic' => $record->value('ORPHA_IC'),
+						'branch_hpos' => $record->value('ahs')
+					];
+				}
+				$neo_query = $this->create_neo($source, $orpha_id, 1, 0, false, true, true);
+				$result = $neo4jClient->run($neo_query);
+				$records = $result->getRecords();
+				foreach ($records as $record) {
+					if (array_key_exists($record->value('ORPHA'),$orphatotals)){
+						$orp = $orphatotals[$record->value('ORPHA')]['orphaic'];
+						$om = $orphatotals[$record->value('ORPHA')]['omimic'];
+						$orpic = $record->value('ORPHA_IC');
+						$omic = $record->value('OMIM_IC');
+						if ($orp != $orpic || $om != $omic){
+							$orphatotals[$record->value('ORPHA')]['hpo'] = $record->value('LINK');
+							$orphatotals[$record->value('ORPHA')]['FC'] = $record->value('FrequencyCode');
+							$orphatotals[$record->value('ORPHA')]['omimic'] = $record->value('OMIM_IC');
+							$orphatotals[$record->value('ORPHA')]['orphaic'] = $record->value('ORPHA_IC');
+							$IC = True;
+						}
+					}else{
+						$orphatotals[$record->value('ORPHA')] = [
+							'hpo' => $record->value('LINK'),
+							'FC' => $record->value('FrequencyCode'),
+							'branches' => 0,
+							'omimic' => $record->value('OMIM_IC'),
+							'orphaic' => $record->value('ORPHA_IC'),
+							'branch_hpos' => []];
+						$IC = True;
+					}
+				}
+				$omimic_min = [];
+				$orphaic_min = [];
+				foreach ($orphatotals as $o => $o_value){
+					$omimic_min[] = $o_value['omimic'];
+					$orphaic_min[] = $o_value['orphaic'];
+				}
+				//problem with infinity values....
+				$ICLIM = $s/100 * min($orphaic_min);
+				// use this code to merge, dosim first
+				//$r=1;
+
+				$run = true;
+				while ($run){
+
+					//Get exact matches
+					if($r == 1 && $hpo == 'true'){
+						error_log("NO SIM HPO and ORHPA");
+						$neo_query = $this->create_neo($source, $orpha_id, 1, $ICLIM, true, false, false);
+					}
+					elseif($r == 1 && $hpo == 'false'){
+						error_log("NO SIM ORPHA");
+						$neo_query = $this->create_neo($source, $orpha_id, 1, $ICLIM, false, false, false);
+
+					}
+					elseif($r < 1 && $hpo == 'true'){
+						error_log("SIM HPO and ORPHA");
+						$neo_query = $this->create_neo($source, $orpha_id, $r, $ICLIM, true, false, false);
+					}
+					elseif($r < 1 && $hpo == 'false'){
+						error_log("SIM ORPHA only");
+						$neo_query = $this->create_neo($source, $orpha_id, $r, $ICLIM, false, false, false);
+					}
+
+					$result = $neo4jClient->run($neo_query);
+					$records = $result->getRecords();
+
+					foreach ($records as $record) {
+						if (array_key_exists($record->value('subjectid'),$subjects) && array_key_exists($record->value('ORPHA'),$subjects[$record->value('subjectid')])){
+							$orp = $subjects[$record->value('subjectid')][$record->value('ORPHA')]['orphaic'];
+							$om = $subjects[$record->value('subjectid')][$record->value('ORPHA')]['omimic'];
+							$orpic = $record->value('ORPHA_IC');
+							$omic = $record->value('OMIM_IC');
+							if ($orp < $orpic || $om < $omic){
+								$subjects[$record->value('subjectid')][$record->value('ORPHA')]['hpo'] = $record->value('LINK');
+								$subjects[$record->value('subjectid')][$record->value('ORPHA')]['FC'] = $record->value('FrequencyCode');
+								$subjects[$record->value('subjectid')][$record->value('ORPHA')]['omimic'] = $record->value('OMIM_IC');
+								$subjects[$record->value('subjectid')][$record->value('ORPHA')]['orphaic'] = $record->value('ORPHA_IC');
+								$subjects[$record->value('subjectid')][$record->value('ORPHA')]['branches'] = $record->value('PA_Branches');
+								$subjects[$record->value('subjectid')][$record->value('ORPHA')]['branch_hpos'] = $record->value('ahs');
+							}
+
+						}
+						else{
+							$subjects[$record->value('subjectid')][$record->value('ORPHA')] = [
+								'hpo' => $record->value('LINK'),
+								'FC' => $record->value('FrequencyCode'),
+								'branches' => $record->value('PA_Branches'),
+								'omimic' => $record->value('OMIM_IC'),
+								'orphaic' => $record->value('ORPHA_IC'),
+								'branch_hpos' => $record->value('ahs')];
+						}
+					}
+
+					if ($IC  == True){
+						if($r == 1 && $hpo == 'true'){
+							error_log("IC NO SIM HPO and ORHPA");
+							$neo_query = $this->create_neo($source, $orpha_id, $ICLIM, 1, $ICLIM, True, False, True);
+						}
+						elseif($r == 1 && $hpo == 'false'){
+							error_log("IC NO SIM ORPHA");
+							$neo_query = $this->create_neo($source, $orpha_id, $ICLIM, 1, $ICLIM, False, False, True);
+
+						}
+						elseif($r < 1 && $hpo == 'true'){
+							error_log("IC SIM HPO and ORPHA");
+							$neo_query = $this->create_neo($source, $orpha_id, $r, $ICLIM, True, False, True);
+						}
+						elseif($r < 1 && $hpo == 'false'){
+							error_log("IC SIM ORPHA only");
+							$neo_query = $this->create_neo($source, $orpha_id, $r, $ICLIM, False, False, True);
+
+						}
+
+						$result = $neo4jClient->run($neo_query);
+						$records = $result->getRecords();
+
+						foreach ($records as $record) {
+							if (array_key_exists($record->value('subjectid'),$subjects) && array_key_exists($record->value('ORPHA'),$subjects[$record->value('subjectid')])){
+
+								$orp = $subjects[$record->value('subjectid')][$record->value('ORPHA')]['orphaic'];
+								$om = $subjects[$record->value('subjectid')][$record->value('ORPHA')]['omimic'];
+								$orpic = $record->value('ORPHA_IC');
+								$omic = $record->value('OMIM_IC');
+								if ($orp < $orpic || $om < $omic){
+									$subjects[$record->value('subjectid')][$record->value('ORPHA')]['hpo'] = $record->value('LINK');
+									$subjects[$record->value('subjectid')][$record->value('ORPHA')]['FC'] = $record->value('FrequencyCode');
+									$subjects[$record->value('subjectid')][$record->value('ORPHA')]['omimic'] = $record->value('OMIM_IC');
+									$subjects[$record->value('subjectid')][$record->value('ORPHA')]['orphaic'] = $record->value('ORPHA_IC');
+								}
+
+							}else{
+								$subjects[$record->value('subjectid')][$record->value('ORPHA')] = [
+									'hpo' => $record->value('LINK'),
+									'FC' => $record->value('FrequencyCode'),
+									'branches' => 0,
+									'omimic' => $record->value('OMIM_IC'),
+									'orphaic' => $record->value('ORPHA_IC'),
+									'branch_hpos' => []];
+							}
+						}
+					}
+					if ($r == 1){
+						$run = False;
+					}
+					$r = 1;
+				}
+
+				// for each subject check ob in link for orpha against orpha tot link, same for ex and min IC otherwise unset
+//				$orphatotals;
+                    foreach ($subjects as $id => $sub) {
+						foreach ($sub as $oid => $orpha) {
+							if ($orpha['orphaic'] < ($orphatotals[$oid]['orphaic'] * ($s/100))) {
+								unset($subjects[$id]);
+							}
+							else{
+									foreach ($orphatotals[$oid]['hpo'] as $h){
+										$key = '';
+										if (($h[1] == 'OB' and array_search($h[0], array_column($subjects[$id][$oid]['hpo'],0)) == '')  || $h[1] == 'OB' and array_search($h[0], array_column($subjects[$id][$oid]['hpo'],0)) != ''){
+											unset($subjects[$id]);
+
+										}
+                                }
+								}
+							}
+						}
+					}
+
+
+
+                //}
+                $pat_ids = array_keys($subjects);
+                if($count === true)
+				{
+					return count($pat_ids);
+				}
+				else
+				{
+					return $pat_ids;
+				}
+            }
+
+
+		}
 
     public function sv_query($lookup,$source, $iscount = TRUE){
         $elasticModel = new Elastic($this->db);
@@ -967,14 +1067,14 @@ class Query extends CafeVariome{
     public function mutation_query($lookup, $source, $iscount = TRUE){
         $elasticModel = new Elastic($this->db);
         $sourceModel = new Source($this->db);
-    
+
         $paramsnew = [];
         $sourceId = $sourceModel->getSourceIDByName($source);
-        $es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;  
-    
+        $es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;
+
         $paramsnew = ['index' => $es_index];
         $paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source . "_eav";
-    
+
         $glist = $lookup['genes'];
 
         if (!empty($glist)) {
@@ -989,7 +1089,7 @@ class Query extends CafeVariome{
             }
             $paramsnew['body']['query']['bool']['must'][1]['bool']['must'][]['bool']['should'] = $genearr;
         }
-    
+
         $mutlist = $lookup['mutation'];
 
         if (!empty($mutlist)) {
@@ -1000,27 +1100,27 @@ class Query extends CafeVariome{
                 $tmp[]['match'] = ['value.raw' => $value];
                 $arr_child['has_child']['query']['bool']['must'] = $tmp;
                 $arr_child['has_child']['type'] = 'eav';
-                $protaffarr[] = $arr_child;    
+                $protaffarr[] = $arr_child;
             }
             $paramsnew['body']['query']['bool']['must'][1]['bool']['must'][]['bool']['should'] = $protaffarr;
         }
-        
+
         $paramsnew['body']['aggs']['punique']['terms']=['field'=>'subject_id','size'=>10000]; //NEW
-    
+
         $jp = json_encode($paramsnew);
-    
+
         $esquery = $this->elasticClient->search($paramsnew);
-    
+
         if ($iscount){
             $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
         }
         else{
             $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
         }
-        
+
         return $result;
     }
-    
+
     public function makeLogic(&$api) {
 
 		$api['logic'] = ['-AND' => []];
@@ -1037,9 +1137,9 @@ class Query extends CafeVariome{
     {
 		$api['query']['components']['matchAll'][0] = [];
     }
-    
+
     function decouple($arr, $type = false) {
-		reset($arr); $type = key($arr); 
+		reset($arr); $type = key($arr);
 		if($type !== 0) {
 			$arr = $arr[$type];
 		}
@@ -1066,7 +1166,7 @@ class Query extends CafeVariome{
 		}
 		return trim($str, ',');
     }
-    
+
     public function generate_pointer_query($result, $jex) {
     	$qStr = '';
 		foreach (explode(',', $result) as $expOR) {
@@ -1081,7 +1181,7 @@ class Query extends CafeVariome{
 		}
 		return trim($qStr, ' OR ');
     }
-    
+
     function mySplit($str) {return preg_split('/,/',$str, NULL, PREG_SPLIT_NO_EMPTY);}
 
     function myMerge($arr1, $arr2) {
@@ -1090,7 +1190,7 @@ class Query extends CafeVariome{
 		else foreach($arr1 as $a1) foreach($arr2 as $a2) $arr[] = $a1 . '|' . $a2;
 		return implode(',', $arr);
     }
-    
+
     function is_assoc($arr) {foreach ($arr as $key => $val) if(is_array($val)) return true; return false;}
 
     function getVal($jex, $path) {
