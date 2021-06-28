@@ -2,16 +2,16 @@
 
 /**
  * ServiceInterface.php
- * 
+ *
  * Created: 17/02/2021
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
+ *
  * This is class that interfaces with Cafe Variome Service process.
- * 
+ *
  */
 
-class ServiceInterface 
+class ServiceInterface
 {
     private $socket;
     private $config;
@@ -65,7 +65,7 @@ class ServiceInterface
         $message = [
             'type' => 'registerprocess',
             'process' => [
-                'pid' => getmypid(), 
+                'pid' => getmypid(),
                 'name' => $name,
                 'entityId' => $entity_id,
                 'message' => $message,
@@ -76,7 +76,7 @@ class ServiceInterface
         ];
 
         try {
-            $this->socket->Create()->Connect()->Write($message, 100);
+            $this->socket->Create()->Connect()->Write($message, 10);
             $this->socket->Close();
 
             return true;
@@ -92,7 +92,7 @@ class ServiceInterface
         $message = [
             'type' => 'reportprogress',
             'process' => [
-                'pid' => getmypid(), 
+                'pid' => getmypid(),
                 'name' => $name, //'bulkupload'
                 'entityId' => $entity_id,
                 'message' => $message,
@@ -104,7 +104,7 @@ class ServiceInterface
         ];
 
         try {
-            $this->socket->Create()->Connect()->Write($message, 100);
+            $this->socket->Create()->Connect()->Write($message, 10);
             $this->socket->Close();
 
             return true;
