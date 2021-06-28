@@ -2,14 +2,15 @@
 
 /**
  * Name EAVDataInput.php
- * 
+ *
  * Created 19/08/2020
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
- * 
+ *
  */
 
 use App\Libraries\CafeVariome\Net\ServiceInterface;
+use App\Models\EAV;
 
 class EAVDataInput extends DataInput
 {
@@ -33,7 +34,7 @@ class EAVDataInput extends DataInput
         $this->registerProcess($file_id);
 
         $fileRecord = $this->getSourceFiles($file_id); //Get a list of files for source
-        
+
         if (count($fileRecord) == 1) {
             $file = $fileRecord[0]['FileName'];
             $this->fileName = $file;
@@ -44,20 +45,20 @@ class EAVDataInput extends DataInput
 
             if ($this->fileMan->Exists($file)) {
                 $this->uploadModel->clearErrorForFile($file_id);
-                $this->sourceModel->lockSource($this->sourceId);	
-        
-                if ($this->delete == UPLOADER_DELETE_ALL) {		
+                $this->sourceModel->lockSource($this->sourceId);
+
+                if ($this->delete == UPLOADER_DELETE_ALL) {
                     $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data');
                     $this->eavModel->deleteRecordsBySourceId($this->sourceId);
                 }
                 elseif ($this->delete == UPLOADER_DELETE_FILE) {
-                    $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
+                    $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
                     $this->eavModel->deleteRecordsByFileId($file_id);
                 }
-                
+
                 $filePath = $this->basePath . $file;
 
-                $return_data = array('result_flag' => 1);   
+                $return_data = array('result_flag' => 1);
                 if (preg_match("/\.csv$|\.tsv$/", $file)) {
                     $line = fgets(fopen($filePath, 'r'));
                     // if (!preg_match("/^" . $this->configuration['subject_id_attribute_name'] . "(.)/", $line, $matches)) {
@@ -73,30 +74,30 @@ class EAVDataInput extends DataInput
 
                     $this->reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::CSV);
                     $this->reader->setFieldDelimiter($delimiter);
-                }     
+                }
                 elseif (preg_match("/\.xlsx$/", $file)) {
-        
+
                     $this->reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::XLSX);
-                } 
+                }
                 elseif (preg_match("/\.ods$/", $file)) {
                     $this->reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::ODS);
                 }
                 else {
                     $return_data['result_flag'] = 0;
-                    $return_data['error'] = "File did not conform to allowed types";   
+                    $return_data['error'] = "File did not conform to allowed types";
                     $message = "File did not conform to allowed types.";
                     $error_code = 2;
-                    $this->uploadModel->errorInsert($file_id, $message, $error_code, true);         
+                    $this->uploadModel->errorInsert($file_id, $message, $error_code, true);
                     //return $return_data;
                 }
-        
+
                 $this->reader->open($filePath);
             }
         }
     }
 
     public function save(int $file_id)
-    { 
+    {
         $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Counting records');
 
         $recordCount = $this->countRecords();
@@ -122,7 +123,7 @@ class EAVDataInput extends DataInput
                     if (!$this->checkHeader($file_id, $row, $attgroups, $temphash)){
                         break;
                     }
-                    $this->db->transStart();			
+                    $this->db->transStart();
                 }
                 else {
                     if ($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE) {
@@ -134,45 +135,7 @@ class EAVDataInput extends DataInput
                         $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
                         $this->sourceModel->unlockSource($this->sourceId);
                     }
-                    foreach ($attgroups as $group){
-                        $uid = md5(uniqid(rand(),true));                           
-                        foreach ($group as $att => $val){ 
-                            $att = strtolower(preg_replace('/\s+/', '_', $att));                  
-                            $value = strtolower($row[$val]);
-                            if ($value == "") continue;     
-                            if (is_a($value, 'DateTime')) $value = $value->format('Y-m-d H:i:s');
-
-                            if ($this->configuration['internal_delimiter'] != '' && $this->configuration['internal_delimiter'] != null) {
-                                //if there is an internal delimiter, split the value on it and insert subvalues individually
-                                $internal_delimiter = $this->configuration['internal_delimiter'];
-
-                                if (strpos($value, $internal_delimiter)) {
-                                    $value_array = explode($internal_delimiter, $value);
-
-                                    foreach ($value_array as $sub_value) {
-                                        $this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $sub_value);
-                                    }
-                                }
-                                else {
-                                    $this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
-                                }
-                            }
-                            else {
-                                $this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
-                            }
-
-                            $counter++;                            
-                            if ($counter % 800 == 0) {
-                                $error = $this->sendBatch();   
-                                if ($error) {                             
-                                    $error_code = 0;
-                                    $message = "MySQL insert was unsuccessful.";
-                                    $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
-                                    $this->sourceModel->unlockSource($this->sourceId);
-                                }
-                            }                         
-                        }
-                    }
+                    $this->processRow($row, $attgroups, $subject_id, $file_id, $counter);
                 }
                 $recordsProcessed++;
 
@@ -189,24 +152,67 @@ class EAVDataInput extends DataInput
         $totalRecordCount = $this->sourceModel->countSourceEntries($this->sourceId);
         $this->sourceModel->updateSource(['record_count' => $totalRecordCount], ['source_id' => $this->sourceId]);
 
-        if ($this->delete == 1) {		
+        if ($this->delete == 1) {
             $this->removeAttribuesAndValuesFiles($this->fileName);
         }
-        
+
         $this->dumpAttributesAndValues($file_id);
 
         $this->uploadModel->markEndOfUpload($file_id, $this->sourceId);
         $this->uploadModel->clearErrorForFile($file_id);
-        $this->sourceModel->unlockSource($this->sourceId);	
+        $this->sourceModel->unlockSource($this->sourceId);
 
         $this->reportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
     }
+
+	private function processRow($row, $attgroups, $subject_id, $file_id, & $counter)
+	{
+		foreach ($attgroups as $group){
+			$uid = md5(uniqid(rand(),true));
+			foreach ($group as $att => $val){
+				$att = strtolower(preg_replace('/\s+/', '_', $att));
+				$value = strtolower($row[$val]);
+				if ($value == "") continue;
+				if (is_a($value, 'DateTime')) $value = $value->format('Y-m-d H:i:s');
+
+				if ($this->configuration['internal_delimiter'] != '' && $this->configuration['internal_delimiter'] != null) {
+					//if there is an internal delimiter, split the value on it and insert subvalues individually
+					$internal_delimiter = $this->configuration['internal_delimiter'];
+
+					if (strpos($value, $internal_delimiter)) {
+						$value_array = explode($internal_delimiter, $value);
+
+						foreach ($value_array as $sub_value) {
+							$this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $sub_value);
+						}
+					}
+					else {
+						$this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
+					}
+				}
+				else {
+					$this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
+				}
+
+				$counter++;
+				if ($counter % 800 == 0) {
+					$error = $this->sendBatch();
+					if ($error) {
+						$error_code = 0;
+						$message = "MySQL insert was unsuccessful.";
+						$this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
+						$this->sourceModel->unlockSource($this->sourceId);
+					}
+				}
+			}
+		}
+	}
 
     /**
     * Send Batch - Fill in the status table on the success of the upload
     *
     * @param N/A
-    * @return boolean $error - True if the transaction failed 
+    * @return boolean $error - True if the transaction failed
     */
     private function sendBatch() {
        $dbRet = $this->db->transComplete();
@@ -241,7 +247,7 @@ class EAVDataInput extends DataInput
     {
         $positions = [];
 
-        for ($i=1; $i < $this->column_count; $i++) { 
+        for ($i=1; $i < $this->column_count; $i++) {
             $positions[$i] = $i;
         }
 
@@ -280,7 +286,7 @@ class EAVDataInput extends DataInput
             if ($pipeline['internal_delimiter'] != null && $pipeline['internal_delimiter'] != '' && in_array($pipeline['internal_delimiter'], $valid_delimiters)) {
                 $this->configuration['internal_delimiter'] = $pipeline['internal_delimiter'];
             }
-            
+
         }
     }
 
@@ -291,7 +297,7 @@ class EAVDataInput extends DataInput
         if (strpos($grouping, ',')) {
             $groups = explode(',', $grouping);
 
-            for ($i=0; $i < count($groups); $i++) { 
+            for ($i=0; $i < count($groups); $i++) {
                 if (intval($groups[$i])) {
                     $group_positions[$groups[$i]] = $groups[$i];
                 }
@@ -305,7 +311,7 @@ class EAVDataInput extends DataInput
     {
         $group_positions = $this->getGroupPositions();
         $groupnumber = 0;
-        for ($i=0; $i < count($row); $i++) { 	
+        for ($i=0; $i < count($row); $i++) {
             if ($i === 0) //check for existence subject id as the first column in header, if necessary
             {
                 if ($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE && $row[$i] != $this->configuration['subject_id_attribute_name']){
@@ -318,17 +324,17 @@ class EAVDataInput extends DataInput
                 continue;
             }
             $temphash[$row[$i]] = $i;
-        
+
             if (in_array($i , $group_positions)){
                 if (count($temphash) > 0){
                     $attgroups[$groupnumber] = $temphash;
                     $groupnumber++;
                     $temphash = [];
                 }
-            }                 
+            }
             if (count($temphash) > 0){
                 $attgroups[$groupnumber] = $temphash;
-            }	
+            }
         }
 
         return ($i > 1) ? true : false;
