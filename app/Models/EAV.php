@@ -100,14 +100,6 @@ class EAV extends Model{
         $this->builder->insert($data);
     }
 
-    public function createEAVRaw(string $uid, int $source, int $file, string $id, string $key, string $value)
-	{
-		$malicious_chars = ['\\', chr(39), chr(34), '/', '’', '<', '>', '&', ';'];
-		$key = str_replace($malicious_chars, '', $key);
-		$value = str_replace($malicious_chars, '', $value);
-
-		$this->db->query("Insert Into eavs (uid, source_id, fileName, subject_id, attribute, value) Values ('$uid', '$source', '$file', '$id', '$key', '$value')");
-	}
     public function updateEAVs(array $data, array $conds = null)
     {        $this->builder = $this->db->table($this->table);
         if ($conds) {
