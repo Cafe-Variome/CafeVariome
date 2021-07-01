@@ -5,7 +5,7 @@ var filesDtPage = 0;
 selectd_fileids = [];
 
 $(document).ready(function() {
-    isImport = window.location.href.split('/').indexOf('Import') == 5;
+    isImport = window.location.href.split('/').indexOf('Import') > 0;
     param = $('#source_id').val();
     reloadTable(param,true, isImport);
 
