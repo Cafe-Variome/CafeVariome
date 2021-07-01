@@ -3,9 +3,9 @@
 /**
  * Discover.php
  * Created: 16/07/2019
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
+ *
  *
  */
 
@@ -40,7 +40,7 @@ class Discover extends CVUI_Controller{
     }
 
     public function select_network(){
-        $uidata = new UIData();   
+        $uidata = new UIData();
         $uidata->title = "Select Network";
 
         $networkInterface = new NetworkInterface();
@@ -54,7 +54,7 @@ class Discover extends CVUI_Controller{
 
         $userNetworks = $networkModel->getNetworksUserMemberOf($user_id);
         $instalattionNtworksResp = $networkInterface->GetNetworksByInstallationKey($this->setting->getInstallationKey());
-        
+
         if ($instalattionNtworksResp->status) {
             $instalattionNetworks = $instalattionNtworksResp->data;
         }
@@ -72,7 +72,7 @@ class Discover extends CVUI_Controller{
         }
 
         $uidata->data['networks'] = $authorisedNetworks;
-        
+
         $uidata->javascript = array(JS."cafevariome/discover.js");
 
         $data = $this->wrapData($uidata);
@@ -80,26 +80,26 @@ class Discover extends CVUI_Controller{
     }
 
     public function query_builder($network_key = null){
-        
+
         $uidata = new UIData();
         $networkInterface = new NetworkInterface();
 
         if ($network_key) {
             $this->session->set(array('network_key' => $network_key));
-        } 
+        }
         else {
             return redirect()->to(base_url($this->controllerName. '/Select_Network'));
         }
 
         // Check if the user is in the master network group for this network
-        
+
         $user_id = $this->authAdapter->getUserId();
-        
+
         $uidata->data['user_id'] = $user_id;
         $uidata->data['network_key'] = $network_key;
-        
+
         error_log("User: " . $this->session->get('email') . " has chosen network: $network_key || " . date("Y-m-d H:i:s"));
-                
+
         $installations = [];
         $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key);
 
@@ -117,8 +117,8 @@ class Discover extends CVUI_Controller{
         $uidata->title = "Discover - Query Builder";
         $uidata->css = array(//VENDOR.'vakata/jstree/dist/themes/default/style.css',
                              VENDOR.'components/jqueryui/themes/base/jquery-ui.css',
-                             CSS.'query_builder.css', 
-                             VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');  
+                             CSS.'query_builder.css',
+                             VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
 
         $uidata->stickyFooter = false;
 
@@ -126,20 +126,21 @@ class Discover extends CVUI_Controller{
                                     VENDOR.'components/jqueryui/jquery-ui.js',
                                     JS.'bootstrap-notify.js',
                                     JS.'mustache.min.js',
-                                    JS.'query_builder_config.js', 
+                                    JS.'query_builder_config.js',
                                     //JS.'cafevariome/query_builder_tree.js',
-                                    JS.'cafevariome/query_builder.js'
+                                    JS.'cafevariome/query_builder.js',
+									VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js'
                                 );
 
         $data = $this->wrapData($uidata);
-        
+
         return view($this->viewDirectory. '/Query_Builder', $data);
     }
 
     function checkElasticSearch() {
         $hosts = (array)$this->setting->settingData['elastic_url'];
         $client = Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-    
+
         try {
             $indices = $client->cat()->indices(array('index' => '*'));
             return true;
