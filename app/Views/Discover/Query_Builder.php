@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($message): ?>
@@ -66,7 +66,7 @@
                     </div>
                 </div>
             </div>
-        </div>    
+        </div>
     </div>
 </div>
 
@@ -94,7 +94,7 @@
                     <div class="col">
                         <input type="text" class="form-control values_end" placeholder="Chr end" value="42929131">
                     </div>
-                    
+
                     <div class="col">
                         <select class="form-control values_refall" style="margin-bottom:15px" tabindex="-1">
                             <option></option>
@@ -111,7 +111,7 @@
                     </div>
                 </div>
             </div>
-        </div>    
+        </div>
     </div>
 </div>
 
@@ -128,7 +128,7 @@
                                 <div class="input-group-text"><i class="fa fa-search"></i></div>
                             </div>
                             <input class="form-control" id="search_filter_phen_left" type="text" placeholder="filter by keyword" style="text-align: center;" />
-                        </div>  
+                        </div>
                         <select id='values_phen_left' class="form-control" size="10"></select>
                         <button class="btnAdd btn btn-secondary btn-block">Add</button>
                     </div>
@@ -138,7 +138,7 @@
                             <div class="input-group-text"><i class="fa fa-search"></i></div>
                             </div>
                             <input class="form-control" id="search_filter_phen_right" type="text" placeholder="filter by keyword" style="text-align: center;">
-                        </div> 
+                        </div>
                         <select id="values_phen_right" class="form-control" size="10"></select>
                         <button class="btnRemove btn btn-secondary btn-block">Remove</button>
                     </div>
@@ -156,7 +156,7 @@
                     </div>
                     <div class="col-2">
                         Exact
-                    </div>                 
+                    </div>
                 </div>
                 <div class="row mb-3">
                     <div class="col">Minimum Matched Terms:</div>
@@ -167,11 +167,11 @@
                         <div id="similarity-range" class="mt-2">
                             <div id="sr-handle" class="ui-slider-handle"></div>
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-2">
                         All
-                    </div>                 
-                </div> 
+                    </div>
+                </div>
                 <div class="row mb-3">
                     <div class="col-5">
                         Include ORPHA:
@@ -180,7 +180,7 @@
                         <input type="checkbox" class="custom-control-input" id="includeORPHA">
                         <label class="custom-control-label" for="includeORPHA"></label>
                     </div>
-                </div>                         
+                </div>
             </div>
         </div>
     </div>
@@ -214,7 +214,7 @@
                     </div>
                     <div class="col-2">
                         Exact
-                    </div>                 
+                    </div>
                 </div>
                 <hr/>
                 <div class="row mb-3">
@@ -229,7 +229,7 @@
                     </div>
                     <div class="col-2">
                         Exact
-                    </div>                 
+                    </div>
                 </div>
                 <hr/>
                 <div class="row mb-3">
@@ -240,7 +240,7 @@
                         <input type="checkbox" class="custom-control-input" id="includeHPO">
                         <label class="custom-control-label" for="includeHPO"></label>
                     </div>
-                </div>                  
+                </div>
             </div>
         </div>
     </div>
@@ -261,7 +261,7 @@
                             <div class="input-group-text"><i class="fa fa-search"></i></div>
                             </div>
                             <input class="form-control" id="search_filter_phen_left" type="text" placeholder="filter by keyword" style="text-align: center;" />
-                        </div>  
+                        </div>
                         <select id='values_phen_left' class="form-control" size="10"></select>
                         <button class="btnAdd btn btn-secondary btn-block">Add</button>
                     </div>
@@ -271,7 +271,7 @@
                             <div class="input-group-text"><i class="fa fa-search"></i></div>
                             </div>
                             <input class="form-control" id="search_filter_phen_right" type="text" placeholder="filter by keyword" style="text-align: center;">
-                        </div> 
+                        </div>
                         <select id="values_phen_right" class="form-control" size="10"></select>
                         <button class="btnRemove btn btn-secondary btn-block">Remove</button>
                     </div>
@@ -296,7 +296,7 @@
                         </label>
                         <input type="text" class="form-control input-mini" id="r" placeholder="" value="0.7">
                         <input type="text" class="form-control input-mini" id="s" placeholder="" value="0">
-                        
+
                         <label class="checkbox inline">
                             <input type="checkbox" id="jc" value="jc"> Jaccard
                         </label>
@@ -349,7 +349,7 @@
       </div>
       <div class="modal-body">
         <div id="jstreeArea">
-                            
+
         </div>
       </div>
       <div class="modal-footer">
@@ -370,6 +370,13 @@
         </button>
       </div>
       <div class="modal-body">
+		  <div class="row">
+			  <div class="col text-center">
+				  <div class="spinner-grow text-info" role="status" style="width: 5rem; height: 5rem; display:none" id="loader">
+					  <span class="sr-only">Loading...</span>
+				  </div>
+			  </div>
+		  </div>
         <table class="table table-hover table-stripped table-bordered" id="resTbl">
             <thead>
                 <tr>

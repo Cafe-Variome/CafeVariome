@@ -1,6 +1,7 @@
 $('#reset_query').click(function() {
     location.reload();
 });
+var modal_data = {};
 
 $( function() {
     $( "#age-range" ).slider({
@@ -282,8 +283,6 @@ $(function() {
         }
     }
 
-    var modal_data = {};
-
     $('#build_query').click(() => {
         $('#waiting').show();
         $('#build_query').prop('disabled', 'true');
@@ -405,6 +404,7 @@ $(function() {
                 data: {'jsonAPI': jsonAPI, 'user_id': $('#user_id').val()},
                 dataType: 'json',
                 success: function (data) {
+                    modal_data = {};
                     $.each(data, function(key, val) {
                         if(key == 'error'){
                             trow = "<tr><td>Error</td><td>" + val + "</td></tr>";
@@ -417,30 +417,15 @@ $(function() {
                         else if(val.length > 0) {
                             resp = $.parseJSON(val)
                             $.each(resp, function(key, val1) {
-                                $('#resTbl tbody').empty();
+                                //$('#resTbl tbody').empty();
                                 trow = "<tr id = " + key + "><td>" + key + "</a></td>";
                                 if (val1 != "Access Denied") {
+                                        modal_data[key] = val1;
                                         if (val1.length > 0) {
-                                            var ic = 1;
-                                            var resRow = '';
-                                            $.each(val1, function (rkey, rval) {
-                                                resRow += '<tr><td>' + ic + '</td><td>' + rval + '</td></tr>'
-                                                ic++;
-                                            })
-
-                                            $('#resTbl tbody').append(resRow);
-                                            trow += '<td><a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal">' + Object.keys(val1).length + '</a></td>';
+                                            trow += '<td><a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal" data-sourcename="' + key + '">' + Object.keys(val1).length + '</a></td>';
                                         }
                                         else if( Object.keys(val1).length > 0){
-                                            var ic = 1;
-                                            var resRow = '';
-                                            $.each(val1, function (rkey, rval) {
-                                                resRow += '<tr><td>' + ic + '</td><td>' + rval + '</td></tr>'
-                                                ic++;
-                                            })
-                                            
-                                            $('#resTbl tbody').append(resRow);
-                                            trow += '<td><a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal">' + Object.keys(val1).length + '</a></td>';
+                                            trow += '<td><a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal" data-sourcename="' + key + '">' + Object.keys(val1).length + '</a></td>';
                                         }
                                         else{
                                             trow += '<td>0</td>';
@@ -528,6 +513,34 @@ $(function() {
         $rule.remove()
     })
 
+    $('#resultModal').on('shown.bs.modal', function (e) {
+        $('#resTbl').hide();
+        $('#loader').show();
+
+        var src = $(e.relatedTarget).data('sourcename');
+        var result_data = modal_data[src];
+        var ic = 1;
+        var resRow = '';
+        $.each(result_data, function (rkey, rval) {
+            resRow += '<tr><td>' + ic + '</td><td>' + rval + '</td></tr>'
+            ic++;
+        })
+
+        $('#resTbl tbody').append(resRow);
+
+        if ($('#resTbl').length) {
+            $('#resTbl').DataTable();
+        }
+
+        $('#loader').hide();
+        $('#resTbl').show();
+
+    })
+
+    $('#resultModal').on('hidden.bs.modal', function (e) {
+        $('#resTbl').DataTable().destroy();
+        $('#resTbl tbody').empty();
+    })
     // https://stackoverflow.com/a/6647367/5510713
     jQuery.fn.filterByText = function(textbox) {
       return this.each(function() {
