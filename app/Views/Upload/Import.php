@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 
@@ -17,7 +17,7 @@
 <form method="post" id="importFiles">
     <input type="hidden" id="source_id" name="source_id" value="<?= $source_id ?>">
     <input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
-    
+
     <div class="form-group row">
         <div class="col-6">
             <input type="text" class="form-control" id="lookupPath" placeholder="Absolute path to directory containing files...">
@@ -66,8 +66,9 @@
   <tbody id="file_grid">
   </tbody>
 </table>
+<br>
 <button class="btn btn-primary" id="batchProcessBtn" onclick="processFiles()" disabled>
     <i class="fa fa-redo-alt"></i> Process Files <span class="badge badge-light">0</span>
-</buttton>
+</button>
 
 <?= $this->endSection() ?>
