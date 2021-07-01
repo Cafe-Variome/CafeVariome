@@ -2,13 +2,13 @@
 
 /**
  * QueryApi.php
- * 
+ *
  * Created : 27/01/2020
- * 
+ *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- * 
- * This controller contains RESTful listeners for network operations. 
+ *
+ * This controller contains RESTful listeners for network operations.
  * Most methods are ported from netauth.php in the previous version.
  */
 use CodeIgniter\RESTful\ResourceController;
@@ -29,13 +29,13 @@ class QueryApi extends ResourceController
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
- 
+
         $this->validateRequest();
     }
 
     private function validateRequest()
     {
-        
+
     }
 
     public function Query()
@@ -60,7 +60,7 @@ class QueryApi extends ResourceController
             try {
                 $resp = $cafeVariomeQuery->search($queryString, $network_key, $user_id);
                 $apiResponseBundle->initiateResponse(1, json_decode($resp, true));
-                
+
             } catch (\Exception $ex) {
                 error_log($ex->getMessage());
                 $apiResponseBundle->initiateResponse(0);
@@ -96,7 +96,7 @@ class QueryApi extends ResourceController
                         $resp['file'] = file_get_contents($file);
                     }
                 }
-            }                  
+            }
             $apiResponseBundle->initiateResponse(1, $resp);
 
         } catch (\Exception $ex) {
@@ -121,8 +121,13 @@ class QueryApi extends ResourceController
             $resp = [];
             $fileMan = new SysFileMan($basePath);
 
+            $resp['modified'] = false;
+            $resp['json'] = '';
             if ($fileMan->Exists($network_key . ".json")) {
-                $resp['json'] = $fileMan->Read($network_key . ".json");
+            	if ($fileMan->GetModificationTimeStamp($network_key . ".json") > $modification_time){
+					$resp['json'] = $fileMan->Read($network_key . ".json");
+					$resp['modified'] = true;
+				}
             }
             else {
                 $resp['json'] = false;
@@ -151,9 +156,14 @@ class QueryApi extends ResourceController
             $resp = [];
             $fileMan = new SysFileMan($basePath);
 
+			$resp['modified'] = false;
+			$resp['json'] = '';
             if ($fileMan->Exists($network_key . "_hpo_ancestry.json")) {
-                $resp['json'] = $fileMan->Read($network_key . "_hpo_ancestry.json");
-            }
+				if ($fileMan->GetModificationTimeStamp($network_key . "_hpo_ancestry.json") < $modification_time) {
+					$resp['json'] = $fileMan->Read($network_key . "_hpo_ancestry.json");
+					$resp['modified'] = true;
+				}
+			}
             else {
                 $resp['json'] = false;
             }

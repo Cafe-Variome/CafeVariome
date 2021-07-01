@@ -1,17 +1,17 @@
 <?php namespace App\Controllers;
 
 /**
- * AjaxApi.php 
- * 
+ * AjaxApi.php
+ *
  * Created 15/08/2019
- * 
+ *
  * @author Mehdi Mehtraizadeh
  * @author Gregory Warren
  * @author Owen Lancaster
  * @author Farid Yavari Dizjikan
- * 
+ *
  * This controller contains listener methods for client-side ajax requests.
- * Methods in this controller were formerly in other controllers. 
+ * Methods in this controller were formerly in other controllers.
  * Code must be more secure. Some of the methods here must be moved to back-end layers for security reasons.
  */
 
@@ -37,7 +37,7 @@ use CodeIgniter\Config\Services;
 	protected $db;
 
     protected $setting;
-    
+
     private $phpshellHelperInstance;
 
     /**
@@ -54,15 +54,15 @@ use CodeIgniter\Config\Services;
         $this->uploadModel = new \App\Models\Upload($this->db);
 
         $this->phpshellHelperInstance = new PHPShellHelper();
-        
+
     }
 
     function query($network_key = '') {
         $networkInterface = new NetworkInterface();
-        
+
 		$authAdapterConfig = config('AuthAdapter');
         $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
-        
+
         //Check to see if user is logged in
         if (!$authAdapter->loggedIn()) {
             return json_encode(['timeout' => 'Your session has timed out. You need to login again.']);
@@ -78,13 +78,13 @@ use CodeIgniter\Config\Services;
             $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
             $loaclResults = $cafeVariomeQuery->search($queryString, $network_key, $user_id); // Execute locally
             array_push($results, $loaclResults);
-    
+
             $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
             $installations = [];
-    
+
             if ($response->status) {
                 $installations = $response->data;
-    
+
                 foreach ($installations as $installation) {
                     if ($installation->installation_key != $this->setting->getInstallationKey()) {
                         // Send the query
@@ -96,7 +96,7 @@ use CodeIgniter\Config\Services;
                     }
                 }
             }
-    
+
             return json_encode($results);
         } catch (\Exception $ex) {
             return json_encode(['error' => 'There was a problem executing the query. Please try again with a different query.']);
@@ -118,19 +118,19 @@ use CodeIgniter\Config\Services;
             $hpo_json = json_decode(stripslashes($this->request->getVar('hpo_json')), 1);
             $hpo_json = json_decode(str_replace('"true"', 'true', json_encode($hpo_json)), 1);
             $hpo_json = json_decode(str_replace('"false"', 'false', json_encode($hpo_json)), 1);
-        
+
             $ancestry = $this->request->getVar('ancestry');
             $hp_term = explode(' ', $this->request->getVar('hp_term'))[0];
-        
+
             $splits = explode('||', $ancestry);
             foreach ($splits as $split) {
                 $parent = &$hpo_json;
-    
+
                 $ancestor = explode('|', $split);
                 $str = 'HP:0000001';
                 foreach(array_reverse($ancestor) as $term) {
                     if($term === 'HP:0000001') continue;
-    
+
                     $str .= ".$term";
                     if(array_key_exists('children', $parent) && is_array($parent['children'])) {
                         foreach($parent['children'] as &$child) {
@@ -160,16 +160,16 @@ use CodeIgniter\Config\Services;
             }
             $hpo_json = str_replace('"true"', 'true', $hpo_json);
             $hpo_json = str_replace('"false"', 'false', $hpo_json);
-    
+
             return json_encode($hpo_json);
         }
 	}
 
 	/**
      * getPhenotypeAttributes
-     * @param string network_key 
+     * @param string network_key
      * @return string in json format, phenotype and hpo data
-     * 
+     *
      */
     function getPhenotypeAttributes(string $network_key) {
         if ($this->request->isAJAX())
@@ -185,51 +185,69 @@ use CodeIgniter\Config\Services;
             if ($response->status) {
                 $installations = $response->data;
             }
-    
+
             $data = array();
-    
+
             foreach ($installations as $installation) {
                 $queryNetInterface = new QueryNetworkInterface($installation->base_url);
                 $eavJson = $queryNetInterface->getEAVJSON($network_key, $fileMan->GetModificationTimeStamp("local_" . $network_key . ".json"));
-                $result = $eavJson->data->json;
+                $status = $eavJson->status;
 
-                if ($result) {
-                    foreach (json_decode($result, 1) as $res) {
-    
-                        if (array_key_exists($res['attribute'], $data)) {
-                            foreach (explode("|", strtolower($res['value'])) as $val) {
-                                if (!in_array($val, $data[$res['attribute']]))
-                                    array_push($data[$res['attribute']], $val);
-                            }
-                        }
-                        else {
-                            $data[$res['attribute']] = explode("|", strtolower($res['value']));
-                        }
-                    }
+                if ($status) {
+                	if ($eavJson->data->modified) {
+                		$result = $eavJson->data->json;
+						$resultArr = json_decode($result, true);
+                		if (is_array($resultArr)){
+							foreach ($resultArr as $res) {
+								if (array_key_exists($res['attribute'], $data)) {
+									foreach (explode("|", strtolower($res['value'])) as $val) {
+										if (!in_array($val, $data[$res['attribute']]))
+											array_push($data[$res['attribute']], $val);
+									}
+								} else {
+									$data[$res['attribute']] = explode("|", strtolower($res['value']));
+								}
+							}
+						}
+
+					}
                 }
             }
-    
+
             foreach(array_keys($data) as $key){
                 sort($data[$key]);
             }
-            
+
             ksort($data);
-    
-            if ($data) {
-                $fileMan->Write("local_" . $network_key . ".json", json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE));
-            }
-    
-            $hpoDataString = '';
+
+			if ($fileMan->Exists("local_" . $network_key . ".json")){
+				$currentData = json_decode($fileMan->Read("local_" . $network_key . ".json"), true);
+				$data = array_merge($currentData, $data);
+			}
+
+			$fileMan->Write("local_" . $network_key . ".json", json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE));
+
+
+            $hpoData = array();
             foreach ($installations as $installation) {
                 $queryNetInterface = new QueryNetworkInterface($installation->base_url);
                 $hpoJson = $queryNetInterface->getHPOJSON($network_key, $fileMan->GetModificationTimeStamp("local_" . $network_key . "_hpo_ancestry.json"));
-                $hpoDataString = $hpoJson->data->json;
+				$status = $hpoJson->status;
 
-                if ($hpoDataString) {
-                    $fileMan->Write("local_" . $network_key . "_hpo_ancestry.json", json_encode($hpoDataString));
-                }
+				if ($status) {
+					if ($hpoJson->data->modified) {
+						$hpoData = array_merge($hpoData, json_decode($hpoJson->data->json, true));
+					}
+				}
             }
-            
+
+			if ($fileMan->Exists("local_" . $network_key . "_hpo_ancestry.json")){
+				$currentHPOData = json_decode($fileMan->Read("local_" . $network_key . "_hpo_ancestry.json"), true);
+				$hpoData = array_merge($currentHPOData, $hpoData);
+			}
+			$fileMan->Write("local_" . $network_key . "_hpo_ancestry.json", json_encode($hpoData));
+
+
             $phen_data = [];
             $hpo_data = [];
 
@@ -240,7 +258,7 @@ use CodeIgniter\Config\Services;
             if ($fileMan->Exists("local_" . $network_key . "_hpo_ancestry.json")) {
                 $hpo_data = json_decode($fileMan->Read("local_" . $network_key . "_hpo_ancestry.json"), 1);
             }
-            
+
             return json_encode([$phen_data, $hpo_data]);
         }
     }
@@ -261,12 +279,12 @@ use CodeIgniter\Config\Services;
         $source_id = $this->request->getVar('source_id');
         $space_needed = $this->request->getVar('size');
         // check if it exists
-        
+
         $sourceExists = $this->sourceModel->getSource($source_id);
         if ($sourceExists) {
             // Since it exists get its source id and then check if its locked
             $isLocked = $this->sourceModel->isSourceLocked($source_id);
-            if (!$isLocked) {					
+            if (!$isLocked) {
                 // if its not locked check if we have enough space on the server
                 $free = diskfreespace(FCPATH);
                 if ($space_needed > $free) {
@@ -290,7 +308,7 @@ use CodeIgniter\Config\Services;
     }
 
     /**
-     * Check Json Presence - Check if the server has any of the targeted json files 
+     * Check Json Presence - Check if the server has any of the targeted json files
      * Already present for this source
      *
      * @param array $_POST['files']  - The list of files we must check presence for
@@ -329,7 +347,7 @@ use CodeIgniter\Config\Services;
      * @return N/A
      */
     public function jsonBatch() {
-        
+
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
         $pipeline_id = $this->request->getVar('pipeline_id');
@@ -351,26 +369,26 @@ use CodeIgniter\Config\Services;
 
         $files = $fileMan->getFiles();
 
-        foreach ($files as $file) {    
+        foreach ($files as $file) {
             if (!$fileMan->isValid($file)) {
                 return false;
-            }   
+            }
 
             if($fileMan->Save($file, $source_path))
-            {     
+            {
                 $this->uploadModel->createUpload($file->getName(),$source_id, $user_id, false, false, null, $pipeline_id);
             }
             else
             {
                 return false;
-            } 
+            }
         }
-        
+
         return true;
     }
- 
+
     /**
-     * Json Start - At this point all files have been uploaded. Lock the source and begin 
+     * Json Start - At this point all files have been uploaded. Lock the source and begin
      * Insert into MySQL
      *
      * @param string $_POST['source'] - The source we must upload into
@@ -400,7 +418,7 @@ use CodeIgniter\Config\Services;
         if ($this->uploadModel->countUploadJobRecord($user_id)) {
             $return['Status'] = true;
             $values = $this->uploadModel->checkUploadJobRecord($user_id);
-            for ($i=0; $i < count($values); $i++) { 
+            for ($i=0; $i < count($values); $i++) {
                 if ($values[$i]['elastic_lock'] == 0) {
                     $source_name = $this->uploadModel->getSourceNameByID($values[$i]['source_id']);
                     array_push($return['Message'], $source_name);
@@ -413,7 +431,7 @@ use CodeIgniter\Config\Services;
         }
         echo json_encode($return);
     }
-    
+
     public function vcf_upload() {
 
         $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
@@ -423,7 +441,7 @@ use CodeIgniter\Config\Services;
 
         $response_array = array('status' => "",'message' => []);
 
-        if ($fileMan->countFiles() == 1){ 
+        if ($fileMan->countFiles() == 1){
             // Only one config file is allowed to be uploaded at the moment.
             $configFile = $fileMan->getFiles()[0];
             $configFileName = $configFile->getName();
@@ -443,8 +461,8 @@ use CodeIgniter\Config\Services;
 
         $spreadsheet =  \PhpOffice\PhpSpreadsheet\IOFactory::load($configFileTempPath);
         $worksheet = $spreadsheet->getActiveSheet();
-        $highestRow = $worksheet->getHighestRow(); 
-        $highestColumn = $worksheet->getHighestColumn(); 
+        $highestRow = $worksheet->getHighestRow();
+        $highestColumn = $worksheet->getHighestColumn();
         $highestColumnIndex = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::columnIndexFromString($highestColumn);
 
         $headers = [];
@@ -468,7 +486,7 @@ use CodeIgniter\Config\Services;
         if ($configFileExtension == "csv" || $configFileExtension == "xls") {
             for ($row = 1; $row <= $highestRow; ++$row) {
                 for ($col = 1; $col <= $highestColumnIndex; ++$col) {
-                    
+
                     if ($row == 1) {
                         $value = $worksheet->getCellByColumnAndRow($col, $row)->getValue();
 
@@ -478,7 +496,7 @@ use CodeIgniter\Config\Services;
 
                             return json_encode($response_array);
                         }
-                        else {	    					
+                        else {
                             array_push($headers, strtolower($value));
                         }
                     }
@@ -487,16 +505,16 @@ use CodeIgniter\Config\Services;
                         $key = $headers[$col];
                         switch ($key) {
                             case 'filename' :
-                                $flag = 0;						      
+                                $flag = 0;
                                 if (is_array($fileNamesArray)) {
                                     if (in_array($value, $fileNamesArray)) $flag = 1;
                                 }
                                 else {
                                     if ($value == $fileNamesArray) $flag = 1;
-                                }	
+                                }
                                 if (!$flag) {
                                     $message = "File: ".$value." not found in list of Uploaded Files from config file: ". $configFileName;
-                                    array_push($response_array['message'], $message);			
+                                    array_push($response_array['message'], $message);
                                 }
                                 if (!preg_match("/\.vcf$|\.vcf\.gz$/", $value)) {
                                     $message = "File: ".$value." is not a vcf file.";
@@ -508,14 +526,14 @@ use CodeIgniter\Config\Services;
                                     array_push($dup_files, $value);
                                 }
                                 $file = $value;
-                                break ;	
+                                break ;
                             case 'tissue' :
                                 $tissue = $value;
                                 break;
                             case 'patient' :
                                 $patient = $value;
                                 break;
-                        }				    					
+                        }
                     }
                 }
                 if ($row == 1) {
@@ -525,7 +543,7 @@ use CodeIgniter\Config\Services;
                     // if the file already exists and we get true from prior if
                     // the file is duplicated and the patient/source/tissue exists
                     array_push($dup_elastic, $file);
-                }	
+                }
                 $pairings[$file][] = $tissue;
                 $pairings[$file][] = $patient;
             }
@@ -537,7 +555,7 @@ use CodeIgniter\Config\Services;
                 if (!empty($dup_elastic)) {
                     $response_array['elastic'] = $dup_elastic;
                 }
-            }	
+            }
             else if (empty($dup_files) && empty($dup_elastic)) {
                 $response_array['status'] = "Green";
                 $response_array['message'] = "no errors";
@@ -559,14 +577,14 @@ use CodeIgniter\Config\Services;
                         $dup_elastic = array_values($dup_elastic);
                         $response_array['elastic'] = $dup_elastic;
                         array_push($types, "elastic");
-                    }		         		
-                } 
+                    }
+                }
                 else {
                     $response_array['elastic'] = $dup_elastic;
                     $response_array['files'] = $dup_files;
                     array_push($types, "elastic");
                     array_push($types, "files");
-                }		
+                }
             }
             else {
                 $response_array['status'] = "Duplicate";
@@ -578,13 +596,13 @@ use CodeIgniter\Config\Services;
                     $response_array['elastic'] = $dup_elastic;
                     array_push($types, "elastic");
                 }
-            }        	
+            }
         }
         else {
             $response_array['status'] = "Cancel";
             array_push($response_array['message'], "Config file is not in correct format. Cannot be read.");
 
-            return json_encode($response_array);		
+            return json_encode($response_array);
         }
 
         if (!$fileMan->Exists($source_id))
@@ -593,14 +611,14 @@ use CodeIgniter\Config\Services;
         }
 
         $fileMan = new UploadFileMan($pairingsPath);
-        
-        $uid = md5(uniqid(rand(),true));  
+
+        $uid = md5(uniqid(rand(),true));
 
         $fileMan->Write($uid.".json", json_encode($pairings));
 
         $response_array['uid'] = $uid;
         $response_array['types'] = $types;
-        
+
         return json_encode($response_array);
     }
 
@@ -609,22 +627,22 @@ use CodeIgniter\Config\Services;
         $basePath = FCPATH . UPLOAD;
         $fileMan = new UploadFileMan($basePath);
 
-        $source_id = $this->request->getVar('source_id'); 
+        $source_id = $this->request->getVar('source_id');
         $uid = $this->request->getVar('uid');
         $user_id = $this->request->getVar('user_id');
 
         if ($fileMan->Exists(UPLOAD_PAIRINGS . $uid . ".json")) {
             $pairings = json_decode($fileMan->Read(UPLOAD_PAIRINGS . $uid . ".json"), true);
 
-            $source_path = UPLOAD_DATA . $source_id . DIRECTORY_SEPARATOR;	
-    
+            $source_path = UPLOAD_DATA . $source_id . DIRECTORY_SEPARATOR;
+
             // Check the number of files we are uploading
             $filesCount = $fileMan->countFiles();
             $finfo = finfo_open(FILEINFO_MIME_TYPE);
-    
+
             $userFiles = $fileMan->getFiles();
-            
-            for($i = 0; $i < $filesCount; $i++){     
+
+            for($i = 0; $i < $filesCount; $i++){
                 // Check the mime and extension for the file we are currently uploading
                 $fileName = $userFiles[$i]->getName();
                 $mime = $userFiles[$i]->getType();
@@ -632,11 +650,11 @@ use CodeIgniter\Config\Services;
 
                 if ($mime != "text/vcard" &&  $xtension == "json") {
                     error_log("failure");
-                }   
-    
+                }
+
                 if($fileMan->Save($userFiles[$i], $source_path))
-                {   
-                    // 13/08/2019 POTENTIAL BUG 
+                {
+                    // 13/08/2019 POTENTIAL BUG
                     // The value for patient must be specified as it is always set to 0 (false)
                     $this->uploadModel->createUpload($fileName, $source_id, $user_id, $pairings[$fileName][0],$pairings[$fileName][1]);
                 }
@@ -659,7 +677,7 @@ use CodeIgniter\Config\Services;
         $user_id = $this->request->getVar('user_id');
         $uid = $this->request->getVar('uid');
         $overwrite = $this->request->getVar('fAction');
-        
+
         // Get ID for source and lock it so further updates and uploads cannot occur until update is finished
         $this->sourceModel->lockSource($source_id);
         $this->uploadModel->addUploadJobRecord($source_id, $uid, $user_id);
@@ -688,12 +706,12 @@ use CodeIgniter\Config\Services;
      * @param array $_FILES           - The file we are uploading
      * @return json_encoded array Success|Headers are not as expected|File is Duplicated
      */
-    public function bulk_upload($force=false){   
+    public function bulk_upload($force=false){
 
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
         $pipeline_id = $this->request->getVar('pipeline_id');
-        
+
         $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
         $fileMan = new UploadFileMan($basePath);
 
@@ -718,12 +736,12 @@ use CodeIgniter\Config\Services;
                 $fileMan->CreateDirectory($source_id);
             }
             if ($fileMan->Save($file, $source_path)) {
-                
+
                 $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
 
                 // Begin background insert to MySQL
 
-                $fAction = $this->request->getVar('fAction'); // File Action 
+                $fAction = $this->request->getVar('fAction'); // File Action
                 if ($fAction == "overwrite") {
                     $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 1 $source_id");
                 }
@@ -754,7 +772,7 @@ use CodeIgniter\Config\Services;
      * @param array $_FILES           - The file we are uploading
      * @return json_encoded array Success|Headers are not as expected|File is Duplicated
      */
-    public function univ_upload($force=false){   
+    public function univ_upload($force=false){
 
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
@@ -785,7 +803,7 @@ use CodeIgniter\Config\Services;
 
                 // Begin background insert to MySQL
 
-                $fAction = $this->request->getVar('fAction'); // File Action 
+                $fAction = $this->request->getVar('fAction'); // File Action
                 if ($fAction == "overwrite") {
                     $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 1 $source_id $setting_file");
                 }
@@ -795,7 +813,7 @@ use CodeIgniter\Config\Services;
                 else {
                     error_log("entered else");
                     return;
-                }	
+                }
                 $uid = md5(uniqid(rand(),true));
                 $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
                 $response_array = array('status'  => "Green",
@@ -820,7 +838,7 @@ use CodeIgniter\Config\Services;
 
         $method = '';
         $overwriteFlag = UPLOADER_DELETE_FILE;
-        
+
         switch (strtolower($extension)) {
             case 'csv':
             case 'xls':
@@ -862,10 +880,10 @@ use CodeIgniter\Config\Services;
         foreach ($fids as $fid) {
             $uploadModel = new Upload();
             $extension = $uploadModel->getFileExtensionById($fid);
-    
+
             $method = '';
             $overwriteFlag = UPLOADER_DELETE_FILE;
-            
+
             switch (strtolower($extension)) {
                 case 'csv':
                 case 'xls':
@@ -883,10 +901,10 @@ use CodeIgniter\Config\Services;
                     return json_encode(0);
                     break;
             }
-    
+
             $uploadModel = new Upload();
             $uploadModel->resetFileStatus($fid);
-    
+
             $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fid . " " . $overwriteFlag);
         }
 
@@ -921,9 +939,9 @@ use CodeIgniter\Config\Services;
         else {
           $output['Files'] = $sourceModel->getSourceStatus($source_id);
           $output['Error'] = $sourceModel->getErrorForSource($source_id);
-        }       
-        
-        return json_encode($output);   
+        }
+
+        return json_encode($output);
     }
 
 
@@ -935,9 +953,9 @@ use CodeIgniter\Config\Services;
      * @param int $add       - 1 if we are adding to index instead of fully regenerating
      * @return array $result - Various parameters to allow front end decision
      */
-    public function elastic_check() {	   
-            
-        $uploadModel = new \App\Models\Upload(); 
+    public function elastic_check() {
+
+        $uploadModel = new \App\Models\Upload();
         $eavModel = new EAV();
 
         $data = json_decode($this->request->getVar('u_data'));
@@ -974,7 +992,7 @@ use CodeIgniter\Config\Services;
                 $result = ['Status' => 'Fully Updated'];
                 return json_encode($result);
             }
-        } 	
+        }
     }
 
 
@@ -987,13 +1005,13 @@ use CodeIgniter\Config\Services;
      * @return N/A
      */
     public function elastic_start() {
-        $eavModel = new \App\Models\EAV(); 
+        $eavModel = new \App\Models\EAV();
         $phpshellHelperInstance = new PHPShellHelper();
         $data = json_decode($this->request->getVar('u_data'));
         $force = $data->force;
         $source_id = $data->id;
         $add = (int)$data->add;
-        
+
         // rebuild the json list for interface
         $phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchAndNeo4JIndex $source_id $add");
     }
@@ -1011,16 +1029,16 @@ use CodeIgniter\Config\Services;
                 $termPair = str_replace("\n", "", $termPair);
                 $termPairArr = explode(",", $termPair);
 
-                array_push($terms, $termPairArr[0] . ' ' . $termPairArr[1]); 
+                array_push($terms, $termPairArr[0] . ' ' . $termPairArr[1]);
             }
         }
-        
+
 		return json_encode($terms);
 	}
 
     public function getAttributeValueFromFile()
     {
-        if ($this->request->isAJAX()) {       
+        if ($this->request->isAJAX()) {
             $source_id = $this->request->getVar('source_id');
 
             $path = FCPATH . UPLOAD . UPLOAD_DATA . $source_id . DIRECTORY_SEPARATOR;
@@ -1045,7 +1063,7 @@ use CodeIgniter\Config\Services;
 
         $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket', 'json']);
         $file_count = count($fileMan->getFiles());
-        
+
         return json_encode($file_count);
     }
 
@@ -1056,7 +1074,7 @@ use CodeIgniter\Config\Services;
         $pipeline_id = $this->request->getVar('pipeline_id');
         $user_id = $this->request->getVar('user_id');
 
-        
+
         $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket', 'json']);
         $unsaved_files = $fileMan->getFiles();
         $files_count = count($unsaved_files);
@@ -1067,7 +1085,7 @@ use CodeIgniter\Config\Services;
         foreach ($unsaved_files as $key => $file) {
             if ($fileMan->isValid($file)) {
                 $source_path = $source_id . DIRECTORY_SEPARATOR;
-                
+
                 if (!$fileMan->Exists($source_id)) {
                     $fileMan->CreateDirectory($source_id);
                 }
@@ -1084,7 +1102,7 @@ use CodeIgniter\Config\Services;
 
         $result = ["unsaved_count" => $unsaved_files_count,
                    "saved_count" =>  $files_count - $unsaved_files_count];
-        
+
         return json_encode($result);
 
     }

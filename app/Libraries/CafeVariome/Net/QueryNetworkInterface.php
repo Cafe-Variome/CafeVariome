@@ -2,12 +2,12 @@
 
 /**
  * QueryNetworkInterface.php
- * 
+ *
  * Created: 27/01/2020
- * 
+ *
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
- * 
+ *
  * This class interfaces this installation with other installations in the network.
  * It is mainly for sending queries to other installations and handling the response.
  */
@@ -57,7 +57,7 @@ class QueryNetworkInterface extends AbstractNetworkInterface
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
-    
+
     public function getEAVJSON(int $network_key, int $modification_time)
     {
         $this->adapterw('QueryApi/getEAVJSON', ['network_key' => $network_key, 'modification_time' => $modification_time]);
@@ -80,4 +80,3 @@ class QueryNetworkInterface extends AbstractNetworkInterface
     }
 
 }
- 
