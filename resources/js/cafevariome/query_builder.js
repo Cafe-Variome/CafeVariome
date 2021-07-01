@@ -143,7 +143,7 @@ $(function() {
                 $('select.values_refall').append($('<option></option>').attr('value', value.toLowerCase()).text(value))
             });
 
-            $.each(JSON.parse(jsonData[1]), (hpo, ancestry) => {
+            $.each(jsonData[1], (hpo, ancestry) => {
                 $('select#values_phen_left').append($('<option></option>').attr('value', ancestry).text(hpo))
             })
 
