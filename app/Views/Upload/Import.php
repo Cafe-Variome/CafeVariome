@@ -70,5 +70,5 @@
 <button class="btn btn-primary" id="batchProcessBtn" onclick="processFiles()" disabled>
     <i class="fa fa-redo-alt"></i> Process Files <span class="badge badge-light">0</span>
 </button>
-
+<br>
 <?= $this->endSection() ?>
