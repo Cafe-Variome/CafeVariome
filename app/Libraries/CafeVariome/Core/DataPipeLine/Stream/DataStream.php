@@ -134,7 +134,8 @@ class DataStream
             }
 
             foreach ($hpo_terms as $term){
-                $matchedTerms = $neo4jInterface->MatchHPO_IS_A($term);
+				$term = strtoupper($term);
+				$matchedTerms = $neo4jInterface->MatchHPO_IS_A($term);
                 $pars = [];
                 $termname = '';
                 foreach ($matchedTerms->getRecords() as $record) {
