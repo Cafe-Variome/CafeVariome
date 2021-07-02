@@ -772,7 +772,8 @@ class Query extends CafeVariome{
                                         return oid as ORPHA,subjectid, olink as LINK, FrequencyCode, ORPHA_IC, OMIM_IC, ohn as MATCHN, collect([sh.hpoid, sh.ICvsOMIM, sh.ICvsORPHA]) as SHPO ';
 
 
-			}else{
+			}
+			else{
 				$neo_query = $neo_query . 'with o, collect(distinct(oh)) as coh, count(distinct(oh)) as ohn, ob.frequencycode as fc,collect(distinct([oh.hpoid,ob.frequencycode,oh.ICvsOMIM, oh.ICvsORPHA])) as hlink
                                         unwind coh as oh
                                         with  o,hlink,fc as FrequencyCode, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC, ohn
@@ -878,8 +879,9 @@ class Query extends CafeVariome{
 					$omimic_min[] = $o_value['omimic'];
 					$orphaic_min[] = $o_value['orphaic'];
 				}
+
 				//problem with infinity values....
-				$ICLIM = $s/100 * min($orphaic_min);
+				$ICLIM = $s/100 * count($orphaic_min) > 0 ? min($orphaic_min) : 0;
 				// use this code to merge, dosim first
 				//$r=1;
 
@@ -938,11 +940,11 @@ class Query extends CafeVariome{
 					if ($IC  == True){
 						if($r == 1 && $hpo == 'true'){
 							error_log("IC NO SIM HPO and ORHPA");
-							$neo_query = $this->create_neo($source, $orpha_id, $ICLIM, 1, $ICLIM, True, False, True);
+							$neo_query = $this->create_neo($source, $orpha_id, $r, $ICLIM, true, False,True);
 						}
 						elseif($r == 1 && $hpo == 'false'){
 							error_log("IC NO SIM ORPHA");
-							$neo_query = $this->create_neo($source, $orpha_id, $ICLIM, 1, $ICLIM, False, False, True);
+							$neo_query = $this->create_neo($source, $orpha_id, $r, $ICLIM, 1, False, True);
 
 						}
 						elseif($r < 1 && $hpo == 'true'){
