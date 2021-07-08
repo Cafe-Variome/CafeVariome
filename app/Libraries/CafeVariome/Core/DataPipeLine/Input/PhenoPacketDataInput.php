@@ -86,12 +86,11 @@ class PhenoPacketDataInput extends DataInput
     public function save(int $file_id)
     {
         $steps = 3;
-        $HPOApi = new HPONetworkInterface();
         $neo4jInterface = new Neo4J();
 
         $this->sourceModel->lockSource($this->sourceId);
 
-        $this->db->transStart();
+        $this->db->begin_transaction();
         $this->reportProgress($file_id, 0, $steps, 'bulkupload', 'Importing data');
 
 		$done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
@@ -118,18 +117,16 @@ class PhenoPacketDataInput extends DataInput
         }
 
         $uid = md5(uniqid(rand(),true));
-        $this->eavModel->createEAV($uid, $this->sourceId, $file_id, $this->id, 'type', 'ancestor');
+        $this->createEAV($uid, $this->sourceId, $file_id, $this->id, 'type', 'ancestor');
 
         foreach ($hits as $key => $value) {
-            $this->eavModel->createEAV($uid, $this->sourceId, $file_id, $this->id, 'ancestor_hpo_id', $key);
-            $this->eavModel->createEAV($uid, $this->sourceId, $file_id, $this->id, 'ancestor_hpo_label', $value);
+            $this->createEAV($uid, $this->sourceId, $file_id, $this->id, 'ancestor_hpo_id', $key);
+            $this->createEAV($uid, $this->sourceId, $file_id, $this->id, 'ancestor_hpo_label', $value);
         }
 
-        $dbRet = $this->db->transComplete();
+        $dbRet = $this->db->commit();
 
-        if ($this->db->transStatus() === FALSE) {
-            $error = true;
-            error_log($this->db->transStatus());
+        if ($dbRet === FALSE) {
             $message = "Data Failed to insert. Please double check file for sanity.";
             $error_code = 4;
             $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
@@ -183,7 +180,7 @@ class PhenoPacketDataInput extends DataInput
                     // reset done array to keep track of whether negated has been added and which meta rows have been added
 
                     if (!in_array($type, $done['type'])) {
-                        $this->eavModel->createEAV($uid,$source,$file,$id,'type',$type);
+                        $this->createEAV($uid,$source,$file,$id,'type',$type);
                         array_push($done['type'], $type);
                     }
                     $done = $this->recursiveNumeric($value,$meta,$id,$file,$source,$uid,$type,$one_group,$done);
@@ -211,7 +208,7 @@ class PhenoPacketDataInput extends DataInput
                     $one_group = true;
                     //$done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
                     if (is_array($type) && !in_array($type, $done['type'])) {
-                        $this->eavModel->createEAV($uid,$source,$file,$id,'type',$type);
+                        $this->createEAV($uid,$source,$file,$id,'type',$type);
                         array_push($done['type'], $type);
                     }
                 }
@@ -229,7 +226,7 @@ class PhenoPacketDataInput extends DataInput
                     $string = $type."_".$key;
                     // $string = $key;
                 }
-                $this->eavModel->createEAV($uid,$source,$file,$id,$string,$value);
+                $this->createEAV($uid,$source,$file,$id,$string,$value);
                 // Since we have just an id row we need to check its id group with our list of meta
                 // attributes (if applicable)
                 if ($key == "id") {
@@ -239,8 +236,8 @@ class PhenoPacketDataInput extends DataInput
                         if (array_key_exists($prefix, $meta)) {
                             // Since it exists now check if we have already added these meta rows before to this group
                             if (!in_array($prefix, $done['meta'])) {
-                                $this->eavModel->createEAV($uid,$source,$file,$id,'meta_name',$meta[$prefix]['meta_name']);
-                                $this->eavModel->createEAV($uid,$source,$file,$id,'meta_version',$meta[$prefix]['meta_version']);
+                                $this->createEAV($uid,$source,$file,$id,'meta_name',$meta[$prefix]['meta_name']);
+                                $this->createEAV($uid,$source,$file,$id,'meta_version',$meta[$prefix]['meta_version']);
                                 array_push($done['meta'], $prefix);
                             }
                         }
@@ -313,7 +310,7 @@ class PhenoPacketDataInput extends DataInput
                 if (is_numeric($key)) {
                         $one_group = true;
                         if (!in_array($type, $done['type'])) {
-                            $this->eavModel->createEAV($uid,$source,$file,$id,'type',$type);
+                            $this->createEAV($uid,$source,$file,$id,'type',$type);
                             array_push($done['type'], $type);
                         }
                 }
@@ -326,7 +323,7 @@ class PhenoPacketDataInput extends DataInput
                         // error_log("extra type: ".$type);
                         if ($uid) {
                             if (!in_array($type, $done['type'])) {
-                                $this->eavModel->createEAV($uid,$source,$file,$id,'type',$type);
+                                $this->createEAV($uid,$source,$file,$id,'type',$type);
                                 array_push($done['type'], $type);
                             }
                         }
@@ -336,18 +333,18 @@ class PhenoPacketDataInput extends DataInput
 				if ($type == $this->configuration['hpo_attribute_name'] && $key == 'type'){
 					if (array_key_exists('negated',$array)){
 						if ($array['negated'] == true){
-							$this->eavModel->createEAV($uid,$source,$file,$id,$this->configuration['negated_hpo_attribute_name'],$value['id']);
+							$this->createEAV($uid,$source,$file,$id,$this->configuration['negated_hpo_attribute_name'],$value['id']);
 						}
 						else{
-							$this->eavModel->createEAV($uid,$source,$file,$id,$this->configuration['hpo_attribute_name'],$value['id']);
+							$this->createEAV($uid,$source,$file,$id,$this->configuration['hpo_attribute_name'],$value['id']);
 						}
 					}
 					else{
-						$this->eavModel->createEAV($uid,$source,$file,$id,$this->configuration['hpo_attribute_name'],$value['id']);
+						$this->createEAV($uid,$source,$file,$id,$this->configuration['hpo_attribute_name'],$value['id']);
 					}
 
 					if (!in_array($type, $done['type'])) {
-						$this->eavModel->createEAV($uid,$source,$file,$id,'type',$type);
+						$this->createEAV($uid,$source,$file,$id,'type',$type);
 						array_push($done['type'], $type);
 					}
 
@@ -392,7 +389,7 @@ class PhenoPacketDataInput extends DataInput
 
 				$string = $type."_".$key;
 
-                $this->eavModel->createEAV($uid,$source,$file,$id,$string,$value);
+                $this->createEAV($uid,$source,$file,$id,$string,$value);
                 // Since we have just an id row we need to check its id group with our list of meta
                 // attributes (if applicable)
                 if ($key == "id") {
@@ -402,8 +399,8 @@ class PhenoPacketDataInput extends DataInput
                         if (array_key_exists($prefix, $meta)) {
                             // Since it exists now check if we have already added these meta rows before to this group
                             if (!in_array($prefix, $done['meta'])) {
-                                $this->eavModel->createEAV($uid,$source,$file,$id,'meta_name',$meta[$prefix]['meta_name']);
-                                $this->eavModel->createEAV($uid,$source,$file,$id,'meta_version',$meta[$prefix]['meta_version']);
+                                $this->createEAV($uid,$source,$file,$id,'meta_name',$meta[$prefix]['meta_name']);
+                                $this->createEAV($uid,$source,$file,$id,'meta_version',$meta[$prefix]['meta_version']);
                                 array_push($done['meta'], $prefix);
                             }
                         }
@@ -487,12 +484,12 @@ class PhenoPacketDataInput extends DataInput
 
         foreach ($output as $key => $value) {
             $uid = md5(uniqid(rand(),true));
-            $this->eavModel->createEAV($uid,$source,$file,$id,"genomeAssembly",$assembly);
-            $this->eavModel->createEAV($uid,$source,$file,$id,"sequence",$chrom);
-            $this->eavModel->createEAV($uid,$source,$file,$id,"coordinateSystem",$coordinateSystem);
-            $this->eavModel->createEAV($uid,$source,$file,$id,"position",$pos);
-            $this->eavModel->createEAV($uid,$source,$file,$id,"deletion",$ref);
-            $this->eavModel->createEAV($uid,$source,$file,$id,"insertion",$alt);
+            $this->createEAV($uid,$source,$file,$id,"genomeAssembly",$assembly);
+            $this->createEAV($uid,$source,$file,$id,"sequence",$chrom);
+            $this->createEAV($uid,$source,$file,$id,"coordinateSystem",$coordinateSystem);
+            $this->createEAV($uid,$source,$file,$id,"position",$pos);
+            $this->createEAV($uid,$source,$file,$id,"deletion",$ref);
+            $this->createEAV($uid,$source,$file,$id,"insertion",$alt);
             $this->recursiveCell($output[$key],$uid,$source,$file,$id);
         }
         return $pos;
@@ -515,7 +512,7 @@ class PhenoPacketDataInput extends DataInput
                 $output =$this->recursiveCell($value,$uid,$source,$file,$id);
             }
             else {
-                $this->eavModel->createEAV($uid,$source,$file,$id,$key,$value);
+                $this->createEAV($uid,$source,$file,$id,$key,$value);
             }
         }
     }

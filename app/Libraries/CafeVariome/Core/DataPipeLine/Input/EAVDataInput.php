@@ -120,7 +120,7 @@ class EAVDataInput extends DataInput
                     if (!$this->checkHeader($file_id, $row, $attgroups, $temphash)){
                         break;
                     }
-                    $this->db->transStart();
+                    $this->db->begin_transaction();
                 }
                 else {
                     if ($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE) {
@@ -144,7 +144,7 @@ class EAVDataInput extends DataInput
 
         $this->reader->close();
 
-        $this->db->transComplete();
+        $this->db->commit();
 
         if ($this->delete == 1) {
             $this->removeAttribuesAndValuesFiles($this->fileName);
@@ -171,19 +171,19 @@ class EAVDataInput extends DataInput
 						$value_array = explode($internal_delimiter, $value);
 
 						foreach ($value_array as $sub_value) {
-							$this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $sub_value);
+							$this->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $sub_value);
 						}
 					}
 					else {
-						$this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
+						$this->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
 					}
 				}
 				else {
-					$this->eavModel->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
+					$this->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
 				}
 
 				$counter++;
-				if ($counter % 800 == 0) {
+				if ($counter % SPREADSHEET_BATCH_SIZE == 0) {
 					$error = $this->sendBatch();
 					if ($error) {
 						$error_code = 0;
@@ -202,15 +202,15 @@ class EAVDataInput extends DataInput
     * @param N/A
     * @return boolean $error - True if the transaction failed
     */
-    private function sendBatch() {
-       $dbRet = $this->db->transComplete();
-       // select has had some problem.
-       if ($this->db->transStatus() === FALSE) {
-           return true;
-       }
-       else {
-           $this->db->transStart();
-       }
+    private function sendBatch()
+	{
+       $status = $this->db->commit();
+
+       if (!$status){
+       	return !$status;
+	   }
+
+       $this->db->begin_transaction();
     }
 
     private function countRecords(): int

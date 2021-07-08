@@ -70,7 +70,7 @@ class VCFDataInput extends DataInput
                             foreach ($val as $v) {
                                 if (in_array($v[0], $config)) {
                                     array_push($this->records, ['uid' => $uid, 'attribute' => $v[0], 'value' => $v[1]]);
-                                    //$this->eavModel->createEAV($uid, $this->sourceId, $file_id, $this->subject_id, $v[0], $v[1]);
+                                    //$this->createEAV($uid, $this->sourceId, $file_id, $this->subject_id, $v[0], $v[1]);
                                 }
                             }
                         }
@@ -79,7 +79,7 @@ class VCFDataInput extends DataInput
                         }
                         else {
                             array_push($this->records, ['uid' => $uid, 'attribute' => $this->headers[$i], 'value' => $values[$i]]);
-                            //$this->eavModel->createEAV($uid, $this->sourceId, $file_id, $this->subject_id, $this->headers[$i], $values[$i]);
+                            //$this->createEAV($uid, $this->sourceId, $file_id, $this->subject_id, $this->headers[$i], $values[$i]);
                         }
                     }
                 }
@@ -94,15 +94,15 @@ class VCFDataInput extends DataInput
 
         $this->reportProgress($file_id, $recordsProcessed, $recordCount, 'bulkupload', 'Importing data');
 
-        $this->db->transStart();
+		$this->db->commit();
 
         foreach ($this->records as $record) {
-            $this->eavModel->createEAV($record['uid'], $this->sourceId, $file_id, $this->subject_id, $record['attribute'], $record['value']);
+            $this->createEAV($record['uid'], $this->sourceId, $file_id, $this->subject_id, $record['attribute'], $record['value']);
             $this->reportProgress($file_id, $recordsProcessed, $recordCount, 'bulkupload');
             $recordsProcessed ++;
         }
 
-        $this->db->transComplete();
+		$this->db->commit();
 
 		if ($this->delete == 1) {
 			$this->removeAttribuesAndValuesFiles($this->fileName);
