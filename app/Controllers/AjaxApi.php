@@ -911,6 +911,17 @@ use CodeIgniter\Config\Services;
         return json_encode(1);
     }
 
+    public function processFilesBySourceId()
+	{
+		$source_id = $this->request->getVar('source_id');
+		$pending = $this->request->getVar('pending');
+		$overwrite_flag = $this->request->getVar('overwrite');
+
+		$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task insertFilesBySourceId $source_id $pending $overwrite_flag");
+		return json_encode(1);
+
+	}
+
     public function getSourceCounts()
     {
         $sourceModel = new Source();
