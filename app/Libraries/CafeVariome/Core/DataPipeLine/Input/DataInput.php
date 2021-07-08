@@ -107,6 +107,16 @@ abstract class DataInput
 		$this->sourceModel->updateSource(['record_count' => $totalRecordCount], ['source_id' => $this->sourceId]);
     }
 
-    }
+	public function finalize(int $file_id, bool $update_subject_count = true)
+	{
+		if ($update_subject_count){
+			$this->updateSubjectCount();
+		}
+		$this->uploadModel->markEndOfUpload($file_id, $this->sourceId);
+		$this->uploadModel->clearErrorForFile($file_id);
+		$this->sourceModel->unlockSource($this->sourceId);
+		$this->reportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
+	}
+
 
 }
