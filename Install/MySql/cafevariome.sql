@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.4deb1+bionic9
+-- version 5.0.4deb2~bpo10+1+bionic1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 21, 2021 at 10:02 AM
+-- Generation Time: Jul 08, 2021 at 04:31 PM
 -- Server version: 5.7.34-0ubuntu0.18.04.1
--- PHP Version: 7.4.14
+-- PHP Version: 7.4.20
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -32,7 +32,7 @@ CREATE TABLE `eavs` (
   `uid` char(36) NOT NULL,
   `source_id` int(11) NOT NULL,
   `fileName` mediumint(8) UNSIGNED NOT NULL,
-  `subject_id` varchar(20) NOT NULL,
+  `subject_id` varchar(36) NOT NULL,
   `attribute` varchar(50) NOT NULL,
   `value` varchar(200) DEFAULT NULL,
   `elastic` bit(1) NOT NULL DEFAULT b'0'
@@ -359,7 +359,7 @@ CREATE TABLE `users_groups` (
 --
 
 INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
-(1, 1, 1);
+(1, 1, 1),
 
 -- --------------------------------------------------------
 
@@ -579,7 +579,7 @@ ALTER TABLE `pipeline`
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=69;
+  MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `sources`
