@@ -158,24 +158,39 @@ $(function() {
             template['patient'] = $('.rule')[0].outerHTML
             template['genotype'] = $('.rule')[1].outerHTML
 
-            $('select#values_phen_left').filterByText($('#search_filter_phen_left'));
+            //$('select#values_phen_left').filterByText($('#search_filter_phen_left'));
 
             initSelect2();
         })
         .fail(()=> alert(error['load_phen_json']))
     }
 
-    var hpo_json = {};
+    $search_str = ''
+    $('#search_filter_phen_left').keyup(function() {
+        if($search_str == $(this).val()) return;
+        $('select#values_phen_left').empty()
+        str = $(this).val().trim().split(' ').filter((term) => term.length != 1).reduce((v1, v2) => v1 + " " + v2)
+        $.getJSON('https://www185.lamp.le.ac.uk/EpadGreg/hpo/query/' + (str) + '/0/1', (data) => {
+            $('select#values_phen_left').empty()
+            data.forEach((term) => {
+                $('select#values_phen_left').append($('<option></option>').attr('value', term).text(term))
+            })
+        })
+            .fail(function() {  });
+        $search_str = $(this).val()
+    })
 
-    $.ajax({
-        dataType: "json",
-        url: baseurl + "AjaxApi/HPOQuery",
-        data: null,
-        success: function(data){
-            hpo_json = data;
-            // init_hpotree(hpo_json);
-        }
-    });
+
+    // var hpo_json = {};
+    // $.ajax({
+    //     dataType: "json",
+    //     url: baseurl + "AjaxApi/HPOQuery",
+    //     data: null,
+    //     success: function(data){
+    //         hpo_json = data;
+    //         init_hpotree(hpo_json);
+    //     }
+    // });
 
     // Load JSON API template and initialise query builder if successful
     function load_json_api_template(qb_config, phen_attrib) {
