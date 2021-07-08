@@ -60,7 +60,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             try {
                 $inputPipeLine->absorb($file_id);
                 $inputPipeLine->save($file_id);
-
+				$inputPipeLine->finalize($file_id);
             } catch (\Exception $ex) {
                 error_log($ex->getMessage());
             }
@@ -85,7 +85,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         try {
             $inputPipeLine->absorb($file_id);
             $inputPipeLine->save($file_id);
-
+			$inputPipeLine->finalize($file_id);
         } catch (\Exception $ex) {
             error_log($ex->getMessage());
         }
@@ -276,6 +276,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
             $inputPipeLine->absorb($file_id);
             $inputPipeLine->save($file_id);
+			$inputPipeLine->finalize($file_id);
         }
     }
 
@@ -291,6 +292,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         try {
             $inputPipeLine->absorb($file_id);
             $inputPipeLine->save($file_id);
+			$inputPipeLine->finalize($file_id);
         } catch (\Exception $ex) {
             error_log($ex->getMessage());
         }
@@ -319,6 +321,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             $inputPipeLine = new EAVDataInput($sourceId, $overwrite);
             $inputPipeLine->absorb($fileId);
             $inputPipeLine->save($fileId);
+			$inputPipeLine->finalize($fileId);
         }
         else{
             error_log('File not found.');
