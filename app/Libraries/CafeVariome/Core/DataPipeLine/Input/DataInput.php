@@ -9,6 +9,7 @@
  *
  */
 
+use App\Libraries\CafeVariome\Core\DataPipeLine\Database;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Controller;
 use CodeIgniter\CLI\CLI;
@@ -48,7 +49,7 @@ abstract class DataInput
         $this->sourceId = $source_id;
 
         $this->basePath = FCPATH . UPLOAD . UPLOAD_DATA . $this->sourceId . DIRECTORY_SEPARATOR;
-        $this->db = \Config\Database::connect();
+        $this->db = new Database();
 
         $this->uploadModel = new Upload();
         $this->sourceModel = new Source();
@@ -127,5 +128,14 @@ abstract class DataInput
 	protected function reportProgress(int $file_id, int $records_processed, int $total_records, string $job = 'bulkupload', string $status = "", bool $finished = false)
 	{
 		$this->serviceInterface->ReportProgress($file_id, $records_processed, $total_records, $job, $status, $finished);
+	}
+
+	protected function createEAV(string $uid, int $source, int $file_id, string $subject_id, string $attribute, string $value)
+	{
+		$malicious_chars = ['\\', chr(39), chr(34), '/', '’', '<', '>', '&', ';'];
+		$attribute = str_replace($malicious_chars, '', $attribute);
+		$value = str_replace($malicious_chars, '', $value);
+
+		$this->db->insert("INSERT INTO eavs (uid, source_id, fileName, subject_id, attribute, value) VALUES ('$uid', '$this->sourceId', '$file_id', '$subject_id', '$attribute', '$value');");
 	}
 }
