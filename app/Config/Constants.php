@@ -138,5 +138,8 @@ define('GROUPING_COLUMNS_CUSTOM', 1);
 define('EAV_BATCH_SIZE', 30000);
 define('NEO4J_BATCH_SIZE', 30000);
 
+//Data input batch size used in transactions
+define('SPREADSHEET_BATCH_SIZE', 1000);
+
 
 
