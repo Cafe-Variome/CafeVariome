@@ -5,14 +5,14 @@
  * Created 01/08/2019
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- * 
+ *
  * Upload model class that handles operations on data files.
  */
 
 use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 
- class Upload extends Model 
+ class Upload extends Model
  {
     protected $db;
     protected $table      = 'uploaddatastatus';
@@ -33,14 +33,14 @@ use CodeIgniter\Database\ConnectionInterface;
 
     /**
 	 * getFiles
-     * 
+     *
 	 * General function to get fetch data from uploaddatastatus table.
-     * 
+     *
      * @author Mehdi Mehtarizadeh
 	 */
 	function getFiles(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
 		$this->builder = $this->db->table($this->table);
-		
+
 		if ($cols) {
             $this->builder->select($cols);
         }
@@ -61,7 +61,7 @@ use CodeIgniter\Database\ConnectionInterface;
         }
 
         $query = $this->builder->get()->getResultArray();
-        return $query; 
+        return $query;
     }
 
     public function getFileById(int $file_id)
@@ -84,7 +84,7 @@ use CodeIgniter\Database\ConnectionInterface;
         $now = date('Y-m-d H:i:s');
         // Check if the file has been uploaded before
         if ($this->isDuplicateFile($file,$source_id)) {
-            // If it has all we need to do is to update a current row with some of the 
+            // If it has all we need to do is to update a current row with some of the
             // information which is current
             $data = array(
             'user_id' => $user_id,
@@ -100,7 +100,7 @@ use CodeIgniter\Database\ConnectionInterface;
             $this->builder->update($data);
 
             $this->builder->select('ID');
-            $this->builder->where('source_id', $source_id);   
+            $this->builder->where('source_id', $source_id);
             $this->builder->where('FileName', $file);
             $query = $this->builder->get()->getResultArray();
             $insert_id = $query[0]['ID'];
@@ -117,16 +117,16 @@ use CodeIgniter\Database\ConnectionInterface;
                 'patient' => $patient,
                 'setting_file' => $settingFile,
                 'pipeline_id' => $pipeline_id,
-                'tissue' => $tissue);		
+                'tissue' => $tissue);
             $this->builder->insert($data);
             $insert_id = $this->db->insertID();
-        }			
+        }
         return $insert_id;
     }
 
     /**
      * Get File Name - Get the File name for given ID
-     * 
+     *
      * Moved to upload controller by Mehdi Mehtarizadeh (02/08/2019)
      *
      * @param int $file_id - The File ID we are trying to find name for
@@ -217,7 +217,7 @@ use CodeIgniter\Database\ConnectionInterface;
         // create array
         $duplicates = [];
         // loop through files array
-        for ($i=0; $i < count($files); $i++) { 
+        for ($i=0; $i < count($files); $i++) {
             $this->builder = $this->db->table($this->table);
             $this->builder->where('source_id', $source_id);
             $this->builder->where('FileName', $files[$i]);
@@ -243,12 +243,12 @@ use CodeIgniter\Database\ConnectionInterface;
 
         $this->builder->where('source_id', $source_id);
         $this->builder->where('FileName', $file);
-        $query = $this->builder->countAllResults(); 
+        $query = $this->builder->countAllResults();
         return $query;
     }
 
     /**
-     * Pheno Packet Files - Get a list of all rows which are pending, have a .json extension  
+     * Pheno Packet Files - Get a list of all rows which are pending, have a .json extension
      * for a given source. Used in PhenoPacket upload/insert
      *
      * @param int $source_id - The source_id we are checking
@@ -320,7 +320,7 @@ use CodeIgniter\Database\ConnectionInterface;
     }
 
     /**
-     * Error Insert - During our upload we have encountered an error 
+     * Error Insert - During our upload we have encountered an error
      * Adding to upload_error table
      *
      * Moved to upload model by Mehdi Mehtarizadeh (02/08/2019)
@@ -330,7 +330,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param int $error_code   - The ID of the error
      * @param boolean $test     - Optional parameter if you wish to error log the created data array
      * 						      Pass in true in this location
-     * @param boolean $continue - Optional parameter if we are adding an error but not aborting rest of 
+     * @param boolean $continue - Optional parameter if we are adding an error but not aborting rest of
      *  						  upload
      * @return void
      */
@@ -356,12 +356,12 @@ use CodeIgniter\Database\ConnectionInterface;
             $this->builder->update($data);
         }
     }
-        
+
     /**
      * Big Insert Wrap - Fill in the status table on the success of the upload
      *
      * Moved to upload model by Mehdi Mehtarizadeh (02/08/2019)
-     * 
+     *
      * @param string $file   - The file we just finished uploading
      * @param int $source_id - The ID of the source we have uploaded to
      * @return void
@@ -385,7 +385,7 @@ use CodeIgniter\Database\ConnectionInterface;
      *
      * @param int $source_id  - The source_id we are checking
      * @param string $patient - The Patient we are checking
-     * @param string $tissue  - The tissue we are checking  
+     * @param string $tissue  - The tissue we are checking
      * @return int 0 if doesnt exist| 1 if it does
      */
     public function patientSubjectSourceCombo($source_id,$patient,$tissue) {
@@ -394,7 +394,7 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->where('source_id', $source_id);
         $this->builder->where('patient', $patient);
         $this->builder->where('tissue', $tissue);
-        $query = $this->builder->countAllResults(); 
+        $query = $this->builder->countAllResults();
         return $query;
     }
 
@@ -419,7 +419,7 @@ use CodeIgniter\Database\ConnectionInterface;
 
         // Check if this VCF is duplicated
         if ($this->isDuplicateVcf($file,$source_id)) {
-            // If it has all we need to do is to update a current row with some of the 
+            // If it has all we need to do is to update a current row with some of the
             // information which is current
             $data = array(
                 'user_id' => $user_id,
@@ -440,9 +440,9 @@ use CodeIgniter\Database\ConnectionInterface;
                 'uploadend' => null,
                 'status' => 'Pending',
                 'patient' => $patient,
-                'tissue' => $tissue);				
+                'tissue' => $tissue);
             $this->builder->insert($data);
-        }		
+        }
     }
 
     /**
@@ -459,7 +459,7 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->select('*');
         $this->builder->where('source_id', $source_id);
         $this->builder->where('filename', $file);
-        $query = $this->builder->countAllResults(); 
+        $query = $this->builder->countAllResults();
         return $query;
     }
 
@@ -473,7 +473,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param string $file_name - The file we are uploading
      * @param string $tmp       - The file path for where the file is stored in /tmp
      *							  prior to being uploaded
-     * @return bool 
+     * @return bool
     */
     public function isDuplicatePhysicalFile($source_id,$file_name, $tmp): bool{
         $source_path = FCPATH."upload/UploadData/".$source_id;
@@ -486,7 +486,7 @@ use CodeIgniter\Database\ConnectionInterface;
         }
         else {
             return false;
-        }    	
+        }
     }
 
     /**
@@ -499,7 +499,7 @@ use CodeIgniter\Database\ConnectionInterface;
     {
         $this->builder = $this->db->table($this->table);
         $this->builder->select('ID, FileName, tissue, patient');
-        $this->builder->like('FileName', '.vcf', 'before'); 
+        $this->builder->like('FileName', '.vcf', 'before');
         $this->builder->where('source_id', $source_id);
 
         if ($pending) {
@@ -529,12 +529,12 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param int $source_id - The name of the source
      * @return int      - Count of how many Files there are which arent in ElasticSearch
      */
-    function getElasticsearchUnprocessedFilesBySourceId(int $source_id): int 
+    function getElasticsearchUnprocessedFilesBySourceId(int $source_id): int
     {
         $this->builder = $this->db->table($this->table);
 
         $this->builder->where('source_id', $source_id);
-        $count = $this->builder->countAllResults(); 
+        $count = $this->builder->countAllResults();
         return $count;
     }
 
@@ -574,6 +574,21 @@ use CodeIgniter\Database\ConnectionInterface;
         }
     }
 
+    public function getFilesBySourceId(int $source_id, bool $pending = true): array
+	{
+		$this->builder = $this->db->table($this->table);
+		$this->builder->select('ID, FileName');
+		$this->builder->where('source_id', $source_id);
+
+		if ($pending) {
+			$this->builder->where('Status', 'Pending');
+		}
+
+		$query = $this->builder->get()->getResultArray();
+
+		return $query;
+    }
+
     public function getPipelineIdsBySourceId(int $source_id): array
     {
         $pids = [];
@@ -586,4 +601,3 @@ use CodeIgniter\Database\ConnectionInterface;
         return $pids;
     }
  }
- 
