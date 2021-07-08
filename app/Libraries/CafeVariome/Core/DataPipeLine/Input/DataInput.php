@@ -119,4 +119,13 @@ abstract class DataInput
 	}
 
 
+	protected function registerProcess(int $file_id, string $job ='bulkupload', string $message ='Starting')
+	{
+		$this->serviceInterface->RegisterProcess($file_id, 1, $job, $message);
+	}
+
+	protected function reportProgress(int $file_id, int $records_processed, int $total_records, string $job = 'bulkupload', string $status = "", bool $finished = false)
+	{
+		$this->serviceInterface->ReportProgress($file_id, $records_processed, $total_records, $job, $status, $finished);
+	}
 }
