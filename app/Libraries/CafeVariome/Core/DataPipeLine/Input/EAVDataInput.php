@@ -146,20 +146,11 @@ class EAVDataInput extends DataInput
 
         $this->db->transComplete();
 
-        $totalRecordCount = $this->sourceModel->countSourceEntries($this->sourceId);
-        $this->sourceModel->updateSource(['record_count' => $totalRecordCount], ['source_id' => $this->sourceId]);
-
         if ($this->delete == 1) {
             $this->removeAttribuesAndValuesFiles($this->fileName);
         }
 
         $this->dumpAttributesAndValues($file_id);
-
-        $this->uploadModel->markEndOfUpload($file_id, $this->sourceId);
-        $this->uploadModel->clearErrorForFile($file_id);
-        $this->sourceModel->unlockSource($this->sourceId);
-
-        $this->reportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
     }
 
 	private function processRow($row, $attgroups, $subject_id, $file_id, & $counter)
