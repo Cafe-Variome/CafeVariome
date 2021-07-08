@@ -9,6 +9,7 @@
  *
  */
 
+use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Controller;
 use CodeIgniter\CLI\CLI;
 use App\Models\Upload;
@@ -21,6 +22,7 @@ use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use CodeIgniter\Config;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+
 
 abstract class DataInput
 {
@@ -39,8 +41,9 @@ abstract class DataInput
     protected $pipeline_id;
     protected $fileName;
     protected $reader;
+	protected $serviceInterface;
 
-    public function __construct(int $source_id)
+	public function __construct(int $source_id)
     {
         $this->sourceId = $source_id;
 
@@ -52,7 +55,9 @@ abstract class DataInput
         $this->eavModel = new EAV();
         $this->pipelineModel = new Pipeline();
         $this->fileMan = new FileMan($this->basePath);
-    }
+		$this->serviceInterface = new ServiceInterface();
+
+	}
 
     abstract public function absorb(int $fileId);
     abstract public function save(int $fileId);
@@ -94,6 +99,13 @@ abstract class DataInput
                 }
             }
         }
+    }
+
+	protected function updateSubjectCount()
+	{
+		$totalRecordCount = $this->sourceModel->countSourceEntries($this->sourceId);
+		$this->sourceModel->updateSource(['record_count' => $totalRecordCount], ['source_id' => $this->sourceId]);
+    }
 
     }
 
