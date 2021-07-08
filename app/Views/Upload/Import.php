@@ -67,8 +67,12 @@
   </tbody>
 </table>
 <br>
-<button class="btn btn-primary" id="batchProcessBtn" onclick="processFiles()" disabled>
-    <i class="fa fa-redo-alt"></i> Process Files <span class="badge badge-light">0</span>
+<button class="btn btn-primary" id="batchProcessBtn" onclick="processSelectedFiles()" disabled>
+    <i class="fa fa-redo-alt"></i> Process Selected Files <span class="badge badge-light">0</span>
+</button>
+
+<button class="btn btn-primary" id="batchProcessPendingBtn" onclick="processPendingFiles()">
+	<i class="fa fa-redo-alt"></i> Process Pending Files <span class="badge badge-light">0</span>
 </button>
 <br>
 <?= $this->endSection() ?>

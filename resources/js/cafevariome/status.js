@@ -43,7 +43,7 @@ $(document).ready(function() {
     eventSource.onerror = function(err) {
     };
 
-})
+});
 
 function reloadTable(param,first, chkBox = false) {
     if ($('.dataTables_filter input').is(":focus")) {
@@ -61,15 +61,16 @@ function reloadTable(param,first, chkBox = false) {
         	$("#file_grid").empty();
 
             $('#fActionOverwrite').prop('disabled', response.Files.length == 0);
-
+            var pendingFilesCount = 0;
         	for (var i = 0; i < response.Files.length; i++) {
 
+                if (response.Files[i].Status == 'Pending') {
+                    pendingFilesCount++;
+                }
                 var checkBoxStr = "";
                 if (chkBox) {
                     checkBoxStr = "<td>";
-                    //if (response.Files[i].Status == 'Pending') {
-                        checkBoxStr += "<input type='checkbox' class='fileChkBx' data-fileid='" + response.Files[i].ID + "' onclick='updateFileIDs(event)'></input>";
-                    //}
+                    checkBoxStr += "<input type='checkbox' class='fileChkBx' data-fileid='" + response.Files[i].ID + "' onclick='updateFileIDs(event)'></input>";
                     checkBoxStr += "</td>";
                 }
 
@@ -80,7 +81,6 @@ function reloadTable(param,first, chkBox = false) {
                 }
                 else if(response.Files[i].Status == 'Success'){
                     $('#file_' + response.Files[i].ID).append("<td><a href='#' data-toggle='tooltip' data-placement='top' title='Data has been successfully processed for this file.'><i class='fa fa-check text-success'></i></a> <a href='#' data-toggle='tooltip' data-placement='top' data-html='true' title='Upload Start:" + response.Files[i].uploadStart + " <br/> Upload End: " + response.Files[i].uploadEnd + "'><i class='fa fa-info text-info'></i></a> </td>");
-                    //$('#file_' + response.Files[i].ID).append("<td>"+ response.Files[i].uploadStart +"</td> <td>"+ response.Files[i].uploadEnd+"</td><td>"+ response.Error.length +" error(s)</td> <td style='text-align:center'><a href='#' data-toggle='tooltip' data-placement='bottom' title='Data has been successfully processed for this file.'><i class='fa fa-check text-success'></i></a></td>");
                 }
                 else if (response.Error.length > 0) {
                     ErrorString = "";
@@ -92,20 +92,22 @@ function reloadTable(param,first, chkBox = false) {
                         }
                     }
                     $('#file_' + response.Files[i].ID).append("<td><a href='#' data-toggle='tooltip' data-html='true' data-placement='top' title='" + ErrorString + "'><i class='fa fa-exclamation-triangle text-warning'></i></a> </td>");
-                    ///*If Errors, Display*/$('#file_' + response.Files[i].ID).append("<td>"+ response.Files[i].uploadStart +"</td> <td>"+ response.Files[i].uploadEnd+"</td><td>"+ response.Files[i].ID +" error(s) <hr/><i class='fa fa-exclamation-triangle text-warning'></i> " + ErrorString + " </td> <td style='text-align:center'><a href='#' data-toggle='tooltip' data-placement='bottom' title='There was an error processing this file. Fix the issues and try again.'> <i class='fa fa-exclamation text-danger'>   </i>  </a></td>");
                 }
 
                 actionStr = "<td id='action-" + response.Files[i].ID + "'><a href='#' data-toggle='tooltip' data-placement='top' title='Remove Records and Re-process File' class='reprocess' onclick='processFile(" + response.Files[i].ID + ", 1)'><i class='fa fa-redo-alt text-info'></i></a>";
-                
-                // if(!response.Files[i].FileName.toString().toLowerCase().includes('.vcf') && !response.Files[i].FileName.toString().toLowerCase().includes('.phenopacket')){
-                //     actionStr += " <a href='#' data-toggle='tooltip' data-placement='top' title='Re-process File and Append Records' class='append' onclick='processFile(" + response.Files[i].ID + ", 0)'><i class='fa fa-sync-alt text-warning'></i></a>";
-                // } 
-
                 actionStr += "</td>";
 
                 $('#file_' + response.Files[i].ID).append(actionStr);
 
-            }  
+            }
+
+            $('#batchProcessPendingBtn span').html(pendingFilesCount.toString());
+        	if (pendingFilesCount == 0){
+                $('#batchProcessPendingBtn').prop('disabled', true);
+            }
+        	else{
+                $('#batchProcessPendingBtn').prop('disabled', false);
+            }
 
             filesDt();  
             $(window).scrollTop(currentscroll);  
@@ -157,8 +159,6 @@ function filesDt() {
                 var rowChkBox = $($('#file_table').DataTable().cell({row:rc, column:0}).data());
 
                 if (rowChkBox.length > 0) {
-                    
-                
                     var rowChkBoxHtml;
                     var alreadyChecked = (rowChkBox.prop('checked') && checkOrUncheck) || (!rowChkBox.prop('checked') && !checkOrUncheck);
                     if (rowChkBox.prop('checked') == false && checkOrUncheck){
@@ -276,7 +276,7 @@ function processFile(fileId, overwrite) {
     });
 }
 
-function processFiles() {
+function processSelectedFiles() {
     if (selectd_fileids.length == 0) {
         return;
     }
