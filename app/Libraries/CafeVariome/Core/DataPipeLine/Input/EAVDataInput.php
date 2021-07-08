@@ -9,14 +9,13 @@
  *
  */
 
-use App\Libraries\CafeVariome\Net\ServiceInterface;
 use App\Models\EAV;
 
 class EAVDataInput extends DataInput
 {
     private $delete;
     private $error;
-    private $serviceInterface;
+    protected $serviceInterface;
     protected $configuration;
     private $column_count;
     protected $pipeline_id;
@@ -24,8 +23,6 @@ class EAVDataInput extends DataInput
     public function __construct(int $source_id, int $delete) {
         parent::__construct($source_id);
         $this->delete = $delete;
-        $this->serviceInterface = new ServiceInterface();
-
         $this->initializeConfiguration();
     }
 
@@ -339,17 +336,6 @@ class EAVDataInput extends DataInput
 
         return ($i > 1) ? true : false;
     }
-
-    private function reportProgress(int $file_id, int $records_processed, int $total_records, string $job = 'bulkupload', string $status = "", bool $finished = false)
-    {
-        $this->serviceInterface->ReportProgress($file_id, $records_processed, $total_records, $job, $status, $finished);
-    }
-
-    private function registerProcess(int $file_id, string $job ='bulkupload', string $message ='Starting')
-    {
-        $this->serviceInterface->RegisterProcess($file_id, 1, $job, $message);
-    }
-
 
     protected function reportError(int $file_id, int $error_code, string $message)
     {
