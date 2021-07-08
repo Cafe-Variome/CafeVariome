@@ -99,7 +99,7 @@ use CodeIgniter\Config\Services;
 
             return json_encode($results);
         } catch (\Exception $ex) {
-            return json_encode(['error' => 'There was a problem executing the query. Please try again with a different query.']);
+            return json_encode(['error' => 'There was a problem executing the query. Please try again with a different query.'.$ex->getMessage()]);
         }
     }
 
@@ -881,7 +881,6 @@ use CodeIgniter\Config\Services;
             $uploadModel = new Upload();
             $extension = $uploadModel->getFileExtensionById($fid);
 
-            $method = '';
             $overwriteFlag = UPLOADER_DELETE_FILE;
 
             switch (strtolower($extension)) {
@@ -899,7 +898,6 @@ use CodeIgniter\Config\Services;
                     break;
                 default:
                     return json_encode(0);
-                    break;
             }
 
             $uploadModel = new Upload();
