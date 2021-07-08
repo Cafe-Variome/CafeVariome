@@ -317,3 +317,43 @@ function processFiles() {
         }
     });
 }
+
+function processPendingFiles() {
+
+    var fileData = new FormData();
+    fileData.append('source_id', $('#source_id').val());
+    fileData.append('pending', true);
+    fileData.append('overwrite', 2); // 2 indicates that existing data for the file must be deleted before insertion.
+
+    $.ajax({
+        type: "POST",
+        url: baseurl+'AjaxApi/processFilesBySourceId',
+        data: fileData,
+        dataType: "json",
+        contentType: false,
+        processData: false,
+        success: function(response)  {
+            $.notify({
+                // options
+                message: 'Tasks started.'
+            },{
+                // settings
+                timer: 200
+            });
+
+            filesDtPage = $('#file_table').DataTable().page()
+            id = $('#source_id').val();
+            $('#batchProcessPendingBtn').prop('disabled', true);
+            reloadTable(id,false, isImport);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $.notify({
+                // options
+                message: 'There was an error.'
+            },{
+                // settings
+                timer: 200
+            });
+        }
+    });
+}
