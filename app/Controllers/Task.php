@@ -325,6 +325,69 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
         }
     }
 
+    public function insertFilesBySourceId(int $source_id, bool $pending = true, int $overwrite = UPLOADER_DELETE_FILE)
+	{
+		$uploadModel = new Upload();
+
+		$files = $uploadModel->getFilesBySourceId($source_id, $pending);
+
+		for($c = 0; $c < count($files); $c++)
+		{
+			if (strpos($files[$c]['FileName'], '.')) {
+				$file_id = $files[$c]['ID'];
+				$file_name_array = explode('.', $files[$c]['FileName']);
+				$extension = $file_name_array[count($file_name_array) - 1];
+				$final_round = $c == (count($files) - 1);
+
+				switch (strtolower($extension))
+				{
+					case 'vcf':
+						try
+						{
+							$inputPipeLine = new VCFDataInput($source_id, $overwrite);
+							$inputPipeLine->absorb($file_id);
+							$inputPipeLine->save($file_id);
+							$inputPipeLine->finalize($file_id, $final_round);
+							unset($inputPipeLine);
+						}
+						catch (\Exception $ex) {
+							error_log($ex->getMessage());
+						}
+						break;
+					case 'json':
+					case 'phenopacket':
+						try
+						{
+							$inputPipeLine = new PhenoPacketDataInput($source_id, $overwrite);
+							$inputPipeLine->absorb($file_id);
+							$inputPipeLine->save($file_id);
+							$inputPipeLine->finalize($file_id, $final_round);
+							unset($inputPipeLine);
+						}
+						catch (\Exception $ex) {
+							error_log($ex->getMessage());
+						}
+						break;
+					case 'csv':
+					case 'xls':
+					case 'xlsx':
+						try
+						{
+							$inputPipeLine = new EAVDataInput($source_id, $overwrite);
+							$inputPipeLine->absorb($file_id);
+							$inputPipeLine->save($file_id);
+							$inputPipeLine->finalize($file_id, $final_round);
+							unset($inputPipeLine);
+						}
+						catch (\Exception $ex) {
+							error_log($ex->getMessage());
+						}
+						break;
+				}
+			}
+		}
+	}
+
     public function regenerateElasticsearchAndNeo4JIndex(int $source_id, $add)
     {
         try {
