@@ -23,26 +23,24 @@ class PhenoPacketDataInput extends DataInput
     private $id;
     protected $configuration;
     private $delete;
-    private $serviceInterface;
 
     public function __construct(int $source_id, int $delete)
     {
         parent::__construct($source_id);
         $this->delete = $delete;
-        $this->serviceInterface = new ServiceInterface();
-
         $this->initializeConfiguration();
     }
 
     public function absorb(int $file_id)
     {
-        $this->serviceInterface->RegisterProcess($file_id, 1, 'bulkupload', "Starting");
+		$this->registerProcess($file_id);
 
         $fileRecord = $this->getSourceFiles($file_id);
 
         if (count($fileRecord) == 1) {
             $file = $fileRecord[0]['FileName'];
-            if (array_key_exists('pipeline_id', $fileRecord[0])) {
+			$this->fileName = $file;
+			if (array_key_exists('pipeline_id', $fileRecord[0])) {
                 $this->pipeline_id = $fileRecord[0]['pipeline_id'];
                 $this->applyPipeline($this->pipeline_id);
             }
@@ -52,12 +50,12 @@ class PhenoPacketDataInput extends DataInput
                 $this->data = json_decode($fileContent, true);
 
                 if ($this->delete == UPLOADER_DELETE_ALL) {
-                    $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the source');
+                    $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the source');
                     $this->eavModel->deleteRecordsBySourceId($this->sourceId);
                     $this->delete = true;
                 }
                 else if($this->delete == UPLOADER_DELETE_FILE){
-                    $this->serviceInterface->ReportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
+                    $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
                     $this->eavModel->deleteRecordsByFileId($file_id);
                 }
 
@@ -94,15 +92,15 @@ class PhenoPacketDataInput extends DataInput
         $this->sourceModel->lockSource($this->sourceId);
 
         $this->db->transStart();
-        $this->serviceInterface->ReportProgress($file_id, 0, $steps, 'bulkupload', 'Importing data');
+        $this->reportProgress($file_id, 0, $steps, 'bulkupload', 'Importing data');
 
 		$done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
         // perform recursive insert for given file
         $done = $this->recursivePacket($this->data, $this->meta, $this->id, $file_id, $this->sourceId, null, null, null, $done);
 
-        $this->serviceInterface->ReportProgress($file_id, 1, $steps, 'bulkupload');
+        $this->reportProgress($file_id, 1, $steps, 'bulkupload');
 
-        $this->serviceInterface->ReportProgress($file_id, 2, $steps, 'bulkupload');
+        $this->reportProgress($file_id, 2, $steps, 'bulkupload');
 
         $output = [];
         $hits = [];
@@ -137,20 +135,15 @@ class PhenoPacketDataInput extends DataInput
             $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
         }
         else {
-            $this->serviceInterface->ReportProgress($file_id, 3, $steps, 'bulkupload');
-            $this->serviceInterface->ReportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
+            $this->reportProgress($file_id, 3, $steps, 'bulkupload');
+            $this->reportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
         }
 
-        $totalRecordCount = $this->sourceModel->countSourceEntries($this->sourceId);
+		if ($this->delete == 1) {
+			$this->removeAttribuesAndValuesFiles($this->fileName);
+		}
 
-        $this->sourceModel->updateSource(['record_count' => $totalRecordCount], ['source_id' => $this->sourceId]);
-
-        // update status table to class current file as inserted to database
         $this->dumpAttributesAndValues($file_id);
-        $this->uploadModel->markEndOfUpload($file_id, $this->sourceId);
-
-        $this->sourceModel->unlockSource($this->sourceId);
-
     }
 
     /**
