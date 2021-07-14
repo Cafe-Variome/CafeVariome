@@ -136,6 +136,6 @@ abstract class DataInput
 		$attribute = str_replace($malicious_chars, '', $attribute);
 		$value = str_replace($malicious_chars, '', $value);
 
-		$this->db->insert("INSERT INTO eavs (uid, source_id, fileName, subject_id, attribute, value) VALUES ('$uid', '$this->sourceId', '$file_id', '$subject_id', '$attribute', '$value');");
+		$this->db->insert("INSERT IGNORE INTO eavs (uid, source_id, fileName, subject_id, attribute, value) VALUES ('$uid', '$this->sourceId', '$file_id', '$subject_id', '$attribute', '$value');");
 	}
 }
