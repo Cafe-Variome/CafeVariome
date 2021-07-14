@@ -44,13 +44,4 @@ class MatchAllQuery extends AbstractQuery
 
 		return $result;
 	}
-
-	private function getESInstance(): \Elasticsearch\Client
-	{
-		$setting = Settings::getInstance();
-
-		$hosts = array($setting->getElasticSearchUri());
-		return ClientBuilder::create()->setHosts($hosts)->build();
-	}
-
 }
