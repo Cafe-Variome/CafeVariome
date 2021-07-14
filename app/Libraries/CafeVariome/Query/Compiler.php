@@ -318,13 +318,13 @@ class Compiler
 			case 'ordo':
 				$ORPHASimilarityQuery = new ORPHASimilarityQuery();
 				$ORPHASimilarityQuery->execute($clause, $source_id, $iscount);
-			case 'matchAll':
+			case 'matchall':
 				$matchAllQuery = new MatchAllQuery();
 				return $matchAllQuery->execute($clause, $source_id, $iscount);
 			case 'phenotype':
 				$phenotypeQuery = new PhenotypeQuery();
 				return $phenotypeQuery->execute($clause, $source_id, $iscount);
-			case 'subjectVariant':
+			case 'subjectvariant':
 				$subjectvariantQuery = new SubjectVariantQuery();
 				return $subjectvariantQuery->execute($clause, $source_id, $iscount);
 			case 'mutation':
