@@ -45,11 +45,12 @@
 </head>
 
 <body class="d-flex flex-column h-100">
-    <header>
-        <?= $this->include('partial/nav') ?>
-    </header>
-    
-    <main role="main flex-shrink-0">
+    <div class="container">
+        <header>
+            <?= $this->include('partial/nav') ?>
+        </header>
+    </div>
+    <main role="main">
         <div class="container">
             <?= $this->renderSection('content') ?>
         </div>
