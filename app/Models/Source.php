@@ -358,7 +358,8 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->update($data);
     }
 
-    function getSourcesForInstallationThatUserIdHasDisplayGroupAccessTo(int $user_id, string $installation_key, int $network_key, $accesstype) {
+    function getSourcesByUserIdAndNetworkKey(int $user_id, string $installation_key, int $network_key, string $accesstype = 'master')
+	{
         $this->builder = $this->db->table('users_groups_networks');
 
         $this->builder->select('ngs.source_id');
