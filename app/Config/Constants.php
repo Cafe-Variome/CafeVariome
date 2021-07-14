@@ -141,5 +141,7 @@ define('NEO4J_BATCH_SIZE', 30000);
 //Data input batch size used in transactions
 define('SPREADSHEET_BATCH_SIZE', 1000);
 
+//Elasticsearch Aggregate Size
+define('ELASTICSERACH_AGGREGATE_SIZE', 10000);
 
 
