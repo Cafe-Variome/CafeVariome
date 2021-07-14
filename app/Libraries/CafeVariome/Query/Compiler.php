@@ -317,7 +317,7 @@ class Compiler
 				return $HPOSimilarityQuery->execute($clause, $source_id, $iscount);
 			case 'ordo':
 				$ORPHASimilarityQuery = new ORPHASimilarityQuery();
-				$ORPHASimilarityQuery->execute($clause, $source_id, $iscount);
+				return $ORPHASimilarityQuery->execute($clause, $source_id, $iscount);
 			case 'matchall':
 				$matchAllQuery = new MatchAllQuery();
 				return $matchAllQuery->execute($clause, $source_id, $iscount);
