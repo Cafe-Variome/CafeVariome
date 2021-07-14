@@ -43,7 +43,6 @@ class Compiler
 			throw new \Exception('Query is not in a correct JSON format.');
 		}
 
-		$this->query = $query_array;
 		$installation_key = $setting->getInstallationKey();
 		$user_id = ($session->get('user_id') != null) ? $session->get('user_id') : $user_id;
 
@@ -58,6 +57,8 @@ class Compiler
 		if(!isset($query_array['logic']) || empty($query_array['logic'])) {
 			$this->makeLogic($query_array); // no logic section provided
 		}
+
+		$this->query = $query_array;
 
 		$decoupled = $this->decouple($query_array['logic']); // convert to ORs(AND, AND)
 		$pointer_query = $this->generate_pointer_query($decoupled);
