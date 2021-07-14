@@ -5,7 +5,7 @@
  * @author Owen Lancaster
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- * 
+ *
  * Source model class. This class handles operations on source entities.
  */
 
@@ -30,17 +30,15 @@ use CodeIgniter\Database\ConnectionInterface;
     }
 
     /**
-     * 
+     *
      */
     public function getOnlineSources() {
         $this->builder = $this->db->table($this->table);
+
         $this->builder->where('status', 'online');
         $query = $this->builder->get()->getResultArray();
-        $sources_options = array();
-        foreach ($query as $source) {
-            $sources_options[$source['name']] = $source['description'];
-        }
-        return $sources_options;
+
+        return $query;
     }
 
     public function createSource($data) {
@@ -51,7 +49,7 @@ use CodeIgniter\Database\ConnectionInterface;
     }
 
     /**
-     * 
+     *
      */
     public function updateSource(array $data, array $conds) {
         $this->builder = $this->db->table($this->table);
@@ -63,14 +61,14 @@ use CodeIgniter\Database\ConnectionInterface;
 
     /**
 	 * getSources
-     * 
+     *
 	 * General function to get fetch data from sources table.
-     * 
+     *
      * @author Mehdi Mehtarizadeh
 	 */
 	function getSources(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
 		$this->builder = $this->db->table($this->table);
-		
+
 		if ($cols) {
             $this->builder->select($cols);
         }
@@ -91,11 +89,11 @@ use CodeIgniter\Database\ConnectionInterface;
         }
 
         $query = $this->builder->get()->getResultArray();
-        return $query; 
+        return $query;
     }
 
     /**
-     * 
+     *
      */
     public function getSource(int $source_id) {
 
@@ -111,8 +109,8 @@ use CodeIgniter\Database\ConnectionInterface;
 
     /**
      * getSourcesByNetwork(int $network_key)
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getSourcesByNetwork(int $network_key)
     {
@@ -121,14 +119,14 @@ use CodeIgniter\Database\ConnectionInterface;
 		$this->builder->where('network_key', $network_key);
 
         $data = $this->builder->get()->getResultArray();
-        
+
         return $data;
     }
 
     /**
      * getSourcesByNetworks(array $network_keys)
-     * 
-     * @return array 
+     *
+     * @return array
      */
     public function getSourcesByNetworks(array $network_keys)
     {
@@ -138,7 +136,7 @@ use CodeIgniter\Database\ConnectionInterface;
 		$this->builder->whereIn('network_key', $network_keys);
 
         $data = $this->builder->get()->getResultArray();
-        
+
         return $data;
     }
 
@@ -164,8 +162,8 @@ use CodeIgniter\Database\ConnectionInterface;
     }
 
     /**
-     * 
-     * 
+     *
+     *
      */
     function getSourceId($group_id) {
         $this->builder = $this->db->table('network_groups_sources');
@@ -184,13 +182,13 @@ use CodeIgniter\Database\ConnectionInterface;
         $query = $this->builder->get()->getResultArray();
         return $query? $query[0]['source_id'] : null;
     }
-    
+
     /**
      * Get Source Name - Get the source name for given ID
      *
      * @param int $source_id - The source ID we are trying to find name for
      * @return string the Source Name
-     * 
+     *
      * Moved to source model by Mehdi Mehtarizadeh(02/08/2019)
      */
     public function getSourceNameByID($source_id) {
@@ -216,7 +214,7 @@ use CodeIgniter\Database\ConnectionInterface;
         $query = $this->builder->get()->getResultArray();
         return $query ? $query[0]['elastic_lock'] : false;
     }
-    
+
     /**
      * Counts entries per source.
      */
@@ -241,7 +239,7 @@ use CodeIgniter\Database\ConnectionInterface;
     }
 
     /**
-     * 
+     *
      */
     public function deleteSourceFromEAVs(int $source_id) {
         $this->builder = $this->db->table('eavs');
@@ -249,7 +247,7 @@ use CodeIgniter\Database\ConnectionInterface;
     }
 
     /**
-     * 
+     *
      */
     public function deleteSource($source_id) {
         $this->builder = $this->db->table($this->table);
@@ -264,7 +262,7 @@ use CodeIgniter\Database\ConnectionInterface;
      */
     public function getSourceStatus($source_id) {
         // SELECT UploadDataStatus.FileName, UploadDataStatus.uploadStart, UploadDataStatus.uploadStart, UploadDataStatus.Status, UploadDataStatus.elasticStatus, users.email FROM UploadDataStatus INNER JOIN users ON UploadDataStatus.user_id=users.id;
-        
+
         $this->builder = $this->db->table('uploaddatastatus');
         $this->builder->select('uploaddatastatus.ID,uploaddatastatus.FileName,uploaddatastatus.uploadEnd,uploaddatastatus.uploadStart,uploaddatastatus.Status,uploaddatastatus.elasticStatus,uploaddatastatus.patient,uploaddatastatus.tissue,users.email,sources.name');
         $this->builder->join('users', 'uploaddatastatus.user_id=users.id', 'inner');
@@ -292,7 +290,7 @@ use CodeIgniter\Database\ConnectionInterface;
         $query = $this->builder->get()->getResultArray();
         return $query;
     }
-        
+
     public function canCurateSource($source_id, $user_id) {
         $this->builder = $this->db->table('curators');
 
@@ -302,11 +300,11 @@ use CodeIgniter\Database\ConnectionInterface;
         $count = $this->builder->countAllResults();
         return $count;
     }
-    
+
     /**
      * Toggle Source Lock -  Lock the source which is currently being regenerated or
      * uploaded to
-     * 
+     *
      * Moved to source model by Mehdi Mehtarizadeh (02/08/2019)
      * @deprecated
      * @param int $source_id - The source we are locking
@@ -325,9 +323,9 @@ use CodeIgniter\Database\ConnectionInterface;
     /**
      * Source Lock -  Lock the source which is currently being regenerated or
      * uploaded to
-     * 
+     *
      * Moved to source model by Mehdi Mehtarizadeh (02/08/2019)
-     * 
+     *
      * @param int $source_id - The source we are locking
      * @return void
      */
@@ -343,9 +341,9 @@ use CodeIgniter\Database\ConnectionInterface;
     /**
      * Source Unock -  Unlock the source which was being regenerated or
      * uploaded to
-     * 
+     *
      * Moved to source model by Mehdi Mehtarizadeh (02/08/2019)
-     * 
+     *
      * @param int $source_id - The source we are locking
      * @return void
      */
@@ -382,7 +380,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param int $source_id - The name of the source
      * @return N/A
      */
-    function setElasticFlag(int $source_id) 
+    function setElasticFlag(int $source_id)
     {
         $this->builder = $this->db->table($this->table);
 
@@ -398,7 +396,7 @@ use CodeIgniter\Database\ConnectionInterface;
      * @param int $source_id - The name of the source
      * @return array $query       - All columns for all files which are fresh
      */
-    function getElasticFlag(int $source_id):int 
+    function getElasticFlag(int $source_id):int
     {
         $this->builder = $this->db->table($this->table);
 
@@ -409,5 +407,5 @@ use CodeIgniter\Database\ConnectionInterface;
 
         return ($query) ? $query[0]->elastic_status : -1;
     }
-    
+
  }
