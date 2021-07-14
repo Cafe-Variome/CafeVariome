@@ -14,7 +14,7 @@ use Elasticsearch\ClientBuilder;
  *
  */
 
-class MatchAllQuery
+class MatchAllQuery extends AbstractQuery
 {
 	private $aggregate_size;
 
