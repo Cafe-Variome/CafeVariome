@@ -44,6 +44,7 @@ class QueryApi extends ResourceController
         $queryString = $this->request->getVar('query');
         //$user_id = $this->request->getVar('user_id');
         $token = json_decode($this->request->getVar('token'), true);
+		$apiResponseBundle = new APIResponseBundle();
 
         if ($token != null) {
 
@@ -52,13 +53,12 @@ class QueryApi extends ResourceController
             $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
             $user_id = $authAdapter->getUserIdByToken($token);
 
-            $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query();
+            $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler();
 
-            $apiResponseBundle = new APIResponseBundle();
             $networkRequestModel = new NetworkRequest();
             $resp = [];
             try {
-                $resp = $cafeVariomeQuery->search($queryString, $network_key, $user_id);
+                $resp = $cafeVariomeQuery->CompileAndRunQuery($queryString, $network_key, $user_id);
                 $apiResponseBundle->initiateResponse(1, json_decode($resp, true));
 
             } catch (\Exception $ex) {
