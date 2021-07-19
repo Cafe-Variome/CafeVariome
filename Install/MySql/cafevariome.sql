@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 08, 2021 at 04:31 PM
+-- Generation Time: Jul 19, 2021 at 03:43 PM
 -- Server version: 5.7.34-0ubuntu0.18.04.1
 -- PHP Version: 7.4.20
 
@@ -248,13 +248,12 @@ CREATE TABLE `sources` (
   `description` mediumtext NOT NULL,
   `long_description` mediumtext NOT NULL,
   `status` varchar(15) NOT NULL,
-  `type` varchar(30) NOT NULL DEFAULT 'mysql',
   `date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
   `record_count` bigint(255) NOT NULL DEFAULT '0',
   `elastic_status` tinyint(1) DEFAULT '0',
-  `elastic_lock` tinyint(1) DEFAULT '0',
-  `elastic_data` tinyint(1) DEFAULT '0',
-  `neo4j_data` tinyint(1) DEFAULT '0'
+  `elastic_lock` tinyint(1) DEFAULT '0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -359,7 +358,7 @@ CREATE TABLE `users_groups` (
 --
 
 INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
-(1, 1, 1),
+(1, 1, 1);
 
 -- --------------------------------------------------------
 
@@ -468,8 +467,7 @@ ALTER TABLE `settings`
 ALTER TABLE `sources`
   ADD PRIMARY KEY (`source_id`),
   ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `status` (`status`),
-  ADD KEY `type` (`type`);
+  ADD KEY `status` (`status`);
 
 --
 -- Indexes for table `uploaddatastatus`
