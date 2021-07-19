@@ -75,13 +75,9 @@ class Compiler
 				if(!in_array($source_id, $master_group_sources) && !in_array($source_id, $source_display_group_sources) && !in_array($source_id, $count_display_group_sources)) continue;
 
 				$results[$source['name']] = "Access Denied";
-				if (array_key_exists($source_id, $master_group_sources) || array_key_exists($source_id, $source_display_group_sources))
+				if (array_key_exists($source_id, $source_display_group_sources) || array_key_exists($source_id, $count_display_group_sources))
 				{
 					$results[$source['name']] = $this->execute_query($pointer_query, $source['source_id']);
-				}
-				if (array_key_exists($source_id, $count_display_group_sources))
-				{
-
 				}
 			}
 		}
