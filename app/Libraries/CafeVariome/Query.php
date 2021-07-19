@@ -10,6 +10,11 @@ use App\Models\EAV;
 use App\Libraries\ElasticSearch;
 use Elasticsearch\ClientBuilder;
 
+/**
+ * Class Query
+ * @package App\Libraries\CafeVariome
+ * @deprecated
+ */
 class Query extends CafeVariome{
 
     private $elasticClient;
