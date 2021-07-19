@@ -3,15 +3,15 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <div class="row">
 	<div class="col">
 		<p>Please enter the source information below.</p>
 	</div>
-</div>	
+</div>
 <?php if($message): ?>
 	<div class="row">
 		<div class="col">
@@ -43,7 +43,17 @@
 	</div>
 	<div class="col-6">
 		<?php echo form_label('Source URI', 'uri'); ?>
-		<?php echo form_input($uri); ?>		
+		<?php echo form_input($uri); ?>
+	</div>
+</div>
+<div class="form-group row">
+	<div class=col-6>
+		<?php echo form_label('Username', 'username'); ?>
+		<?php echo form_input($username); ?>
+	</div>
+	<div class="col-6">
+		<?php echo form_label('Password', 'password'); ?>
+		<?php echo form_input($password); ?>
 	</div>
 </div>
 <div class="form-group row">
@@ -65,7 +75,7 @@
 <div class="form-group row">
 	<div class=col-12>
 		<?php echo form_label('Long Source Description', 'long_description'); ?>
-			<?php echo form_textarea($long_description); ?>	
+			<?php echo form_textarea($long_description); ?>
 		</div>
 </div>
 <div class="form-group row">

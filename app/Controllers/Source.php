@@ -149,12 +149,26 @@ class Source extends CVUI_Controller{
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ]
+            ],
+			'username' => [
+				'label'  => 'Username',
+				'rules'  => 'string',
+				'errors' => [
+					'string' => '{field} must be a valid string.'
+				]
+			],
+			'password' => [
+				'label'  => 'Password',
+				'rules'  => 'string',
+				'errors' => [
+					'string' => '{field} must be a valid string.'
+				]
+			],
         ]
         );
 
         // Get all available groups for the networks this installation is a member of from auth central for multi select list
-        $networkModel = new \App\Models\Network($this->db);
+        $networkModel = new \App\Models\Network();
 
         $networkGroups = $networkModel->getNetworkGroupsForInstallation();
 
@@ -180,9 +194,10 @@ class Source extends CVUI_Controller{
             $description = $this->request->getVar('desc');
             $long_description = $this->request->getVar('long_description');
             $status = $this->request->getVar('status');
-            $type = $this->request->getVar('type');
+			$username = $this->request->getVar('username');
+			$password = $this->request->getVar('password');
 
-            $source_data = array("name" => $name, "owner_name" => $owner_name, "email" => $email, "uri" => $uri, "description" => $description, "long_description" => $long_description, "type" => "mysql", "status" => $status);
+            $source_data = array("name" => $name, "owner_name" => $owner_name, "email" => $email, "uri" => $uri, "description" => $description, "long_description" => $long_description, "status" => $status, 'username' => $username, 'password' => $password);
             try {
                 $insert_id = $this->sourceModel->createSource($source_data);
 
@@ -192,7 +207,7 @@ class Source extends CVUI_Controller{
                         // Need to explode the group multi select to get the group_id and the network_key since the value is comma separated as I needed to pass both in the value
                         $group_data_array[] = $src_group_data;
                     }
-                    $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
+                    $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id, $group_data_array);
                 }
 
                 if ($this->request->getVar('count_display')) {
@@ -200,7 +215,7 @@ class Source extends CVUI_Controller{
                     foreach ($this->request->getVar('count_display') as $count_group_data) {
                         $group_data_array[] = $count_group_data;
                     }
-                    $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id,$group_data_array);
+                    $networkModel->addSourceFromInstallationToMultipleNetworkGroups($insert_id, $group_data_array);
                 }
 
                 $this->setStatusMessage("Source '$name' was created successfully.", STATUS_SUCCESS);
@@ -268,13 +283,21 @@ class Source extends CVUI_Controller{
                 'value' => set_value('status'),
             );
 
-            $uidata->data['type'] = array(
-                'name' => 'type',
-                'id' => 'type',
-                'type' => 'select',
-                'class' => 'form-control',
-                'value' => set_value('type'),
-            );
+			$uidata->data['username'] = array(
+				'name' => 'username',
+				'id' => 'username',
+				'type' => 'text',
+				'class' => 'form-control',
+				'value' => set_value('username'),
+			);
+
+			$uidata->data['password'] = array(
+				'name' => 'password',
+				'id' => 'password',
+				'type' => 'text',
+				'class' => 'form-control',
+				'value' => set_value('password'),
+			);
 
             $uidata->data['selected_source_display'] = $this->request->getVar('source_display') ? $this->request->getVar('source_display') :[];
             $uidata->data['selected_count_display'] = $this->request->getVar('count_display') ? $this->request->getVar('count_display') :[];
@@ -354,7 +377,21 @@ class Source extends CVUI_Controller{
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ]
+            ],
+			'username' => [
+				'label'  => 'Username',
+				'rules'  => 'string',
+				'errors' => [
+					'string' => '{field} must be a valid string.'
+				]
+			],
+			'password' => [
+				'label'  => 'Password',
+				'rules'  => 'string',
+				'errors' => [
+					'string' => '{field} must be a valid string.'
+				]
+			],
         ]
         );
 
@@ -369,11 +406,12 @@ class Source extends CVUI_Controller{
             $update_data['uri'] = $this->request->getVar('uri');
             $update_data['description'] = $this->request->getVar('desc');
             $update_data['long_description'] = $this->request->getVar('long_description');
-            $update_data['type'] = $this->request->getVar('type');
             $update_data['status'] = $this->request->getVar('status');
+			$update_data['username'] = $this->request->getVar('username');
+			$update_data['password'] = $this->request->getVar('password');
 
-            try {
-                $this->sourceModel->updateSource($update_data, ["source_id"=>$this->request->getVar('source_id')]);
+			try {
+                $this->sourceModel->updateSource($update_data, ["source_id" => $this->request->getVar('source_id')]);
 
                 $group_data_array = array();
                 // Check if there any groups selected
@@ -480,12 +518,22 @@ class Source extends CVUI_Controller{
                     'type' => 'select',
                     'value' => set_value('status'),
                 );
-                $uidata->data['type'] = array(
-                    'name' => 'type',
-                    'id' => 'type',
-                    'type' => 'dropdown',
-                    'value' => set_value('type', $source_data['type']),
-                );
+
+				$uidata->data['username'] = array(
+					'name' => 'username',
+					'id' => 'username',
+					'type' => 'text',
+					'class' => 'form-control',
+					'value' => set_value('username', $source_data['username']),
+				);
+
+				$uidata->data['password'] = array(
+					'name' => 'password',
+					'id' => 'password',
+					'type' => 'text',
+					'class' => 'form-control',
+					'value' => set_value('password', $source_data['password']),
+				);
 
                 $uidata->javascript = array(JS.'cafevariome/components/transferbox.js',JS.'cafevariome/source.js');
 
