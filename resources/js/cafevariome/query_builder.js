@@ -1,7 +1,8 @@
 $('#reset_query').click(function() {
     location.reload();
 });
-var modal_data = {};
+var result_data = {};
+var source_data = {};
 
 $( function() {
     $( "#age-range" ).slider({
@@ -419,7 +420,8 @@ $(function() {
                 data: {'jsonAPI': jsonAPI, 'user_id': $('#user_id').val()},
                 dataType: 'json',
                 success: function (data) {
-                    modal_data = {};
+                    result_data = {};
+                    source_data = {};
                     $.each(data, function(key, val) {
                         if(key == 'error'){
                             trow = "<tr><td>Error</td><td>" + val + "</td></tr>";
@@ -434,22 +436,37 @@ $(function() {
                             $.each(resp, function(key, val1) {
                                 //$('#resTbl tbody').empty();
                                 trow = "<tr id = " + key + "><td>" + key + "</a></td>";
-                                if (val1 != "Access Denied") {
-                                        modal_data[key] = val1;
-                                        if (val1.length > 0) {
-                                            trow += '<td><a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal" data-sourcename="' + key + '">' + Object.keys(val1).length + '</a></td>';
-                                        }
-                                        else if( Object.keys(val1).length > 0){
-                                            trow += '<td><a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal" data-sourcename="' + key + '">' + Object.keys(val1).length + '</a></td>';
+                                if (val1['records'] != "Access Denied") {
+                                    var records = val1['records'];
+                                    var source_display = val1['source_display'];
+                                    source_data[key] = val1['details'];
+                                    result_data[key] = records;
+                                    trow += '<td>';
+                                    if (records.length > 0 || Object.keys(records).length > 0) {
+                                        if (source_display){
+                                            trow += '<a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal" data-sourcename="' + key + '">' + Object.keys(records).length + '</a>';
                                         }
                                         else{
-                                            trow += '<td>0</td>';
+                                            trow +=  Object.keys(records).length;
                                         }
                                     }
                                     else{
-                                        trow += '<td>Access Denied</td>';
+                                        trow += '0';
                                     }
-                                    trow += "</tr>";
+                                    trow += '</td><td>';
+
+                                    if (source_display){
+                                        trow += '<a type="button" class="btn btn-info active" data-toggle="modal" data-target="#sourceModal" data-sourcename="' + key + '"><i class="fa fa-database"></i></a>';
+                                    }
+                                    else{
+                                        trow += 'Not Available';
+                                    }
+                                    trow += '</td>';
+                                }
+                                else{
+                                    trow += '<td>Access Denied</td>';
+                                }
+                                trow += "</tr>";
                                     $('#query_result tbody').append(trow);
                                 //}
                             })    
@@ -526,17 +543,17 @@ $(function() {
             $rule.siblings().find('.btn-remove').hide();
         }
         $rule.remove()
-    })
+    });
 
     $('#resultModal').on('shown.bs.modal', function (e) {
         $('#resTbl').hide();
         $('#loader').show();
 
         var src = $(e.relatedTarget).data('sourcename');
-        var result_data = modal_data[src];
+        var source_results = result_data[src];
         var ic = 1;
         var resRow = '';
-        $.each(result_data, function (rkey, rval) {
+        $.each(source_results, function (rkey, rval) {
             resRow += '<tr><td>' + ic + '</td><td>' + rval + '</td></tr>'
             ic++;
         })
@@ -550,13 +567,35 @@ $(function() {
         $('#loader').hide();
         $('#resTbl').show();
 
-    })
+    });
 
     $('#resultModal').on('hidden.bs.modal', function (e) {
         $('#resTbl').DataTable().destroy();
         $('#resTbl tbody').empty();
-    })
-    // https://stackoverflow.com/a/6647367/5510713
+    });
+
+    $('#sourceModal').on('show.bs.modal', function (e) {
+
+        var src = $(e.relatedTarget).data('sourcename');
+        var source_results = source_data[src];
+        $('#source_name').html('<p class="ml-1">' + source_results['name'] + '</p>');
+        $('#source_owner').html('<p class="ml-1">' + source_results['owner_name'] + '</p>');
+        $('#source_owner_email').html('<p class="ml-1">' + source_results['email'] + '</p>');
+        $('#source_uri').html('<p class="ml-1">' + source_results['uri'] + '</p>');
+        $('#source_description').html('<p class="ml-1">' + source_results['description'] + '</p>');
+        $('#source_long_description').html('<p class="ml-1">' + source_results['long_description'] + '</p>');
+    });
+
+    $('#sourceModal').on('hidden.bs.modal', function (e) {
+        $('#source_name').html('');
+        $('#source_owner').html('');
+        $('#source_owner_email').html('');
+        $('#source_uri').html('');
+        $('#source_description').html('');
+        $('#source_long_description').html('');
+    });
+
+        // https://stackoverflow.com/a/6647367/5510713
     jQuery.fn.filterByText = function(textbox) {
       return this.each(function() {
         var select = this;

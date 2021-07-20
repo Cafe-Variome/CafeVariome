@@ -73,7 +73,7 @@ use CodeIgniter\Config\Services;
 
         $user_id = $authAdapter->getUserIdByToken($token);
 
-        //try {
+        try {
             $results = [];
             $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler();
             $loaclResults = $cafeVariomeQuery->CompileAndRunQuery($queryString, $network_key, $user_id); // Execute locally
@@ -98,9 +98,9 @@ use CodeIgniter\Config\Services;
             }
 
             return json_encode($results);
-        //} catch (\Exception $ex) {
+        } catch (\Exception $ex) {
             return json_encode(['error' => 'There was a problem executing the query. Please try again with a different query.'.$ex->getMessage()]);
-        //}
+        }
     }
 
     function HPOQuery(string $hpo_term = ''){

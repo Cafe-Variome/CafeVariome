@@ -331,6 +331,7 @@
         <tr>
             <th>Source</th>
             <th>Counts</th>
+			<th>Source Details</th>
         </tr>
     </thead>
     <tbody>
@@ -394,4 +395,76 @@
     </div>
   </div>
 </div>
+
+<!-- Source Modal -->
+<div class="modal fade" id="sourceModal" tabindex="-1" role="dialog" aria-labelledby="sourceModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="sourceModalLabel">Source Information</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body">
+				<div class="row">
+					<div class="col-6">
+						<b>Source Name</b>
+					</div>
+					<div class="col-6">
+						<b>Owner Name</b>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6" id="source_name">
+
+					</div>
+					<div class="col-6" id="source_owner">
+
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6">
+						<b>Owner Email</b>
+					</div>
+					<div class="col-6">
+						<b>Source URL</b>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6" id="source_owner_email">
+
+					</div>
+					<div class="col-6" id="source_uri">
+
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6">
+						<b>Short Description</b>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12" id="source_description">
+
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-6">
+						<b>Full Description</b>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-12" id="source_long_description">
+
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <?= $this->endSection() ?>
