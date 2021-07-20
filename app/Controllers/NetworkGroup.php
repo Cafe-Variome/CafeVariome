@@ -3,10 +3,10 @@
 /**
  * Name: NetworkGroup.php
  * Created: 31/07/2019
- * 
+ *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
 
 use App\Models\Network;
@@ -15,7 +15,7 @@ use App\Models\User;
 use App\Models\Source;
 use App\Helpers\AuthHelper;
 use App\Libraries\CafeVariome\Auth\AuthAdapter;
-use CodeIgniter\Config\Services; 
+use CodeIgniter\Config\Services;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 
 class NetworkGroup extends CVUI_Controller{
@@ -26,7 +26,7 @@ class NetworkGroup extends CVUI_Controller{
 	 * @var string
 	 */
 	protected $validationListTemplate = 'list';
-	
+
 	private $networkModel;
 
 	private $networkGroupModel;
@@ -39,13 +39,13 @@ class NetworkGroup extends CVUI_Controller{
         parent::setProtected(true);
         parent::setIsAdmin(true);
 		parent::initController($request, $response, $logger);
-		
+
 		$this->validation = Services::validation();
 		$this->networkModel = new Network();
 		$this->networkGroupModel = new \App\Models\NetworkGroup();
         $this->userModel = new User();
 	}
-	
+
 	public function Index(){
         return redirect()->to(base_url($this->controllerName.'/List'));
     }
@@ -54,7 +54,7 @@ class NetworkGroup extends CVUI_Controller{
 		$uidata = new UIData();
 		$uidata->title = "Network Groups";
 
-		$localNetworkGroups = $this->networkGroupModel->getNetworkGroups(null, null, ['name', 'id'], true); // Local network groups
+		$localNetworkGroups = $this->networkGroupModel->getNetworkGroups(null, ['group_type!=' => 'master'], ['name', 'id'], true); // Local network groups
 		$remoteNetworkGroups = $this->networkGroupModel->getRemoteNetworkGroups(); // Remote network groups
 
 		$network_groups_for_installation = [];
@@ -92,7 +92,7 @@ class NetworkGroup extends CVUI_Controller{
 		$networkInterface = new NetworkInterface();
 
         //validate form input
-        
+
         $this->validation->setRules([
             'group_name' => [
                 'label'  => 'Group name',
@@ -119,7 +119,7 @@ class NetworkGroup extends CVUI_Controller{
             ]
         ]
         );
-		
+
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
 			// Create the new group
 			$name =  $this->request->getVar('group_name');
@@ -129,14 +129,14 @@ class NetworkGroup extends CVUI_Controller{
 							'network_key' => $this->request->getVar('network'),
 							'url' => base_url()
 			);
-			
+
 			try {
 				$this->networkGroupModel->createNetworkGroup($data);
 				$this->setStatusMessage("Network group '$name' was created.", STATUS_SUCCESS);
 			} catch (\Exception $ex) {
 				$this->setStatusMessage("There was a problem creating '$name'.", STATUS_ERROR);
 			}
-			return redirect()->to(base_url($this->controllerName . '/List'));   
+			return redirect()->to(base_url($this->controllerName . '/List'));
 
 		}
 		else {
@@ -178,11 +178,11 @@ class NetworkGroup extends CVUI_Controller{
 				'class' => 'form-control',
 				'value' => set_value('group_type'),
             );
-            
+
             $data = $this->wrapData($uidata);
 
 			return view($this->viewDirectory.'/Create', $data);
-		}		
+		}
 
     }
 
@@ -223,7 +223,7 @@ class NetworkGroup extends CVUI_Controller{
 						$f = $this->networkGroupModel->deleteNetworkGroup($id);
 						$this->setStatusMessage("Network group was removed.", STATUS_SUCCESS);
 
-						return redirect()->to(base_url($this->controllerName.'/List'));            	
+						return redirect()->to(base_url($this->controllerName.'/List'));
 					}
 					else {
 						$this->setStatusMessage("Unable to delete network group as sources from another installation are present in the group.", STATUS_ERROR);					}
@@ -231,13 +231,13 @@ class NetworkGroup extends CVUI_Controller{
 					$this->setStatusMessage("There was a problem removing network group.", STATUS_ERROR);
 				}
 			}
-			return redirect()->to(base_url($this->controllerName.'/List'));            	
+			return redirect()->to(base_url($this->controllerName.'/List'));
 		}
 
 		$data = $this->wrapData($uidata);
 
 		return view($this->viewDirectory.'/Delete', $data);
-		
+
 	}
 
 	function Update_Users(int $id, $isMaster = false) {
@@ -257,17 +257,15 @@ class NetworkGroup extends CVUI_Controller{
                 $installation_key = $this->request->getVar('installation_key');
 
                 try {
-                    $this->networkModel->deleteAllUsersFromNetworkGroup($group_id);
+                    $this->networkModel->deleteAllUsersFromNetworkGroup($group_id, false);
                     $network_key = $this->networkModel->getNetworkKeybyGroupId($group_id);
-    
+
                     foreach ($this->request->getVar('users') as $user_id)
                     {
                         $this->networkModel->addUserToNetworkGroup($user_id, $group_id, $installation_key, $network_key);
                     }
-    
-                    $this->networkModel->deleteUserFromAllOtherNetworkGroups($network_key, $this->request->getVar('users'));
-                    $this->setStatusMessage("Granted users list was updated for '$name'.", STATUS_SUCCESS);
 
+                    $this->setStatusMessage("Granted users list was updated for '$name'.", STATUS_SUCCESS);
                 } catch (\Exception $ex) {
                     $this->setStatusMessage("There was a problem updating granted users list for '$name'.", STATUS_ERROR);
                 }
@@ -301,7 +299,7 @@ class NetworkGroup extends CVUI_Controller{
                     $this->setStatusMessage("There was a problem updating granted sources list for '$name'.", STATUS_ERROR, true);
                 }
             }
-            else { 
+            else {
                 // No groups selected so remove the user from all network groups
                 $group_id = $this->request->getVar('id');
                 $installation_key = $this->request->getVar('installation_key');
@@ -313,23 +311,23 @@ class NetworkGroup extends CVUI_Controller{
                     $this->setStatusMessage("There was a problem removing all sources from the list of granted sources for '$name'.", STATUS_ERROR, true);
                 }
             }
-    
-			return redirect()->to(base_url($this->controllerName.'/List'));            
+
+			return redirect()->to(base_url($this->controllerName.'/List'));
         }
         else{
 
             $uidata->data['user_id'] = $id;
-    
+
             //set the flash data error message if there is one
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
             $users = $this->userModel->getUsers();
             $selectedUsers = $this->networkModel->getNetworkGroupUsers($id);
             $group_details = $this->networkModel->getNetworkGroup($id);
-            $uidata->data['name'] = $group_details['name'];   
-            $uidata->data['group_type'] = $group_details['group_type']; 
-    
+            $uidata->data['name'] = $group_details['name'];
+            $uidata->data['group_type'] = $group_details['group_type'];
+
             $sourceModel = new Source();
-    
+
             $sources = $sourceModel->getSources();
             $selectedSources = $sourceModel->getSourceId($id);
 
@@ -346,7 +344,7 @@ class NetworkGroup extends CVUI_Controller{
 
             $uidata->data['sources'] = $sourcesList;
             $uidata->data['selectedSources'] = $selectedSourcesList;
-            
+
             $usersList = [];
             $selectedUsersList = [];
 
@@ -363,8 +361,8 @@ class NetworkGroup extends CVUI_Controller{
             }
 
             $uidata->data['users'] = $usersList;
-            $uidata->data['selectedUsers'] = $selectedUsersList;   
-            
+            $uidata->data['selectedUsers'] = $selectedUsersList;
+
             $uidata->data['remote_user_email'] = array(
                 'name' => 'remote_user_email',
                 'id' => 'remote_user_email',
@@ -372,13 +370,13 @@ class NetworkGroup extends CVUI_Controller{
                 'class' => 'form-control',
                 'value' =>set_value('remote_user_email'),
             );
-            
+
             $uidata->data['isMaster'] = ($isMaster ? $isMaster : 0);
             $uidata->data['user_id'] = $id;
             $uidata->data['installation_key'] = $this->setting->getInstallationKey();
-    
+
             $uidata->javascript = array(JS."cafevariome/network.js", JS."cafevariome/components/transferbox.js");
-    
+
             $data = $this->wrapData($uidata);
             return view($this->viewDirectory.'/Update_Users', $data);
         }
