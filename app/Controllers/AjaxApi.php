@@ -854,7 +854,6 @@ use CodeIgniter\Config\Services;
                 break;
             default:
                 return json_encode(0);
-                break;
         }
 
         $uploadModel = new Upload();
