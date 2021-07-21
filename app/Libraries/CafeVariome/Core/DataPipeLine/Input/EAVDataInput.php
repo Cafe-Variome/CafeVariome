@@ -291,6 +291,9 @@ class EAVDataInput extends DataInput
                 }
             }
         }
+        else if (is_numeric($grouping)){
+			$group_positions[$grouping] = $grouping;
+		}
 
         return $group_positions;
     }

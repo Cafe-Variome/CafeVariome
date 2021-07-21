@@ -2,11 +2,11 @@
 
 /**
  * ValidationHelper.php
- * 
+ *
  * Created: 19/08/2019
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
+ *
  * This class contains helper functions for form validation.
  */
 
@@ -24,13 +24,13 @@ class ValidationHelper{
      * unique_network_group_name_check
      * @param string $group_name the user input to be checked for uniqueness.
      * @param string $network_key the network key accompanying group name.
-     * 
+     *
      * @return bool true if the network group name does not exist in the database, false otherwise.
-     * 
+     *
      * @author Mehdi Mehtarizadeh
      */
-    
-    function unique_network_group_name_check(string $group_name, string $network_key): bool 
+
+    function unique_network_group_name_check(string $group_name, string $network_key): bool
     {
         $networkGroupModel = new \App\Models\NetworkGroup();
         return ($networkGroupModel->getNetworkGroups('', array('network_key' => $network_key, 'name' => $group_name)) ? false : true);
@@ -64,7 +64,7 @@ class ValidationHelper{
                 if (preg_match($regexp, $str, $matches)) {
                     return true;
                 }
-                
+
                 $err = "The only valid input for {field} is alphanumeric characters, dashes, and underscores.";
             }
         }
@@ -99,6 +99,9 @@ class ValidationHelper{
 
                     return true;
                 }
+                elseif (is_numeric($str)){
+                	return true;
+				}
             }
         }
 
