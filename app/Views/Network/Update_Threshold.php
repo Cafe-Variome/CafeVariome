@@ -26,7 +26,7 @@
 <div class="form-group row">
 	<div class="col">
 		<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i>  Save</button>
-		<a href="<?php echo base_url() . 'network'; ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>        
+		<a href="<?php echo base_url() . '/Network'; ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>        
 	</div>
 </div>
 
