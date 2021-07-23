@@ -50,6 +50,11 @@ class Compiler
 		$source_display_group_sources = $this->getNetworkGroups($user_id, $network_key, $installation_key, 'source_display');
 		$count_display_group_sources = $this->getNetworkGroups($user_id, $network_key, $installation_key, 'count_display');
 
+		$attributes = [];
+		if (array_key_exists('attributes', $query_array['requires']['response']['components'])){
+			$attributes = $query_array['requires']['response']['components']['attributes'];
+		}
+
 		if (!isset($query_array['query']) || empty($query_array['query'])) {
 			$query_array['query']['components']['matchAll'][0] = [];
 		}
@@ -74,11 +79,20 @@ class Compiler
 				$source_id = $source['source_id'];
 				if(!in_array($source_id, $master_group_sources) && !in_array($source_id, $source_display_group_sources) && !in_array($source_id, $count_display_group_sources)) continue;
 
-				$results[$source['name']]['records'] = "Access Denied";
+				$results[$source['name']]['records']['subjects'] = "Access Denied";
 				if (array_key_exists($source_id, $source_display_group_sources) || array_key_exists($source_id, $count_display_group_sources))
 				{
+					$ids = $this->execute_query($pointer_query, $source['source_id']);
+					$records = [];
+					$records['subjects'] = $ids;
+
+					$elasticResult = new ElasticsearchResult();
+					foreach ($attributes as $attribute){
+						$records['attributes'][$attribute] = $elasticResult->extract($ids, $attribute, $source_id);
+					}
+
 					$results[$source['name']] = [
-						'records' => $this->execute_query($pointer_query, $source['source_id']),
+						'records' => $records,
 						'source_display' => array_key_exists($source_id, $source_display_group_sources),
 						'details' => $source
 					];
@@ -331,5 +345,42 @@ class Compiler
 				$mutationQuery = new MutationQuery();
 				return $mutationQuery->execute($clause, $source_id, $iscount);
 		}
+	}
+
+	private function elasticVal (array $ids, string $attribute, string $source, $flag = 'id') {
+		$elasticModel = new Elastic();
+		$sourceModel = new Source();
+
+		$paramsnew = [];
+		$sourceId = $sourceModel->getSourceIDByName($source);
+		$es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;
+		$paramsnew = ['index' => $es_index];
+
+		$paramsnew['size'] = 10000;
+		//$paramsnew['type'] = 'subject';
+		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source . '_eav'; // for source
+		$paramsnew['body']['query']['bool']['must'][1]['term']['type'] = "eav";
+		$paramsnew['body']['query']['bool']['must'][2]['term']['attribute'] = $attribute;
+		foreach ($ids as $id) {
+			$paramsnew['body']['query']['bool']['should'][] = ['term'=>['subject_id' => $id]];
+		}
+
+		$paramsnew['body']['query']['bool']["minimum_should_match"] = 1;
+
+		$jp = json_encode($paramsnew);
+
+		$resultsnew = $this->elasticClient->search($paramsnew);
+
+		$final = [];
+		foreach ($resultsnew['hits']['hits'] as $hit) {
+			$id =  $hit['_source']['subject_id'];
+			$val =  $hit['_source']['value'];
+			$final[$flag === 'value' ? $val : $id][] = $flag === 'value' ? $id : $val;
+		}
+		foreach ($final as $key => $value) {
+			$final[$key] = array_unique($final[$key]);
+		}
+		return $final;
+
 	}
 }

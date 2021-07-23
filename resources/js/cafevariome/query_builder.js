@@ -306,6 +306,7 @@ $(function() {
         $.ajax({ url: urls['qb_json'], dataType: 'json', })
         .done((jsonAPI) => {
 
+            var attributes = [] // Attributes that need to be extracted from sources after query go here. Do not add subject_id as it is included implicitly.
             var logic = {"-AND": []}
             var eav = []
             var phe = []
@@ -405,6 +406,7 @@ $(function() {
 
             if(logic_gen.length > 1 && genLogic === 'OR') {logic['-AND'].push({'-OR': logic_gen})}
 
+            jsonAPI['requires']['response']['components']['attributes'] = attributes;
             jsonAPI['query']['components']['eav'] = eav;
             jsonAPI['query']['components']['subjectVariant'] = gen;
             jsonAPI['query']['components']['phenotype'] = phe;
@@ -436,8 +438,8 @@ $(function() {
                             $.each(resp, function(key, val1) {
                                 //$('#resTbl tbody').empty();
                                 trow = "<tr id = " + key + "><td>" + key + "</a></td>";
-                                if (val1['records'] != "Access Denied") {
-                                    var records = val1['records'];
+                                if (val1['records']['subjects'] != "Access Denied") {
+                                    var records = val1['records']['subjects'];
                                     var source_display = val1['source_display'];
                                     source_data[key] = val1['details'];
                                     result_data[key] = records;
