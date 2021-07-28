@@ -138,9 +138,9 @@ class DataStream
 				$matchedTerms = $neo4jInterface->MatchHPO_IS_A($term);
                 $pars = [];
                 $termname = '';
-                foreach ($matchedTerms->getRecords() as $record) {
-                    array_push($pars, $record->value('ph'));
-                    $termname = $record->value('termname');
+                foreach ($matchedTerms as $record) {
+                    array_push($pars, $record->get('ph'));
+                    $termname = $record->get('termname');
                 }
                 $term .= ' (' . $termname . ')';
                 $ancestors = $this->collect_ids_neo4j('', $pars);
@@ -158,8 +158,8 @@ class DataStream
                             $matchedTerms = $neo4jInterface->MatchHPO_IS_A($t);
                             $pars = [];
                             $termname = '';
-                            foreach ($matchedTerms->getRecords() as $record) {
-                                array_push($pars, $record->value('ph'));
+                            foreach ($matchedTerms as $record) {
+                                array_push($pars, $record->get('ph'));
                             }
                             $parents = array_merge($parents, $this->collect_ids_neo4j($ancestor, $pars));
                             $flag = false;
