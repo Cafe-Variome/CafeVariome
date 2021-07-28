@@ -9,9 +9,11 @@
  */
 
 use App\Models\Source;
-use GraphAware\Neo4j\Client\ClientBuilder;
 use App\Models\Settings;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
+use Laudis\Neo4j\Authentication\Authenticate;
+use Laudis\Neo4j\ClientBuilder;
+use Laudis\Neo4j\Databags\Statement;
 
 class Neo4J
 {
@@ -49,27 +51,27 @@ class Neo4J
         return $this->status;
     }
 
-    private function getClient()
-    {
-        $baseNeo4jAddress = $this->neo4jAddress;
-        if (strpos($baseNeo4jAddress, 'http://') !== false) {
-            $baseNeo4jAddress = str_replace("http://","",$baseNeo4jAddress);
-        }
-        if (strpos($baseNeo4jAddress, 'https://') !== false) {
-            $baseNeo4jAddress = str_replace("https://","",$baseNeo4jAddress);
+    private function getClient(): \Laudis\Neo4j\Contracts\ClientInterface
+	{
+    	$protocol = 'http';
+        if (strpos($this->neo4jAddress, 'https://') !== false) {
+			$protocol = 'https';
         }
 
-        $client = ClientBuilder::create()
-        ->addConnection('default', 'http://'. $this->neo4jUsername . ':' .$this->neo4jPassword .'@'.$baseNeo4jAddress.':'.$this->neo4jPort)
-        ->setDefaultTimeout(60)
-        ->build();
+        return ClientBuilder::create()
+			->withDriver($protocol, $this->neo4jAddress . ':' . $this->neo4jPort, Authenticate::basic($this->neo4jUsername, $this->neo4jPassword)) // creates an http driver
+			->withDefaultDriver($protocol)
+			->build();
+    }
 
-        return $client;
+	public function runQuery(string $query)
+	{
+		return $this->neo4jClient->run($query);
     }
 
     public function MatchHPO_IS_A(string $hpoTerm)
     {
-        $query = "MATCH (c:HPOterm{hpoid:\"".$hpoTerm."\"})-[:IS_A]->(p:HPOterm) RETURN c.termname as termname, p.hpoid as ph";
+        $query = "MATCH (c:HPOterm{hpoid:\"".$hpoTerm."\"})-[:IS_A]->(p:HPOterm) RETURN c.term as termname, p.hpoid as ph";
         return $this->neo4jClient->run($query);
     }
 
@@ -111,24 +113,23 @@ class Neo4J
         return $parents;
     }
 
-
 	public function InsertSubject(string $subject_id, string $source_name, string $batch, bool $allow_duplicate = false)
 	{
-		$this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
+		$this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->beginTransaction();
 		if (!$allow_duplicate) {
 			$query = 'MATCH (n:Subject{subjectid:"'.$subject_id.'"}) RETURN n.subjectid as id';
 			$result = $this->neo4jClient->run($query);
-			$exists = count($result->records()) > 0 ? true : false;
+			$exists = $result->count() > 0 ? true : false;
 			if ($exists) {
 				return;
 			}
 		}
-		$this->transactionStack->push("CREATE (n:Subject{ subjectid: '".$subject_id."', source: '".$source_name."', batch: '".$batch."' })");
+		$this->transactionStack->runStatement(Statement::create("CREATE (n:Subject{ subjectid: '".$subject_id."', source: '".$source_name."', batch: '".$batch."' })"));
 	}
 
 	public function ConnectSubject(string $subject_id, string $node_type, string $node_key, string $node_id, string $relationship_label)
 	{
-		$this->transactionStack->push("MATCH (a:Subject),(b:" . $node_type . ") WHERE a.subjectid = '" . $subject_id . "' AND b." . $node_key . " = '" . $node_id . "' CREATE (a)<-[r:" . $relationship_label . "]-(b)");
+		$this->transactionStack->runStatement(Statement::create("MATCH (a:Subject),(b:" . $node_type . ") WHERE a.subjectid = '" . $subject_id . "' AND b." . $node_key . " = '" . $node_id . "' CREATE (a)<-[r:" . $relationship_label . "]-(b)"));
 	}
 
 	public function InsertSubjects(array $data, string $source_name, string $batch)
@@ -137,7 +138,7 @@ class Neo4J
 		$sourceModel = new Source();
 
 		$source_id = $sourceModel->getSourceIDByName($source_name);
-		$this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
+		$this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->beginTransaction();
 
 		$subjectsAdded = 0;
 		if (count($data) > 0) {
@@ -155,7 +156,7 @@ class Neo4J
 	{
 		$serviceInterface = new ServiceInterface();
 
-		$this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->transaction();
+		$this->transactionStack = $this->transactionStack ? $this->transactionStack : $this->neo4jClient->beginTransaction();
 
 		$subjectsConnected = 0;
 		if (count($data) > 0) {
@@ -202,13 +203,5 @@ class Neo4J
     private function destroyTransaction()
     {
         $this->transactionStack = null;
-    }
-
-    private function collectIDs(string $ancestor, array $data) {
-        $arr = [];
-        foreach ($data as $d) {
-            $arr[] = $ancestor === '' ? $d : $ancestor . '|'. $d;
-        }
-        return $arr;
     }
 }
