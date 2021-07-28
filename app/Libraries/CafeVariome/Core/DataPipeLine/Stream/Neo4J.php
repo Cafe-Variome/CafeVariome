@@ -82,10 +82,10 @@ class Neo4J
         $termname = '';
         $matchedTerms = $this->MatchHPO_IS_A($hpoTerm);
 
-        foreach ($matchedTerms->getRecords() as $record) {
-            array_push($pars, $record->value('ph'));
-            $termname = $record->value('termname');
-            $parents[$record->value('ph')] = $record->value('termname');
+        foreach ($matchedTerms as $record) {
+            array_push($pars, $record->get('ph'));
+            $termname = $record->get('termname');
+            $parents[$record->get('ph')] = $record->get('termname');
         }
 
         $last_ancestor = '';
@@ -95,10 +95,10 @@ class Neo4J
                 $last_ancestor = $ancestor;
                 if($ancestor !== 'HP:0000001') {
                     $matchedTerms = $this->MatchHPO_IS_A($ancestor);
-                    foreach ($matchedTerms->getRecords() as $record) {
-                        array_push($pars, $record->value('ph'));
-                        $parents[$last_ancestor] = $record->value('termname');
-                        $last_ancestor = $record->value('ph');
+                    foreach ($matchedTerms as $record) {
+                        array_push($pars, $record->get('ph'));
+                        $parents[$last_ancestor] = $record->get('termname');
+                        $last_ancestor = $record->get('ph');
                         $processed_ancestor_key = array_search($ancestor, $pars);
                         unset($pars[$processed_ancestor_key]);
                         $i ++;
