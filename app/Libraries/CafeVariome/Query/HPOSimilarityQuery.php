@@ -57,11 +57,10 @@ class HPOSimilarityQuery extends AbstractQuery
 			// $neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()<-[:IS_A*0..20]-()-[r2:PHENOTYPE_OF]->(m) where (" . $id_str . ") and m.source = \"" . $source . "\" with m.subjectid as subjectid, n.hpoid as hpoid with subjectid as subjectid, count(distinct(hpoid)) as hpoid where hpoid >=  $s  return subjectid, hpoid";
 			$pat_ids = [];
 
-			$result = $this->getNeo4JInstance()->run($neo_query);
-			$records = $result->getRecords();
+			$records = $this->getNeo4JInstance()->runQuery($neo_query);
 
 			foreach ($records as $record) {
-				$pat_ids[] = $record->value('subjectid');
+				$pat_ids[] = $record->get('subjectid');
 			}
 
 			if ($r < 1) {
@@ -76,19 +75,18 @@ class HPOSimilarityQuery extends AbstractQuery
 				$neo_query = $neo_query . " with s.subjectid as subjectid, count(distinct(n.hpoid)) as hpoid where hpoid >= $s with hpoid as hpoid, subjectid as subjectid return subjectid, hpoid ORDER BY hpoid DESC";
 			}
 
-			$result = $this->getNeo4JInstance()->run($neo_query);
-			$records = $result->getRecords();
+			$records = $this->getNeo4JInstance()->runQuery($neo_query);
 
 			$pat_ids = [];
 			foreach ($records as $record)
 			{
-				$pat_ids[] = $record->value('subjectid');
+				$pat_ids[] = $record->get('subjectid');
 			}
 
 			$pat_ids = array_unique($pat_ids);
 
 			if($iscount === true) {
-				return count($records);
+				return $records->count();
 			}
 			else {
 				return $pat_ids;
