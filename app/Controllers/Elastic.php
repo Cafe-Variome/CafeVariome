@@ -2,22 +2,21 @@
 
 /**
  * Elastic.php
- * 
+ *
  * Created 08/08/2019
- * 
+ *
  * @author Mehdi Mehtarizadeh
  * @author Farid Yavari Dizjikan
- * 
+ *
  * This controller makes it possible for users to contact elastic search server.
  */
 
- 
+
 use App\Models\UIData;
 use App\Models\Settings;
 use App\Models\Source;
 use App\Models\Network;
 use App\Libraries\ElasticSearch;
-use App\Libraries\CafeVariome\PHPShellHelper;
 use CodeIgniter\Config\Services;
 
 class Elastic extends CVUI_Controller{
@@ -57,8 +56,8 @@ class Elastic extends CVUI_Controller{
 		$indicesStatus = $elasticSearch->ping() ? $elasticClient->indices()->stats() : null;
 
         $title_prefix = $elasticModel->getTitlePrefix();
-        
-        for ($i=0; $i < count($sources); $i++) { 
+
+        for ($i=0; $i < count($sources); $i++) {
 
             if($elasticSearch->indexExists($title_prefix . "_" .$sources[$i]['source_id']) != null){
                 $sources[$i]['elastic_index'] = true;
@@ -69,14 +68,14 @@ class Elastic extends CVUI_Controller{
                     $indexStatusString .= "<br/> Total Documents: " .  $indexStatus['total']['docs']['count'];
                     $indexStatusString .= "<br/> Deleted Documents: " .  $indexStatus['total']['docs']['deleted'];
                     $indexStatusString .= "<br/> Size : " .  round((intval($indexStatus['total']['store']['size_in_bytes'])/1048576), 2) . " M.B.";
-                    
+
                     $sources[$i]['elastic_status'] = $indexStatusString;
                 }
             }
             else {
                 $sources[$i]['elastic_index'] = false;
             }
-            
+
             $sources[$i]['network_assigned'] = false;
 
             foreach ($networkAssignedSources as $networkSourcePair) {
