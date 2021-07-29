@@ -18,7 +18,7 @@
 	<meta name="keywords" content="<?php echo $keywords ?>" />
 	<meta name="author" content="<?php echo $author ?>" />
 	<meta name="description" content="<?php echo $description ?>" />
-	
+
     <!-- Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh 11/6/2019 -->
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "twbs/bootstrap/dist/css/bootstrap.css");?>" />
     <link rel="stylesheet" href="<?php echo base_url(CSS . "site.css");?>" />
@@ -40,7 +40,7 @@
         var baseurl = "<?= base_url(); ?>" + '/';
         var authurl = "<?php print rtrim($setting->settingData['auth_server'],"/"); // remove trailing slash from the auth_server config variable ?>";
     </script>
-    <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
+    <script src="<?php echo base_url(JS."jquery-3.6.0.min.js");?>"></script>
 
 </head>
 
@@ -58,19 +58,19 @@
 
     <footer id="footer" class="footer <?= ($stickyFooter) ? 'footer-sticky' : '' ?> mt-auto py-3">
         <div class="container">
-            <span class="text-muted">Powered by CafeVariome</span>             
+            <span class="text-muted">Powered by CafeVariome</span>
         </div>
     </footer>
-    
+
     <script src="<?php echo base_url(VENDOR."twbs/bootstrap/dist/js/bootstrap.bundle.js");?>"></script>
     <script src="<?php echo base_url(VENDOR."select2/select2/dist/js/select2.js");?>"></script>
     <script type="text/javascript">
         $('[data-toggle="tooltip"]').tooltip();
     </script>
-    
+
     <!-- extra Java Script-->
     <?php foreach($javascript as $js):?>
     <script src="<?php echo (substr($js, 0, 4) != 'http' ? base_url($js) : $js)?>"></script>
-    <?php endforeach;?>    
+    <?php endforeach;?>
 </body>
 </html>

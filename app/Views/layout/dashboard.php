@@ -38,7 +38,7 @@
             var authurl = "<?php print rtrim($setting->settingData['auth_server'],"/"); // remove trailing slash from the auth_server config variable ?>";
         </script>
 
-        <script src="<?php echo base_url(JS."jquery-3.4.1.js");?>"></script>
+        <script src="<?php echo base_url(JS."jquery-3.6.0.min.js");?>"></script>
     </head>
 
     <body id="page-top">
@@ -159,7 +159,7 @@
             </li>
 
             <!-- Heading -->
-            <div class="sidebar-heading">   
+            <div class="sidebar-heading">
                 Access Control
             </div>
 
@@ -177,7 +177,7 @@
             </li>
 
             <!-- Heading -->
-            <div class="sidebar-heading">   
+            <div class="sidebar-heading">
                 Content
             </div>
 
@@ -195,7 +195,7 @@
             </li>
 
             <!-- Heading -->
-            <div class="sidebar-heading">   
+            <div class="sidebar-heading">
                 System
             </div>
 
@@ -327,7 +327,7 @@
     <!-- extra Java Script-->
     <?php foreach($javascript as $js):?>
     <script src="<?php echo base_url($js)?>"></script>
-    <?php endforeach;?>    
+    <?php endforeach;?>
 
     <script type="text/javascript">
         $('[data-toggle="tooltip"]').tooltip();
