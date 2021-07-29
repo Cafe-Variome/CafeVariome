@@ -28,7 +28,7 @@ use App\Models\Elastic;
 use App\Models\Upload;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
-use App\Libraries\CafeVariome\PHPShellHelper;
+use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use CodeIgniter\Config\Services;
 

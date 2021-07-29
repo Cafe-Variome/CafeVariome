@@ -2,16 +2,16 @@
 
 /**
  * Name EAVDataInput.php
- * 
+ *
  * Created 19/08/2020
  * @author Samuel Balco
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
  * @author Farid Yavari Dizjikan
- * 
+ *
  */
 
-use App\Libraries\CafeVariome\UniversalUploaderShellHelper;
+use App\Libraries\CafeVariome\Helpers\Shell\UniversalUploaderShellHelper;
 
 class UniversalDataInput extends DataInput
 {
@@ -36,11 +36,11 @@ class UniversalDataInput extends DataInput
 
             if ($this->fileMan->Exists($file)) {
                 $this->uploadModel->clearErrorForFile($fileId);
-        
-                if ($this->delete == 1) {		
+
+                if ($this->delete == 1) {
                     $this->eavModel->deleteRecordsBySourceId($this->sourceId);
                 }
-                
+
                 $this->filePath = $this->basePath . $file;
             }
         }
