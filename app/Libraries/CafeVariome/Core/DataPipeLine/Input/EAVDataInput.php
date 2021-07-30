@@ -58,16 +58,9 @@ class EAVDataInput extends DataInput
                 $return_data = array('result_flag' => 1);
                 if (preg_match("/\.csv$|\.tsv$/", $file)) {
                     $line = fgets(fopen($filePath, 'r'));
-                    // if (!preg_match("/^" . $this->configuration['subject_id_attribute_name'] . "(.)/", $line, $matches)) {
-                    //     $message = "No " . $this->configuration['subject_id_attribute_name'] . " column.";
-                    //     $return_data['result_flag'] = 0;
-                    //     $return_data['error'] = $message;
-                    //     $error_code = 1;
-                    //     $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
-                    //     //return $return_data;
-                    // }
+                    preg_match("/^" . $this->configuration['subject_id_attribute_name'] . "(.)/", $line, $matches);
 
-                    $delimiter = ',';
+                    $delimiter = $matches[1];
 
                     $this->reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::CSV);
                     $this->reader->setFieldDelimiter($delimiter);
