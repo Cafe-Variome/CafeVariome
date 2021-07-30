@@ -173,6 +173,14 @@ class EAV extends Model{
 
 		$query = $this->builder->get()->getResultArray();
 
+		//Loop over results to make sure terms start with the correct prefix.
+		for($c = 0; $c < count($query); $c++)
+		{
+			if (is_numeric($query[$c]['value'])){
+				$query[$c]['value'] = 'ORPHA:' . $query[$c]['value'];
+			}
+		}
+
         return $query;
     }
 
@@ -200,7 +208,15 @@ class EAV extends Model{
 
         $data = $this->builder->get()->getResultArray();
 
-        return $data;
+		//Loop over results to make sure terms start with the correct prefix.
+		for($c = 0; $c < count($data); $c++)
+		{
+			if (is_numeric($data[$c]['value'])){
+				$data[$c]['value'] = 'HP:' . $data[$c]['value'];
+			}
+		}
+
+		return $data;
     }
 
     public function getNegatedHPOTermsBySourceId(int $source_id, array $negated_hpo_attribute_names = [], int $limit = -1, int $offset = -1)
@@ -224,6 +240,14 @@ class EAV extends Model{
 		}
 
         $data = $this->builder->get()->getResultArray();
+
+		//Loop over results to make sure terms start with the correct prefix.
+		for($c = 0; $c < count($data); $c++)
+		{
+			if (is_numeric($data[$c]['value'])){
+				$data[$c]['value'] = 'HP:' . $data[$c]['value'];
+			}
+		}
 
         return $data;
     }
