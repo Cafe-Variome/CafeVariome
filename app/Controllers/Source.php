@@ -11,7 +11,7 @@
  */
 
 use App\Models\UIData;
-use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4j;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4J;
 use \App\Models\Elastic;
 use \App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use CodeIgniter\Config\Services;
@@ -601,7 +601,7 @@ class Source extends CVUI_Controller{
 
                 //delete the associated node from neo4j database
                 try {
-                    $neo4jInterface = new Neo4j();
+                    $neo4jInterface = new Neo4J();
                     $neo4jInterface->deleteSource($source_id);
                 } catch (\Exception $ex) {
                     $this->setStatusMessage("There was an error in deleting Neo4J data of the source.", STATUS_ERROR, true);
