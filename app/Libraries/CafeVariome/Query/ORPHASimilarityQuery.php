@@ -2,6 +2,7 @@
 
 
 use App\Models\Source;
+use Laudis\Neo4j\Types\CypherList;
 
 /**
  * ORPHASimilarityQuery.php
@@ -127,29 +128,39 @@ class ORPHASimilarityQuery extends AbstractQuery
 					$records = $neo4jClient->runQuery($neo_query);
 
 					foreach ($records as $record) {
-						if (array_key_exists($record->get('subjectid'),$subjects) && array_key_exists($record->get('ORPHA'),$subjects[$record->get('subjectid')])){
-							$orp = $subjects[$record->get('subjectid')][$record->get('ORPHA')]['orphaic'];
-							$om = $subjects[$record->get('subjectid')][$record->get('ORPHA')]['omimic'];
-							$orpic = $record->get('ORPHA_IC');
-							$omic = $record->get('OMIM_IC');
-							if ($orp < $orpic || $om < $omic){
-								$subjects[$record->get('subjectid')][$record->get('ORPHA')]['hpo'] = $record->get('LINK');
-								$subjects[$record->get('subjectid')][$record->get('ORPHA')]['FC'] = $record->get('FrequencyCode');
-								$subjects[$record->get('subjectid')][$record->get('ORPHA')]['omimic'] = $record->get('OMIM_IC');
-								$subjects[$record->get('subjectid')][$record->get('ORPHA')]['orphaic'] = $record->get('ORPHA_IC');
-								$subjects[$record->get('subjectid')][$record->get('ORPHA')]['branches'] = $record->get('PA_Branches');
-								$subjects[$record->get('subjectid')][$record->get('ORPHA')]['branch_hpos'] = $record->get('ahs');
-							}
+						$subject_id = $record->get('subjectid');
+						$orpha = $record->get('ORPHA');
+						$link = $record->get('LINK');
+						$link = $this->CyphertoArray($link);
+						$frequency_code = $record->get('FrequencyCode');
+						$frequency_code = $this->CyphertoArray($frequency_code);
+						$omim_ic = $record->get('OMIM_IC');
+						$orpha_ic = $record->get('ORPHA_IC');
+						$PA_Branches = $record->get('PA_Branches');
+						$ahs = $record->get('ahs');
+						$ahs = $this->CyphertoArray($ahs);
 
+						if (array_key_exists($subject_id,$subjects) && array_key_exists($orpha,$subjects[$subject_id])){
+							$orp = $subjects[$subject_id][$orpha]['orphaic'];
+							$om = $subjects[$subject_id][$orpha]['omimic'];
+
+							if ($orp < $orpha_ic || $om < $omim_ic){
+								$subjects[$subject_id][$orpha]['hpo'] = $link;
+								$subjects[$subject_id][$orpha]['FC'] = $frequency_code;
+								$subjects[$subject_id][$orpha]['omimic'] = $omim_ic;
+								$subjects[$subject_id][$orpha]['orphaic'] = $orpha_ic;
+								$subjects[$subject_id][$orpha]['branches'] = $PA_Branches;
+								$subjects[$subject_id][$orpha]['branch_hpos'] = $ahs;
+							}
 						}
 						else{
-							$subjects[$record->get('subjectid')][$record->get('ORPHA')] = [
-								'hpo' => $record->get('LINK'),
-								'FC' => $record->get('FrequencyCode'),
-								'branches' => $record->get('PA_Branches'),
-								'omimic' => $record->get('OMIM_IC'),
-								'orphaic' => $record->get('ORPHA_IC'),
-								'branch_hpos' => $record->get('ahs')];
+							$subjects[$subject_id][$orpha] = [
+								'hpo' => $link,
+								'FC' => $frequency_code,
+								'branches' => $PA_Branches,
+								'omimic' => $omim_ic,
+								'orphaic' => $orpha_ic,
+								'branch_hpos' => $ahs];
 						}
 					}
 
@@ -176,26 +187,35 @@ class ORPHASimilarityQuery extends AbstractQuery
 						$records = $neo4jClient->runQuery($neo_query);
 
 						foreach ($records as $record) {
-							if (array_key_exists($record->get('subjectid'),$subjects) && array_key_exists($record->get('ORPHA'),$subjects[$record->get('subjectid')])){
+							$subject_id = $record->get('subjectid');
+							$orpha = $record->get('ORPHA');
+							$link = $record->get('LINK');
+							$link = $this->CyphertoArray($link);
+							$frequency_code = $record->get('FrequencyCode');
+							$frequency_code = $this->CyphertoArray($frequency_code);
+							$omim_ic = $record->get('OMIM_IC');
+							$orpha_ic = $record->get('ORPHA_IC');
 
-								$orp = $subjects[$record->get('subjectid')][$record->get('ORPHA')]['orphaic'];
-								$om = $subjects[$record->get('subjectid')][$record->get('ORPHA')]['omimic'];
-								$orpic = $record->get('ORPHA_IC');
-								$omic = $record->get('OMIM_IC');
-								if ($orp < $orpic || $om < $omic){
-									$subjects[$record->get('subjectid')][$record->get('ORPHA')]['hpo'] = $record->get('LINK');
-									$subjects[$record->get('subjectid')][$record->get('ORPHA')]['FC'] = $record->get('FrequencyCode');
-									$subjects[$record->get('subjectid')][$record->get('ORPHA')]['omimic'] = $record->get('OMIM_IC');
-									$subjects[$record->get('subjectid')][$record->get('ORPHA')]['orphaic'] = $record->get('ORPHA_IC');
+							if (array_key_exists($subject_id,$subjects) && array_key_exists($orpha,$subjects[$subject_id])){
+
+								$orp = $subjects[$subject_id][$orpha]['orphaic'];
+								$om = $subjects[$subject_id][$orpha]['omimic'];
+
+								if ($orp < $orpha_ic || $om < $omim_ic){
+									$subjects[$subject_id][$orpha]['hpo'] = $link;
+									$subjects[$subject_id][$orpha]['FC'] = $frequency_code;
+									$subjects[$subject_id][$orpha]['omimic'] = $omim_ic;
+									$subjects[$subject_id][$orpha]['orphaic'] = $orpha_ic;
 								}
 
-							}else{
-								$subjects[$record->get('subjectid')][$record->get('ORPHA')] = [
-									'hpo' => $record->get('LINK'),
-									'FC' => $record->get('FrequencyCode'),
+							}
+							else{
+								$subjects[$subject_id][$orpha] = [
+									'hpo' => $link,
+									'FC' => $frequency_code,
 									'branches' => 0,
-									'omimic' => $record->get('OMIM_IC'),
-									'orphaic' => $record->get('ORPHA_IC'),
+									'omimic' => $omim_ic,
+									'orphaic' => $orpha_ic,
 									'branch_hpos' => []];
 							}
 						}
@@ -317,5 +337,20 @@ class ORPHASimilarityQuery extends AbstractQuery
 			}
 		}
 		return $neo_query;
+	}
+
+	private function CyphertoArray(CypherList $list): array
+	{
+		if (is_iterable($list) && get_class($list) == 'Laudis\Neo4j\Types\CypherList'){
+			$list_array = $list->toArray();
+
+			foreach ($list_array as & $item){
+				if(is_iterable($item)){
+					$item = $item->toArray();
+				}
+			}
+		}
+
+		return $list_array;
 	}
 }
