@@ -5,7 +5,7 @@
  * @author Owen Lancaster
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- * 
+ *
  * User model class that handles operations on User entity.
  */
 
@@ -20,7 +20,7 @@ class User extends Model{
     protected $builder;
 
     protected $primaryKey = 'id';
-    
+
    // protected $tempReturnType = 'array';
 
 
@@ -33,11 +33,11 @@ class User extends Model{
         }
     }
 
-    function createUser(string $email, string $username, array $groups = [], array $data = [], &$authadapter){
+    function createUser(string $email, string $username, &$authadapter, array $groups = [], array $data = []){
         $authadapter->register($email, $username, $data, $groups);
     }
 
-    function updateUser(int $user_id,array $groups = [], array $data = [], &$authadapter){
+    function updateUser(int $user_id, &$authadapter, array $groups = [], array $data = []){
         $authadapter->update($user_id, $data, $groups);
     }
 
@@ -90,14 +90,14 @@ function detailsUser(int $user_id, &$authadapter){
     }
     /**
 	 * getUsers
-     * 
+     *
 	 * General function to get fetch data from users table.
-     * 
+     *
      * @author Mehdi Mehtarizadeh
 	 */
 	function getUsers(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
 		$this->builder = $this->db->table($this->table);
-		
+
 		if ($cols) {
             $this->builder->select($cols);
         }
@@ -118,15 +118,15 @@ function detailsUser(int $user_id, &$authadapter){
         }
 
         $query = $this->builder->get()->getResultArray();
-        return $query; 
+        return $query;
     }
 
     /**
      * userExists
      * returns true if user exists in the local database.
-     * 
+     *
      * @author Mehdi Mehtarizadeh
-     * @param string $username  
+     * @param string $username
      * @return bool true if user exists false otherwise
      */
     function userExists(string $username):bool{
@@ -138,7 +138,7 @@ function detailsUser(int $user_id, &$authadapter){
 
     /**
      * getName
-     * @param int $id 
+     * @param int $id
      * @param bool $fullName
      * @return string user's first (and last name) or username if both first and last name are null
      */
@@ -150,7 +150,7 @@ function detailsUser(int $user_id, &$authadapter){
             if ($user[0]['first_name'] == null && $user[0]['last_name']) {
                 $name = $user[0]['username'];
             }
-            else {  
+            else {
                 if ($fullName) {
                     $name = $user[0]['first_name'] . ' ' . $user[0]['last_name'];
                 }
@@ -163,7 +163,7 @@ function detailsUser(int $user_id, &$authadapter){
     }
 
     /**
-     * Add Remote User - Add a  minimal new user as remote 
+     * Add Remote User - Add a  minimal new user as remote
      *
      * @param string $email   - The email of the new user
 	 * @return int $insert_id ID of inserted user

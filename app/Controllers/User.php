@@ -2,11 +2,11 @@
 
 /**
  * User.php
- * 
+star *
  * Created : 11/09/2019
- * 
+ *
  * User controller class
- * 
+ *
  */
 
 use App\Models\UIData;
@@ -86,7 +86,7 @@ class User extends CVUI_Controller{
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ]                            
+            ]
         ]
         );
 
@@ -113,7 +113,7 @@ class User extends CVUI_Controller{
             $userModel = new \App\Models\User();
 
             try {
-                $userModel->createUser($email, $email, $groups, $data, $this->authAdapter);
+                $userModel->createUser($email, $email, $this->authAdapter, $groups, $data);
                 $this->setStatusMessage("User '$email' was created.", STATUS_SUCCESS);
             } catch (\Exception $ex) {
                 $this->setStatusMessage("There was a problem creating '$email'.", STATUS_ERROR);
@@ -121,7 +121,7 @@ class User extends CVUI_Controller{
             return redirect()->to(base_url($this->controllerName.'/List'));
 
         }
-        else { 
+        else {
             $uidata->data['groups'] = $groups;
             //display the create user form
             //set the flash data error message if there is one
@@ -185,7 +185,7 @@ class User extends CVUI_Controller{
         $uidata = new UIData();
         $uidata->title = "Users";
         $uidata->stickyFooter = false;
-        
+
         $userModel = new \App\Models\User($this->db);
         $networkModel = new Network($this->db);
 
@@ -193,7 +193,7 @@ class User extends CVUI_Controller{
 
         $uidata->data['users'] = $userModel->getUsers();
 
-    
+
 		$users_groups_data = $networkModel->getCurrentNetworkGroupsForUsers();
 
         $users_groups = array();
@@ -251,12 +251,12 @@ class User extends CVUI_Controller{
                     'errors' => [
                         'required' => '{field} is required.'
                     ]
-                ]                            
+                ]
             ]
             );
-    
+
             if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-    
+
                 $email    = $this->request->getVar('uemail');
                 $groups = ($this->request->getVar('isadmin') != null) ? [1] : [0];
                 $is_admin = ($this->request->getVar('isadmin') != null) ? 1 : 0;
@@ -274,9 +274,9 @@ class User extends CVUI_Controller{
                         "remote" => $remote,
                         "active" => $active
                 ];
-    
+
                 try {
-                    $userModel->updateUser($id, $groups, $data, $this->authAdapter);
+                    $userModel->updateUser($id, $this->authAdapter, $groups, $data);
                     $this->setStatusMessage("User '$email' was updated.", STATUS_SUCCESS);
 
                 } catch (\Exception $ex) {
@@ -284,7 +284,7 @@ class User extends CVUI_Controller{
                 }
                 return redirect()->to(base_url($this->controllerName.'/List'));
             }
-            else { 
+            else {
                 $uidata->data['groups'] = $groups;
 
                 $user_groups = $networkModel->getNetworkGroupsForInstallationForUser((int)$user['id']);
@@ -302,7 +302,7 @@ class User extends CVUI_Controller{
                 //display the create user form
                 //set the flash data error message if there is one
                 $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-    
+
                 $uidata->data['first_name'] = array(
                         'name'  => 'first_name',
                         'id'    => 'first_name',
@@ -356,7 +356,7 @@ class User extends CVUI_Controller{
                 $uidata->data['uemail'] = $user['email'];
             }
             $data = $this->wrapData($uidata);
-            return view($this->viewDirectory. '/Update', $data);  
+            return view($this->viewDirectory. '/Update', $data);
         }
     }
 
@@ -375,8 +375,8 @@ class User extends CVUI_Controller{
             $user = $user[0];
             $email = $user['email'];
             $uidata->data['id'] = $user['id'];
-            $uidata->data['first_name'] = $user['first_name']; 
-            $uidata->data['last_name'] = $user['last_name']; 
+            $uidata->data['first_name'] = $user['first_name'];
+            $uidata->data['last_name'] = $user['last_name'];
 
             $this->validation->setRules([
                 'confirm' => [
@@ -385,7 +385,7 @@ class User extends CVUI_Controller{
                     'errors' => [
                         'required' => '{field} is required.'
                     ]
-                ]         
+                ]
             ]);
             if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
                 if ($this->request->getVar('confirm') == 'yes') {
@@ -432,7 +432,7 @@ class User extends CVUI_Controller{
         $uidata->data['is_admin'] = $user['is_admin'];
         $uidata->data['ip_address'] = $user['ip_address'];
         $users_groups_data = $networkModel->getCurrentNetworkGroupsForUsers();
-        
+
         $users_groups = array();
         // If there were groups fetch from auth server for users then add them to the view
         if (!array_key_exists('error', $users_groups_data)) {
