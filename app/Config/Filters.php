@@ -30,7 +30,7 @@ class Filters extends BaseConfig
 	public $globals = [
 		'before' => [
 			// 'honeypot',
-		    'csrf' => ['except' => ['QueryApi/*', 'AjaxApi/*', 'NetworkApi/*', 'Elastic/*']]
+		    'csrf' => ['except' => ['QueryApi/*', 'AjaxApi/*', 'NetworkApi/*']]
 		],
 		'after'  => [
 			//'toolbar',
