@@ -164,8 +164,9 @@ class EAV extends Model{
             $this->builder->whereIn('attribute', $orpha_attribute_names);
         }
         else {
-            $this->builder->like('value', "orpha:", 'after'); //Diagnosis
-        }
+            $this->builder->like('value', "orpha:", 'after');
+			$this->builder->orLike('value', "ordo:", 'after');
+		}
 
 		if ($limit > 0) {
 			$this->builder->limit($limit);
@@ -178,6 +179,9 @@ class EAV extends Model{
 		{
 			if (is_numeric($query[$c]['value'])){
 				$query[$c]['value'] = 'ORPHA:' . $query[$c]['value'];
+			}
+			else if(stripos($query[$c]['value'], 'ordo:')){
+				$query[$c]['value'] = str_ireplace('ordo:', 'ORPHA:', $query[$c]['value']);
 			}
 		}
 
@@ -374,19 +378,19 @@ class EAV extends Model{
      * @param int $file_id  - the file id where these HPO terms have come from
      * @return array $final - List of HPO terms which have negated=0
      */
-    public function checkNegatedForHPO(array $hpo, int $file_id, string $hpo_attribute_name): array
+    public function checkNegatedForHPO(array $hpos, int $file_id, string $hpo_attribute_name): array
 	{
         $this->builder = $this->db->table($this->table);
 
         $final =[];
-        for ($i=0; $i < count($hpo); $i++) {
+        foreach ($hpos as $hpo) {
         	$this->builder->select('value');
-            $this->builder->where('value', $hpo[$i]);
+            $this->builder->where('value', $hpo);
             $this->builder->where('attribute', $hpo_attribute_name);
             $query = $this->builder->get()->getResultArray();
 
             if (count($query) == 1) {
-                array_push($final, $hpo[$i]);
+                array_push($final, $hpo);
             }
         }
 

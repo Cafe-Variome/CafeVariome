@@ -47,12 +47,6 @@ Options FollowSymLinks
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Deny Access To Certain User Agents (bots)
-    #	RewriteCond %{HTTP_USER_AGENT} ^User\ Agent\ 1 [OR]
-    #	RewriteCond %{HTTP_USER_AGENT} ^Another\ Bot\ You\ Want\ To\ Block [OR]
-    #	RewriteCond %{HTTP_USER_AGENT} ^Another\ UA
-    #	RewriteRule ^.* - [F,L]
-
 	# Deny Access to Hidden Files and Directories
 	RewriteCond %{SCRIPT_FILENAME} -d [OR]
 	RewriteCond %{SCRIPT_FILENAME} -f
