@@ -425,4 +425,20 @@ class EAV extends Model{
 		return $count;
     }
 
+	public function getLastIdByUID(string $uid): int
+	{
+		$this->builder = $this->db->table($this->table);
+
+		$this->builder->select('id');
+		$this->builder->where('uid', $uid);
+		$this->builder->orderBy('id', 'DESC');
+		$this->builder->limit(1);
+
+		$query = $this->builder->get()->getResultArray();
+		if (count($query) == 1){
+			return $query[0]['id'];
+		}
+
+		return -1;
+	}
 }
