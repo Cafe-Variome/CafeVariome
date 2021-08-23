@@ -260,100 +260,100 @@ class DataStream
         // Set the elastic state of data to stale
         $sourceModel->updateSource(["elastic_status"=>0], ["source_id" => $source_id]);
 
-        // Figure out how many documents we need to index
-        $eavsize = $eavModel->countUnaddedEAVs($source_id);
-        // Get all the unique subject ids for this source
-        $uniqueIdsCount = $eavModel->countUniqueUIDs($source_id);
+		// Figure out how many documents we need to index
+		$eavsize = $eavModel->countUnaddedEAVs($source_id);
+		// Get all the unique subject ids for this source
+		$uniqueIdsCount = $eavModel->countUniqueUIDs($source_id);
 
-        $totalRecords = $eavsize + $uniqueIdsCount; //Total number of Elasticsearch documents to be created.
+		$totalRecords = $eavsize + $uniqueIdsCount; //Total number of Elasticsearch documents to be created.
 
-        $bulk = [];
-        $countparents = 0;
+		$bulk = [];
+		$countparents = 0;
 
-        $this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex', 'Generating Elasticsearch index');
+		$this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex', 'Generating Elasticsearch index');
 
-        $offset = 0;
-        $currId = 0;
-        $batchSize = EAV_BATCH_SIZE;
-        while ($offset < $uniqueIdsCount){
+		$offset = 0;
+		$currId = 0;
+		$batchSize = EAV_BATCH_SIZE;
+		while ($offset < $uniqueIdsCount){
 
-            $unique_ids = $eavModel->getEAVs('id,uid,subject_id', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], true, $batchSize);
+			$unique_ids = $eavModel->getEAVs('uid,subject_id', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], true, $batchSize);
+			$uid_count = count($unique_ids);
+			if ($uid_count == 0){
+				break;
+			}
+			$currId = $eavModel->getLastIdByUID($unique_ids[$uid_count - 1]['uid']);
 
-            $lastRec = end($unique_ids);
-            $currId = $lastRec['id'];
-            reset($unique_ids);
+			// start making all the parent documents in ElasticSearch
+			for ($i=0; $i < $uid_count; $i++) {
+				$bulk['body'][] = ["index"=>[ "_id"=>$unique_ids[$i]['uid'],"_index"=>$index_name]];
+				$bulk['body'][] = ["subject_id"=>$unique_ids[$i]['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"sub", "source"=>$source_name."_eav"];
 
-            // start making all the parent documents in ElasticSearch
-            $uid_count = count($unique_ids);
-            for ($i=0; $i < $uid_count; $i++) {
-                $bulk['body'][] = ["index"=>[ "_id"=>$unique_ids[$i]['uid'],"_index"=>$index_name]];
-                $bulk['body'][] = ["subject_id"=>$unique_ids[$i]['subject_id'], "eav_rel"=>["name"=>"sub"], "type"=>"sub", "source"=>$source_name."_eav"];
+				unset($unique_ids[$i]);
 
-                unset($unique_ids[$i]);
+				$countparents++;
 
-                $countparents++;
+				if ($countparents % EAV_BATCH_SIZE == 0){
+					$responses = $elasticClient->bulk($bulk);
+					$bulk=[];
+					unset ($responses);
 
-                if ($countparents%500 == 0){
-                    $responses = $elasticClient->bulk($bulk);
-                    $bulk=[];
-                    unset ($responses);
+					$this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex');
+				}
+			}
 
-                    $this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex');
-                }
-            }
-
-            $offset += $batchSize;
-        }
+			$offset += $batchSize;
+		}
 
 
-        // Send the last parents through who didnt get finished in loop
-        if (!empty($bulk['body'])){
-            $responses = $elasticClient->bulk($bulk);
-            $bulk=[];
-            unset ($responses);
+		// Send the last parents through who didnt get finished in loop
+		if (!empty($bulk['body'])){
+			$responses = $elasticClient->bulk($bulk);
+			$bulk=[];
+			unset ($responses);
 
-            $this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex');
-        }
+			$this->serviceInterface->ReportProgress($source_id, $countparents, $totalRecords, 'elasticsearchindex');
+		}
 
-        $bulk=[];
-        $offset = 0;
-        $counta = 0;
-        $currId = 0;
-        $batchSize = EAV_BATCH_SIZE;
+		$bulk=[];
+		$offset = 0;
+		$counta = 0;
+		$currId = 0;
+		$batchSize = EAV_BATCH_SIZE;
 
-        while ($offset < $eavsize){
-            // Get current limit chunk of data
-            $eavdata = $eavModel->getEAVs('id,uid,subject_id,attribute,value', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], false, $batchSize);
+		while ($offset < $eavsize){
+			// Get current limit chunk of data
+			$eavdata = $eavModel->getEAVs('id,uid,subject_id,attribute,value', ["source_id"=>$source_id, "elastic"=>0, 'id>' => $currId], false, $batchSize);
 
-            $eav_count = count($eavdata);
+			$eav_count = count($eavdata);
 
-            $lastRec = end($eavdata);
-            $currId = $lastRec['id'];
-            reset($eavdata);
+			$lastRec = end($eavdata);
+			$currId = $lastRec['id'];
+			reset($eavdata);
 
-            // Loop through limit chunk
-            for ($i=0; $i < $eav_count; $i++) {
-                $eavdata[$i]['attribute'] = preg_replace('/\s+/', '_', $eavdata[$i]['attribute']);
-                $bulk['routing'] = $eavdata[$i]['uid'];
-                $bulk['body'][] = ["index"=>["_index"=>$index_name]];
-                $bulk['body'][] = ["subject_id"=>$eavdata[$i]['subject_id'],"attribute"=>$eavdata[$i]['attribute'],"value"=>strtolower($eavdata[$i]['value']), "eav_rel"=>["name"=>"eav","parent"=>$eavdata[$i]['uid']], "type"=>"eav", "source"=>$source_name."_eav"];
+			// Loop through limit chunk
+			for ($i=0; $i < $eav_count; $i++) {
+				$eavdata[$i]['attribute'] = preg_replace('/\s+/', '_', $eavdata[$i]['attribute']);
+				$bulk['routing'] = $eavdata[$i]['uid'];
+				$bulk['body'][] = ["index"=>["_index"=>$index_name]];
+				$bulk['body'][] = ["subject_id"=>$eavdata[$i]['subject_id'],"attribute"=>$eavdata[$i]['attribute'],"value"=>strtolower($eavdata[$i]['value']), "eav_rel"=>["name"=>"eav","parent"=>$eavdata[$i]['uid']], "type"=>"eav", "source"=>$source_name."_eav"];
 
-                unset($eavdata[$i]);
+				unset($eavdata[$i]);
 
-                $counta++;
-                // Every 500 documents bulk insert to ElasticSearch
-                if ($counta%500 == 0){
-                    $responses = $elasticClient->bulk($bulk);
-                    $bulk=[];
-                    unset ($responses);
+				$counta++;
 
-                    $this->serviceInterface->ReportProgress($source_id, $countparents + $counta, $totalRecords, 'elasticsearchindex');
-                }
-            }
+				if ($counta % EAV_BATCH_SIZE == 0){
+					$responses = $elasticClient->bulk($bulk);
+					$bulk=[];
+					unset ($responses);
 
-            // Update offset
-            $offset += $batchSize;
-        }
+					$this->serviceInterface->ReportProgress($source_id, $countparents + $counta, $totalRecords, 'elasticsearchindex');
+				}
+			}
+
+			// Update offset
+			$offset += $batchSize;
+		}
 
         // Send the last set of documents through
         if (!empty($bulk['body'])){
