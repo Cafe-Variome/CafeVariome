@@ -49,7 +49,12 @@ class ElasticsearchResult extends AbstractResult
 		foreach ($results['hits']['hits'] as $hit) {
 			$id =  $hit['_source']['subject_id'];
 			$val =  $hit['_source']['value'];
-			$final[$id] = $val;
+			if (!array_key_exists($id, $final)){
+				$final[$id] = [$val];
+			}
+			else{
+				array_push($final[$id], $val);
+			}
 		}
 
 		return $final;
