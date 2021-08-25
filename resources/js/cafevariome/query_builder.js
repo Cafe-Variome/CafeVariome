@@ -634,7 +634,7 @@ $(document).ready(function() {
     var optionData = [];
     load_Ordo();
     function load_Ordo() {
-        $.ajax({ url: baseurl + 'AjaxApi/loadOrpha'  })
+        $.ajax({ url: baseurl + 'ContentAPI/loadOrpha'  })
         .done((d)=>{ 
             d.forEach( (item)=>{
                 optionData.push(item);
