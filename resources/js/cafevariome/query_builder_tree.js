@@ -12,7 +12,7 @@
                         cb.call(this, hpo_json);
                     } else {
                         $.ajax({
-                            url: baseurl + "AjaxApi/HPOQuery/"+node.id,
+                            url: baseurl + "ContentAPI/hpoQuery/"+node.id,
                             type: 'POST',
                             dataType: 'JSON'
                         }).done(function(data) {
@@ -100,7 +100,7 @@
         destroy_hpotree();
 
         $.ajax({
-            url: baseurl + 'AjaxApi/build_tree',
+            url: baseurl + 'ContentAPI/buildHPOTree',
             type: 'POST',
             dataType: 'JSON',
             data: {'hpo_json' : JSON.stringify(hpo_json), 'ancestry': $('select#values_phen_left').val(), 'hp_term': $('select#values_phen_left :selected').text()},
@@ -126,7 +126,7 @@
                         cb.call(this, hpo_json);
                     } else {
                         $.ajax({
-                            url: baseurl + "discovery/HPOQuery/"+node.id,
+                            url: baseurl + "ContentAPI/hpoQuery/"+node.id,
                             type: 'POST',
                             dataType: 'JSON'
                         }).done(function(data) {
