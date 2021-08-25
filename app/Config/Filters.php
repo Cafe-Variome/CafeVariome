@@ -2,6 +2,7 @@
 
 namespace Config;
 
+use App\Filters\AJAXFilter;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Filters\CSRF;
 use CodeIgniter\Filters\DebugToolbar;
@@ -19,6 +20,7 @@ class Filters extends BaseConfig
 		'csrf'     => CSRF::class,
 		'toolbar'  => DebugToolbar::class,
 		'honeypot' => Honeypot::class,
+		'ajax'     => AJAXFilter::class
 	];
 
 	/**
@@ -30,7 +32,7 @@ class Filters extends BaseConfig
 	public $globals = [
 		'before' => [
 			// 'honeypot',
-		    'csrf' => ['except' => ['QueryApi/*', 'AjaxApi/*', 'NetworkApi/*']]
+		    'csrf' => ['except' => ['QueryApi/*', 'NetworkApi/*']],
 		],
 		'after'  => [
 			//'toolbar',
@@ -58,5 +60,11 @@ class Filters extends BaseConfig
 	 *
 	 * @var array
 	 */
-	public $filters = [];
+	public $filters = [
+		'ajax' => [
+			'before' => ['AjaxApi/*'],
+			'after' => ['AjaxApi/*']
+			]
+
+	];
 }
