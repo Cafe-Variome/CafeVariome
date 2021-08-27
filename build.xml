@@ -44,7 +44,7 @@
     <!-- Target: Get Dependencies                      -->
     <!-- ============================================  -->
     <target name="main" depends="copyfiles" description="get dependencies using composer">
-        <composer command="install" composer="/usr/bin/composer">
+        <composer command="install" composer="composer">
             <arg value="-d"/>
             <arg path="${builddir}" />
         </composer>
