@@ -44,7 +44,7 @@
     <!-- Target: Get Dependencies                      -->
     <!-- ============================================  -->
     <target name="main" depends="copyfiles" description="get dependencies using composer">
-        <composer command="install" composer="composer">
+        <composer command="install" composer="/opt/php7/bin/composer">
             <arg value="-d"/>
             <arg path="${builddir}" />
         </composer>
