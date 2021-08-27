@@ -1,0 +1,52 @@
+<?xml version="1.0"  encoding="UTF-8" ?>
+
+<project name="cafevariome" basedir="." default="main">
+    <property file="./build.properties" />
+
+    <property name="package"  value="${phing.project.name}" override="true" />
+    <property name="builddir" value="./build/cafevariome" override="true" />
+    <property name="dependencydir" value="${builddir}/vendor" override="true" />
+    <property name="srcdir"   value="${project.basedir}" override="true" />
+
+    <!-- Fileset for all files -->
+    <fileset dir="." id="allfiles">
+        <include name="app/**" />
+        <include name="Install/**" />
+        <include name="resources/**" />
+        <include name="tests/**" />
+        <include name="upload/pairings/index.html" />
+        <include name="upload/settings/index.html" />
+        <include name="upload/UploadData/index.html" />
+        <include name="upload/.htaccess" />
+        <include name="writable/cache/index.html" />
+        <include name="writable/debugbar/" />
+        <include name="writable/logs/" />
+        <include name="writable/session/index.html" />
+        <include name="writable/uploads/index.html" />
+        <include name="writable/.htaccess" />
+        <include name=".htaccess" />
+        <include name="index.php" />
+        <include name="composer.json" />
+        <include name="phpunit.xml.dist" />
+        <include name="composer.json" />
+    </fileset>
+
+    <!-- ============================================  -->
+    <!-- Target: Copy Files                            -->
+    <!-- ============================================  -->
+    <target name="copyfiles" description="copy project source files">
+        <copy todir="${builddir}">
+            <fileset refid="allfiles" />
+        </copy>
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: Get Dependencies                      -->
+    <!-- ============================================  -->
+    <target name="main" depends="copyfiles" description="get dependencies using composer">
+        <composer command="install" composer="/usr/bin/composer">
+            <arg value="-d"/>
+            <arg path="${builddir}" />
+        </composer>
+    </target>
+</project>
