@@ -34,11 +34,6 @@
         }
     },
     "scripts": {
-        "post-update-cmd": [
-            "@composer dump-autoload",
-            "CodeIgniter\\ComposerScripts::postUpdate"
-            
-        ],
         "CVInstall": [
             "@composer dump-autoload",
             "bash Install/install.sh",
