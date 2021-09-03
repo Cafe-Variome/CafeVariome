@@ -43,10 +43,19 @@
     <!-- ============================================  -->
     <!-- Target: Get Dependencies                      -->
     <!-- ============================================  -->
-    <target name="main" depends="copyfiles" description="get dependencies using composer">
+    <target name="fetchdependencies" depends="copyfiles" description="get dependencies using composer">
         <composer command="install" composer="/opt/php8/bin/composer">
             <arg value="-d"/>
             <arg path="${builddir}" />
         </composer>
     </target>
+
+    <target name="main" depends="fetchdependencies" description="archive the build to a zip file">
+        <zip destfile="cafevariome.zip">
+            <fileset dir="${builddir}">
+                <include name="**/**" />
+            </fileset>
+        </zip>
+    </target>
+
 </project>
