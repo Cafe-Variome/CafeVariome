@@ -7,8 +7,6 @@
  *
  * @author Mehdi Mehtraizadeh
  * @author Gregory Warren
- * @author Owen Lancaster
- * @author Farid Yavari Dizjikan
  *
  * This controller contains listener methods for client-side ajax requests.
  * Methods in this controller were formerly in other controllers.
@@ -16,11 +14,10 @@
  */
 
 use CodeIgniter\Controller;
-use App\Helpers\AuthHelper;
+use Config\Database;
 use App\Models\Settings;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
-use App\Libraries\CafeVariome\Net\HPONetworkInterface;
 use App\Models\EAV;
 use App\Models\Source;
 use App\Models\Network;
@@ -30,9 +27,8 @@ use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 use App\Libraries\CafeVariome\Auth\AuthAdapter;
-use CodeIgniter\Config\Services;
 
- class AjaxApi extends Controller{
+class AjaxApi extends Controller{
 
 	protected $db;
 
@@ -44,17 +40,15 @@ use CodeIgniter\Config\Services;
 	 * Constructor
 	 *
 	 */
-    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+	{
 		parent::initController($request, $response, $logger);
-		$this->db = \Config\Database::connect();
 
+		$this->db = Database::connect();
         $this->setting =  Settings::getInstance();
-
-        $this->sourceModel = new Source($this->db);
-        $this->uploadModel = new \App\Models\Upload($this->db);
-
+        $this->sourceModel = new Source();
+        $this->uploadModel = new Upload();
         $this->phpshellHelperInstance = new PHPShellHelper();
-
     }
 
     function query($network_key = '') {
