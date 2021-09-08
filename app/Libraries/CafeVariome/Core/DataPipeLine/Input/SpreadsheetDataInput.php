@@ -1,7 +1,7 @@
 <?php namespace App\Libraries\CafeVariome\Core\DataPipeLine\Input;
 
 /**
- * Name EAVDataInput.php
+ * Name SpreadsheetDataInput.php
  *
  * Created 19/08/2020
  * @author Mehdi Mehtarizadeh
@@ -11,7 +11,7 @@
 
 use App\Models\EAV;
 
-class EAVDataInput extends DataInput
+class SpreadsheetDataInput extends DataInput
 {
     private $delete;
     private $error;
