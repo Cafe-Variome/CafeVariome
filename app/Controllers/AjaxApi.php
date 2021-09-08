@@ -193,6 +193,67 @@ class AjaxApi extends Controller{
         }
     }
 
+	 /**
+	  * elasticCheck() - Checking function prior to update to determine type of update desired and whether it is needed.
+	  *
+	  * @param int $force     - Are we forcing the regnerate? 1 if so and 0 if not
+	  * @param int $id        - The source id for the elasticsearch index
+	  * @param int $add       - 1 if we are adding to index instead of fully regenerating
+	  * @return array $result - Various parameters to allow front end decision
+	  */
+	 public function elasticCheck() {
+
+		 $uploadModel = new \App\Models\Upload();
+		 $eavModel = new EAV();
+
+		 $source_id = $this->request->getVar('source_id');
+		 $force = $this->request->getVar('force');
+		 $add = $this->request->getVar('add');
+
+		 $unprocessedFilesCount = $uploadModel->getElasticsearchUnprocessedFilesBySourceId($source_id);
+
+		 if (!$unprocessedFilesCount) {
+			 $result = ['Status' => 'Empty'];
+			 return json_encode($result);
+		 }
+		 if ($add) {
+			 $unaddedEAVsCount = $eavModel->countUnaddedEAVs($source_id);
+			 if ($unaddedEAVsCount == 0) {
+				 $result = ['Status' => 'Fully Updated'];
+				 return json_encode($result);
+			 }
+			 else {
+				 $result = ['Status' => 'Success'];
+				 return json_encode($result);
+			 }
+		 }
+		 else {
+			 if ($force) {
+				 $result = ['Status' => 'Success'];
+				 return json_encode($result);
+			 }
+			 else {
+				 $result = ['Status' => 'Fully Updated'];
+				 return json_encode($result);
+			 }
+		 }
+	 }
+
+	 /**
+	  * elasticStart - Begin ElasticSearch regeneration
+	  *
+	  * @param int $id        - The source id for the elasticsearch index
+	  * @param int $add       - 1 if we are adding to index instead of fully regenerating
+	  * @return void
+	  */
+	 public function elasticStart() {
+		 $source_id = $this->request->getVar('source_id');
+		 $add = $this->request->getVar('add');
+
+		 // rebuild the json list for interface
+		 $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchAndNeo4JIndex $source_id $add");
+	 }
+
     /**
      * validateUpload - Ensure the source we are wanting to upload to is an actual source
      * Users can change the parameter on url to what they wish
