@@ -639,7 +639,7 @@ class AjaxApi extends Controller{
                 $mime = $userFiles[$i]->getType();
                 $extension = $userFiles[$i]->getExtension();
 
-                if ($mime != "text/vcard" &&  $xtension == "json") {
+                if ($mime != "text/vcard" &&  $extension == "json") {
                     error_log("failure");
                 }
 
