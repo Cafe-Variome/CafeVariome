@@ -103,8 +103,8 @@ class AjaxApi extends Controller{
      * @return string in json format, phenotype and hpo data
      *
      */
-    function getPhenotypeAttributes(string $network_key) {
-        if ($this->request->isAJAX())
+    public function getPhenotypeAttributes(string $network_key) {
+        if ($this->request->getMethod() == 'post')
         {
             $basePath = FCPATH . JSON_DATA_DIR;
 
