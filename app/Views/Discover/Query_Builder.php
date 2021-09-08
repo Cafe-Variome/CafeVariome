@@ -310,6 +310,7 @@
 
 <input type="hidden" value="<?php echo $network_key;?>" id="network_key"/>
 <input type="hidden" value="<?php echo $user_id;?>" id="user_id"/>
+<input type="hidden" id="csrf_token" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
 
 <div class="row" id="reset_buildQuery">
     <div class="col">
