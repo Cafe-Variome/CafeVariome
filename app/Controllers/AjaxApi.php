@@ -51,9 +51,8 @@ class AjaxApi extends Controller{
         $this->phpshellHelperInstance = new PHPShellHelper();
     }
 
-    function query($network_key = '') {
+    public function query() {
         $networkInterface = new NetworkInterface();
-
 		$authAdapterConfig = config('AuthAdapter');
         $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
 
@@ -62,6 +61,7 @@ class AjaxApi extends Controller{
             return json_encode(['timeout' => 'Your session has timed out. You need to login again.']);
         }
 
+        $network_key = $this->request->getVar('network_key');
         $queryString = json_encode($this->request->getVar('jsonAPI'));
         $token = $authAdapter->getToken();
 
