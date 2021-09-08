@@ -127,8 +127,13 @@ $(function() {
     var phen_data = {};
     // Load phenotype json and then load JSON API template if successful
     function load_phen_json() {
-        var phen_attrib = []
-        $.ajax({ url: urls['phen_json'], dataType: 'json'})
+        var query_builder_post = getCSRFToken();
+        $.ajax({
+            type: 'post',
+            url: urls['phen_json'],
+            data:query_builder_post,
+            dataType: 'json'
+        })
         .done((jsonData)=> { 
             phen_data = jsonData[0];
 
@@ -303,7 +308,7 @@ $(function() {
         $('#waiting').show();
         $('#build_query').prop('disabled', 'true');
         $('#query_result tbody').html('')
-        $.ajax({ url: urls['qb_json'], dataType: 'json', })
+        $.ajax({ url: urls['qb_json'], dataType: 'json'})
         .done((jsonAPI) => {
 
             var attributes = [] // Attributes that need to be extracted from sources after query go here. Do not add subject_id as it is included implicitly.
@@ -414,12 +419,14 @@ $(function() {
             jsonAPI['query']['components']['ordo'] = ordo;
 
             jsonAPI['logic'] = logic;
+            let csrfTokenObj = getCSRFToken('keyvaluepair');
+            let queryData = {'jsonAPI': jsonAPI, 'network_key': $('#network_key').val()};
+            var csrfTokenName = Object.keys(csrfTokenObj)[0];
+            queryData[csrfTokenName] = csrfTokenObj[csrfTokenName];
 
-            $.ajax({url: baseurl + 'AjaxApi/query/' + $('#network_key').val(),
-                dataType: 'html',
-                delay: 200,
+            $.ajax({url: baseurl + 'AjaxApi/query',
                 type: 'POST',
-                data: {'jsonAPI': jsonAPI, 'user_id': $('#user_id').val()},
+                data: queryData,
                 dataType: 'json',
                 success: function (data) {
                     result_data = {};
@@ -650,3 +657,17 @@ $(document).ready(function() {
         })
     }
 });
+
+function getCSRFToken(format = 'string'){
+    csrf_token = $('#csrf_token').val();
+    csrf_token_name = $('#csrf_token').prop('name');
+
+    switch (format) {
+        case "string":
+            return csrf_token_name + '=' + csrf_token;
+        case "keyvaluepair":
+            var csrfObj = {};
+            csrfObj[csrf_token_name] = csrf_token;
+            return csrfObj;
+    }
+}
