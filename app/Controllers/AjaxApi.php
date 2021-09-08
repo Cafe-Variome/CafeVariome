@@ -20,8 +20,6 @@ use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 use App\Models\EAV;
 use App\Models\Source;
-use App\Models\Network;
-use App\Models\Elastic;
 use App\Models\Upload;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
