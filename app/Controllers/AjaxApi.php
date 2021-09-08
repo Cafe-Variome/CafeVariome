@@ -690,69 +690,74 @@ class AjaxApi extends Controller{
     }
 
     /**
-     * bulk_upload - Perform Upload for CSV/XLS/XLSX files
+     * spreadsheetUpload - Perform Upload for CSV/XLS/XLSX files
      * TODO: Create a link to page from sources admin. Replace with stand alone vcf page
      *
-     * @param string $_POST['source'] - The source name we will be uploading to
-     * @param array $_FILES           - The file we are uploading
+     * @param string $source_id - The source name we will be uploading to
+     * @param int $user_id
+	 * @param int $pipeline_id
+	 * @param bool $force
      * @return json_encoded array Success|Headers are not as expected|File is Duplicated
      */
-    public function bulk_upload($force=false){
+    public function spreadsheetUpload()
+	{
+		if ($this->request->getMethod() == 'post'){
+			$source_id = $this->request->getVar('source_id');
+			$user_id = $this->request->getVar('user_id');
+			$pipeline_id = $this->request->getVar('pipeline_id');
+			$force = $this->request->getVar('force');
 
-        $source_id = $this->request->getVar('source_id');
-        $user_id = $this->request->getVar('user_id');
-        $pipeline_id = $this->request->getVar('pipeline_id');
+			$basePath = FCPATH . UPLOAD . UPLOAD_DATA;
+			$fileMan = new UploadFileMan($basePath);
 
-        $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
-        $fileMan = new UploadFileMan($basePath);
+			if ($fileMan->countFiles() == 1){ // Only 1 file is allowed to go through this uploader
+				$file = $fileMan->getFiles()[0];
+				$file_name = $file->getName();
 
-        if ($fileMan->countFiles() == 1){ // Only 1 file is allowed to go through this uploader
-            $file = $fileMan->getFiles()[0];
-            $file_name = $file->getName();
+				if (!$force) {
+					if($fileMan->Exists($source_id . DIRECTORY_SEPARATOR . $file_name)){
+						$response_array = array('status' => "Duplicate");
+						return json_encode($response_array);
+					}
+				}
 
-            if (!$force) {
-                if($fileMan->Exists($source_id . DIRECTORY_SEPARATOR . $file_name)){
-                    $response_array = array('status' => "Duplicate");
-                    return json_encode($response_array);
-                }
-            }
+				if (!$fileMan->isValid($file)) {
+					$response_array = array('status' => "InvalidFile");
+					return json_encode($response_array);
+				}
 
-            if (!$fileMan->isValid($file)) {
-                $response_array = array('status' => "InvalidFile");
-                return json_encode($response_array);
-            }
+				$source_path = $source_id . DIRECTORY_SEPARATOR;
+				if (!$fileMan->Exists($source_id)) {
+					$fileMan->CreateDirectory($source_id);
+				}
+				if ($fileMan->Save($file, $source_path)) {
 
-            $source_path = $source_id . DIRECTORY_SEPARATOR;
-            if (!$fileMan->Exists($source_id)) {
-                $fileMan->CreateDirectory($source_id);
-            }
-            if ($fileMan->Save($file, $source_path)) {
+					$file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
 
-                $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
+					// Begin background insert to MySQL
 
-                // Begin background insert to MySQL
+					$fAction = $this->request->getVar('fAction'); // File Action
+					if ($fAction == "overwrite") {
+						$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task spreadsheetInsert $file_id 1 $source_id");
+					}
+					elseif ($fAction == "append") {
+						$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task spreadsheetInsert $file_id 00 $source_id");
+					}
+					$uid = md5(uniqid(rand(),true));
+					$this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
+					$response_array = array('status'  => "Green",
+						'message' => "",
+						'uid'     => $uid);
+					return json_encode($response_array);
+				}
+				else{
+					$response_array = array('status'  => "Red",
+						'message' => "Unknown error.");
 
-                $fAction = $this->request->getVar('fAction'); // File Action
-                if ($fAction == "overwrite") {
-                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 1 $source_id");
-                }
-                elseif ($fAction == "append") {
-                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task bulkUploadInsert $file_id 00 $source_id");
-                }
-                $uid = md5(uniqid(rand(),true));
-                $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
-                $response_array = array('status'  => "Green",
-                                        'message' => "",
-                                        'uid'     => $uid);
-                return json_encode($response_array);
-            }
-            else{
-                $response_array = array('status'  => "Red",
-                'message' => "Unknown error.");
-
-                return json_encode($response_array);
-            }
-        }
+					return json_encode($response_array);
+				}
+			}
+		}
     }
 
     /**
