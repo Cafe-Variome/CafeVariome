@@ -839,7 +839,7 @@ class AjaxApi extends Controller{
             case 'csv':
             case 'xls':
             case 'xlsx':
-                $method = 'bulkUploadInsert';
+                $method = 'spreadsheetInsert';
                 break;
             case 'phenopacket':
             case 'json':
@@ -882,7 +882,7 @@ class AjaxApi extends Controller{
                 case 'csv':
                 case 'xls':
                 case 'xlsx':
-                    $method = 'bulkUploadInsert';
+                    $method = 'spreadsheetInsert';
                     break;
                 case 'phenopacket':
                 case 'json':

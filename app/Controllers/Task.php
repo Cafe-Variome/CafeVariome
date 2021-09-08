@@ -21,7 +21,7 @@ use App\Models\Elastic;
 use App\Models\Settings;
 use App\Models\EAV;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\DataStream;
-use App\Libraries\CafeVariome\Core\DataPipeLine\Input\EAVDataInput;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Input\SpreadsheetDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\PhenoPacketDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\UniversalDataInput;
@@ -299,14 +299,14 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
     }
 
     /**
-     * bulkUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
+     * spreadsheetInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
      *
      * @param string $file        - The File We are uploading
      * @param int $overwrite         - 0: We do not need to delete data from eavs | 1: We do need to
      * @param string $source      - The name of the source we are uploading to
      * @return array $return_data - Basic information on the status of the upload
      */
-    public function bulkUploadInsert(int $fileId,  int $overwrite = UPLOADER_DELETE_FILE) {
+    public function spreadsheetInsert(int $fileId,  int $overwrite = UPLOADER_DELETE_FILE) {
         $uploadModel = new Upload();
         $sourceModel = new Source();
 
@@ -318,7 +318,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
                 $sourceModel->updateSource(['record_count' => 0], ['source_id' => $sourceId]);
             }
 
-            $inputPipeLine = new EAVDataInput($sourceId, $overwrite);
+            $inputPipeLine = new SpreadsheetDataInput($sourceId, $overwrite);
             $inputPipeLine->absorb($fileId);
             $inputPipeLine->save($fileId);
 			$inputPipeLine->finalize($fileId);
@@ -376,7 +376,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 					case 'xlsx':
 						try
 						{
-							$inputPipeLine = new EAVDataInput($source_id, $overwrite);
+							$inputPipeLine = new SpreadsheetDataInput($source_id, $overwrite);
 							$inputPipeLine->absorb($file_id);
 							$inputPipeLine->save($file_id);
 							$inputPipeLine->finalize($file_id, $final_round);
