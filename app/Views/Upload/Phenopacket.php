@@ -3,8 +3,8 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <div id="load"></div>
@@ -40,6 +40,7 @@
 	<input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
 	<input type="hidden" id="source_id" value="<?php echo $source_id ?>" />
 	<input type="hidden" name="uploader" id="uploader" value="phenopacket" />
+	<input type="hidden" name="<?= csrf_token() ?>" id="csrf_token" value="<?= csrf_hash() ?>" />
 
 	<div class="form-group row">
 		<div class="col-6">
@@ -73,7 +74,7 @@
 	</div>
 	<div class="col-6"></div>
 	</div>
-</form> 
+</form>
 
 <hr>
 
