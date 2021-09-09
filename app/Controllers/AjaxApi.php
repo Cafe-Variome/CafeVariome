@@ -960,21 +960,23 @@ class AjaxApi extends Controller{
 
     public function getSourceCounts()
     {
-        $sourceModel = new Source();
-        $sourceRecordount = $sourceModel->getSources('source_id, name, record_count', ['status' => 'online']);
+		if ($this->request->getMethod() == 'post') {
+			$sourceModel = new Source();
+			$sourceRecordount = $sourceModel->getSources('source_id, name, record_count', ['status' => 'online']);
 
-        $sc = 0;
-        $maxSourcesToDisplay = 12;
-        $sourceCountList = [];
-        foreach ($sourceRecordount as $srCount) {
-            if ($sc > $maxSourcesToDisplay) {
-                break;
-            }
-            array_push($sourceCountList, $srCount['record_count']);
-            $sc++;
-        }
+			$sc = 0;
+			$maxSourcesToDisplay = 12;
+			$sourceCountList = [];
+			foreach ($sourceRecordount as $srCount) {
+				if ($sc > $maxSourcesToDisplay) {
+					break;
+				}
+				array_push($sourceCountList, $srCount['record_count']);
+				$sc++;
+			}
 
-        return json_encode($sourceCountList);
+			return json_encode($sourceCountList);
+		}
     }
 
     public function getSourceStatus(){
