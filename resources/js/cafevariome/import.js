@@ -90,7 +90,7 @@ function importDir() {
             }
 
             $('#lookupCount').text(textStatus);
-            reloadTable(source_id,false);
+            reloadTable(source_id,false, true);
         },
         error: function(jqXHR, textStatus, errorThrown) {
             showError(textStatus, errorThrown)
