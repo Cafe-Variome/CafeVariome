@@ -3,13 +3,13 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <div class="row">
   <div class="col">
-  Elasticsearch Service Status: 
+  Elasticsearch Service Status:
   <?php if ($isRunning): ?>
     <span class="text-success">Running</span>
   <?php else: ?>
@@ -18,6 +18,7 @@
   </div>
 </div>
 <br/>
+<input type="hidden" id="csrf_token" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
 <table class="table table-bordered table-hover table-striped" id="index_table">
   <thead>
     <tr>
@@ -28,7 +29,7 @@
     </tr>
   </thead>
   <tbody id="index_grid">
-    <?php foreach ($elastic_update as $row): ?> 
+    <?php foreach ($elastic_update as $row): ?>
     <tr id="index_<?php echo $row['source_id']; ?>">
       <td><?= $indexPrefix."_".$row['source_id']; ?></td>
       <td><?= $row['name'] ?></td>
@@ -42,7 +43,7 @@
             </a>
             <a data-toggle="tooltip" data-placement="top" title="Unable to append newly-uploaded data to ElasticSearch since it not running.">
               <span class="fa fa-sync text-secondary"></span>
-            </a>            
+            </a>
           </td>
       <?php else: ?>
       <td id="status-<?= $row['source_id']; ?>">
@@ -60,13 +61,13 @@
         </a>
       <?php endif; ?>
       </td>
-        <td id="action-<?= $row['source_id']; ?>">   
-          <?php if ($row['network_assigned']): ?>    
+        <td id="action-<?= $row['source_id']; ?>">
+          <?php if ($row['network_assigned']): ?>
             <?php if($row['elastic_lock']): ?>
             <a data-toggle="tooltip" data-placement="top" title="The source is locked as it appears that data is being appended to the source at the moment. Wait until the operation finishes and the source is unlocked.">
               <span class="fa fa-lock text-danger"></span>
             </a>
-            <?php else: ?>                             
+            <?php else: ?>
             <a onclick="regenElastic('<?php echo $row['source_id']; ?>', false);" id="update_<?php echo $row['name']; ?>" data-toggle="tooltip" data-placement="top" title="Click to regenerate this ElasticSearch Index">
               <span class="fa fa-redo text-info"></span>
             </a>
