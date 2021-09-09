@@ -813,95 +813,149 @@ class AjaxApi extends Controller{
         }
     }
 
+    public function lookupDirectory()
+	{
+		if ($this->request->getMethod() == 'post') {
+			$path = $this->request->getVar('lookup_dir');
+			$fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket', 'json']);
+			$file_count = count($fileMan->getFiles());
+
+			return json_encode($file_count);
+		}
+	}
+
+	public function importFromDirectory()
+	{
+		 if ($this->request->getMethod() == 'post') {
+			 $path = $this->request->getVar('lookup_dir');
+			 $source_id = $this->request->getVar('source_id');
+			 $pipeline_id = $this->request->getVar('pipeline_id');
+			 $user_id = $this->request->getVar('user_id');
+
+			 $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket', 'json']);
+			 $unsaved_files = $fileMan->getFiles();
+			 $files_count = count($unsaved_files);
+
+			 $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
+			 $fileMan = new SysFileMan($basePath);
+
+			 foreach ($unsaved_files as $key => $file) {
+				 if ($fileMan->isValid($file)) {
+					 $source_path = $source_id . DIRECTORY_SEPARATOR;
+
+					 if (!$fileMan->Exists($source_id)) {
+						 $fileMan->CreateDirectory($source_id);
+					 }
+
+					 if ($fileMan->Save($file, $source_path)) {
+						 $file_name = $file->getName();
+						 $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
+						 unset($unsaved_files[$key]);
+					 }
+				 }
+			 }
+
+			 $unsaved_files_count = count($unsaved_files);
+
+			 $result = ["unsaved_count" => $unsaved_files_count,
+				 "saved_count" => $files_count - $unsaved_files_count];
+
+			 return json_encode($result);
+		 }
+	}
+
     public function processFile()
     {
-        $fileId = $this->request->getVar('fileId');
-        $overwrite = $this->request->getVar('overwrite');
+		if ($this->request->getMethod() == 'post') {
+			$fileId = $this->request->getVar('fileId');
 
-        $uploadModel = new Upload();
-        $extension = $uploadModel->getFileExtensionById($fileId);
+			$uploadModel = new Upload();
+			$extension = $uploadModel->getFileExtensionById($fileId);
 
-        $method = '';
-        $overwriteFlag = UPLOADER_DELETE_FILE;
+			$method = '';
+			$overwriteFlag = UPLOADER_DELETE_FILE;
 
-        switch (strtolower($extension)) {
-            case 'csv':
-            case 'xls':
-            case 'xlsx':
-                $method = 'spreadsheetInsert';
-                break;
-            case 'phenopacket':
-            case 'json':
-                $method = 'phenoPacketInsertByFileId';
-                break;
-            case 'vcf':
-                $method = 'vcfInsertByFileId';
-                break;
-            default:
-                return json_encode(0);
-        }
+			switch (strtolower($extension)) {
+				case 'csv':
+				case 'xls':
+				case 'xlsx':
+					$method = 'spreadsheetInsert';
+					break;
+				case 'phenopacket':
+				case 'json':
+					$method = 'phenoPacketInsertByFileId';
+					break;
+				case 'vcf':
+					$method = 'vcfInsertByFileId';
+					break;
+				default:
+					return json_encode(0);
+			}
 
-        $uploadModel = new Upload();
-        $uploadModel->resetFileStatus($fileId);
+			$uploadModel = new Upload();
+			$uploadModel->resetFileStatus($fileId);
 
-        $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fileId . " " . $overwriteFlag);
+			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fileId . " " . $overwriteFlag);
 
-        return json_encode(1);
+			return json_encode(1);
+		}
     }
 
     public function processFiles()
     {
-        $fileIds = $this->request->getVar('fileIds');
+		if ($this->request->getMethod() == 'post') {
+			$fileIds = $this->request->getVar('fileIds');
 
-        $fids = [];
-        if (strpos($fileIds, ',')) {
-            $fids = explode(',', $fileIds);
-        }
-        else {
-            $fids[] = intval($fileIds);
-        }
+			$fids = [];
+			if (strpos($fileIds, ',')) {
+				$fids = explode(',', $fileIds);
+			} else {
+				$fids[] = intval($fileIds);
+			}
 
-        foreach ($fids as $fid) {
-            $uploadModel = new Upload();
-            $extension = $uploadModel->getFileExtensionById($fid);
+			foreach ($fids as $fid) {
+				$uploadModel = new Upload();
+				$extension = $uploadModel->getFileExtensionById($fid);
 
-            $overwriteFlag = UPLOADER_DELETE_FILE;
+				$overwriteFlag = UPLOADER_DELETE_FILE;
 
-            switch (strtolower($extension)) {
-                case 'csv':
-                case 'xls':
-                case 'xlsx':
-                    $method = 'spreadsheetInsert';
-                    break;
-                case 'phenopacket':
-                case 'json':
-                    $method = 'phenoPacketInsertByFileId';
-                    break;
-                case 'vcf':
-                    $method = 'vcfInsertByFileId';
-                    break;
-                default:
-                    return json_encode(0);
-            }
+				switch (strtolower($extension)) {
+					case 'csv':
+					case 'xls':
+					case 'xlsx':
+						$method = 'spreadsheetInsert';
+						break;
+					case 'phenopacket':
+					case 'json':
+						$method = 'phenoPacketInsertByFileId';
+						break;
+					case 'vcf':
+						$method = 'vcfInsertByFileId';
+						break;
+					default:
+						return json_encode(0);
+				}
 
-            $uploadModel = new Upload();
-            $uploadModel->resetFileStatus($fid);
+				$uploadModel = new Upload();
+				$uploadModel->resetFileStatus($fid);
 
-            $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fid . " " . $overwriteFlag);
-        }
+				$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fid . " " . $overwriteFlag);
+			}
 
-        return json_encode(1);
+			return json_encode(1);
+		}
     }
 
     public function processFilesBySourceId()
 	{
-		$source_id = $this->request->getVar('source_id');
-		$pending = $this->request->getVar('pending');
-		$overwrite_flag = $this->request->getVar('overwrite');
+		if ($this->request->getMethod() == 'post') {
+			$source_id = $this->request->getVar('source_id');
+			$pending = $this->request->getVar('pending');
+			$overwrite_flag = $this->request->getVar('overwrite');
 
-		$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task insertFilesBySourceId $source_id $pending $overwrite_flag");
-		return json_encode(1);
-
+			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task insertFilesBySourceId $source_id $pending $overwrite_flag");
+			return json_encode(1);
+		}
 	}
 
     public function getSourceCounts()
@@ -923,111 +977,22 @@ class AjaxApi extends Controller{
         return json_encode($sourceCountList);
     }
 
-    public function getSourceStatus(int $source_id){
-        $sourceModel = new Source();
-        $output = ['Files' => [], 'Error' => []];
-        if ($source_id== 'all') {
-            $output['Files'] = $sourceModel->getSourceStatus('all');
-        }
-        else {
-          $output['Files'] = $sourceModel->getSourceStatus($source_id);
-          $output['Error'] = $sourceModel->getErrorForSource($source_id);
-        }
+    public function getSourceStatus(){
 
-        return json_encode($output);
+		if ($this->request->getMethod() == 'post') {
+			$source_id = $this->request->getVar('source_id');
+			$sourceModel = new Source();
+			$output = ['Files' => [], 'Error' => []];
+			if ($source_id == 'all') {
+				$output['Files'] = $sourceModel->getSourceStatus('all');
+			} else {
+				$output['Files'] = $sourceModel->getSourceStatus($source_id);
+				$output['Error'] = $sourceModel->getErrorForSource($source_id);
+			}
+
+			return json_encode($output);
+		}
     }
-
-
-    /**
-     * Elastic Check - Checking function prior to update to determine type of update desired and whether it is needed.
-     *
-     * @param int $force     - Are we forcing the regnerate? 1 if so and 0 if not
-     * @param int $id        - The source id for the elasticsearch index
-     * @param int $add       - 1 if we are adding to index instead of fully regenerating
-     * @return array $result - Various parameters to allow front end decision
-     */
-    public function elastic_check() {
-
-        $uploadModel = new \App\Models\Upload();
-        $eavModel = new EAV();
-
-        $data = json_decode($this->request->getVar('u_data'));
-        $force = $data->force;
-        $source_id = $data->id;
-        $add = $data->add;
-
-        $unprocessedFilesCount = $uploadModel->getElasticsearchUnprocessedFilesBySourceId($source_id);
-
-        if (!$unprocessedFilesCount) {
-            $result = ['Status' => 'Empty'];
-            return json_encode($result);
-        }
-        if ($add) {
-            $unaddedEAVsCount = $eavModel->countUnaddedEAVs($source_id);
-            if ($unaddedEAVsCount == 0) {
-                $result = ['Status' => 'Fully Updated'];
-                return json_encode($result);
-            }
-            else {
-                $time = $unaddedEAVsCount/2786;
-                $result = ['Status' => 'Success','Time'=> $time];
-                return json_encode($result);
-            }
-        }
-        else {
-            if ($force) {
-                $count = $eavModel->countUnaddedEAVs($source_id);
-                $time = $count/2786;
-                $result = ['Status' => 'Success','Time'=> $time];
-                return json_encode($result);
-            }
-            else {
-                $result = ['Status' => 'Fully Updated'];
-                return json_encode($result);
-            }
-        }
-    }
-
-
-    /**
-     * Elastic Start - Begin ElasticSearch regeneration
-     *
-     * @param int $force     - Are we forcing the regnerate? 1 if so and 0 if not
-     * @param int $id        - The source id for the elasticsearch index
-     * @param int $add       - 1 if we are adding to index instead of fully regenerating
-     * @return N/A
-     */
-    public function elastic_start() {
-        $eavModel = new \App\Models\EAV();
-        $phpshellHelperInstance = new PHPShellHelper();
-        $data = json_decode($this->request->getVar('u_data'));
-        $force = $data->force;
-        $source_id = $data->id;
-        $add = (int)$data->add;
-
-        // rebuild the json list for interface
-        $phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchAndNeo4JIndex $source_id $add");
-    }
-
-    function loadOrpha(){
-        $this->response->setHeader("Content-Type", "application/json");
-
-        $path = FCPATH . RESOURCES_DIR . STATIC_DIR;
-        $fileMan = new SysFileMan($path);
-        $terms = [];
-        if ($fileMan->Exists(ORPHATERMS_SOURCE)) {
-            while (($line = $fileMan->ReadLine(ORPHATERMS_SOURCE)) != false) {
-                $termPair = $line;
-                $termPair = str_replace('"', "", $termPair);
-                $termPair = str_replace("\n", "", $termPair);
-                $termPairArr = explode(",", $termPair);
-
-                array_push($terms, $termPairArr[0] . ' ' . $termPairArr[1]);
-            }
-        }
-
-		return json_encode($terms);
-	}
 
     public function getAttributeValueFromFile()
     {
@@ -1050,53 +1015,4 @@ class AjaxApi extends Controller{
         }
     }
 
-    public function lookupDirectory()
-    {
-        $path = $this->request->getVar('lookup_dir');
-
-        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket', 'json']);
-        $file_count = count($fileMan->getFiles());
-
-        return json_encode($file_count);
-    }
-
-    public function importFromDirectory()
-    {
-        $path = $this->request->getVar('lookup_dir');
-        $source_id = $this->request->getVar('source_id');
-        $pipeline_id = $this->request->getVar('pipeline_id');
-        $user_id = $this->request->getVar('user_id');
-
-
-        $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket', 'json']);
-        $unsaved_files = $fileMan->getFiles();
-        $files_count = count($unsaved_files);
-
-        $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
-        $fileMan = new SysFileMan($basePath);
-
-        foreach ($unsaved_files as $key => $file) {
-            if ($fileMan->isValid($file)) {
-                $source_path = $source_id . DIRECTORY_SEPARATOR;
-
-                if (!$fileMan->Exists($source_id)) {
-                    $fileMan->CreateDirectory($source_id);
-                }
-
-                if ($fileMan->Save($file, $source_path)) {
-                    $file_name = $file->getName();
-                    $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
-                    unset($unsaved_files[$key]);
-                }
-            }
-        }
-
-        $unsaved_files_count = count($unsaved_files);
-
-        $result = ["unsaved_count" => $unsaved_files_count,
-                   "saved_count" =>  $files_count - $unsaved_files_count];
-
-        return json_encode($result);
-
-    }
  }
