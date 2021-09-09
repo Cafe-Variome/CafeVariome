@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <div class="row">
@@ -33,22 +33,23 @@
 <?php endif ?>
 
 <form enctype="multipart/form-data" method="post" id="vcfinfo">
-  <input type="hidden" id="source_id" value="<?php echo $source_id ?>" name="source">
-  <input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
-  <input type="hidden" name="uploader" id="uploader" value="vcf" />
+	<input type="hidden" id="source_id" value="<?php echo $source_id ?>" name="source">
+	<input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
+	<input type="hidden" name="uploader" id="uploader" value="vcf" />
+	<input type="hidden" name="<?= csrf_token() ?>" id="csrf_token" value="<?= csrf_hash() ?>" />
 
-  <div class="form-group row">
-  	<div class="col-6">
+	<div class="form-group row">
+	<div class="col-6">
 		<div class="row">
 			<div class="col">
 				<div class="custom-file">
 					<input type="file" class="custom-file-input" name="config" id="config" accept=".csv, .xls, .xlsx" required>
 					<label class="custom-file-label" for="customFile">Config File to describe VCF's:</label>
 				</div>
-			</div>		
+			</div>
 		</div>
 		<div class="row">
-			<div class="col">			
+			<div class="col">
 				<div class="custom-file">
 					<input type="file" class="custom-file-input" name='userfile[]' id="dataFile" aria-describedby="dataFile" accept=".vcf" required multiple>
 					<label class="custom-file-label" for="customFile">File(s) to submit:</label>
@@ -75,9 +76,9 @@
 		<div class="spinner-border text-warning" id="uploadSpinner" role="status" style="display:none;">
 			<span class="sr-only">Loading...</span>
 		</div>
-	</div>	
-  </div>
-</form> 
+	</div>
+	</div>
+</form>
 
 </hr>
 
@@ -101,7 +102,7 @@
 		<h5 class="modal-title" id="exampleModalLabel">Resolve VCF upload issues for Source: <?php echo $source_id; ?></h5>
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 		  <span aria-hidden="true">&times;</span>
-		</button>      
+		</button>
 	  </div>
 	  <div class="modal-body">
 		<div id="variableIssue">

@@ -31,47 +31,47 @@ $(document).ready(function() {
 		} 
 		id = $('#source_id').val();
 		user_id =  $('#user_id').val();
-		selected = $('input[name="fAction[]"]:checked').val(); 
-
-		param = "source_id="+id+"&size="+size;
+		selected = $('input[name="fAction[]"]:checked').val();
+		csrf_token = $('#csrf_token').val();
+		csrf_token_name = $('#csrf_token').prop('name');
+		param = 'source_id=' + id + '&size=' + size + '&' + csrf_token_name + '=' + csrf_token;
 		$cfile = $("#config")[0].files[0];
 		$.ajax({
-      		type: "post",  
+      		type: 'post',
       		url: baseurl+'AjaxApi/validateUpload',
       		data: param,
-      		dataType: "json", 
+      		dataType: 'json',
       		success: function(response)  {
-				if (response == "Red") {
-					alert("Illegal Source Target.")
+				if (response == 'Red') {
+					alert('Illegal Source Target.');
 				}
-				else if (response == "Locked") {
-					alert("This source is currently locked as there is a database update operation already ongoing. Please wait till its complete.");
+				else if (response == 'Locked') {
+					alert('This source is currently locked as there is a database update operation already ongoing. Please wait till its complete.');
 				}
-				else if (response == "Yellow") {
-					alert("There is not enough space on the server to accept this file. Please get an Administrator to clear some space.");
+				else if (response == 'Yellow') {
+					alert('There is not enough space on the server to accept this file. Please get an Administrator to clear some space.');
 				}
 				else {
-					// var ajaxData = new FormData(this);
 					$('#uploadSpinner').show();
 					var formData = new FormData();
-					formData.append("source_id", id);
-					formData.append("files", file_names);
-					formData.append("config", $("#config")[0].files[0])					
+					formData.append(csrf_token_name, csrf_token);
+					formData.append('source_id', id);
+					formData.append('files', file_names);
+					formData.append('config', $("#config")[0].files[0]);
 					$.ajax({
 						//Send the form through to do_upload
-			      		type: "POST",  
-			      		url: baseurl+'AjaxApi/vcf_upload',
-			      		contentType: 'multipart/form-data',
+			      		type: 'POST',
+			      		url: baseurl+'AjaxApi/vcfUpload',
 			      		data: formData,
 			      		cache: false,
 						contentType: false,
 						processData: false,       
 			      		success: function(response)  {
 			      			data = $.parseJSON(response);
-			      			if (data.status == "Overload") {
+			      			if (data.status == 'Overload') {
 			      				alert(data.message);
 			      			}
-			      			else if (data.status == "Cancel") {
+			      			else if (data.status == 'Cancel') {
 			      				// alert(data.message);
 			      				$('#vcf_errors').empty();			      
 			      				for (var i = 0; i < data.message.length; i++) {
@@ -84,34 +84,33 @@ $(document).ready(function() {
 			      					}
 			                    }
 			      			}
-			      			else if (data.status == "Duplicate") {
+			      			else if (data.status == 'Duplicate') {
 			      				confirmvcf(data);		
 			      			}
-			      			else if (data.status == "Green") {
+			      			else if (data.status == 'Green') {
 								id = $('#source_id').val();
 			      				counter = 0;
 								flag = true;
 								for (i = 0; i < $('#dataFile')[0].files.length; i++) {
-									// console.log("Success");
 									if (flag) {
 										var formData = new FormData();
-										formData.append("source_id", id);
-										formData.append("uid", data.uid);
+										formData.append(csrf_token_name, csrf_token);
+										formData.append('source_id', id);
+										formData.append('uid', data.uid);
 										formData.append('user_id', user_id);
 										flag = false;
 									}
 									formData.append("userfile[]", $('#dataFile')[0].files[i]);
 									counter++;
-									if (counter%20 == 0) {
+									if (counter % 20 == 0) {
 										flag = true;
 										$.ajax({
-											type: "POST",  
+											type: 'POST',
 											url: baseurl+'AjaxApi/vcfBatch',
-											contentType: 'multipart/form-data',
 											data: formData,
 											cache: false,
 											contentType: false,
-											dataType: "application/json", 
+											dataType: 'application/json',
 											processData: false,
 											success: function(response)  {
 
@@ -120,29 +119,28 @@ $(document).ready(function() {
 									}
 								}
 								$.ajax({
-									type: "POST",  
+									type: 'POST',
 									url: baseurl+'AjaxApi/vcfBatch',
-									contentType: 'multipart/form-data',
 									data: formData,
 									cache: false,
 									contentType: false,
 									processData: false,
 									success: function(response)  {
 										var formData = new FormData();
+										formData.append(csrf_token_name, csrf_token);
 										formData.append("source_id", id);
 										formData.append("uid", data.uid);
 										formData.append('user_id', user_id);
 										formData.append('fAction', selected);
 										$.ajax({
-											type: "POST",   
+											type: 'POST',
 								      		url: baseurl+'AjaxApi/vcfStart',
 								      		data: formData,
 											cache: false,
 											contentType: false,
 											processData: false,
 											success: function(response)  {
-												console.log(response);
-												if (JSON.parse(response) == "Green") {
+												if (JSON.parse(response) == 'Green') {
 													$('#uploadSpinner').hide();
 													$.notify({
 								                        // options
@@ -301,26 +299,28 @@ function batchVcf() {
 	uid = sessionStorage.getItem('uid');
 	done = JSON.parse(sessionStorage.getItem('done'));
 	sessionStorage.clear();
+	csrf_token = $('#csrf_token').val();
+	csrf_token_name = $('#csrf_token').prop('name');
 	for (i = 0; i < $('#dataFile')[0].files.length; i++) {
 		// console.log("Success");
 		file = $('#dataFile')[0].files[i];
 		if (flag) {
 			var formData = new FormData();
-			formData.append("source_id", id);
-			formData.append("uid", uid);
+			formData.append(csrf_token_name, csrf_token);
+			formData.append('source_id', id);
+			formData.append('uid', uid);
 			formData.append('user_id', user_id);
 			flag = false;
 		}
 		if (done.includes(file.name)) {
-			formData.append("userfile[]", $('#dataFile')[0].files[i]);
+			formData.append('userfile[]', $('#dataFile')[0].files[i]);
 			counter++;
 		}		
 		if (counter%20 == 0) {
 			flag = true;
 			$.ajax({
-				type: "POST",  
+				type: 'POST',
 				url: baseurl+'AjaxApi/vcfBatch',
-				contentType: 'multipart/form-data',
 				data: formData,
 				cache: false,
 				contentType: false,
@@ -333,7 +333,7 @@ function batchVcf() {
 		}
 	}
 	$.ajax({
-		type: "POST",  
+		type: 'POST',
 		url: baseurl+'AjaxApi/vcfBatch',
 		contentType: 'multipart/form-data',
 		data: formData,
@@ -344,12 +344,13 @@ function batchVcf() {
 			source_id = $('#source_id').val();
 
 			var formData = new FormData();
+			formData.append(csrf_token_name, csrf_token);
 			formData.append("source_id", source_id);
 			formData.append("uid", uid);
 			formData.append('user_id', user_id);
 			formData.append('fAction', selected);
 			$.ajax({
-				type: "POST",   
+				type: 'POST',
 	      		url: baseurl+'AjaxApi/vcfStart',
 				data: formData,
 				processData: false,
@@ -357,7 +358,7 @@ function batchVcf() {
 				contentType: false,
 				success: function(response)  {
 					console.log(response)
-					if (JSON.parse(response) == "Green") {
+					if (JSON.parse(response) == 'Green') {
 						$('#uploadSpinner').hide()
 	      				$.notify({
 	                        // options
