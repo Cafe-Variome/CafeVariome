@@ -419,8 +419,8 @@ $(function() {
             jsonAPI['query']['components']['ordo'] = ordo;
 
             jsonAPI['logic'] = logic;
-            let csrfTokenObj = getCSRFToken('keyvaluepair');
-            let queryData = {'jsonAPI': jsonAPI, 'network_key': $('#network_key').val()};
+            var csrfTokenObj = getCSRFToken('keyvaluepair');
+            var queryData = {'jsonAPI': jsonAPI, 'network_key': $('#network_key').val()};
             var csrfTokenName = Object.keys(csrfTokenObj)[0];
             queryData[csrfTokenName] = csrfTokenObj[csrfTokenName];
 
