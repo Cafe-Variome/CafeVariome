@@ -307,26 +307,25 @@ class AjaxApi extends Controller{
      * @return string Green | json_encoded array with list of files
      */
     public function checkJsonPresence() {
+		if ($this->request->getMethod() == 'post') {
+			$duplicates = [];
+			$source_id = $this->request->getVar('source_id');
+			$fileNames = $this->request->getVar('fileNames');
 
-        $duplicates = [];
+			$sourceFiles = $this->uploadModel->getFiles('FileName', ['source_id' => $source_id]);
 
-        $source_id = $this->request->getVar('source_id');
-        $fileNames = $this->request->getVar('fileNames');
+			foreach ($sourceFiles as $sourceFile) {
+				if (in_array($sourceFile['FileName'], $fileNames)) {
+					array_push($duplicates, $sourceFile['FileName']);
+				}
+			}
 
-        $sourceFiles = $this->uploadModel->getFiles('FileName', ['source_id' => $source_id]);
-
-        foreach ($sourceFiles as $sourceFile) {
-            if (in_array($sourceFile['FileName'], $fileNames)) {
-                array_push($duplicates, $sourceFile['FileName']);
-            }
-        }
-
-        if (count($duplicates) > 0) {
-            return json_encode($duplicates);
-        }
-        else {
-            return json_encode("Green");
-        }
+			if (count($duplicates) > 0) {
+				return json_encode($duplicates);
+			} else {
+				return json_encode("Green");
+			}
+		}
     }
 
     /**
@@ -338,44 +337,42 @@ class AjaxApi extends Controller{
      * @return N/A
      */
     public function jsonBatch() {
+		if ($this->request->getMethod() == 'post') {
+			$source_id = $this->request->getVar('source_id');
+			$user_id = $this->request->getVar('user_id');
+			$pipeline_id = $this->request->getVar('pipeline_id');
 
-        $source_id = $this->request->getVar('source_id');
-        $user_id = $this->request->getVar('user_id');
-        $pipeline_id = $this->request->getVar('pipeline_id');
+			$basePath = FCPATH . UPLOAD . UPLOAD_DATA;
+			// Create the source upload directory if it doesnt exist
+			$source_path = $source_id;
 
-        $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
-        // Create the source upload directory if it doesnt exist
-        $source_path =  $source_id;
+			$fileMan = new UploadFileMan($basePath);
+			if (!$fileMan->Exists($source_path)) {
+				$fileMan->CreateDirectory($source_path);
+			}
 
-        $fileMan = new UploadFileMan($basePath);
-        if (!$fileMan->Exists($source_path)) {
-            $fileMan->CreateDirectory($source_path);
-        }
+			$source_path = $source_id . DIRECTORY_SEPARATOR;
 
-        $source_path =  $source_id . DIRECTORY_SEPARATOR;
+			if (!$fileMan->Exists($source_path)) {
+				$fileMan->CreateDirectory($source_path);
+			}
 
-        if (!$fileMan->Exists($source_path)) {
-            $fileMan->CreateDirectory($source_path);
-        }
+			$files = $fileMan->getFiles();
 
-        $files = $fileMan->getFiles();
+			foreach ($files as $file) {
+				if (!$fileMan->isValid($file)) {
+					return false;
+				}
 
-        foreach ($files as $file) {
-            if (!$fileMan->isValid($file)) {
-                return false;
-            }
+				if ($fileMan->Save($file, $source_path)) {
+					$this->uploadModel->createUpload($file->getName(), $source_id, $user_id, false, false, null, $pipeline_id);
+				} else {
+					return false;
+				}
+			}
 
-            if($fileMan->Save($file, $source_path))
-            {
-                $this->uploadModel->createUpload($file->getName(),$source_id, $user_id, false, false, null, $pipeline_id);
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        return true;
+			return true;
+		}
     }
 
     /**
@@ -386,20 +383,22 @@ class AjaxApi extends Controller{
      * @return string Green for success
      */
     public function jsonStart() {
-        // Assign posted source to easier variable
-        $source_id = $this->request->getVar('source_id');
-        $user_id = $this->request->getVar('user_id');
-        // Get ID for source and lock it so further updates and uploads cannot occur
-        // Until update is finished
-        $this->sourceModel->lockSource($source_id);
-        $uid = md5(uniqid(rand(),true));
-        $this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
+		if ($this->request->getMethod() == 'post') {
+			// Assign posted source to easier variable
+			$source_id = $this->request->getVar('source_id');
+			$user_id = $this->request->getVar('user_id');
+			// Get ID for source and lock it so further updates and uploads cannot occur
+			// Until update is finished
+			$this->sourceModel->lockSource($source_id);
+			$uid = md5(uniqid(rand(), true));
+			$this->uploadModel->addUploadJobRecord($source_id, $uid, $user_id);
 
-        // Create thread to begin SQL insert in the background
-        $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertBySourceId " . $source_id . " 00");
+			// Create thread to begin SQL insert in the background
+			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertBySourceId " . $source_id . " 00");
 
-        // Report to front end that the process has now begun
-        echo json_encode("Green");
+			// Report to front end that the process has now begun
+			echo json_encode("Green");
+		}
     }
 
     public function checkUploadJobs() {
