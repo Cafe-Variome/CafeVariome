@@ -5,6 +5,8 @@ $("#importFiles").submit(function(event) {
 function lookupDir() {
 
     var lookup_dir = $('#lookupPath').val();
+    var csrf_token = $('#csrf_token').val();
+    var csrf_token_name = $('#csrf_token').prop('name');
 
     if (lookup_dir == null || lookup_dir == '') {
         $('#lookupPath').addClass('is-invalid');
@@ -16,9 +18,10 @@ function lookupDir() {
 
     var fileData = new FormData();
     fileData.append('lookup_dir', $('#lookupPath').val());
+    fileData.append(csrf_token_name, csrf_token);
 
     $.ajax({
-        type: "POST",  
+        type: 'POST',
         url: baseurl+'AjaxApi/lookupDirectory',
         data: fileData,
         dataType: "json", 
@@ -49,6 +52,8 @@ function lookupDir() {
 function importDir() {
     var source_id = $('#source_id').val();
     var pipeline_id = $('#pipeline').val();
+    var csrf_token = $('#csrf_token').val();
+    var csrf_token_name = $('#csrf_token').prop('name');
 
     if (pipeline_id == null || pipeline_id == '' || pipeline_id == -1) {
         $('#pipeline').addClass('is-invalid');
@@ -63,9 +68,10 @@ function importDir() {
     fileData.append('source_id', $('#source_id').val());
     fileData.append('pipeline_id', pipeline_id);
     fileData.append('user_id', $('#user_id').val());
+    fileData.append(csrf_token_name, csrf_token);
 
     $.ajax({
-        type: "POST",  
+        type: 'POST',
         url: baseurl+'AjaxApi/importFromDirectory',
         data: fileData,
         dataType: "json", 
