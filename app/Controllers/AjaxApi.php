@@ -202,39 +202,37 @@ class AjaxApi extends Controller{
 	  * @return array $result - Various parameters to allow front end decision
 	  */
 	 public function elasticCheck() {
+		 if ($this->request->getMethod() == 'post') {
+			 $uploadModel = new \App\Models\Upload();
+			 $eavModel = new EAV();
 
-		 $uploadModel = new \App\Models\Upload();
-		 $eavModel = new EAV();
+			 $source_id = $this->request->getVar('source_id');
+			 $force = $this->request->getVar('force');
+			 $add = $this->request->getVar('add');
 
-		 $source_id = $this->request->getVar('source_id');
-		 $force = $this->request->getVar('force');
-		 $add = $this->request->getVar('add');
+			 $unprocessedFilesCount = $uploadModel->getElasticsearchUnprocessedFilesBySourceId($source_id);
 
-		 $unprocessedFilesCount = $uploadModel->getElasticsearchUnprocessedFilesBySourceId($source_id);
-
-		 if (!$unprocessedFilesCount) {
-			 $result = ['Status' => 'Empty'];
-			 return json_encode($result);
-		 }
-		 if ($add) {
-			 $unaddedEAVsCount = $eavModel->countUnaddedEAVs($source_id);
-			 if ($unaddedEAVsCount == 0) {
-				 $result = ['Status' => 'Fully Updated'];
+			 if (!$unprocessedFilesCount) {
+				 $result = ['Status' => 'Empty'];
 				 return json_encode($result);
 			 }
-			 else {
-				 $result = ['Status' => 'Success'];
-				 return json_encode($result);
-			 }
-		 }
-		 else {
-			 if ($force) {
-				 $result = ['Status' => 'Success'];
-				 return json_encode($result);
-			 }
-			 else {
-				 $result = ['Status' => 'Fully Updated'];
-				 return json_encode($result);
+			 if ($add) {
+				 $unaddedEAVsCount = $eavModel->countUnaddedEAVs($source_id);
+				 if ($unaddedEAVsCount == 0) {
+					 $result = ['Status' => 'Fully Updated'];
+					 return json_encode($result);
+				 } else {
+					 $result = ['Status' => 'Success'];
+					 return json_encode($result);
+				 }
+			 } else {
+				 if ($force) {
+					 $result = ['Status' => 'Success'];
+					 return json_encode($result);
+				 } else {
+					 $result = ['Status' => 'Fully Updated'];
+					 return json_encode($result);
+				 }
 			 }
 		 }
 	 }
@@ -246,12 +244,14 @@ class AjaxApi extends Controller{
 	  * @param int $add       - 1 if we are adding to index instead of fully regenerating
 	  * @return void
 	  */
-	 public function elasticStart() {
-		 $source_id = $this->request->getVar('source_id');
-		 $add = $this->request->getVar('add');
-
-		 // rebuild the json list for interface
-		 $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchAndNeo4JIndex $source_id $add");
+	 public function elasticStart()
+	 {
+		 if ($this->request->getMethod() == 'post'){
+			 $source_id = $this->request->getVar('source_id');
+			 $add = $this->request->getVar('add');
+			 // rebuild the json list for interface
+			 $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchAndNeo4JIndex $source_id $add");
+	 	}
 	 }
 
     /**
