@@ -1,9 +1,11 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
+<input type="hidden" id="csrf_token" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($networkMsg): ?>
@@ -16,7 +18,7 @@
 				</div>
 				<div class="col-3">
 					<span class="fa fa-exclamation-triangle fa-5x"></span>
-				</div>			
+				</div>
 			</div>
 		</div>
 	</div>
@@ -30,7 +32,7 @@
 			<div class="row">
 				<div class="col">
 					<?php echo $elasticMsg ?>
-				</div>		
+				</div>
 			</div>
 		</div>
 	</div>
@@ -44,7 +46,7 @@
 			<div class="row">
 				<div class="col">
 					<?php echo $neo4jMsg ?>
-				</div>		
+				</div>
 			</div>
 		</div>
 	</div>
@@ -199,7 +201,7 @@
 									<span class="icon text-50">
 									<i class="fas fa-cross text-secondary"></i>
 									</span>
-								<?php endif ?> 
+								<?php endif ?>
 							</div>
 						</div>
 						<div class="row mb-1">
@@ -213,10 +215,10 @@
 									<span class="icon text-50">
 									<i class="fas fa-cross text-secondary"></i>
 									</span>
-								<?php endif ?> 
+								<?php endif ?>
 							</div>
 							<div class="col-4">OpenID Provider</div>
-							<div class="col-2">					                                                                                                                                                                          
+							<div class="col-2">
 								<?php if($keycloakStatus): ?>
 									<span class="icon text-50">
 									<i class="fas fa-check text-success"></i>
@@ -225,7 +227,7 @@
 									<span class="icon text-white-50">
 									<i class="fas fa-cross text-secondary"></i>
 									</span>
-								<?php endif ?> 
+								<?php endif ?>
 							</div>
 						</div>
 						<hr>
@@ -245,9 +247,12 @@ var rchart = document.getElementById('recordsrc_chart');
 var dchart = document.getElementById('disk_chart');
 
 $(document).ready(function(){
-
-	$.ajax({url: baseurl + "AjaxApi/getSourceCounts",
-		
+	var csrf_token = $('#csrf_token').val();
+	var csrf_token_name = $('#csrf_token').prop('name');
+	$.ajax({
+		url: baseurl + "AjaxApi/getSourceCounts",
+		type: 'post',
+		data:  csrf_token_name + '=' + csrf_token,
 		success: function(result){
 			var recordChart = new Chart(rchart.getContext('2d'), {
 			type: 'bar',
