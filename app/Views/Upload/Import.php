@@ -17,6 +17,7 @@
 <form method="post" id="importFiles">
     <input type="hidden" id="source_id" name="source_id" value="<?= $source_id ?>">
     <input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
+	<input type="hidden" id="csrf_token" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
 
     <div class="form-group row">
         <div class="col-6">
