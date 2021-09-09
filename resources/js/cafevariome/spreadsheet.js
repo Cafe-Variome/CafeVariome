@@ -27,91 +27,97 @@ $("#uploadBulk").submit(function(event) {
         id = $('#source_id').val();
         name = $('#dataFile')[0].files[0].name;
         param = id;
-        validateParams = 'source_id=' + id + '&size=' + size;
+        csrf_token = $('#csrf_token').val();
+        csrf_token_name = $('#csrf_token').prop('name');
+        validateParams = 'source_id=' + id + '&size=' + size + '&' + csrf_token_name + '=' + csrf_token;
         $('#uploadBtn').prop('disabled', 'disabled');
         $('#uploadSpinner').show();
 
         $.ajax({
-            type: "post",  
+            type: 'post',
             url: baseurl+'AjaxApi/validateUpload',
             data: validateParams,
-            dataType: "json", 
+            dataType: 'json',
             success: function(response)  {
                 //get the data put onto the form
-                if (response != "Green") {
-                    alert("Illegal Source Target.")
+                if (response == 'Locked') {
+                    alert('This source is currently locked as there is a database update operation already ongoing. Please wait till its complete.');
                 }
-                else if (response == "Locked") {
-                    alert("This source is currently locked as there is a database update operation already ongoing. Please wait till its complete.");
+                else if (response == 'Yellow') {
+                    alert('There is not enough space on the server to accept this file/s. Please get an Administrator to clear some space.');
                 }
-                else if (response == "Yellow") {
-                    alert("There is not enough space on the server to accept this file/s. Please get an Administrator to clear some space.");
+                else if (response != 'Green') {
+                    alert('Illegal Source Target.');
                 }
                 else {
                     var uploadData = new FormData();
+                    uploadData.append(csrf_token_name, csrf_token);
                     uploadData.append('source_id', $('#source_id').val());
                     uploadData.append('user_id', $('#user_id').val());
-                    uploadData.append('files', $('#dataFile')[0].files[0]);
                     uploadData.append('fAction', selected);
                     uploadData.append('pipeline_id', $('#pipeline').val());
+                    uploadData.append('files', $('#dataFile')[0].files[0]);
+
                     $.ajax({
-                        //Send the form through to do_upload
-                        type: "POST",  
-                        url: baseurl+'AjaxApi/bulk_upload',
-                        contentType: 'multipart/form-data',
+                        type: 'post',
+                        url: baseurl+'AjaxApi/spreadsheetUpload/',
+                        contentType: false,
                         data: uploadData,
                         cache: false,
-                        contentType: false,
-                        processData: false,       
-                        success: function(response)  {
-                            $('#uploadSpinner').hide();
-                            $('#uploadBtn').prop('disabled', false);
-                            $("#uploadBulk")[0].reset();
-                            console.log(response);
-                            data = $.parseJSON(response);
+                        processData: false,
+                        dataType: 'json',
+                        success: function(data)  {
+                            $('#uploadBulk')[0].reset();
+                            //data = $.parseJSON(response);
                             //if the data has the wrong headers warn the user
-                            if (data.status == "Header") {
+                            if (data.status == 'Header') {
                                 alert(data.message);
                             }
                             //check if the user wants to delete prior file or leave it
-                            else if (data.status == "Duplicate") {
-                                if (confirm("This file has been uploaded before. Do you want to replace the file and all associated data?")) {
+                            else if (data.status == 'Duplicate') {
+                                if (confirm('This file has been uploaded before. Do you want to replace the file and all associated data?')) {
+                                    uploadData.append('force', true);
+
                                     $.ajax({
-                                        type: "POST",  
-                                        url: baseurl+'AjaxApi/bulk_upload/true',
-                                        contentType: 'multipart/form-data',
+                                        type: 'POST',
+                                        url: baseurl+'AjaxApi/spreadsheetUpload/',
+                                        contentType: false,
                                         data: uploadData,
                                         cache: false,
-                                        contentType: false,
                                         processData: false,
                                         success: function(response)  {
-                                            //location.reload(); 
-
                                         	  $.notify({
-                                                message: 'Upload Complete. We are currently processing your data.',
-                                                type: 'info'
-										      },{
-										        timer: 200
-										    });
-                                            //fileUploadInterval();     
-                                            reloadTable($('#source_id').val(),false);
+                                                    message: 'Upload Complete. The file is being processed soon.',
+                                                    type: 'info'
+                                                  },{
+                                                    timer: 200
+                                              });
+                                              reloadTable($('#source_id').val(),false);
                                         },
                                         error: function(jqXHR, textStatus, errorThrown) {
-                                            alert("loading error data " + errorThrown);
+                                            $.notify({
+                                                message: 'An error occurred while uploading the file: ' + errorThrown,
+                                                type: 'danger'
+                                            },{
+                                                timer: 200
+                                            });
+                                        },
+                                        complete: function (jqXHR, textStatus){
+                                            $('#uploadSpinner').hide();
+                                            $('#uploadBtn').prop('disabled', false);
                                         }
                                     });
                                 }
                             }
-                            else if(data.status == "Red"){
+                            else if(data.status == 'Red'){
                                 $.notify({
                                     message: 'Unknown error.',
                                     type: 'danger'
-
                                   },{
                                     timer: 200
                                 });
                             }
-                            else if (data.status == "InvalidFile") {
+                            else if (data.status == 'InvalidFile') {
                                 $.notify({
                                     message: 'File is not valid.',
                                     type: 'warning'
@@ -127,22 +133,35 @@ $("#uploadBulk").submit(function(event) {
                                     timer: 200
                                 });
                                 reloadTable($('#source_id').val(),false);
-                            	//fileUploadInterval();                           
                             }
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
                             $.notify({
-                                message: 'Unknown error.',
+                                message: 'An error occurred while uploading the file: ' + errorThrown,
                                 type: 'danger'
                               },{
                                 timer: 200
                             });
+                        },
+                        complete: function (jqXHR, textStatus){
+                            $('#uploadSpinner').hide();
+                            $('#uploadBtn').prop('disabled', false);
                         }
                     });
                 }
 
             },
             error: function(jqXHR, textStatus, errorThrown) {
+                $.notify({
+                    message: 'An error occurred while validating file upload: ' + errorThrown,
+                    type: 'danger'
+                },{
+                    timer: 200
+                });
+            },
+            complete: function (jqXHR, textStatus){
+                $('#uploadSpinner').hide();
+                $('#uploadBtn').prop('disabled', false);
             }
         }); 
 

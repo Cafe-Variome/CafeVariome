@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <div class="row mt-2">
@@ -35,7 +35,7 @@
 	<input type="hidden" id="source_id" name="source_id" value="<?= $source_id ?>">
 	<input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
 	<input type="hidden" name="uploader" id="uploader" value="bulk" />
-
+	<input type="hidden" name="<?= csrf_token() ?>" id="csrf_token" value="<?= csrf_hash() ?>" />
 	<div class="form-group row">
 		<div class="col-6">
 			<div class="custom-file">
@@ -107,7 +107,7 @@
 		<h5 class="modal-title" id="exampleModalLabel">Header rules for CSV/XLSX File Upload</h5>
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 		  <span aria-hidden="true">&times;</span>
-		</button>      
+		</button>
 	  </div>
 	  <div class="modal-body">
 		<p>The first column must be "subject_id". The file will not be processed otherwise.</p>
@@ -146,7 +146,7 @@
 		<h5 class="modal-title" id="exampleModalLabel">Confirm Overwrite</h5>
 		<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 		  <span aria-hidden="true">&times;</span>
-		</button>          
+		</button>
 		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
 	  </div>
 	  <div class="modal-body">
