@@ -4,10 +4,10 @@
 /**
  * Name: Upload.php
  * Created: 31/07/2019
- * 
+ *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
 
 use App\Models\UIData;
@@ -69,9 +69,7 @@ use CodeIgniter\Config\Services;
 
     /**
      * VCF - Render the Stand-Alone view to upload VCF's
-     * NOT BEING USED / DEPRECATED
      *
-     * @return N/A
      */
     public function VCF($source_id) {
 
@@ -87,6 +85,10 @@ use CodeIgniter\Config\Services;
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
 
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js', JS.'cafevariome/status.js', JS.'cafevariome/vcf.js'];
+
+		$piplineModel = new Pipeline();
+		$pipelines = $piplineModel->getPipelines();
+		$uidata->data['pipelines'] = $pipelines;
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/VCF', $data);
@@ -106,7 +108,7 @@ use CodeIgniter\Config\Services;
 
         $uidata->data['uploadedFiles'] = $this->sourceModel->getSourceStatus($source_id);
         $uidata->data['uploadedFilesErrors'] = $this->sourceModel->getErrorForSource($source_id);
-        
+
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js', JS.'cafevariome/status.js', JS.'cafevariome/spreadsheet.js'];
 
