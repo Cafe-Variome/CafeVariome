@@ -401,7 +401,10 @@ class AjaxApi extends Controller{
 		}
     }
 
-    public function checkUploadJobs() {
+	/**
+	 * @depreacted
+	 */
+    private function checkUploadJobs() {
 
         $user_id = $this->request->getVar('user_id');
         $return = ['Status' => '', 'Message' => []];
