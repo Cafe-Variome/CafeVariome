@@ -5,11 +5,11 @@ Options FollowSymLinks
 # Protecting files that give away sensitive information
 # ----------------------------------------------------------------------
 <Files "composer*">
-     Deny from all
+    Require all denied
 </Files>
 
 <Files ~ "\.(env|nojekyll|spark|txt|dist|md|xml|gitignore|gitattributes|lock|editorconfig|yml)$">
-     Deny from all
+    Require all denied
 </Files>
 
 # ----------------------------------------------------------------------
