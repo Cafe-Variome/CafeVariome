@@ -14,53 +14,59 @@ function regenElastic(id,add) {
   }
   
   function callElastic(id,force,add) {
-    dataArray = {
-      "id"   :id,
-      "force":force,
-      "add"  :add
-    };
-  
-     $.ajax({url: baseurl + 'AjaxApi/elastic_check',
-          delay: 200,
+
+      var postData = {'source_id': id, 'force': force, 'add': add};
+      var csrfTokenObj = getCSRFToken('keyvaluepair');
+      var csrfTokenName = Object.keys(csrfTokenObj)[0];
+      postData[csrfTokenName] = csrfTokenObj[csrfTokenName];
+
+     $.ajax({url: baseurl + 'AjaxApi/elasticCheck',
           type: 'POST',
-          data : {u_data : JSON.stringify(dataArray)},
-          // data: param,
-          dataType: 'html',
+          data : postData,
+          dataType: 'json',
           success: function (data) {
-            console.log(data);
-            data = $.parseJSON(data);
-              if (data.Status == "Success") {
-                $.ajax({url  : baseurl + 'AjaxApi/elastic_start',
+              if (data.Status == 'Success') {
+                $.ajax({url  : baseurl + 'AjaxApi/elasticStart',
                   type: 'POST',
-                  data : {u_data : JSON.stringify(dataArray)},
-                  dataType: 'json'
+                  data : postData,
+                  dataType: 'json',
+                    success: function (data) {
+                        $.notify({
+                            // options
+                            message: 'ElasticSearch is now regenerating.'},{
+                            // settings
+                            timer: 200
+                        });
+                    }
                 });
-                setToOff(data.Time);
 
                 $('#status-' + id.toString()).empty();
-                $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div><p id='statusmessage-" + id.toString() + "' style='font-size: 10px'></p>")
+                $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div><p id='statusmessage-" + id.toString() + "' style='font-size: 10px'></p>");
 
                 $('#action-' + id.toString()).children().hide();
-
               }
-              else if (data.Status == "Empty") {
-                alert("This Source doesnt have any data uploaded to it yet. Please go to Data tab to rectify this.");
+              else if (data.Status == 'Empty') {
+                alert('This Source doesnt have any data uploaded to it yet. Please go to Data tab to rectify this.');
               }
               else {
-                  alert("ElasticSearch is fully up to date. Upload more data first.");
+                  alert('ElasticSearch is fully up to date. Upload more data first.');
               }
-  
           }
       });
   }
 
-function setToOff(time) {
-  $.notify({
-    // options
-    message: 'ElasticSearch is now regenerating.'},{
-    // settings
-    timer: 200
-  });
+function getCSRFToken(format = 'string'){
+    csrf_token = $('#csrf_token').val();
+    csrf_token_name = $('#csrf_token').prop('name');
+
+    switch (format) {
+        case "string":
+            return csrf_token_name + '=' + csrf_token;
+        case "keyvaluepair":
+            var csrfObj = {};
+            csrfObj[csrf_token_name] = csrf_token;
+            return csrfObj;
+    }
 }
 
 $(document).ready(function() {
@@ -102,26 +108,26 @@ $(document).ready(function() {
   };
 
   if ($('#index_table').length) {
-    $('#index_table').dataTable( {
-      "sDom": "<'row'<'col 'l><'col'f>r>t<'row'<'col 'i><'col'p>>",
-      "oLanguage": {
-          "sLengthMenu": "_MENU_ records per page"
-      }
-    } );        
-}
+        $('#index_table').dataTable( {
+          "sDom": "<'row'<'col 'l><'col'f>r>t<'row'<'col 'i><'col'p>>",
+          "oLanguage": {
+              "sLengthMenu": "_MENU_ records per page"
+          }
+        });
+    }
 
-$('#indexStatusModal').on('show.bs.modal', function (event) {
-  var button = $(event.relatedTarget);
-  var indexName = button.data('indexname'); 
-  var indexStatus = button.data('elasticstatus'); 
-  var modal = $(this)
-  modal.find('.modal-title').html('Index Status for ' + indexName)
-  modal.find('.modal-body div').html(indexStatus)
-})
+    $('#indexStatusModal').on('show.bs.modal', function (event) {
+      var button = $(event.relatedTarget);
+      var indexName = button.data('indexname');
+      var indexStatus = button.data('elasticstatus');
+      var modal = $(this);
+      modal.find('.modal-title').html('Index Status for ' + indexName);
+      modal.find('.modal-body div').html(indexStatus);
+    });
 
-$('#indexStatusModal').on('hide.bs.modal', function (e) {
-  var modal = $(this)
-  modal.find('.modal-body div').empty()
-})
+    $('#indexStatusModal').on('hide.bs.modal', function (e) {
+      var modal = $(this);
+      modal.find('.modal-body div').empty();
+    });
 
-})
+});
