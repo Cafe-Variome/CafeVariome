@@ -425,7 +425,7 @@ class AjaxApi extends Controller{
         echo json_encode($return);
     }
 
-    public function vcf_upload() {
+    public function vcfUpload() {
 
         $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
         $pairingsPath = FCPATH . UPLOAD . UPLOAD_PAIRINGS;
