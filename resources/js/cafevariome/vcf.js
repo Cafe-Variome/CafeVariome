@@ -98,6 +98,8 @@ $(document).ready(function() {
 										formData.append('source_id', id);
 										formData.append('uid', data.uid);
 										formData.append('user_id', user_id);
+										formData.append('pipeline_id', $('#pipeline').val());
+
 										flag = false;
 									}
 									formData.append("userfile[]", $('#dataFile')[0].files[i]);
@@ -310,6 +312,8 @@ function batchVcf() {
 			formData.append('source_id', id);
 			formData.append('uid', uid);
 			formData.append('user_id', user_id);
+			formData.append('pipeline_id', $('#pipeline').val());
+
 			flag = false;
 		}
 		if (done.includes(file.name)) {

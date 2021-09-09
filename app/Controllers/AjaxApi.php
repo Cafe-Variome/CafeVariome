@@ -614,6 +614,7 @@ class AjaxApi extends Controller{
 			$source_id = $this->request->getVar('source_id');
 			$uid = $this->request->getVar('uid');
 			$user_id = $this->request->getVar('user_id');
+			$pipeline_id = $this->request->getVar('pipeline_id');
 
 			if ($fileMan->Exists(UPLOAD_PAIRINGS . $uid . ".json")) {
 				$pairings = json_decode($fileMan->Read(UPLOAD_PAIRINGS . $uid . ".json"), true);
@@ -636,7 +637,7 @@ class AjaxApi extends Controller{
 					if ($fileMan->Save($userFiles[$i], $source_path)) {
 						// 13/08/2019 POTENTIAL BUG
 						// The value for patient must be specified as it is always set to 0 (false)
-						$this->uploadModel->createUpload($fileName, $source_id, $user_id, $pairings[$fileName][0], $pairings[$fileName][1]);
+						$this->uploadModel->createUpload($fileName, $source_id, $user_id, $pairings[$fileName][0], $pairings[$fileName][1], null, $pipeline_id);
 					} else {
 						// if it failed to upload report error
 						// TODO: Make it return failure and reflect in JS for this eventuality
