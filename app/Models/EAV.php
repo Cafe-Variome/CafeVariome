@@ -91,7 +91,7 @@ class EAV extends Model{
         $data = [
             'uid'        =>  $uid,
             'source_id'     => $source,
-            'fileName'   => $file,
+            'file_id'   => $file,
             'subject_id' => $id,
             'attribute'  => $key,
             'value'      => $value
@@ -285,7 +285,7 @@ class EAV extends Model{
 
         $this->builder->select("attribute, value, count(*) AS count");
         $this->builder->where("source_id", $source_id);
-        $this->builder->where("fileName",$file_id);
+        $this->builder->where("file_id",$file_id);
         $this->builder->groupBy(["attribute","value"]);
 
         $query = $this->builder->get()->getResultArray();
@@ -322,7 +322,7 @@ class EAV extends Model{
     public function deleteRecordsByFileId(int $file_id)
     {
         $this->builder = $this->db->table($this->table);
-        $this->builder->where('fileName', $file_id);
+        $this->builder->where('file_id', $file_id);
         $this->builder->delete();
     }
 
