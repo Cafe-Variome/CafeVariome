@@ -750,13 +750,13 @@ class AjaxApi extends Controller{
 
     /**
      * univ_upload - Perform Upload for CSV/XLS/XLSX files
-     *
-     * @param string $_POST['source'] - The source name we will be uploading to
-     * @param string $_POST['config'] - The settings file uesd for import
-     * @param array $_FILES           - The file we are uploading
+     * @deprecated
+     * @param string source - The source name we will be uploading to
+     * @param string config - The settings file uesd for import
+     * @param array files           - The file we are uploading
      * @return json_encoded array Success|Headers are not as expected|File is Duplicated
      */
-    public function univ_upload($force=false){
+    private function univ_upload($force=false){
 
         $source_id = $this->request->getVar('source_id');
         $user_id = $this->request->getVar('user_id');
