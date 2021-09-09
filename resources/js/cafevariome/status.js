@@ -49,9 +49,15 @@ function reloadTable(param,first, chkBox = false) {
     if ($('.dataTables_filter input').is(":focus")) {
         return;
     }
+    csrfTokenObj = getCSRFToken('keyvaluepair');
+    postData = {'source_id': param};
+    var csrfTokenName = Object.keys(csrfTokenObj)[0];
+    postData[csrfTokenName] = csrfTokenObj[csrfTokenName];
+
 	$.ajax({
         type: "POST",
-        url: baseurl+'AjaxApi/getSourceStatus/' + param,
+        url: baseurl+'AjaxApi/getSourceStatus/',
+        data: postData,
         dataType: "json",
         success: function(response) {
             currentscroll = $(window).scrollTop();
@@ -356,4 +362,18 @@ function processPendingFiles() {
             });
         }
     });
+}
+
+function getCSRFToken(format = 'string'){
+    csrf_token = $('#csrf_token').val();
+    csrf_token_name = $('#csrf_token').prop('name');
+
+    switch (format) {
+        case "string":
+            return csrf_token_name + '=' + csrf_token;
+        case "keyvaluepair":
+            var csrfObj = {};
+            csrfObj[csrf_token_name] = csrf_token;
+            return csrfObj;
+    }
 }
