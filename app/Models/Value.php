@@ -63,4 +63,17 @@ class Value extends Model
 		return $this->builder->update(['frequency' => $frequency]);
 	}
 
+	public function getFrequencyByName(string $name): float
+	{
+		$this->builder->select('frequency');
+		$this->builder->where('name', $name);
+		$result = $this->builder->get()->getResultArray();
+
+		if(count($result) == 1){
+			return $result[0]['frequency'];
+		}
+
+		return -1;
+	}
+
 }
