@@ -600,4 +600,40 @@ use CodeIgniter\Database\ConnectionInterface;
 
         return $pids;
     }
+
+	 /**
+	  * Get Status For Source - Get all rows from UploadDataStatus for given source
+	  *
+	  * @param int $source_id  - The source id we are wanting rows from
+	  * @return array $query   - Our Results
+	  */
+	 public function getFilesStatusBySourceId(int $source_id)
+	 {
+		 $this->builder = $this->db->table($this->table);
+
+		 $this->builder->select($this->table . '.*,users.email,pipeline.id as pipelineId, pipeline.name as pipelineName');
+		 $this->builder->join('users', $this->table . '.user_id=users.id', 'inner');
+		 $this->builder->join('pipeline', $this->table . '.pipeline_id=pipeline.id', 'inner');
+		 $this->builder->where($this->table . '.source_id', $source_id);
+
+		 return $this->builder->get()->getResultArray();
+	 }
+
+	 /**
+	  * Get Error For Source - Get all rows from upload_error for given source
+	  *
+	  * @param int $source_id  - The source id we are wanting rows from
+	  * @return array $query   - Our Results
+	  */
+	 public function getFileErrorsBySourceId(int $source_id)
+	 {
+		 $this->builder = $this->db->table('upload_error');
+
+		 $this->builder->select('*');
+		 if ($source_id != 'all') {
+			 $this->builder->where('source_id', $source_id);
+		 }
+
+		 return $this->builder->get()->getResultArray();
+	 }
  }

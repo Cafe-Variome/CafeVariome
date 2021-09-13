@@ -983,14 +983,10 @@ class AjaxApi extends Controller{
 
 		if ($this->request->getMethod() == 'post') {
 			$source_id = $this->request->getVar('source_id');
-			$sourceModel = new Source();
+			$uploadModel = new Upload();
 			$output = ['Files' => [], 'Error' => []];
-			if ($source_id == 'all') {
-				$output['Files'] = $sourceModel->getSourceStatus('all');
-			} else {
-				$output['Files'] = $sourceModel->getSourceStatus($source_id);
-				$output['Error'] = $sourceModel->getErrorForSource($source_id);
-			}
+			$output['Files'] = $uploadModel->getFilesStatusBySourceId($source_id);
+			$output['Error'] = $uploadModel->getFileErrorsBySourceId($source_id);
 
 			return json_encode($output);
 		}

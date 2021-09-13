@@ -254,44 +254,10 @@ use CodeIgniter\Database\ConnectionInterface;
         $this->builder->delete(['source_id' => $source_id]);
     }
 
-    /**
-     * Get Status For Source - Get all rows from UploadDataStatus for given source
-     *
-     * @param int $source_id  - The source id we are wanting rows from
-     * @return array $query   - Our Results
-     */
-    public function getSourceStatus($source_id) {
-        // SELECT UploadDataStatus.FileName, UploadDataStatus.uploadStart, UploadDataStatus.uploadStart, UploadDataStatus.Status, UploadDataStatus.elasticStatus, users.email FROM UploadDataStatus INNER JOIN users ON UploadDataStatus.user_id=users.id;
-
-        $this->builder = $this->db->table('uploaddatastatus');
-        $this->builder->select('uploaddatastatus.ID,uploaddatastatus.FileName,uploaddatastatus.uploadEnd,uploaddatastatus.uploadStart,uploaddatastatus.Status,uploaddatastatus.elasticStatus,uploaddatastatus.patient,uploaddatastatus.tissue,users.email,sources.name');
-        $this->builder->join('users', 'uploaddatastatus.user_id=users.id', 'inner');
-        $this->builder->join('sources', 'uploaddatastatus.source_id=sources.source_id', 'inner');
-        if ($source_id != 'all') {
-            $this->builder->where('uploaddatastatus.source_id', $source_id);
-        }
-        $query = $this->builder->get()->getResultArray();
-        return $query;
-    }
-
-    /**
-     * Get Error For Source - Get all rows from upload_error for given source
-     *
-     * @param int $source_id  - The source id we are wanting rows from
-     * @return array $query   - Our Results
-     */
-    public function getErrorForSource($source_id) {
-        $this->builder = $this->db->table('upload_error');
-
-        $this->builder->select('*');
-        if ($source_id != 'all') {
-            $this->builder->where('source_id', $source_id);
-        }
-        $query = $this->builder->get()->getResultArray();
-        return $query;
-    }
-
-    public function canCurateSource($source_id, $user_id) {
+	 /**
+	  * @deprecated
+	  */
+    private function canCurateSource($source_id, $user_id) {
         $this->builder = $this->db->table('curators');
 
         $where = "source_id = '$source_id' AND user_id = '$user_id'";
