@@ -89,5 +89,16 @@ class Value extends Model
 		return -1;
 	}
 
+	public function updateFrequencyById(int $id, float $frequency, bool $add = true):bool
+	{
+		if ($add) {
+			$currentFrequency = $this->getFrequencyById($id);
+			if ($currentFrequency > 0) {
+				$frequency = $frequency + $currentFrequency;
+			}
+		}
+		$this->builder->where('id', $id);
+		return $this->builder->update(['frequency' => $frequency]);
+	}
 
 }
