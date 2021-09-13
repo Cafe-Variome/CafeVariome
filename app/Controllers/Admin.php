@@ -54,7 +54,7 @@ class Admin extends CVUI_Controller{
         $uidata->title = "Administrator Dashboard";
         $uidata->stickyFooter = false;
         $uidata->css = [CSS.'dashboard/chartjs/Chart.min.css'];
-        $uidata->javascript = [JS.'dashboard/chartjs/Chart.min.js'];
+        $uidata->javascript = [JS.'dashboard/chartjs/Chart.min.js', JS . 'cafevariome/admin.js'];
 
         $sourceModel = new Source();
         $networkInterface = new NetworkInterface();
@@ -84,7 +84,6 @@ class Admin extends CVUI_Controller{
             }
 
             $sourceCountList[$source['name']] = 0;
-
             $sc++;
         }
 
@@ -122,14 +121,15 @@ class Admin extends CVUI_Controller{
         $uidata->data['keycloakStatus'] = $keyCloak->ping();
         $uidata->data['serviceStatus'] = $service->ping();
 
-
-
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Index', $data);
     }
 
-
-    function Settings() {
+	/**
+	 * @deprecated
+	 * @see Setting controller
+	 */
+    private function Settings() {
         $uidata = new UIData();
         $uidata->title = "Settings";
         $uidata->stickyFooter = false;
