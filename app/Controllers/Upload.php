@@ -106,9 +106,6 @@ use CodeIgniter\Config\Services;
         $uidata->data['user_id'] = $user_id;
         $uidata->data['source_id'] = $source_id;
 
-        $uidata->data['uploadedFiles'] = $this->sourceModel->getSourceStatus($source_id);
-        $uidata->data['uploadedFilesErrors'] = $this->sourceModel->getErrorForSource($source_id);
-
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js', JS.'cafevariome/status.js', JS.'cafevariome/spreadsheet.js'];
 
