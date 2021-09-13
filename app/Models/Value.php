@@ -76,4 +76,18 @@ class Value extends Model
 		return -1;
 	}
 
+	public function getFrequencyById(int $id): float
+	{
+		$this->builder->select('frequency');
+		$this->builder->where('id', $id);
+		$result = $this->builder->get()->getResultArray();
+
+		if(count($result) == 1){
+			return $result[0]['frequency'];
+		}
+
+		return -1;
+	}
+
+
 }
