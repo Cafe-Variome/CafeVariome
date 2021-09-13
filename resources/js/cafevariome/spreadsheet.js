@@ -1,6 +1,18 @@
 $("#uploadBulk").submit(function(event) {  
     event.preventDefault();
-   //form to upload file to system
+    var pipeline_id = $('#pipeline').val();
+    if (pipeline_id == -1 || pipeline_id == null || pipeline_id == '') {
+        $('#pipeline').addClass('is-invalid');
+        return;
+    }
+    else{
+        $('#pipeline').removeClass('is-invalid');
+    }
+    source_id = $('#source_id').val();
+    name = $('#dataFile')[0].files[0].name;
+    csrf_token = $('#csrf_token').val();
+    csrf_token_name = $('#csrf_token').prop('name');
+    //form to upload file to system
     //allow the user to upload files to the server to be inserted into MySQL
     //first perform checks to ensure sanity of file
     selected = $('input[name="fAction[]"]:checked').val();
