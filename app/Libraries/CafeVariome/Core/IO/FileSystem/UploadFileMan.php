@@ -1,12 +1,12 @@
 <?php namespace App\Libraries\CafeVariome\Core\IO\FileSystem;
 
 /**
- * UploadFileMan.php 
+ * UploadFileMan.php
  * Created: 23/01/2020
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
- * File Manager Class 
+ *
+ * File Manager Class
  */
 
 
@@ -33,8 +33,8 @@ class UploadFileMan extends FileMan
     public function loadFiles()
     {
         foreach ($this->fileStack as $fileSetKey => $fileSet) {
-            if (is_countable($fileSet['name'])) { // We have more than one file 
-                for ($i=0; $i < count($fileSet['name']); $i++) { 
+            if (is_countable($fileSet['name'])) { // We have more than one file
+                for ($i=0; $i < count($fileSet['name']); $i++) {
                     $f = new File($fileSet['name'][$i], $fileSet['size'][$i], $fileSet['tmp_name'][$i], $fileSet['type'][$i], $fileSet['error'][$i]);
                     array_push($this->files, $f);
                 }
@@ -75,5 +75,34 @@ class UploadFileMan extends FileMan
     {
         return $this->files;
     }
+
+	public static function getMaximumAllowedUploadSize(): string
+	{
+		$max_size = -1;
+		if ($max_size < 0) {
+			$post_max_size = ini_get('post_max_size');
+			if ($post_max_size > 0) {
+				$max_size = $post_max_size;
+			}
+
+			$upload_max = ini_get('upload_max_filesize');
+			if ($upload_max > 0 && $upload_max < $max_size) {
+				$max_size = $upload_max;
+			}
+		}
+		return $max_size;
+	}
+
+	public static function parseSizeToByte(string $size) : float
+	{
+		$unit = preg_replace('/[^bkmgtpezy]/i', '', $size); // Remove the non-unit characters from the size.
+		$size = preg_replace('/[^0-9\.]/', '', $size); // Remove the non-numeric characters from the size.
+		if ($unit) {
+			// Find the position of the unit in the ordered string which is the power of magnitude to multiply a kilobyte by.
+			return round($size * pow(1024, stripos('bkmgtpezy', $unit[0])));
+		}
+		else {
+			return round($size);
+		}
+	}
 }
- 
