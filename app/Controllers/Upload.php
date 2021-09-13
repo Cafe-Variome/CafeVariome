@@ -10,6 +10,7 @@
  *
  */
 
+use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Models\UIData;
 use App\Models\Source;
 use App\Models\Pipeline;
@@ -113,6 +114,9 @@ use CodeIgniter\Config\Services;
         $pipelines = $piplineModel->getPipelines();
 
         $uidata->data['pipelines'] = $pipelines;
+		$maximumAllowedUploadSize = UploadFileMan::getMaximumAllowedUploadSize();
+		$uidata->data['maxUploadSize'] = UploadFileMan::parseSizeToByte($maximumAllowedUploadSize);
+		$uidata->data['maxUploadSizeH'] = $maximumAllowedUploadSize;
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/Spreadsheet', $data);

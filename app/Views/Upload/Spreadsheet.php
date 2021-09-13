@@ -36,8 +36,15 @@
 	<input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
 	<input type="hidden" name="uploader" id="uploader" value="bulk" />
 	<input type="hidden" name="<?= csrf_token() ?>" id="csrf_token" value="<?= csrf_hash() ?>" />
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none;" id="uploadWarningAlert">
+				<p id="uploadWarningText"></p>
+			</div>
+		</div>
+	</div>
 	<div class="form-group row">
-		<div class="col-6">
+		<div class="col-5">
 			<div class="custom-file">
 				<input type="file" class="custom-file-input" name='userfile' id="dataFile" accept=".csv, .xls, .xlsx" aria-describedby="dataFile" required>
 				<label class="custom-file-label" for="dataFile">Choose file</label>
@@ -58,16 +65,18 @@
 			<button class="btn btn-large btn-primary bg-gradient-primary" id="uploadBtn" type="submit">
 				<span class="fa fa-upload"></span> Upload File
 			</button>
-		</div>
-		<div class="col-2">
-			<div class="spinner-border text-warning" id="uploadSpinner" role="status" style="display:none;">
+			<div class="spinner-border text-warning spinner-border-sm" id="uploadSpinner" role="status" style="display:none;">
 				<span class="sr-only">Loading...</span>
 			</div>
+		</div>
+		<div class="col-3">
+			Maximum File Size Allowed: <span id="maxUploadSize" data-bytevalue="<?= $maxUploadSize ?>"> <?= $maxUploadSizeH ?></span> <br>
+			Selected File Size: <span id="selectedFileSize">-</span>
 		</div>
 	</div>
 
 	<div class="form-group row">
-		<div class="col-6">
+		<div class="col-5">
 			<select name="pipeline" id="pipeline" class="form-control">
 				<option value="-1" selected>Please select a pipeline...</option>
 				<?php foreach($pipelines as $pipeline): ?>
@@ -81,15 +90,13 @@
 		<div class="col-7"></div>
 	</div>
 </form>
-
-
 <hr>
-
 <table class="table table-bordered table-striped table-hover" id="file_table" width="100%" cellspacing="0">
   <thead>
 	<tr>
 		<th>File-name</th>
 		<th>User</th>
+		<th>Pipeline</th>
 		<th>Status</th>
 		<th>Action</th>
 	</tr>
