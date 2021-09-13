@@ -101,4 +101,10 @@ class Value extends Model
 		return $this->builder->update(['frequency' => $frequency]);
 	}
 
+	public function deleteAbsentValueById(int $id)
+	{
+		$this->builder->where('id', $id);
+		$this->builder->where('frequency', 0); // Frequency = 0 indicates a value is absent and is no more needed.
+		$this->builder->delete();
+	}
 }
