@@ -55,10 +55,10 @@ function reloadTable(param,first, chkBox = false) {
     postData[csrfTokenName] = csrfTokenObj[csrfTokenName];
 
 	$.ajax({
-        type: "POST",
+        type: 'POST',
         url: baseurl+'AjaxApi/getSourceStatus/',
         data: postData,
-        dataType: "json",
+        dataType: 'json',
         success: function(response) {
             currentscroll = $(window).scrollTop();
         	if (!first) {
@@ -81,6 +81,8 @@ function reloadTable(param,first, chkBox = false) {
                 }
 
         		$("#file_grid").append("<tr id='file_"+ response.Files[i].ID + "'>" + checkBoxStr + "<td>" + response.Files[i].FileName + "</td><td>" + response.Files[i].email + "</td></tr>");
+
+                $('#file_' + response.Files[i].ID).append("<td><a target='_blank' href='" + baseurl + "Pipeline/Details/" +  response.Files[i].pipelineId + "'>" + response.Files[i].pipelineName + "</a></td>");
 
                 if (response.Files[i].Status == 'Pending') {
                     $('#file_' + response.Files[i].ID).append("<td><div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + response.Files[i].ID + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100'>0%</div></div><p id='statusmessage-" + response.Files[i].ID + "' style='font-size: 10px'></p></td>");
@@ -245,16 +247,20 @@ function updateFileIDs(elem){
 
 function processFile(fileId, overwrite) {
 
+    var csrfTokenObj = getCSRFToken('keyvaluepair');
+    var csrfTokenName = Object.keys(csrfTokenObj)[0];
+
     var fileData = new FormData();
     fileData.append('fileId', fileId.toString());
     fileData.append('overwrite', overwrite.toString());
     fileData.append('uploader', $('#uploader').val());
+    fileData.append(csrfTokenName, csrfTokenObj[csrfTokenName]);
 
     $.ajax({
-        type: "POST",  
+        type: 'POST',
         url: baseurl+'AjaxApi/processFile',
         data: fileData,
-        dataType: "json", 
+        dataType: 'json',
         contentType: false,
         processData: false,   
         success: function(response)  {
@@ -286,14 +292,18 @@ function processSelectedFiles() {
     if (selectd_fileids.length == 0) {
         return;
     }
+    var csrfTokenObj = getCSRFToken('keyvaluepair');
+    var csrfTokenName = Object.keys(csrfTokenObj)[0];
+
     var fileData = new FormData();
     fileData.append('fileIds', selectd_fileids);
+    fileData.append(csrfTokenName, csrfTokenObj[csrfTokenName]);
 
     $.ajax({
-        type: "POST",  
+        type: 'POST',
         url: baseurl+'AjaxApi/processFiles',
         data: fileData,
-        dataType: "json", 
+        dataType: 'json',
         contentType: false,
         processData: false,   
         success: function(response)  {
@@ -326,16 +336,20 @@ function processSelectedFiles() {
 
 function processPendingFiles() {
 
+    var csrfTokenObj = getCSRFToken('keyvaluepair');
+    var csrfTokenName = Object.keys(csrfTokenObj)[0];
+
     var fileData = new FormData();
     fileData.append('source_id', $('#source_id').val());
     fileData.append('pending', true);
     fileData.append('overwrite', 2); // 2 indicates that existing data for the file must be deleted before insertion.
+    fileData.append(csrfTokenName, csrfTokenObj[csrfTokenName]);
 
     $.ajax({
-        type: "POST",
+        type: 'POST',
         url: baseurl+'AjaxApi/processFilesBySourceId',
         data: fileData,
-        dataType: "json",
+        dataType: 'json',
         contentType: false,
         processData: false,
         success: function(response)  {
