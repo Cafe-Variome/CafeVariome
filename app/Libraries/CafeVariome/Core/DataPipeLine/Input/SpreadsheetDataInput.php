@@ -10,6 +10,7 @@
  */
 
 use App\Models\EAV;
+use \Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
 class SpreadsheetDataInput extends DataInput
 {
@@ -59,18 +60,17 @@ class SpreadsheetDataInput extends DataInput
                 if (preg_match("/\.csv$|\.tsv$/", $file)) {
                     $line = fgets(fopen($filePath, 'r'));
                     preg_match("/^" . $this->configuration['subject_id_attribute_name'] . "(.)/", $line, $matches);
-
                     $delimiter = $matches[1];
 
-                    $this->reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::CSV);
+                    $this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
                     $this->reader->setFieldDelimiter($delimiter);
                 }
                 elseif (preg_match("/\.xlsx$/", $file)) {
 
-                    $this->reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::XLSX);
+					$this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
                 }
                 elseif (preg_match("/\.ods$/", $file)) {
-                    $this->reader = \Box\Spout\Reader\ReaderFactory::create(\Box\Spout\Common\Type::ODS);
+					$this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
                 }
                 else {
                     $return_data['result_flag'] = 0;
@@ -78,7 +78,6 @@ class SpreadsheetDataInput extends DataInput
                     $message = "File did not conform to allowed types.";
                     $error_code = 2;
                     $this->uploadModel->errorInsert($file_id, $message, $error_code, true);
-                    //return $return_data;
                 }
 
                 $this->reader->open($filePath);
@@ -109,7 +108,8 @@ class SpreadsheetDataInput extends DataInput
             $temphash = [];
 
             foreach ($sheet->getRowIterator() as $row) {
-                if ($recordsProcessed == -1) {
+				$row = $row->toArray();
+				if ($recordsProcessed == -1) {
                     if (!$this->checkHeader($file_id, $row, $attgroups, $temphash)){
                         break;
                     }
@@ -211,6 +211,7 @@ class SpreadsheetDataInput extends DataInput
         $rc = -1; // set counter to -1 initially to avoid counting header of the file
         foreach ($this->reader->getSheetIterator() as $sheet) {
             foreach ($sheet->getRowIterator() as $row) {
+				$row = $row->toArray();
                 $this->column_count = count($row);
                 $rc++;
             }
