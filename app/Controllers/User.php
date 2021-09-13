@@ -206,7 +206,7 @@ class User extends CVUI_Controller{
 		}
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
 
-        $uidata->javascript = array(JS."cafevariome/components/datatable.js", JS."cafevariome/admin.js", VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+        $uidata->javascript = array(JS."cafevariome/components/datatable.js", JS."cafevariome/user.js", VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/List', $data);
@@ -443,7 +443,7 @@ class User extends CVUI_Controller{
         }
         $uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
 
-        $uidata->javascript = array(JS . "cafevariome/components/datatable.js", JS . "cafevariome/admin.js", VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
+        $uidata->javascript = array(JS . "cafevariome/components/datatable.js", JS . "cafevariome/user.js", VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/Details', $data);
