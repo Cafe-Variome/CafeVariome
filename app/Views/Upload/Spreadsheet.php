@@ -74,8 +74,11 @@
 					<option value="<?= $pipeline['id'] ?>"><?= $pipeline['name'] ?></option>
 				<?php endforeach; ?>
 			</select>
+			<div class="invalid-feedback">
+				Please select a pipeline.
+			</div>
 		</div>
-		<div class="col-6"></div>
+		<div class="col-7"></div>
 	</div>
 </form>
 
