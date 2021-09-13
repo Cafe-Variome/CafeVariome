@@ -50,4 +50,17 @@ class Value extends Model
 
 		return $value_id;
 	}
+
+	public function updateFrequencyByName(string $name, float $frequency, bool $add = true):bool
+	{
+		if ($add) {
+			$currentFrequency = $this->getFrequencyByName($name);
+			if ($currentFrequency > 0) {
+				$frequency = $frequency + $currentFrequency;
+			}
+		}
+		$this->builder->where('name', $name);
+		return $this->builder->update(['frequency' => $frequency]);
+	}
+
 }
