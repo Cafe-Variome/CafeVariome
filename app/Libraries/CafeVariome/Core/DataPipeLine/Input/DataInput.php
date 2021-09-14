@@ -162,4 +162,22 @@ abstract class DataInput
 		$malicious_chars = ['\\', chr(39), chr(34), '/', '’', '<', '>', '&', ';'];
 		return str_replace($malicious_chars, $soap, $dirty_string);
 	}
+
+	protected function getAttributeIdByName(string $attribute): int
+	{
+		if (array_key_exists($attribute, $this->attributes))
+		{
+			$attribute_id = $this->attributes[$attribute]['id'];
+		}
+		else
+		{
+			$attribute_id = $this->createAttribute($attribute); // Insert attribute to database
+			// Add attribute to the list
+			$this->attributes[$attribute] = [
+				'id' => $attribute_id,
+				'values' => []
+			];
+		}
+		return $attribute_id;
+	}
 }
