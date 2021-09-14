@@ -172,8 +172,6 @@ $("#uploadBulk").submit(function(event) {
             $('#uploadBtn').prop('disabled', false);
         }
     });
-
-
 });
 
 $('#dataFile').on('change',function(){
@@ -194,7 +192,6 @@ $('#dataFile').on('change',function(){
     {
         $('#uploadWarningAlert').hide();
         $('#uploadBtn').prop('disabled', false);
-
     }
 });
 
