@@ -205,7 +205,7 @@ abstract class DataInput
 		$freq = $this->attributes[$attribute]['values'][$value]['frequency'];
 		$this->attributes[$attribute]['values'][$value]['frequency'] = $freq + 1;
 	}
-	
+
 	protected function updateValueFrequencies()
 	{
 		$db = \Config\Database::connect();
@@ -217,6 +217,26 @@ abstract class DataInput
 			}
 		}
 
+		$db->transComplete();
+	}
+
+	protected function deleteExistingRecords(int $file_id)
+	{
+		$db = \Config\Database::connect();
+		$db->transStart();
+		$valueFrequencies = $this->eavModel->getValueFrequenciesBySourceIdAndFileId($this->sourceId, $file_id); // Get value frequencies
+		if (count($valueFrequencies) > 0){
+			$this->eavModel->deleteRecordsByFileId($file_id); // Delete records from eavs
+			$valueCount = count($valueFrequencies);
+			for ($i = 0; $i < $valueCount; $i++){
+				$value_id = $valueFrequencies[$i]['value_id'];
+				$value_frequency = $valueFrequencies[$i]['frequency'];
+				$this->valueModel->updateFrequencyById($value_id, -$value_frequency);
+				$this->valueModel->deleteAbsentValueById($value_id); // Delete value if frequency is 0
+				unset($valueFrequencies[$i]);
+			}
+			unset($value_id);
+		}
 		$db->transComplete();
 	}
 }
