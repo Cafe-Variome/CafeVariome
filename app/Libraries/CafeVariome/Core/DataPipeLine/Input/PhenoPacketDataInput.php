@@ -49,14 +49,9 @@ class PhenoPacketDataInput extends DataInput
                 $fileContent = $this->fileMan->Read($file);
                 $this->data = json_decode($fileContent, true);
 
-                if ($this->delete == UPLOADER_DELETE_ALL) {
-                    $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the source');
-                    $this->eavModel->deleteRecordsBySourceId($this->sourceId);
-                    $this->delete = true;
-                }
-                else if($this->delete == UPLOADER_DELETE_FILE){
+                if($this->delete == UPLOADER_DELETE_FILE){
                     $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
-                    $this->eavModel->deleteRecordsByFileId($file_id);
+					$this->deleteExistingRecords($file_id);
                 }
 
                 $this->meta = null;
@@ -117,16 +112,25 @@ class PhenoPacketDataInput extends DataInput
         }
 
         $uid = md5(uniqid(rand(),true));
-        $this->createEAV($uid, $this->sourceId, $file_id, $this->id, 'type', 'ancestor');
+
+		$type_attribute_id = $this->getAttributeIdByName('type'); // Add an attribute by the name 'type' and get its id
+		$ancestor_value_id = $this->getValueIdByNameAndAttributeId('ancestor', 'type'); // Add a value for type called ancestor
+        $this->createEAV($uid, $file_id, $this->id, $type_attribute_id, $ancestor_value_id); // Create EAV relationship between 'type' and 'ancestor'
+
+		$ancestor_hpo_attribute_id = $this->getAttributeIdByName('ancestor_hpo_id'); // Add an attribute by the name 'ancestor_hpo_id' and get its id
+		$ancestor_hpo_label_attribute_id = $this->getAttributeIdByName('ancestor_hpo_label'); // Add an attribute by the name 'ancestor_hpo_label'
 
         foreach ($hits as $key => $value) {
-            $this->createEAV($uid, $this->sourceId, $file_id, $this->id, 'ancestor_hpo_id', $key);
-            $this->createEAV($uid, $this->sourceId, $file_id, $this->id, 'ancestor_hpo_label', $value);
+			$key_value_id = $this->getValueIdByNameAndAttributeId($key, 'ancestor_hpo_id'); // Add a value for 'ancestor_hpo_id'
+			$this->createEAV($uid, $file_id, $this->id, $ancestor_hpo_attribute_id, $key_value_id); // Create EAV relationship between 'ancestor_hpo_id' and $key_value_id
+
+			$value_id = $this->getValueIdByNameAndAttributeId($value, 'ancestor_hpo_label'); // Add a value for 'ancestor_hpo_label'
+            $this->createEAV($uid, $file_id, $this->id, $ancestor_hpo_label_attribute_id, $value_id); // Create EAV relationship between 'ancestor_hpo_label' and $value_id
         }
 
         $dbRet = $this->db->commit();
 
-        if ($dbRet === FALSE) {
+        if ($dbRet === false) {
             $message = "Data Failed to insert. Please double check file for sanity.";
             $error_code = 4;
             $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
@@ -136,11 +140,8 @@ class PhenoPacketDataInput extends DataInput
             $this->reportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
         }
 
-		if ($this->delete == 1) {
-			$this->removeAttribuesAndValuesFiles($this->fileName);
-		}
-
-        $this->dumpAttributesAndValues($file_id);
+		//Update value frequencies
+		$this->updateValueFrequencies();
     }
 
     /**
@@ -180,7 +181,9 @@ class PhenoPacketDataInput extends DataInput
                     // reset done array to keep track of whether negated has been added and which meta rows have been added
 
                     if (!in_array($type, $done['type'])) {
-                        $this->createEAV($uid,$source,$file,$id,'type',$type);
+						$type_attribute_id = $this->getAttributeIdByName('type'); // Get attribute id of 'type'
+						$type_value_id = $this->getValueIdByNameAndAttributeId($type, 'type'); // Add $type as a value for 'type' and get its id
+                        $this->createEAV($uid, $file, $id, $type_attribute_id, $type_value_id); // Add the EAV relationship
                         array_push($done['type'], $type);
                     }
                     $done = $this->recursiveNumeric($value,$meta,$id,$file,$source,$uid,$type,$one_group,$done);
@@ -208,7 +211,9 @@ class PhenoPacketDataInput extends DataInput
                     $one_group = true;
                     //$done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
                     if (is_array($type) && !in_array($type, $done['type'])) {
-                        $this->createEAV($uid,$source,$file,$id,'type',$type);
+						$type_attribute_id = $this->getAttributeIdByName('type'); // Get attribute id of 'type'
+						$type_value_id = $this->getValueIdByNameAndAttributeId($type, 'type'); // Add $type as a value for 'type' and get its id
+                        $this->createEAV($uid, $file, $id, $type_attribute_id, $type_value_id);
                         array_push($done['type'], $type);
                     }
                 }
@@ -226,7 +231,11 @@ class PhenoPacketDataInput extends DataInput
                     $string = $type."_".$key;
                     // $string = $key;
                 }
-                $this->createEAV($uid,$source,$file,$id,$string,$value);
+
+				$string_attribute_id = $this->getAttributeIdByName($string); // Get attribute id of '$string'
+				$value_id = $this->getValueIdByNameAndAttributeId($value, $string); // Add '$value' as a value for '$string' and get its id
+                $this->createEAV($uid, $file, $id, $string_attribute_id, $value_id);
+
                 // Since we have just an id row we need to check its id group with our list of meta
                 // attributes (if applicable)
                 if ($key == "id") {
@@ -236,8 +245,14 @@ class PhenoPacketDataInput extends DataInput
                         if (array_key_exists($prefix, $meta)) {
                             // Since it exists now check if we have already added these meta rows before to this group
                             if (!in_array($prefix, $done['meta'])) {
-                                $this->createEAV($uid,$source,$file,$id,'meta_name',$meta[$prefix]['meta_name']);
-                                $this->createEAV($uid,$source,$file,$id,'meta_version',$meta[$prefix]['meta_version']);
+								$meta_name_attribute_id = $this->getAttributeIdByName('meta_name'); // Get attribute id of 'meta_name'
+								$meta_name_value_id = $this->getValueIdByNameAndAttributeId($meta[$prefix]['meta_name'], 'meta_name'); // Add '$meta[$prefix]['meta_name']' as a value for 'meta_name' and get its id
+                                $this->createEAV($uid, $file, $id,$meta_name_attribute_id, $meta_name_value_id);
+
+								$meta_version_attribute_id = $this->getAttributeIdByName('meta_version'); // Get attribute id of 'meta_version'
+								$meta_version_value_id = $this->getValueIdByNameAndAttributeId($meta[$prefix]['meta_version'], 'meta_version'); // Add '$meta[$prefix]['meta_version']' as a value for 'meta_version' and get its id
+								$this->createEAV($uid, $file, $id,$meta_version_attribute_id, $meta_version_value_id);
+
                                 array_push($done['meta'], $prefix);
                             }
                         }
@@ -258,10 +273,11 @@ class PhenoPacketDataInput extends DataInput
      * @param array $output   - Array we are adding results to
      * @return array $output  - See Above
      */
-    private function arrSearch($array,$output){
+    private function arrSearch(array $array, array $output): array
+	{
         foreach($array as $key => $value){
             if(is_array($value)){
-                $output = $this->arrSearch($value,$output);
+                $output = $this->arrSearch($value, $output);
             }
             else {
                 if ($key == "id") {
@@ -310,7 +326,9 @@ class PhenoPacketDataInput extends DataInput
                 if (is_numeric($key)) {
                         $one_group = true;
                         if (!in_array($type, $done['type'])) {
-                            $this->createEAV($uid,$source,$file,$id,'type',$type);
+							$type_attribute_id = $this->getAttributeIdByName('type'); // Get attribute id of 'type'
+							$type_value_id = $this->getValueIdByNameAndAttributeId($type, 'type'); // Add $type as a value for 'type' and get its id
+                            $this->createEAV($uid, $file, $id, $type_attribute_id, $type_value_id);
                             array_push($done['type'], $type);
                         }
                 }
@@ -320,10 +338,11 @@ class PhenoPacketDataInput extends DataInput
                     }
                     if ($key != "type") {
                         $type = $key;
-                        // error_log("extra type: ".$type);
                         if ($uid) {
                             if (!in_array($type, $done['type'])) {
-                                $this->createEAV($uid,$source,$file,$id,'type',$type);
+								$type_attribute_id = $this->getAttributeIdByName('type'); // Get attribute id of 'type'
+								$type_value_id = $this->getValueIdByNameAndAttributeId($type, 'type'); // Add $type as a value for 'type' and get its id
+                                $this->createEAV($uid, $file, $id, $type_attribute_id, $type_value_id);
                                 array_push($done['type'], $type);
                             }
                         }
@@ -333,18 +352,26 @@ class PhenoPacketDataInput extends DataInput
 				if ($type == $this->configuration['hpo_attribute_name'] && $key == 'type'){
 					if (array_key_exists('negated',$array)){
 						if ($array['negated'] == true){
-							$this->createEAV($uid,$source,$file,$id,$this->configuration['negated_hpo_attribute_name'],$value['id']);
+							$negated_hpo_attribute_id = $this->getAttributeIdByName($this->configuration['negated_hpo_attribute_name']); // Get attribute id of '$this->configuration['negated_hpo_attribute_name']'
+							$value_id = $this->getValueIdByNameAndAttributeId($value['id'], $this->configuration['negated_hpo_attribute_name']); // Add $value['id'] as a value for '$this->configuration['negated_hpo_attribute_name']' and get its id
+							$this->createEAV($uid, $file, $id, $negated_hpo_attribute_id, $value_id);
 						}
 						else{
-							$this->createEAV($uid,$source,$file,$id,$this->configuration['hpo_attribute_name'],$value['id']);
+							$hpo_attribute_id = $this->getAttributeIdByName($this->configuration['hpo_attribute_name']); // Get attribute id of '$this->configuration['hpo_attribute_name']
+							$value_id = $this->getValueIdByNameAndAttributeId($value['id'], $this->configuration['hpo_attribute_name']); // Add $value['id'] as a value for '$this->configuration['hpo_attribute_name']' and get its id
+							$this->createEAV($uid, $file, $id, $hpo_attribute_id, $value_id);
 						}
 					}
 					else{
-						$this->createEAV($uid,$source,$file,$id,$this->configuration['hpo_attribute_name'],$value['id']);
+						$hpo_attribute_id = $this->getAttributeIdByName($this->configuration['hpo_attribute_name']); // Get attribute id of '$this->configuration['hpo_attribute_name']
+						$value_id = $this->getValueIdByNameAndAttributeId($value['id'], $this->configuration['hpo_attribute_name']); // Add $value['id'] as a value for '$this->configuration['hpo_attribute_name']' and get its id
+						$this->createEAV($uid, $file, $id, $hpo_attribute_id, $value_id);
 					}
 
 					if (!in_array($type, $done['type'])) {
-						$this->createEAV($uid,$source,$file,$id,'type',$type);
+						$type_attribute_id = $this->getAttributeIdByName('type'); // Get attribute id of 'type'
+						$type_value_id = $this->getValueIdByNameAndAttributeId($type, 'type'); // Add $type as a value for 'type' and get its id
+						$this->createEAV($uid, $file, $id, $type_attribute_id, $type_value_id);
 						array_push($done['type'], $type);
 					}
 
@@ -389,7 +416,9 @@ class PhenoPacketDataInput extends DataInput
 
 				$string = $type."_".$key;
 
-                $this->createEAV($uid,$source,$file,$id,$string,$value);
+				$string_attribute_id = $this->getAttributeIdByName($string); // Get attribute id of '$string'
+				$value_id = $this->getValueIdByNameAndAttributeId($type, $string); // Add $value as a value for '$string' and get its id
+                $this->createEAV($uid, $file, $id, $string_attribute_id, $value_id);
                 // Since we have just an id row we need to check its id group with our list of meta
                 // attributes (if applicable)
                 if ($key == "id") {
@@ -399,8 +428,14 @@ class PhenoPacketDataInput extends DataInput
                         if (array_key_exists($prefix, $meta)) {
                             // Since it exists now check if we have already added these meta rows before to this group
                             if (!in_array($prefix, $done['meta'])) {
-                                $this->createEAV($uid,$source,$file,$id,'meta_name',$meta[$prefix]['meta_name']);
-                                $this->createEAV($uid,$source,$file,$id,'meta_version',$meta[$prefix]['meta_version']);
+								$meta_name_attribute_id = $this->getAttributeIdByName('meta_name'); // Get attribute id of 'meta_name'
+								$meta_name_value_id = $this->getValueIdByNameAndAttributeId($meta[$prefix]['meta_name'], 'meta_name'); // Add '$meta[$prefix]['meta_name']' as a value for 'meta_name' and get its id
+								$this->createEAV($uid, $file, $id, $meta_name_attribute_id, $meta_name_value_id);
+
+								$meta_version_attribute_id = $this->getAttributeIdByName('meta_version'); // Get attribute id of 'meta_version'
+								$meta_version_value_id = $this->getValueIdByNameAndAttributeId($meta[$prefix]['meta_version'], 'meta_version'); // Add '$meta[$prefix]['meta_version']' as a value for 'meta_version' and get its id
+								$this->createEAV($uid, $file, $id, $meta_version_attribute_id, $meta_version_value_id);
+
                                 array_push($done['meta'], $prefix);
                             }
                         }
@@ -484,12 +519,26 @@ class PhenoPacketDataInput extends DataInput
 
         foreach ($output as $key => $value) {
             $uid = md5(uniqid(rand(),true));
-            $this->createEAV($uid,$source,$file,$id,"genomeAssembly",$assembly);
-            $this->createEAV($uid,$source,$file,$id,"sequence",$chrom);
-            $this->createEAV($uid,$source,$file,$id,"coordinateSystem",$coordinateSystem);
-            $this->createEAV($uid,$source,$file,$id,"position",$pos);
-            $this->createEAV($uid,$source,$file,$id,"deletion",$ref);
-            $this->createEAV($uid,$source,$file,$id,"insertion",$alt);
+			$genome_assembly_attribute_id = $this->getAttributeIdByName('genomeAssembly'); // Get attribute id of 'genomeAssembly'
+			$sequence_attribute_id = $this->getAttributeIdByName('sequence'); // Get attribute id of 'sequence'
+			$coordinate_system_attribute_id = $this->getAttributeIdByName('coordinateSystem'); // Get attribute id of 'coordinateSystem'
+			$position_attribute_id = $this->getAttributeIdByName('position'); // Get attribute id of 'position'
+			$deletion_attribute_id = $this->getAttributeIdByName('deletion'); // Get attribute id of 'deletion'
+			$insertion_attribute_id = $this->getAttributeIdByName('insertion'); // Get attribute id of 'insertion'
+
+			$assembly_value_id = $this->getValueIdByNameAndAttributeId($assembly, 'genomeAssembly'); // Add '$assembly' as a value for 'genomeAssembly' and get its id
+			$chrom_value_id = $this->getValueIdByNameAndAttributeId($chrom, 'sequence'); // Add '$chrom' as a value for 'sequence' and get its id
+			$coordinate_ystem_value_id = $this->getValueIdByNameAndAttributeId($coordinateSystem, 'coordinateSystem'); // Add '$coordinateSystem' as a value for 'coordinateSystem' and get its id
+			$pos_value_id = $this->getValueIdByNameAndAttributeId($pos, 'position'); // Add '$pos' as a value for 'position' and get its id
+			$ref_value_id = $this->getValueIdByNameAndAttributeId($ref, 'deletion'); // Add '$ref' as a value for 'deletion' and get its id
+			$alt_value_id = $this->getValueIdByNameAndAttributeId($alt, 'insertion'); // Add '$alt' as a value for 'insertion' and get its id
+
+			$this->createEAV($uid, $file, $id, $genome_assembly_attribute_id, $assembly_value_id);
+            $this->createEAV($uid, $file, $id, $sequence_attribute_id, $chrom_value_id);
+            $this->createEAV($uid, $file, $id, $coordinate_system_attribute_id, $coordinate_ystem_value_id);
+            $this->createEAV($uid, $file, $id, $position_attribute_id, $pos_value_id);
+            $this->createEAV($uid, $file, $id, $deletion_attribute_id, $ref_value_id);
+            $this->createEAV($uid, $file, $id, $insertion_attribute_id, $alt_value_id);
             $this->recursiveCell($output[$key],$uid,$source,$file,$id);
         }
         return $pos;
@@ -509,10 +558,12 @@ class PhenoPacketDataInput extends DataInput
 
         foreach($array as $key => $value){
             if(is_array($value)){
-                $output =$this->recursiveCell($value,$uid,$source,$file,$id);
+                $output = $this->recursiveCell($value,$uid,$source,$file,$id);
             }
             else {
-                $this->createEAV($uid,$source,$file,$id,$key,$value);
+				$key_attribute_id = $this->getAttributeIdByName($key); // Get attribute id of '$key'
+				$value_id = $this->getValueIdByNameAndAttributeId($value, $key); // Add '$value' as a value for '$key' and get its id
+				$this->createEAV($uid, $file, $id, $key_attribute_id, $value_id);
             }
         }
     }
