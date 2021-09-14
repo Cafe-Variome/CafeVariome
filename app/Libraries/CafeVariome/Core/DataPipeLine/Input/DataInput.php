@@ -200,6 +200,22 @@ abstract class DataInput
 		return $value_id;
 	}
 
+	protected function getValueByValueIdAndAttributeName(int $value_id, string $attribute): ?string
+	{
+		if (array_key_exists($attribute, $this->attributes))
+		{
+			$values = $this->attributes[$attribute]['values'];
+
+			foreach ($values as $value => $value_details){
+				if ($value_details['id'] === $value_id){
+					return $value;
+				}
+			}
+			return null;
+		}
+		throw new \Exception('Attribute does not exist');
+	}
+
 	protected function incrementValueFrequency(string $value, string $attribute): void
 	{
 		$freq = $this->attributes[$attribute]['values'][$value]['frequency'];
