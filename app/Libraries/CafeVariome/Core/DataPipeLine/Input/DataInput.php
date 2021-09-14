@@ -19,9 +19,10 @@ use App\Models\Elastic;
 use App\Models\Settings;
 use App\Models\EAV;
 use App\Models\Pipeline;
+use App\Models\Attribute;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
-use CodeIgniter\Config;
+use App\Models\Value;
 use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
 
