@@ -46,7 +46,7 @@ class SpreadsheetDataInput extends DataInput
 
 				if ($this->delete == UPLOADER_DELETE_FILE) {
                     $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
-                    $this->eavModel->deleteRecordsByFileId($file_id);
+					$this->deleteExistingRecords($file_id);
                 }
 
                 $filePath = $this->basePath . $file;
@@ -131,43 +131,48 @@ class SpreadsheetDataInput extends DataInput
         }
 
         $this->reader->close();
-
         $this->db->commit();
 
-        if ($this->delete == 1) {
-            $this->removeAttribuesAndValuesFiles($this->fileName);
-        }
+		//Update value frequencies
+		$this->updateValueFrequencies();
 
-        $this->dumpAttributesAndValues($file_id);
     }
 
 	private function processRow($row, $attgroups, $subject_id, $file_id, & $counter)
 	{
 		foreach ($attgroups as $group){
 			$uid = md5(uniqid(rand(),true));
-			foreach ($group as $att => $val){
-				$att = strtolower(preg_replace('/\s+/', '_', $att));
+			foreach ($group as $attribute => $val){
 				$value = strtolower($row[$val]);
-				if ($value == "") continue;
+				if ($value == "") continue; // Skip empty values
+				$attribute = strtolower(preg_replace('/\s+/', '_', $attribute)); // replace spaces with underline
+				$attribute = $this->sanitiseString($attribute); // sanitise attribute here to remove malicious characters
+
+				$value = $this->sanitiseString($value);
 				if (is_a($value, 'DateTime')) $value = $value->format('Y-m-d H:i:s');
+
+				$attribute_id = $this->getAttributeIdByName($attribute);
 
 				if ($this->configuration['internal_delimiter'] != '' && $this->configuration['internal_delimiter'] != null) {
 					//if there is an internal delimiter, split the value on it and insert subvalues individually
 					$internal_delimiter = $this->configuration['internal_delimiter'];
 
-					if (strpos($value, $internal_delimiter)) {
-						$value_array = explode($internal_delimiter, $value);
+					if (strpos($value, $internal_delimiter) !== false) {
+						$value_array = explode($internal_delimiter, $value); // Split compound value to sub_values
 
 						foreach ($value_array as $sub_value) {
-							$this->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $sub_value);
+							$sub_value_id = $this->getValueIdByNameAndAttributeId($sub_value, $attribute);
+							$this->createEAV($uid, $file_id, $subject_id, $attribute_id, $sub_value_id);
 						}
 					}
 					else {
-						$this->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
+						$value_id = $this->getValueIdByNameAndAttributeId($value, $attribute);
+						$this->createEAV($uid, $file_id, $subject_id, $attribute_id, $value_id);
 					}
 				}
 				else {
-					$this->createEAV($uid, $this->sourceId, $file_id, $subject_id, $att, $value);
+					$value_id = $this->getValueIdByNameAndAttributeId($value, $attribute);
+					$this->createEAV($uid, $file_id, $subject_id, $attribute_id, $value_id);
 				}
 
 				$counter++;
