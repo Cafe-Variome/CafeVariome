@@ -98,18 +98,28 @@ class PhenoPacketDataInput extends DataInput
 
         $output = [];
         $hits = [];
-        $matches = array_unique($this->arrSearch($this->data, $output));
-        $matches = $this->eavModel->checkNegatedForHPO($matches, $file_id, $this->configuration['hpo_attribute_name']);
-        for ($i=0; $i < count($matches); $i++) {
-            $result = $neo4jInterface->GetAncestors($matches[$i]);
-            if (count($result) > 0) {
-                foreach ($result as $key => $value) {
-                    if (!array_key_exists($key, $hits)) {
-                        $hits[$key] = $value;
-                    }
-                }
-            }
-        }
+        $hpo_terms = array_unique($this->arrSearch($this->data, $output));
+		if (count($hpo_terms) > 0) {
+			$hpo_attribute_id = $this->getAttributeIdByName($this->configuration['hpo_attribute_name']);
+			$hpo_value_ids = [];
+			for ($i = 0; $i < count($hpo_terms); $i++) {
+				$hpo_value_id = $this->getValueIdByNameAndAttributeId($hpo_terms[$i], $this->configuration['hpo_attribute_name']);
+				array_push($hpo_value_ids, $hpo_value_id);
+			}
+
+			$matches = $this->eavModel->checkNegatedForHPO($hpo_value_ids, $hpo_attribute_id);
+			for ($i = 0; $i < count($matches); $i++) {
+				$hpo_term = $this->getValueByValueIdAndAttributeName($matches[$i], $this->configuration['hpo_attribute_name']);
+				$result = $neo4jInterface->GetAncestors($hpo_term);
+				if (count($result) > 0) {
+					foreach ($result as $key => $value) {
+						if (!array_key_exists($key, $hits)) {
+							$hits[$key] = $value;
+						}
+					}
+				}
+			}
+		}
 
         $uid = md5(uniqid(rand(),true));
 
