@@ -43,10 +43,7 @@ use CodeIgniter\Config\Services;
      * @return N/A
      */
     public function Phenopacket($source_id) {
-        // Check if user is logged in and admin
-        // Since this is a shared function for curators and admin check that the curator is a curator for this source
         $user_id = $this->authAdapter->getUserId();
-        //$source_id = $this->sourceModel->getSourceIDByName($source);
 
         // data for hidden input for source
         $uidata = new UIData();
@@ -59,8 +56,10 @@ use CodeIgniter\Config\Services;
         $pipelines = $piplineModel->getPipelines();
 
         $uidata->data['pipelines'] = $pipelines;
+		$maximumAllowedUploadSize = UploadFileMan::getMaximumAllowedUploadSize();
+		$uidata->data['maxUploadSize'] = UploadFileMan::parseSizeToByte($maximumAllowedUploadSize);
+		$uidata->data['maxUploadSizeH'] = $maximumAllowedUploadSize;
 
-        // preparing webpage
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = [VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',JS. 'bootstrap-notify.js',JS.'cafevariome/phenopacket.js',JS.'cafevariome/status.js'];
 
