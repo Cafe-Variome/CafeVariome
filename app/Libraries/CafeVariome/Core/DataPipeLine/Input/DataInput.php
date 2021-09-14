@@ -136,4 +136,24 @@ abstract class DataInput
 	{
 		$this->db->insert("INSERT IGNORE INTO eavs (uid, source_id, file_id, subject_id, attribute_id, value_id) VALUES ('$uid', '$this->sourceId', '$file_id', '$subject_id', '$attribute_id', '$value_id');");
 	}
+
+	protected function createAttribute(string $name): int
+	{
+		$attribute_id = $this->attributeModel->getAttributeIdByNameAndSourceId($name, $this->sourceId);
+		if ($attribute_id == -1){
+			$attribute_id = $this->attributeModel->createAttribute($name, $this->sourceId);
+		}
+
+		return $attribute_id;
+	}
+
+	protected function createValue(string $value, int $attribute_id): int
+	{
+		$value_id = $this->valueModel->getValueIdByNameAndAttributeId($value, $attribute_id);
+		if ($value_id == -1){
+			$value_id = $this->valueModel->createValue($value, $attribute_id);
+		}
+
+		return $value_id;
+	}
 }
