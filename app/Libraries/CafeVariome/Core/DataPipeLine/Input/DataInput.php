@@ -156,4 +156,10 @@ abstract class DataInput
 
 		return $value_id;
 	}
+
+	protected function sanitiseString(string $dirty_string, string $soap = ''): string
+	{
+		$malicious_chars = ['\\', chr(39), chr(34), '/', '’', '<', '>', '&', ';'];
+		return str_replace($malicious_chars, $soap, $dirty_string);
+	}
 }
