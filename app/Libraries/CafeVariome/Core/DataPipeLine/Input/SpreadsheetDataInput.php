@@ -15,7 +15,6 @@ use \Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 class SpreadsheetDataInput extends DataInput
 {
     private $delete;
-    private $error;
     protected $serviceInterface;
     protected $configuration;
     private $column_count;
