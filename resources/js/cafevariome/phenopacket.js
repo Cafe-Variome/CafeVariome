@@ -20,7 +20,10 @@ $("#phenoinfo").submit(function(e){
 	csrf_token = $('#csrf_token').val();
 	csrf_token_name = $('#csrf_token').prop('name');
 	param = 'source_id=' + id + '&size=' + size + '&' + csrf_token_name + '=' + csrf_token;
-	console.log(param);
+
+	$('#uploadBtn').prop('disabled', 'disabled');
+	$('#uploadSpinner').show();
+
 	$.ajax({
 		type: 'post',
 		url: baseurl+'AjaxApi/validateUpload',
@@ -90,7 +93,26 @@ $("#phenoinfo").submit(function(e){
 										dataType: 'json',
 										processData: false,
 										success: function(response)  {
-
+											$.notify({
+												// options
+												message: 'Upload Complete. Now inserting into MySQL.'
+											},{
+												// settings
+												timer: 200
+											});
+											reloadTable($('#source_id').val(),false);
+										},
+										error: function(jqXHR, textStatus, errorThrown) {
+											$.notify({
+												message: 'An error occurred while uploading file(s): ' + errorThrown,
+												type: 'danger'
+											},{
+												timer: 200
+											});
+										},
+										complete: function (jqXHR, textStatus){
+											$('#uploadSpinner').hide();
+											$('#uploadBtn').prop('disabled', false);
 										}
 									});
 								}
@@ -125,14 +147,50 @@ $("#phenoinfo").submit(function(e){
 												});
 												reloadTable($('#source_id').val(),false);
 											}
+										},
+										error: function(jqXHR, textStatus, errorThrown) {
+											$.notify({
+												message: 'An error occurred while uploading file(s): ' + errorThrown,
+												type: 'danger'
+											},{
+												timer: 200
+											});
+										},
+										complete: function (jqXHR, textStatus){
+											$('#uploadSpinner').hide();
+											$('#uploadBtn').prop('disabled', false);
 										}
 									});
 								}
 							});
 						}
+					},
+					error: function(jqXHR, textStatus, errorThrown) {
+						$.notify({
+							message: 'An error occurred while checking for existence of files: ' + errorThrown,
+							type: 'danger'
+						},{
+							timer: 200
+						});
+					},
+					complete: function (jqXHR, textStatus){
+						$('#uploadSpinner').hide();
+						$('#uploadBtn').prop('disabled', false);
 					}
 				});
 			}
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			$.notify({
+				message: 'An error occurred while validating file upload: ' + errorThrown,
+				type: 'danger'
+			},{
+				timer: 200
+			});
+		},
+		complete: function (jqXHR, textStatus){
+			$('#uploadSpinner').hide();
+			$('#uploadBtn').prop('disabled', false);
 		}
 	});
 });
