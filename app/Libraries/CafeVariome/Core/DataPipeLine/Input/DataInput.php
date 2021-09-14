@@ -132,12 +132,8 @@ abstract class DataInput
 		$this->serviceInterface->ReportProgress($file_id, $records_processed, $total_records, $job, $status, $finished);
 	}
 
-	protected function createEAV(string $uid, int $source, int $file_id, string $subject_id, string $attribute, string $value)
+	protected function createEAV(string $uid, int $file_id, string $subject_id, int $attribute_id, int $value_id)
 	{
-		$malicious_chars = ['\\', chr(39), chr(34), '/', '’', '<', '>', '&', ';'];
-		$attribute = str_replace($malicious_chars, '', $attribute);
-		$value = str_replace($malicious_chars, '', $value);
-
-		$this->db->insert("INSERT IGNORE INTO eavs (uid, source_id, fileName, subject_id, attribute, value) VALUES ('$uid', '$this->sourceId', '$file_id', '$subject_id', '$attribute', '$value');");
+		$this->db->insert("INSERT IGNORE INTO eavs (uid, source_id, file_id, subject_id, attribute_id, value_id) VALUES ('$uid', '$this->sourceId', '$file_id', '$subject_id', '$attribute_id', '$value_id');");
 	}
 }
