@@ -180,4 +180,23 @@ abstract class DataInput
 		}
 		return $attribute_id;
 	}
+
+	protected function getValueIdByNameAndAttributeId(string $value, string $attribute): int
+	{
+		if (array_key_exists($value, $this->attributes[$attribute]['values']))
+		{
+			$value_id = $this->attributes[$attribute]['values'][$value]['id'];
+			$this->incrementValueFrequency($value, $attribute); // increment value frequency
+		}
+		else
+		{
+			$value_id = $this->createValue($value, $this->attributes[$attribute]['id']); // Insert value to database
+			// Add value to the list
+			$this->attributes[$attribute]['values'][$value] = [
+				'id' => $value_id,
+				'frequency' => 1
+			];
+		}
+		return $value_id;
+	}
 }
