@@ -8,7 +8,7 @@
 <hr>
 <div class="row">
 	<div class="col">
-	  <h4>Import VCF's into <?php echo $source_name; ?></h3>
+	  <h4>Import VCF's into <?php echo $source_name; ?></h4>
 	  <p>Config file can be  a CSV, XLS, or XLSX file with three columns with headers: FileName, Patient ID, Tissue <br> This will allow us to correctly map and classify VCF files for reference and query purposes.</p>
 	</div>
 </div>
