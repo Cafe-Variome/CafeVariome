@@ -199,4 +199,10 @@ abstract class DataInput
 		}
 		return $value_id;
 	}
+
+	protected function incrementValueFrequency(string $value, string $attribute): void
+	{
+		$freq = $this->attributes[$attribute]['values'][$value]['frequency'];
+		$this->attributes[$attribute]['values'][$value]['frequency'] = $freq + 1;
+	}
 }
