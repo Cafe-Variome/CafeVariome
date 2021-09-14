@@ -205,4 +205,18 @@ abstract class DataInput
 		$freq = $this->attributes[$attribute]['values'][$value]['frequency'];
 		$this->attributes[$attribute]['values'][$value]['frequency'] = $freq + 1;
 	}
+	
+	protected function updateValueFrequencies()
+	{
+		$db = \Config\Database::connect();
+		$db->transStart();
+
+		foreach ($this->attributes as $attribute => $attribute_details){
+			foreach ($this->attributes[$attribute]['values'] as $value => $value_details){
+				$this->valueModel->updateFrequencyByName($value, $this->attributes[$attribute]['values'][$value]['frequency']);
+			}
+		}
+
+		$db->transComplete();
+	}
 }
