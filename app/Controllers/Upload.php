@@ -94,7 +94,7 @@ use CodeIgniter\Config\Services;
         return view($this->viewDirectory . '/VCF', $data);
     }
 
-    function Spreadsheet(int $source_id) {
+    public function Spreadsheet(int $source_id) {
 
         $uidata = new UIData();
         $uidata->title = "Upload Spreadsheet Files";
@@ -143,7 +143,7 @@ use CodeIgniter\Config\Services;
         return view($this->viewDirectory . '/Import', $data);
     }
 
-    public function Universal(int $source_id) {
+    private function Universal(int $source_id) {
 
         $uidata = new UIData();
         $uidata->title = "Universal Upload";
