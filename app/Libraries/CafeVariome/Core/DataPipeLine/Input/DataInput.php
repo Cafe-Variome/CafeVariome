@@ -11,12 +11,8 @@
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Database;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
-use CodeIgniter\Controller;
-use CodeIgniter\CLI\CLI;
 use App\Models\Upload;
 use App\Models\Source;
-use App\Models\Elastic;
-use App\Models\Settings;
 use App\Models\EAV;
 use App\Models\Pipeline;
 use App\Models\Attribute;
