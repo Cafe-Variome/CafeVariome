@@ -57,7 +57,9 @@ abstract class DataInput
         $this->pipelineModel = new Pipeline();
         $this->fileMan = new FileMan($this->basePath);
 		$this->serviceInterface = new ServiceInterface();
-
+		$this->attributeModel = new Attribute();
+		$this->valueModel = new Value();
+		$this->attributes = [];
 	}
 
     abstract public function absorb(int $fileId);
