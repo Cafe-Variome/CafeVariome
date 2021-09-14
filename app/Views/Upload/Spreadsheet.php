@@ -8,7 +8,7 @@
 <hr>
 <div class="row mt-2">
 	<div class="col">
-		<h4>Upload a spreadsheet file for '<?php echo $source_name; ?>'</h3>
+		<h4>Upload a spreadsheet file for '<?php echo $source_name; ?>'</h4>
 		<p>Accepted file formats are comma delimited, CSV, XLS, and XLSX. </p>
 	</div>
 </div>
