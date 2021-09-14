@@ -40,6 +40,9 @@ abstract class DataInput
     protected $fileName;
     protected $reader;
 	protected $serviceInterface;
+	protected Attribute $attributeModel;
+	protected Value $valueModel;
+	protected array $attributes;
 
 	public function __construct(int $source_id)
     {
