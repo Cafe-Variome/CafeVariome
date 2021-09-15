@@ -3,8 +3,8 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($statusMessage): ?>
@@ -76,7 +76,7 @@
 				Offline
 			<?php endif; ?>
 			</td>
-		</tr>		
+		</tr>
 		<?php endforeach; ?>
 	</tbody>
 </table>
@@ -88,7 +88,7 @@
 <div class="row">
 	<div class="col">
 		<a href="<?php echo base_url($controllerName.'/Create') ?>" class="btn btn-primary bg-gradient-primary">
-			<i class="fa fa-file"></i>  Create Source
+			<i class="fa fa-file"></i>  Create a Source
 		</a>
 	</div>
 </div>
@@ -110,29 +110,29 @@
 						<a id="bulkImport" class="btn btn-small btn-primary">
 							<i class="fa fa-file-upload"></i> Upload Spreadsheet Files
 						</a>
-					</div>				
+					</div>
 				</div>
 				<div class="row mb-2">
 					<div class="col">
 						<a id="phenoPacketsImport" class="btn btn-small btn-primary">
 							<i class="fa fa-file-upload"></i> Upload PhenoPacket Files
 						</a>
-					</div>		
-				</div>	
+					</div>
+				</div>
 				<div class="row mb-2">
 					<div class="col">
 						<a id="VCFImport" class="btn btn-small btn-primary">
 							<i class="fa fa-file-upload"></i> Upload VCF Files
 						</a>
-					</div>		
-				</div>	
+					</div>
+				</div>
 				<!-- <div class="row">
 					<div class="col">
 						<a id="UniversalImport" class="btn btn-small btn-primary">
 							<i class="fa fa-plus"></i> Universal Import
 						</a>
-					</div>		
-				</div>	
+					</div>
+				</div>
 				<div class="row">
 					<div class="col">
 						<p>
@@ -143,7 +143,7 @@
 			</div>
 			<div class="modal-footer">
 			<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-			</div>		
+			</div>
 		</div>
 	</div>
 
