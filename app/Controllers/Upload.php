@@ -74,8 +74,7 @@ use CodeIgniter\Config\Services;
     public function VCF($source_id) {
 
         $uidata = new UIData();
-        $uidata->title = "Upload VCF";
-        // Since this is a shared function for curators and admin check that the curator is a curator for this source
+        $uidata->title = "Upload VCF Files";
         $user_id = $this->authAdapter->getUserId();
 
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
