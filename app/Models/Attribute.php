@@ -44,7 +44,7 @@ class Attribute extends Model
 		return $this->db->insertID();
 	}
 
-	public function getAttributes(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1)
+	private function getAttributes(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1)
 	{
 		if ($cols) {
 			$this->builder->select($cols);
@@ -65,6 +65,26 @@ class Attribute extends Model
 			$this->builder->limit($limit);
 		}
 
+		return $this->builder->get()->getResultArray();
+	}
+
+	public function getAttributesBySourceId(int $source_id, bool $include_source_name = true): array
+	{
+		if ($include_source_name){
+			$this->builder->select($this->table . '.*, sources.name as source_name');
+			$this->builder->join('sources', $this->table .'.source_id = sources.source_id');
+		}
+		$this->builder->where($this->table . '.source_id', $source_id);
+
+		return $this->builder->get()->getResultArray();
+	}
+
+	public function getAllAttributes(bool $include_source_name = true): array
+	{
+		if ($include_source_name){
+			$this->builder->select($this->table . '.*, sources.name as source_name');
+			$this->builder->join('sources', $this->table .'.source_id = sources.source_id');
+		}
 		return $this->builder->get()->getResultArray();
 	}
 
