@@ -89,6 +89,9 @@ use CodeIgniter\Config\Services;
 		$piplineModel = new Pipeline();
 		$pipelines = $piplineModel->getPipelines();
 		$uidata->data['pipelines'] = $pipelines;
+		$maximumAllowedUploadSize = UploadFileMan::getMaximumAllowedUploadSize();
+		$uidata->data['maxUploadSize'] = UploadFileMan::parseSizeToByte($maximumAllowedUploadSize);
+		$uidata->data['maxUploadSizeH'] = $maximumAllowedUploadSize;
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/VCF', $data);
