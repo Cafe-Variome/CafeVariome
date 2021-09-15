@@ -21,8 +21,8 @@
 	<tr>
 		<th>Name</th>
 		<th>Display Name</th>
-		<th>Type</th>
 		<th>Source</th>
+		<th>Type</th>
 		<th>Storage Location</th>
 		<th>Actions</th>
 	</tr>
@@ -32,8 +32,8 @@
 		<tr>
 			<td><?= $attribute['name'] ?></td>
 			<td><?= $attribute['display_name'] ?></td>
+			<td><?= $source_name ?></td>
 			<td><?= $attribute['type'] ?></td>
-			<td><?= $attribute['source_name'] ?></td>
 			<td><?= $attribute['storage_location'] ?></td>
 			<td>
 				<a href=""><i class="fa fa-list text-info"></i></a>
