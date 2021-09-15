@@ -100,7 +100,9 @@
 <hr>
 <div class="row">
 	<div class="col">
-		<a class="btn btn-secondary" href="<?= base_url('Source') ?>"><i class="fa fa-backward"></i> Go back</a>
+		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
+			<i class="fa fa-database"></i> View Sources
+		</a>
 	</div>
 </div>
 
