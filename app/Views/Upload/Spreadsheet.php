@@ -91,7 +91,7 @@
 	</div>
 </form>
 <hr>
-<table class="table table-bordered table-striped table-hover" id="file_table" width="100%" cellspacing="0">
+<table class="table table-bordered table-striped table-hover" id="file_table">
   <thead>
 	<tr>
 		<th>File-name</th>
