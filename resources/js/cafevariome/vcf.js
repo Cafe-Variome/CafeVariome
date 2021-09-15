@@ -11,7 +11,7 @@ $(document).ready(function() {
    		$('input.target').not($(this).prev('input')).prop('checked', false);  
    	} 	
    });
-})
+});
 $('input.target').on('change', function() {
     $('input.target').not(this).prop('checked', false);  
 });
@@ -164,60 +164,58 @@ $(document).ready(function() {
       		}
       	});
 	});
-})
+});
 
 function confirmvcf(data) {
 	counter = 0;
 	done = [];
-	$("#applyAll").prop('checked', false);
+	$('#applyAll').prop('checked', false);
 	if (sessionStorage) {
 		sessionStorage.clear();
 		for (var i = 0; i < data.types.length; i++) {
 			target = data.types[i];
 			sessionStorage.setItem(data.types[i], JSON.stringify(data[target]));
 		}
-		sessionStorage.setItem("uid", data.uid);
-		sessionStorage.setItem("check", 1);
-		sessionStorage.setItem("done", JSON.stringify(done));
-		sessionStorage.setItem("count", data.types.length);
-        $("#vcfGrid").empty();
-        if (data.types[0] == "both") {
-			remakeModal("both");
+		sessionStorage.setItem('uid', data.uid);
+		sessionStorage.setItem('check', 1);
+		sessionStorage.setItem('done', JSON.stringify(done));
+		sessionStorage.setItem('count', data.types.length);
+        $('#vcfGrid').empty();
+        if (data.types[0] == 'both') {
+			remakeModal('both');
 		}
-		else if (data.types[0] == "elastic") {
-			remakeModal("elastic");
+		else if (data.types[0] == 'elastic') {
+			remakeModal('elastic');
 		}
-		else if (data.types[0] == "files") {
-			remakeModal("files");
+		else if (data.types[0] == 'files') {
+			remakeModal('files');
 		}       
 		$('#confirmVcf').modal('show');
 	}
 }
 
-
-
 function proceedVcf() {
 	var $boxes = $('input[name="chk[]"]:checked');
 	done = JSON.parse(sessionStorage.getItem('done'));
 	for (var i = 0; i < $boxes.length; i++) {
-		console.log("value: "+$boxes[i].value);
+		console.log('value: ' + $boxes[i].value);
 		done.push($boxes[i].value);
 	}
-	sessionStorage.removeItem("done");
+	sessionStorage.removeItem('done');
 	sessionStorage.setItem('done', JSON.stringify(done));
 	if (sessionStorage.getItem('both') !== null) {
-		$('#vcfTable').dataTable().fnDestroy();
-	   	remakeModal("both");
+		$('#vcfTable').DataTable().destroy();
+	   	remakeModal('both');
 	  	return;
 	}
 	if (sessionStorage.getItem('elastic') !== null) {
-		$('#vcfTable').dataTable().fnDestroy();
-	  	remakeModal("elastic");
+		$('#vcfTable').DataTable().destroy();
+	  	remakeModal('elastic');
 	  	return;
 	}
 	if (sessionStorage.getItem('files') !== null) {
-		$('#vcfTable').dataTable().fnDestroy();
-	  	remakeModal("files");
+		$('#vcfTable').DataTable().destroy();
+	  	remakeModal('files');
 	  return;
 	}
 	if (sessionStorage.getItem('done') != "[]") {
@@ -226,7 +224,7 @@ function proceedVcf() {
 	}
 	else {
 		$('#confirmVcf').modal('hide');
-		$('#vcfTable').dataTable().fnDestroy();
+		$('#vcfTable').DataTable().destroy();
 		$.notify({
             // options
             message: 'No Files were selected. This upload was cancelled.'
@@ -238,43 +236,43 @@ function proceedVcf() {
 }
 
 function remakeModal(target) {
-	$("#variableIssue").empty();
-	if (target == "both") {
-		$("#variableIssue").append('<p>These files have both been uploaded before and the Patient/Tissue combo is already stored in our database.</p>');
-		$("#variableIssue").append('<p>By Uploading these files you will replace the files and data currently stored in the database.</p>');
+	$('#variableIssue').empty();
+	if (target == 'both') {
+		$('#variableIssue').append('<p>These files have both been uploaded before and the Patient/Tissue combo is already stored in our database.</p>');
+		$('#variableIssue').append('<p>By Uploading these files you will replace the files and data currently stored in the database.</p>');
 	}
-	else if (target == "elastic") {
-		$("#variableIssue").append('<p>The Patient/Tissue Combo linked to these files in your config file means there is already a database present with these settings.</p>');
-		$("#variableIssue").append('<p>By uploading these files you will overwrite the data stored in these databases.</p>');
+	else if (target == 'elastic') {
+		$('#variableIssue').append('<p>The Patient/Tissue Combo linked to these files in your config file means there is already a database present with these settings.</p>');
+		$('#variableIssue').append('<p>By uploading these files you will overwrite the data stored in these databases.</p>');
 	}
-	else if (target == "files") {
-		$("#variableIssue").append('<p>These files with these names been uploaded before.</p>');
-		$("#variableIssue").append('<p>By uploading them you will replace the files but no data in databases will be overwritten.</p>');
+	else if (target == 'files') {
+		$('#variableIssue').append('<p>These files with these names been uploaded before.</p>');
+		$('#variableIssue').append('<p>By uploading them you will replace the files but no data in databases will be overwritten.</p>');
 	}
 	count = sessionStorage.getItem('count')-1;
 	if (count == 1) {
-		$("#variableIssue").append('<p>There is '+count+' more item to resolve after this.</p>');
+		$('#variableIssue').append('<p>There is '+count+' more item to resolve after this.</p>');
 	}
 	else {
-		$("#variableIssue").append('<p>There are '+count+' more items to resolve after this.</p>');
+		$('#variableIssue').append('<p>There are '+count+' more items to resolve after this.</p>');
 	}
 	sessionStorage.setItem('count',count);
-	$("#vcfGrid").empty();
+	$('#vcfGrid').empty();
     arr = JSON.parse(sessionStorage.getItem(target));
     if (arr instanceof Array) {
 		for (var i = 0; i < arr.length; i++) {
-			$("#vcfGrid").append('<tr id="row_'+i+'"></tr>');
-			$("#row_"+i).append('<td>'+arr[i]+'</td>');
-			$("#row_"+i).append('<td><label id="child"><input type="checkbox" class="select-checkbox" value="'+arr[i]+'" name="chk[]" id="file_'+i+'"> Tick to upload and replace.</label></td>');
+			$('#vcfGrid').append('<tr id="row_'+i+'"></tr>');
+			$('#row_' + i).append('<td>'+arr[i]+'</td>');
+			$('#row_' + i).append('<td><label id="child"><input type="checkbox" class="select-checkbox" value="'+arr[i]+'" name="chk[]" id="file_'+i+'"> Tick to upload and replace.</label></td>');
 		}
 	}
 	else {
-		$("#vcfGrid").append('<tr id="row_0"></tr>');
-		$("#row_0").append('<td>'+arr+'</td>');
-		$("#row_0").append('<td><label id="child"><input type="checkbox" class="select-checkbox" value="'+sessionStorage.both+'" name="chk[]" id="file_'+0+'"> Tick to upload and replace.</label></td>');
+		$('#vcfGrid').append('<tr id="row_0"></tr>');
+		$('#row_0').append('<td>'+arr+'</td>');
+		$('#row_0').append('<td><label id="child"><input type="checkbox" class="select-checkbox" value="'+sessionStorage.both+'" name="chk[]" id="file_'+0+'"> Tick to upload and replace.</label></td>');
 	}
 	$('#vcfTable').css('width', '');
-	$('#vcfTable').dataTable( {
+	$('#vcfTable').DataTable( {
 	    columnDefs: [ {
 	        orderable: false,
 	        className: 'select-checkbox',
@@ -291,7 +289,7 @@ function remakeModal(target) {
 
 function batchVcf() {
 	$('#confirmVcf').modal('hide');
-	$('#vcfTable').dataTable().fnDestroy();
+	$('#vcfTable').DataTable().destroy();
 	id = $('#source_id').val();
 	user_id =  $('#user_id').val();
 	selected = $('input[name="fAction[]"]:checked').val(); 
@@ -328,7 +326,7 @@ function batchVcf() {
 				data: formData,
 				cache: false,
 				contentType: false,
-				dataType: "application/json", 
+				dataType: 'application/json',
 				processData: false,
 				success: function(response)  {
 
@@ -361,7 +359,6 @@ function batchVcf() {
 				cache: false,
 				contentType: false,
 				success: function(response)  {
-					console.log(response)
 					if (JSON.parse(response) == 'Green') {
 						$('#uploadSpinner').hide()
 	      				$.notify({
@@ -382,8 +379,6 @@ function batchVcf() {
 $("#headerInfo").click(function(){
 	$('#uploadInfoModal').modal('show');
 }); 
-
-
 
 function checkAllToggle() {
 	var rowCount = $('#vcfTable >tbody >tr').length;
@@ -411,7 +406,7 @@ $('#confirmVcf').on('hidden', function () {
             // settings
             timer: 200
       	});
-    $('#vcfTable').dataTable().fnDestroy();
+    $('#vcfTable').DataTable().destroy();
 })
 
 $('#dataFile').on('change',function(){
