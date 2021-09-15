@@ -1,6 +1,7 @@
 <?php namespace App\Controllers;
 
 use App\Models\UIData;
+use App\Libraries\CafeVariome\Helpers\UI\AttributeHelper;
 use CodeIgniter\Config\Services;
 
 /**
