@@ -99,10 +99,8 @@ use CodeIgniter\Config\Services;
     public function Spreadsheet(int $source_id) {
 
         $uidata = new UIData();
-        $uidata->title = "Upload Spreadsheet Files";
-
-        // Since this is a shared function for curators and admin check that the curator is a curator for this source
-        $user_id = $this->authAdapter->getUserID();
+        $uidata->title = "Upload Spreadsheet File";
+		$user_id = $this->authAdapter->getUserID();
 
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
         $uidata->data['user_id'] = $user_id;
