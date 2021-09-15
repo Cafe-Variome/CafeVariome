@@ -1,168 +1,157 @@
 var fileIntervalActive = false;
-
-$(document).ready(function() { 
-   $('.norm').on('click', function(){
-   	// console.log($(this).prev('input').prop('checked'));
-   	if ($(this).prev('input').prop('checked')) {
-   		$(this).prev('input').prop('checked', false);
-   	}
-   	else {
-   		$(this).prev('input').prop('checked', true);
-   		$('input.target').not($(this).prev('input')).prop('checked', false);  
-   	} 	
-   });
-});
 $('input.target').on('change', function() {
     $('input.target').not(this).prop('checked', false);  
 });
 
-$(document).ready(function() {
-	//form to upload file to system
-	//allow the user to upload files to the server to be inserted into MySQL
-	//first perform checks to ensure sanity of file
-	$("#vcfinfo").submit(function(e){
-		e.preventDefault();
-		var ajaxData = new FormData(this);
-		size = 0;
-		file_names = [];
-		for (i = 0; i < $('#dataFile')[0].files.length; i++) {
-		  size = size + $('#dataFile')[0].files[i].size;
-		  file_names.push($('#dataFile')[0].files[i].name);
-		} 
-		id = $('#source_id').val();
-		user_id =  $('#user_id').val();
-		selected = $('input[name="fAction[]"]:checked').val();
-		csrf_token = $('#csrf_token').val();
-		csrf_token_name = $('#csrf_token').prop('name');
-		param = 'source_id=' + id + '&size=' + size + '&' + csrf_token_name + '=' + csrf_token;
-		$cfile = $("#config")[0].files[0];
-		$.ajax({
-      		type: 'post',
-      		url: baseurl+'AjaxApi/validateUpload',
-      		data: param,
-      		dataType: 'json',
-      		success: function(response)  {
-				if (response == 'Red') {
-					alert('Illegal Source Target.');
-				}
-				else if (response == 'Locked') {
-					alert('This source is currently locked as there is a database update operation already ongoing. Please wait till its complete.');
-				}
-				else if (response == 'Yellow') {
-					alert('There is not enough space on the server to accept this file. Please get an Administrator to clear some space.');
-				}
-				else {
-					$('#uploadSpinner').show();
-					var formData = new FormData();
-					formData.append(csrf_token_name, csrf_token);
-					formData.append('source_id', id);
-					formData.append('files', file_names);
-					formData.append('config', $("#config")[0].files[0]);
-					$.ajax({
-						//Send the form through to do_upload
-			      		type: 'POST',
-			      		url: baseurl+'AjaxApi/vcfUpload',
-			      		data: formData,
-			      		cache: false,
-						contentType: false,
-						processData: false,       
-			      		success: function(response)  {
-			      			data = $.parseJSON(response);
-			      			if (data.status == 'Overload') {
-			      				alert(data.message);
-			      			}
-			      			else if (data.status == 'Cancel') {
-			      				// alert(data.message);
-			      				$('#vcf_errors').empty();			      
-			      				for (var i = 0; i < data.message.length; i++) {
-			      					if (data.message[i].match("^dup_")) {
-			      						data.message[i] = data.message[i].substring(4);
-			      						$('#vcf_errors').append('<p style="background-color:lightpink; text-align:center;">'+data.message[i]+' has already been uploaded before.</p>');
-			      					}
-			      					else {
-			      						$('#vcf_errors').append('<p style="background-color:lightpink; text-align:center;">'+data.message[i]+'</p>');
-			      					}
-			                    }
-			      			}
-			      			else if (data.status == 'Duplicate') {
-			      				confirmvcf(data);		
-			      			}
-			      			else if (data.status == 'Green') {
-								id = $('#source_id').val();
-			      				counter = 0;
-								flag = true;
-								for (i = 0; i < $('#dataFile')[0].files.length; i++) {
-									if (flag) {
-										var formData = new FormData();
-										formData.append(csrf_token_name, csrf_token);
-										formData.append('source_id', id);
-										formData.append('uid', data.uid);
-										formData.append('user_id', user_id);
-										formData.append('pipeline_id', $('#pipeline').val());
-
-										flag = false;
-									}
-									formData.append("userfile[]", $('#dataFile')[0].files[i]);
-									counter++;
-									if (counter % 20 == 0) {
-										flag = true;
-										$.ajax({
-											type: 'POST',
-											url: baseurl+'AjaxApi/vcfBatch',
-											data: formData,
-											cache: false,
-											contentType: false,
-											dataType: 'application/json',
-											processData: false,
-											success: function(response)  {
-
-											}
-										});
-									}
+$('#vcfinfo').submit(function(e){
+	e.preventDefault();
+	var pipeline_id = $('#pipeline').val();
+	if (pipeline_id == -1 || pipeline_id == null || pipeline_id == '') {
+		$('#pipeline').addClass('is-invalid');
+		return;
+	}
+	else{
+		$('#pipeline').removeClass('is-invalid');
+	}
+	var size = 0;
+	var file_names = [];
+	for (i = 0; i < $('#dataFile')[0].files.length; i++) {
+	  size = size + $('#dataFile')[0].files[i].size;
+	  file_names.push($('#dataFile')[0].files[i].name);
+	}
+	var id = $('#source_id').val();
+	var user_id =  $('#user_id').val();
+	var selected = $('input[name="fAction[]"]:checked').val();
+	var csrf_token = $('#csrf_token').val();
+	var csrf_token_name = $('#csrf_token').prop('name');
+	param = 'source_id=' + id + '&size=' + size + '&' + csrf_token_name + '=' + csrf_token;
+	$cfile = $('#config')[0].files[0];
+	$.ajax({
+		type: 'post',
+		url: baseurl+'AjaxApi/validateUpload',
+		data: param,
+		dataType: 'json',
+		success: function(response)  {
+			if (response == 'Red') {
+				alert('Illegal Source Target.');
+			}
+			else if (response == 'Locked') {
+				alert('This source is currently locked as there is a database update operation already ongoing. Please wait till its complete.');
+			}
+			else if (response == 'Yellow') {
+				alert('There is not enough space on the server to accept this file. Please get an Administrator to clear some space.');
+			}
+			else {
+				$('#uploadSpinner').show();
+				var formData = new FormData();
+				formData.append(csrf_token_name, csrf_token);
+				formData.append('source_id', id);
+				formData.append('files', file_names);
+				formData.append('config', $("#config")[0].files[0]);
+				$.ajax({
+					//Send the form through to do_upload
+					type: 'POST',
+					url: baseurl+'AjaxApi/vcfUpload',
+					data: formData,
+					cache: false,
+					contentType: false,
+					processData: false,
+					success: function(response)  {
+						data = $.parseJSON(response);
+						if (data.status == 'Overload') {
+							alert(data.message);
+						}
+						else if (data.status == 'Cancel') {
+							// alert(data.message);
+							$('#vcf_errors').empty();
+							for (var i = 0; i < data.message.length; i++) {
+								if (data.message[i].match("^dup_")) {
+									data.message[i] = data.message[i].substring(4);
+									$('#vcf_errors').append('<p style="background-color:lightpink; text-align:center;">'+data.message[i]+' has already been uploaded before.</p>');
 								}
-								$.ajax({
-									type: 'POST',
-									url: baseurl+'AjaxApi/vcfBatch',
-									data: formData,
-									cache: false,
-									contentType: false,
-									processData: false,
-									success: function(response)  {
-										var formData = new FormData();
-										formData.append(csrf_token_name, csrf_token);
-										formData.append("source_id", id);
-										formData.append("uid", data.uid);
-										formData.append('user_id', user_id);
-										formData.append('fAction', selected);
-										$.ajax({
-											type: 'POST',
-								      		url: baseurl+'AjaxApi/vcfStart',
-								      		data: formData,
-											cache: false,
-											contentType: false,
-											processData: false,
-											success: function(response)  {
-												if (JSON.parse(response) == 'Green') {
-													$('#uploadSpinner').hide();
-													$.notify({
-								                        // options
-								                        message: 'Upload Complete. Now inserting into ElasticSearch.'
-								                      },{
-								                        // settings
-								                        timer: 200
-							                      	});
-													reloadTable($('#source_id').val(),false);
-												}	
+								else {
+									$('#vcf_errors').append('<p style="background-color:lightpink; text-align:center;">'+data.message[i]+'</p>');
+								}
+							}
+						}
+						else if (data.status == 'Duplicate') {
+							confirmvcf(data);
+						}
+						else if (data.status == 'Green') {
+							id = $('#source_id').val();
+							counter = 0;
+							flag = true;
+							for (i = 0; i < $('#dataFile')[0].files.length; i++) {
+								if (flag) {
+									var formData = new FormData();
+									formData.append(csrf_token_name, csrf_token);
+									formData.append('source_id', id);
+									formData.append('uid', data.uid);
+									formData.append('user_id', user_id);
+									formData.append('pipeline_id', pipeline_id);
+
+									flag = false;
+								}
+								formData.append('userfile[]', $('#dataFile')[0].files[i]);
+								counter++;
+								if (counter % 20 == 0) {
+									flag = true;
+									$.ajax({
+										type: 'POST',
+										url: baseurl+'AjaxApi/vcfBatch',
+										data: formData,
+										cache: false,
+										contentType: false,
+										dataType: 'application/json',
+										processData: false,
+										success: function(response)  {
+
+										}
+									});
+								}
+							}
+							$.ajax({
+								type: 'POST',
+								url: baseurl+'AjaxApi/vcfBatch',
+								data: formData,
+								cache: false,
+								contentType: false,
+								processData: false,
+								success: function(response)  {
+									var formData = new FormData();
+									formData.append(csrf_token_name, csrf_token);
+									formData.append("source_id", id);
+									formData.append("uid", data.uid);
+									formData.append('user_id', user_id);
+									formData.append('fAction', selected);
+									$.ajax({
+										type: 'POST',
+										url: baseurl+'AjaxApi/vcfStart',
+										data: formData,
+										cache: false,
+										contentType: false,
+										processData: false,
+										success: function(response)  {
+											if (JSON.parse(response) == 'Green') {
+												$('#uploadSpinner').hide();
+												$.notify({
+													// options
+													message: 'Upload Complete. Now inserting into ElasticSearch.'
+												  },{
+													// settings
+													timer: 200
+												});
+												reloadTable($('#source_id').val(),false);
 											}
-									  	});
-								  	}
-							  	});
-			      			}
-			      		}
-			      	});
-			    }
-      		}
-      	});
+										}
+									});
+								}
+							});
+						}
+					}
+				});
+			}
+		}
 	});
 });
 
@@ -310,7 +299,7 @@ function batchVcf() {
 			formData.append('source_id', id);
 			formData.append('uid', uid);
 			formData.append('user_id', user_id);
-			formData.append('pipeline_id', $('#pipeline').val());
+			formData.append('pipeline_id', pipeline_id);
 
 			flag = false;
 		}
@@ -412,10 +401,40 @@ $('#confirmVcf').on('hidden', function () {
 $('#dataFile').on('change',function(){
 	var files = $(this).prop('files');
     $(this).next('.custom-file-label').html(files.length.toString() + ' file(s) selected.');
-})
+
+	calculateSelectedFilesSize();
+});
 
 $('#config').on('change',function(){
     var fullFileName = $(this).val();
     var fileName = fullFileName.split('\\')[fullFileName.split('\\').length - 1];
     $(this).next('.custom-file-label').html(fileName);
-})
+
+	calculateSelectedFilesSize();
+});
+
+function calculateSelectedFilesSize() {
+	var selectedFilesSize = 0;
+
+	for (i = 0; i < $('#dataFile')[0].files.length; i++){
+		selectedFilesSize += $('#dataFile')[0].files[i].size;
+	}
+
+	if ($('#config')[0].files.length > 0){
+		selectedFilesSize += $('#config')[0].files[0].size;
+	}
+
+	var maxUploadFileSize = $('#maxUploadSize').data('bytevalue');
+	$('#selectedFileSize').html((selectedFilesSize/1048576).toFixed(2)+ ' MB');
+
+	if (selectedFilesSize > maxUploadFileSize){
+		$('#uploadWarningText').html('Selected file(s) size is larger than the maximum allowed file size for upload. Upload cannot proceed. Please contact the server administrator to increase the upload size or select other files.');
+		$('#uploadWarningAlert').show();
+		$('#uploadBtn').prop('disabled', 'disabled');
+	}
+	else
+	{
+		$('#uploadWarningAlert').hide();
+		$('#uploadBtn').prop('disabled', false);
+	}
+}

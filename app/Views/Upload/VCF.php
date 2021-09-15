@@ -37,68 +37,78 @@
 	<input type="hidden" name="user_id" id="user_id" value="<?= $user_id ?>" />
 	<input type="hidden" name="uploader" id="uploader" value="vcf" />
 	<input type="hidden" name="<?= csrf_token() ?>" id="csrf_token" value="<?= csrf_hash() ?>" />
-
-	<div class="form-group row">
-	<div class="col-6">
-		<div class="row">
-			<div class="col">
-				<div class="custom-file">
-					<input type="file" class="custom-file-input" name="config" id="config" accept=".csv, .xls, .xlsx" required>
-					<label class="custom-file-label" for="customFile">Config File to describe VCF's:</label>
-				</div>
-			</div>
-		</div>
-		<div class="row">
-			<div class="col">
-				<div class="custom-file">
-					<input type="file" class="custom-file-input" name='userfile[]' id="dataFile" aria-describedby="dataFile" accept=".vcf" required multiple>
-					<label class="custom-file-label" for="customFile">File(s) to submit:</label>
-				</div>
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none;" id="uploadWarningAlert">
+				<p id="uploadWarningText"></p>
 			</div>
 		</div>
 	</div>
-	<div class="col-2">
-		<div class="custom-control custom-radio">
-			<input type="radio" id="fActionOverwrite" name="fAction[]" value="overwrite" class="custom-control-input">
-			<label class="custom-control-label" for="fActionOverwrite" data-toggle="tooltip" data-placement="right" title="By selecting this option you will delete all data currently in this source.">Overwrite</label>
+	<div class="form-group row">
+		<div class="col-5">
+			<div class="row">
+				<div class="col">
+					<div class="custom-file">
+						<input type="file" class="custom-file-input" name="config" id="config" accept=".csv, .xls, .xlsx" required>
+						<label class="custom-file-label" for="customFile">Config File to describe VCF's:</label>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col">
+					<div class="custom-file">
+						<input type="file" class="custom-file-input" name='userfile[]' id="dataFile" aria-describedby="dataFile" accept=".vcf" required multiple>
+						<label class="custom-file-label" for="customFile">File(s) to submit:</label>
+					</div>
+				</div>
+			</div>
 		</div>
-		<div class="custom-control custom-radio">
-			<input type="radio" id="fActionAppend" name="fAction[]" value="append" class="custom-control-input" checked>
-			<label class="custom-control-label" for="fActionAppend" data-toggle="tooltip" data-placement="right" title="By selecting this option you will not impact any prior data already within the source.">Append</label>
+		<div class="col-2">
+			<div class="custom-control custom-radio">
+				<input type="radio" id="fActionOverwrite" name="fAction[]" value="overwrite" class="custom-control-input">
+				<label class="custom-control-label" for="fActionOverwrite" data-toggle="tooltip" data-placement="right" title="By selecting this option you will delete all data currently in this source.">Overwrite</label>
+			</div>
+			<div class="custom-control custom-radio">
+				<input type="radio" id="fActionAppend" name="fAction[]" value="append" class="custom-control-input" checked>
+				<label class="custom-control-label" for="fActionAppend" data-toggle="tooltip" data-placement="right" title="By selecting this option you will not impact any prior data already within the source.">Append</label>
+			</div>
 		</div>
-	</div>
-	<div class="col-2">
-		<button class="btn btn-large btn-primary bg-gradient-primary" id="uploadBtn" type="submit">
-			<span class="fa fa-upload"></span> Upload File
-		</button>
-	</div>
-	<div class="col-2">
-		<div class="spinner-border text-warning" id="uploadSpinner" role="status" style="display:none;">
-			<span class="sr-only">Loading...</span>
+		<div class="col-2">
+			<button class="btn btn-large btn-primary bg-gradient-primary" id="uploadBtn" type="submit">
+				<span class="fa fa-upload"></span> Upload File
+			</button>
+			<div class="spinner-border text-warning" id="uploadSpinner" role="status" style="display:none;">
+				<span class="sr-only">Loading...</span>
+			</div>
 		</div>
-	</div>
+		<div class="col-3">
+			Maximum File(s) Size Allowed: <span id="maxUploadSize" data-bytevalue="<?= $maxUploadSize ?>"> <?= $maxUploadSizeH ?></span> <br>
+			Selected File(s) Size: <span id="selectedFileSize">-</span>
+		</div>
 	</div>
 
 	<div class="form-group row">
-		<div class="col-6">
+		<div class="col-5">
 			<select name="pipeline" id="pipeline" class="form-control">
 				<option value="-1" selected>Please select a pipeline...</option>
 				<?php foreach($pipelines as $pipeline): ?>
 					<option value="<?= $pipeline['id'] ?>"><?= $pipeline['name'] ?></option>
 				<?php endforeach; ?>
 			</select>
+			<div class="invalid-feedback">
+				Please select a pipeline.
+			</div>
 		</div>
-		<div class="col-6"></div>
+		<div class="col-7"></div>
 	</div>
 </form>
-
 </hr>
-
-<table class="table table-bordered table-striped table-hover" id="file_table" width="100%" cellspacing="0">
+<table class="table table-bordered table-striped table-hover" id="file_table">
   <thead>
 	<tr>
 		<th>File-name</th>
 		<th>User</th>
+		<th>Pipeline</th>
 		<th>Status</th>
 		<th>Action</th>
 	</tr>
@@ -106,7 +116,6 @@
   <tbody id="file_grid">
   </tbody>
 </table>
-
 <div id="confirmVcf" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
 	<div class="modal-content">
