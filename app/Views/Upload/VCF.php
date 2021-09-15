@@ -116,6 +116,14 @@
   <tbody id="file_grid">
   </tbody>
 </table>
+<hr>
+<div class="row mb-5">
+	<div class="col">
+		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
+			<i class="fa fa-database"></i> View Sources
+		</a>
+	</div>
+</div>
 <div id="confirmVcf" class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
 	<div class="modal-content">
