@@ -107,7 +107,9 @@
 <hr>
 <div class="row mb-5">
   <div class="col">
-	<a class="btn btn-secondary" href="<?= base_url('Source') ?>"><i class="fa fa-backward"></i> Go back</a>
+	<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
+		<i class="fa fa-database"></i> View Sources
+	</a>
   </div>
 </div>
 <div id="uploadInfoModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
