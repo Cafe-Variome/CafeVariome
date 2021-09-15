@@ -279,9 +279,10 @@ function remakeModal(target) {
 function batchVcf() {
 	$('#confirmVcf').modal('hide');
 	$('#vcfTable').DataTable().destroy();
-	id = $('#source_id').val();
-	user_id =  $('#user_id').val();
-	selected = $('input[name="fAction[]"]:checked').val(); 
+	var id = $('#source_id').val();
+	var user_id =  $('#user_id').val();
+	var selected = $('input[name="fAction[]"]:checked').val();
+	var pipeline_id = $('#pipeline').val();
 
 	$('#uploadSpinner').show();
 	flag = true;
