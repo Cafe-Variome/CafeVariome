@@ -68,7 +68,7 @@
   <tbody id="file_grid">
   </tbody>
 </table>
-<div class="row">
+<div class="row mb-5">
 	<div class="col">
 		<button class="btn btn-primary" id="batchProcessBtn" onclick="processSelectedFiles()" disabled>
 			<i class="fa fa-redo-alt"></i> Process Selected Files <span class="badge badge-light">0</span>
