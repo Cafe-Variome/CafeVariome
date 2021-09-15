@@ -191,7 +191,8 @@ use CodeIgniter\Database\ConnectionInterface;
      *
      * Moved to source model by Mehdi Mehtarizadeh(02/08/2019)
      */
-    public function getSourceNameByID($source_id) {
+    public function getSourceNameByID(int $source_id)
+	{
         $this->builder = $this->db->table($this->table);
 
         $this->builder->select('name');
