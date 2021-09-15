@@ -59,7 +59,7 @@
 			<button class="btn btn-large btn-primary bg-gradient-primary" id="uploadBtn" type="submit">
 				<span class="fa fa-upload"></span> Upload File
 			</button>
-			<div class="spinner-border text-warning" id="uploadSpinner" role="status" style="display:none;">
+			<div class="spinner-border text-warning spinner-border-sm" id="uploadSpinner" role="status" style="display:none;">
 				<span class="sr-only">Loading...</span>
 			</div>
 		</div>
