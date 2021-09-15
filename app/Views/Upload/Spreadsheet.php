@@ -105,7 +105,7 @@
   </tbody>
 </table>
 <hr>
-<div class="row">
+<div class="row mb-5">
   <div class="col">
 	<a class="btn btn-secondary" href="<?= base_url('Source') ?>"><i class="fa fa-backward"></i> Go back</a>
   </div>
