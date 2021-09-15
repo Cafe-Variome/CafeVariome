@@ -68,23 +68,14 @@ class Attribute extends Model
 		return $this->builder->get()->getResultArray();
 	}
 
-	public function getAttributesBySourceId(int $source_id, bool $include_source_name = true): array
+	public function getAttributesBySourceId(int $source_id): array
 	{
-		if ($include_source_name){
-			$this->builder->select($this->table . '.*, sources.name as source_name');
-			$this->builder->join('sources', $this->table .'.source_id = sources.source_id');
-		}
-		$this->builder->where($this->table . '.source_id', $source_id);
-
+		$this->builder->where('source_id', $source_id);
 		return $this->builder->get()->getResultArray();
 	}
 
-	public function getAllAttributes(bool $include_source_name = true): array
+	public function getAllAttributes(): array
 	{
-		if ($include_source_name){
-			$this->builder->select($this->table . '.*, sources.name as source_name');
-			$this->builder->join('sources', $this->table .'.source_id = sources.source_id');
-		}
 		return $this->builder->get()->getResultArray();
 	}
 

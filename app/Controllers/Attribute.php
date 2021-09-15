@@ -36,10 +36,16 @@ class Attribute extends CVUI_Controller
 		return redirect()->to(base_url('Source'));
 	}
 
-	public function List(int $source_id = 0)
+	public function List(int $source_id)
 	{
 		$uidata = new UIData();
 		$uidata->title = "Attributes";
+
+		$source_name = $this->sourceModel->getSourceNameByID($source_id);
+
+		if ($source_name == null && $source_id <= 0){
+			return redirect()->to(base_url('Source'));
+		}
 
 		if ($source_id > 0){
 			$attributes = $this->attributeModel->getAttributesBySourceId($source_id);
@@ -48,6 +54,7 @@ class Attribute extends CVUI_Controller
 			$attributes = $this->attributeModel->getAllAttributes();
 		}
 
+		$uidata->data['source_name'] = $source_name;
 		$uidata->data['attributes'] = $attributes;
 
 		$uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
