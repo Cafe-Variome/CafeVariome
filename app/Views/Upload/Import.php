@@ -60,6 +60,7 @@
         <th><input type="checkbox" class="chkBxMaster"></th>
 		<th>File-name</th>
 		<th>User</th>
+		<th>Pipeline</th>
 		<th>Status</th>
 		<th>Action</th>
 	</tr>
