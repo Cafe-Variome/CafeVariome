@@ -50,8 +50,10 @@ class Attribute extends CVUI_Controller
 		if ($source_id > 0){
 			$attributes = $this->attributeModel->getAttributesBySourceId($source_id);
 		}
-		else{
-			$attributes = $this->attributeModel->getAllAttributes();
+
+		foreach ($attributes as &$attribute){
+			$attribute['type'] = AttributeHelper::getAttributeType($attribute['type']);
+			$attribute['storage_location'] = AttributeHelper::getAttributeStorageLocation($attribute['storage_location']);
 		}
 
 		$uidata->data['source_name'] = $source_name;
