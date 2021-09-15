@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.0.4deb2~bpo10+1+bionic1
+-- version 5.1.1deb3+bionic1
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Jul 19, 2021 at 03:43 PM
--- Server version: 5.7.34-0ubuntu0.18.04.1
--- PHP Version: 7.4.20
+-- Generation Time: Sep 15, 2021 at 11:18 AM
+-- Server version: 5.7.35-0ubuntu0.18.04.1
+-- PHP Version: 8.0.10
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,6 +24,25 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `attributes`
+--
+
+CREATE TABLE `attributes` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `display_name` varchar(200) NOT NULL,
+  `source_id` int(11) NOT NULL,
+  `type` tinyint(3) NOT NULL,
+  `min` double NOT NULL,
+  `max` double NOT NULL,
+  `show_in_interface` bit(1) NOT NULL,
+  `include_in_interface_index` bit(1) NOT NULL,
+  `storage_location` tinyint(3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `eavs`
 --
 
@@ -31,11 +50,11 @@ CREATE TABLE `eavs` (
   `id` int(15) NOT NULL,
   `uid` char(36) NOT NULL,
   `source_id` int(11) NOT NULL,
-  `fileName` mediumint(8) UNSIGNED NOT NULL,
+  `file_id` int(11) NOT NULL,
   `subject_id` varchar(36) NOT NULL,
-  `attribute` varchar(50) NOT NULL,
-  `value` varchar(200) DEFAULT NULL,
-  `elastic` bit(1) NOT NULL DEFAULT b'0'
+  `attribute_id` int(11) NOT NULL,
+  `value_id` int(11) DEFAULT NULL,
+  `indexed` bit(1) NOT NULL DEFAULT b'0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -216,8 +235,8 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 (6, 'allow_registrations', 'off', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'authentication', 'required'),
 (7, 'discovery_requires_login', 'on', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'discovery', 'required'),
 (8, 'show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'discovery', 'required'),
-(9, 'auth_server', 'http://localhost/cvnet/', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main', 'required'),
-(10, 'installation_key', 'e9dc0637853ae6748b4d3983630710b8', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'main', 'required'),
+(9, 'auth_server', '', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main', 'required'),
+(10, 'installation_key', '', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'main', 'required'),
 (11, 'logo', 'cafevariome_full.png', 'Main Logo', 'Main logo that appears on top left side of the public pages. The file must be located in resources/images/logos/', 'main', 'required|xss_clean'),
 (12, 'oidc_uri', 'https://auth.discoverynexus.org/auth', 'OpenID URL', 'URL (or IP address) of the OpenID provider authentication endpoint.', 'authentication', 'required'),
 (13, 'oidc_realm', 'ERN', 'Realm Name', 'Some OpenID providers, like KeyCloak, have a realm that acts as a subspace separating users.', 'authentication', 'required'),
@@ -249,8 +268,8 @@ CREATE TABLE `sources` (
   `long_description` mediumtext NOT NULL,
   `status` varchar(15) NOT NULL,
   `date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `username` varchar(100) NOT NULL,
-  `password` varchar(100) NOT NULL,
+  `username` varchar(100) DEFAULT NULL,
+  `password` varchar(100) DEFAULT NULL,
   `record_count` bigint(255) NOT NULL DEFAULT '0',
   `elastic_status` tinyint(1) DEFAULT '0',
   `elastic_lock` tinyint(1) DEFAULT '0'
@@ -374,9 +393,31 @@ CREATE TABLE `users_groups_networks` (
   `network_key` int(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `values`
+--
+
+CREATE TABLE `values` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `attribute_id` int(11) NOT NULL,
+  `display_name` varchar(200) NOT NULL,
+  `frequency` int(11) NOT NULL,
+  `show_in_interface` bit(1) NOT NULL,
+  `include_in_interface_index` bit(1) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `attributes`
+--
+ALTER TABLE `attributes`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `eavs`
@@ -386,10 +427,10 @@ ALTER TABLE `eavs`
   ADD KEY `uid` (`uid`),
   ADD KEY `source_id` (`source_id`),
   ADD KEY `subject_id` (`subject_id`),
-  ADD KEY `attribute` (`attribute`),
-  ADD KEY `value` (`value`),
-  ADD KEY `elastic` (`elastic`),
-  ADD KEY `uid_2` (`uid`,`attribute`,`value`),
+  ADD KEY `attribute_id` (`attribute_id`),
+  ADD KEY `value_id` (`value_id`),
+  ADD KEY `indexed` (`indexed`),
+  ADD KEY `uid_2` (`uid`,`attribute_id`,`value_id`),
   ADD KEY `subj_src` (`subject_id`,`source_id`),
   ADD KEY `comi` (`id`,`source_id`);
 
@@ -516,8 +557,21 @@ ALTER TABLE `users_groups_networks`
   ADD KEY `group_id` (`group_id`);
 
 --
+-- Indexes for table `values`
+--
+ALTER TABLE `values`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Attribute_FK` (`attribute_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `attributes`
+--
+ALTER TABLE `attributes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `eavs`
@@ -607,19 +661,25 @@ ALTER TABLE `upload_jobs`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users_groups`
 --
 ALTER TABLE `users_groups`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
 
 --
 -- AUTO_INCREMENT for table `users_groups_networks`
 --
 ALTER TABLE `users_groups_networks`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `values`
+--
+ALTER TABLE `values`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -669,6 +729,12 @@ ALTER TABLE `users_groups`
 ALTER TABLE `users_groups_networks`
   ADD CONSTRAINT `GroupIDFK` FOREIGN KEY (`group_id`) REFERENCES `network_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `UserFK` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `values`
+--
+ALTER TABLE `values`
+  ADD CONSTRAINT `Attribute_FK` FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
