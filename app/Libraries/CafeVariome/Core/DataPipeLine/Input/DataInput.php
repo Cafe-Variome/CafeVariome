@@ -141,7 +141,7 @@ abstract class DataInput
 	{
 		$attribute_id = $this->attributeModel->getAttributeIdByNameAndSourceId($name, $this->sourceId);
 		if ($attribute_id == -1){
-			$attribute_id = $this->attributeModel->createAttribute($name, $this->sourceId);
+			$attribute_id = $this->attributeModel->createAttribute($name, $this->sourceId, $name);
 		}
 
 		return $attribute_id;
