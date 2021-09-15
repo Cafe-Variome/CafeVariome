@@ -39,7 +39,13 @@
 	<input type="hidden" id="source_id" value="<?php echo $source_id ?>" />
 	<input type="hidden" name="uploader" id="uploader" value="phenopacket" />
 	<input type="hidden" name="<?= csrf_token() ?>" id="csrf_token" value="<?= csrf_hash() ?>" />
-
+	<div class="row">
+		<div class="col">
+			<div class="alert alert-warning alert-dismissible fade show" role="alert" style="display:none;" id="uploadWarningAlert">
+				<p id="uploadWarningText"></p>
+			</div>
+		</div>
+	</div>
 	<div class="form-group row">
 		<div class="col-5">
 			<div class="custom-file">
