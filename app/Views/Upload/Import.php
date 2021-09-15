@@ -70,6 +70,10 @@
 </table>
 <div class="row mb-5">
 	<div class="col">
+		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
+			<i class="fa fa-database"></i> View Sources
+		</a>
+
 		<button class="btn btn-primary" id="batchProcessBtn" onclick="processSelectedFiles()" disabled>
 			<i class="fa fa-redo-alt"></i> Process Selected Files <span class="badge badge-light">0</span>
 		</button>
