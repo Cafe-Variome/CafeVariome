@@ -62,7 +62,7 @@
 				<a href="<?php echo base_url($controllerName. '/Status'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Source File Status">
 					<i class="fa fa-info-circle text-primary"></i>
 				</a>
-				<a href="<?php echo base_url($controllerName. '/Data'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Data Attributes and Values">
+				<a href="<?php echo base_url('Attribute/List'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Data Attributes and Values">
 					<i class="fa fa-database text-info"></i>
 				</a>
 				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] . "/" . $source['name']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Source">
