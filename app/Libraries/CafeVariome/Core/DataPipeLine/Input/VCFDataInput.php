@@ -69,8 +69,9 @@ class VCFDataInput extends DataInput
 
                             foreach ($val as $v) {
                                 if (in_array($v[0], $config)) {
-                                    array_push($this->records, ['uid' => $uid, 'attribute' => $v[0], 'value' => $v[1]]);
-                                    //$this->createEAV($uid, $this->sourceId, $file_id, $this->subject_id, $v[0], $v[1]);
+									$attribute_id = $this->getAttributeIdByName($v[0]);
+									$value_id = $this->getValueIdByNameAndAttributeId($v[1], $v[0]);
+									array_push($this->records, ['uid' => $uid, 'attribute_id' => $attribute_id, 'value_id' => $value_id]);
                                 }
                             }
                         }
@@ -78,8 +79,9 @@ class VCFDataInput extends DataInput
                             continue;
                         }
                         else {
-                            array_push($this->records, ['uid' => $uid, 'attribute' => $this->headers[$i], 'value' => $values[$i]]);
-                            //$this->createEAV($uid, $this->sourceId, $file_id, $this->subject_id, $this->headers[$i], $values[$i]);
+							$attribute_id = $this->getAttributeIdByName($this->headers[$i]);
+							$value_id = $this->getValueIdByNameAndAttributeId($values[$i], $this->headers[$i]);
+                            array_push($this->records, ['uid' => $uid, 'attribute_id' => $attribute_id, 'value_id' => $value_id]);
                         }
                     }
                 }
@@ -97,17 +99,14 @@ class VCFDataInput extends DataInput
 		$this->db->commit();
 
         foreach ($this->records as $record) {
-            $this->createEAV($record['uid'], $this->sourceId, $file_id, $this->subject_id, $record['attribute'], $record['value']);
+            $this->createEAV($record['uid'], $file_id, $this->subject_id, $record['attribute_id'], $record['value_id']);
             $this->reportProgress($file_id, $recordsProcessed, $recordCount, 'bulkupload');
             $recordsProcessed ++;
         }
 
 		$this->db->commit();
 
-		if ($this->delete == 1) {
-			$this->removeAttribuesAndValuesFiles($this->fileName);
-		}
-
-		$this->dumpAttributesAndValues($file_id);
+		//Update value frequencies
+		$this->updateValueFrequencies();
     }
 }
