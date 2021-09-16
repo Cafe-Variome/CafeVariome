@@ -51,7 +51,7 @@ class Value extends Model
 		return $value_id;
 	}
 
-	public function updateFrequencyByName(string $name, float $frequency, bool $add = true):bool
+	public function updateFrequencyByNameAndAttributeId(string $name, int $attribute_id, float $frequency, bool $add = true):bool
 	{
 		if ($add) {
 			$currentFrequency = $this->getFrequencyByName($name);
@@ -60,6 +60,8 @@ class Value extends Model
 			}
 		}
 		$this->builder->where('name', $name);
+		$this->builder->where('attribute_id', $attribute_id);
+
 		return $this->builder->update(['frequency' => $frequency]);
 	}
 
