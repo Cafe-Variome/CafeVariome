@@ -81,6 +81,16 @@ class Attribute extends Model
 		return null;
 	}
 
+	public function updateAttribute(int $attribute_id, string $display_name, bool $show_in_interface, bool $include_in_interface_index)
+	{
+		$this->builder->where('id', $attribute_id);
+		$this->builder->update([
+			'display_name' => $display_name,
+			'show_in_interface' => $show_in_interface,
+			'include_in_interface_index' => $include_in_interface_index
+		]);
+	}
+
 	public function getAttributesBySourceId(int $source_id): array
 	{
 		$this->builder->where('source_id', $source_id);
