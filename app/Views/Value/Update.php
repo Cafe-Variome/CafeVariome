@@ -19,7 +19,7 @@
 <?= form_open($controllerName . '/Update/' . $value_id) ?>
 <div class="form-group row">
 	<div class="col-6">
-		<?php echo form_label('Attribute Name', 'name'); ?>
+		<?php echo form_label('Value Name', 'name'); ?>
 		<?php echo form_input($name); ?>
 		<small class="form-text text-muted">
 			You cannot edit value name as it will be used to index the data associated with it.
