@@ -92,4 +92,18 @@ class Attribute extends Model
 
 		return $attribute_id;
 	}
+
+	public function getAttributeNameById(int $attribute_id): ?string
+	{
+		$this->builder->select('name');
+		$this->builder->where('id', $attribute_id);
+
+		$result = $this->builder->get()->getResultArray();
+
+		if (count($result) == 1){
+			return $result[0]['name'];
+		}
+
+		return null;
+	}
 }
