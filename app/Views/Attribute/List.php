@@ -18,14 +18,14 @@
 <?php endif; ?>
 <table class="table table-bordered table-striped table-hover" id="attributestable">
 	<thead>
-	<tr>
-		<th>Name</th>
-		<th>Display Name</th>
-		<th>Source</th>
-		<th>Type</th>
-		<th>Storage Location</th>
-		<th>Actions</th>
-	</tr>
+		<tr>
+			<th>Name</th>
+			<th>Display Name</th>
+			<th>Source</th>
+			<th>Type</th>
+			<th>Storage Location</th>
+			<th>Actions</th>
+		</tr>
 	</thead>
 	<tbody>
 	<?php foreach ($attributes as $attribute): ?>
@@ -36,7 +36,15 @@
 			<td><?= $attribute['type'] ?></td>
 			<td><?= $attribute['storage_location'] ?></td>
 			<td>
-				<a href="<?= base_url('Value/List') . '/' . $attribute['id']?>" data-toggle="tooltip" data-placement="top" title="View Values"><i class="fa fa-list text-info"></i></a>
+				<a href="<?= base_url('Value/List') . '/' . $attribute['id']?>" data-toggle="tooltip" data-placement="top" title="View Values">
+					<i class="fa fa-list text-success"></i>
+				</a>
+				<a href="<?= base_url($controllerName . '/Update') . '/' . $attribute['id']?>" data-toggle="tooltip" data-placement="top" title="Edit Attribute">
+					<i class="fa fa-edit text-warning"></i>
+				</a>
+				<a href="<?= base_url($controllerName . '/Details') . '/' . $attribute['id']?>" data-toggle="tooltip" data-placement="top" title="View Attribute">
+					<i class="fa fa-eye text-info"></i>
+				</a>
 			</td>
 		</tr>
 	<?php endforeach; ?>
