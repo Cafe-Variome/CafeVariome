@@ -3,7 +3,7 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>
+		<h2><?= $title ?> of '<?= $source_name ?>'</h2>
 	</div>
 </div>
 <hr>
@@ -36,11 +36,18 @@
 			<td><?= $attribute['type'] ?></td>
 			<td><?= $attribute['storage_location'] ?></td>
 			<td>
-				<a href=""><i class="fa fa-list text-info"></i></a>
+				<a href="<?= base_url('Value/List') . '/' . $attribute['id']?>" data-toggle="tooltip" data-placement="top" title="View Values"><i class="fa fa-list text-info"></i></a>
 			</td>
 		</tr>
 	<?php endforeach; ?>
 	</tbody>
 </table>
-
+<hr>
+<div class="row mb-5">
+	<div class="col">
+		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
+			<i class="fa fa-database"></i> View Sources
+		</a>
+	</div>
+</div>
 <?= $this->endSection() ?>
