@@ -24,7 +24,7 @@ class Network extends Model{
 
 	private $setting;
 	private $networkGroupModel;
-	
+
 	public function __construct(ConnectionInterface &$db = Null){
 
         if ($db != null) {
@@ -72,7 +72,7 @@ class Network extends Model{
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	function getMasterGroups() {
 		$this->builder = $this->db->table('network_groups');
@@ -85,9 +85,9 @@ class Network extends Model{
 		}
 		return $end;
 	}
-	
+
 	/**
-	 * 
+	 *
 	 */
 	public function createNetwork ($data) {
 		$this->builder = $this->db->table($this->table);
@@ -98,9 +98,9 @@ class Network extends Model{
 
 	/**
 	 * getNetworksBySource(int $source_id)
-	 * 
+	 *
 	 * Returns network keys a source is assigned to.
-	 * 
+	 *
 	 * @author Mehdi
 	 * @param int $source_id
 	 * @return array network keys|empty
@@ -152,10 +152,10 @@ class Network extends Model{
 	/**
      * Get Current Network Groups For Source In Installation - Get all Network Groups assigned to a Source
      *
-     * @param int $source_id - The ID of the source in question 
+     * @param int $source_id - The ID of the source in question
 	 * @return array         - Details of the Network Groups
      */
-	function getCurrentNetworkGroupsForSourceInInstallation($source_id) {	
+	function getCurrentNetworkGroupsForSourceInInstallation($source_id) {
 		$this->builder = $this->db->table('network_groups_sources');
 
 		$this->builder->join('network_groups', 'network_groups.id = network_groups_sources.group_id');
@@ -180,7 +180,7 @@ class Network extends Model{
 		$query = $this->builder->get()->getResultArray();
 	   	return $query;
 	}
-	
+
 	function getNetworkGroupsForInstallation() {
 		$this->builder = $this->db->table('network_groups');
 		$this->builder->join('networks', 'network_groups.network_key = networks.network_key');
@@ -208,7 +208,7 @@ class Network extends Model{
 		$this->builder = $this->db->table('users');
 		$this->builder->select("users.id, users.username, users.remote");
 		$this->builder->join('users_groups_networks', 'users_groups_networks.user_id=users.id');
-		$this->builder->where(array('users_groups_networks.group_id' => $group_id));	
+		$this->builder->where(array('users_groups_networks.group_id' => $group_id));
 		$query = $this->builder->get()->getResultArray();
 		return $query;
 	}
@@ -230,7 +230,7 @@ class Network extends Model{
 
 		return $network_key;
 	}
-	
+
 	function addUserToNetworkGroup(int $user_id, int $group_id, string $installation_key, string $network_key) {
 		$data = array ( 'group_id' => $group_id,
 						'user_id' => $user_id,
@@ -238,14 +238,14 @@ class Network extends Model{
 						'network_key' => $network_key,
 		);
 
-		$this->builder = $this->db->table('users_groups_networks');				
+		$this->builder = $this->db->table('users_groups_networks');
 		$this->builder->insert( $data);
 		$insert_id = $this->db->insertID();
 		return $insert_id;
 	}
 
 	function deleteUserFromNetworkGroup(int $user_id, int $group_id, string $installation_key, string $network_key){
-		$this->builder = $this->db->table('users_groups_networks');				
+		$this->builder = $this->db->table('users_groups_networks');
 		$this->builder->where('user_id', $user_id);
 		$this->builder->where('group_id', $group_id);
 		$this->builder->where('installation_key', $installation_key);
@@ -256,11 +256,11 @@ class Network extends Model{
 	}
 
 	function deleteUserFromAllNetworkGroups(int $user_id){
-		$this->builder = $this->db->table('users_groups_networks');				
+		$this->builder = $this->db->table('users_groups_networks');
 		$this->builder->where('user_id', $user_id);
 		$this->builder->delete();
 	}
-	
+
 	function deleteAllUsersFromNetworkGroup($group_id, $isMaster = false) {
 		if($isMaster) {
 			$this->builder = $this->db->table('network_groups');
@@ -275,22 +275,22 @@ class Network extends Model{
 			$this->builder->delete();
 		} else {
 			$this->builder = $this->db->table('users_groups_networks');
-			$this->builder->where('group_id', $group_id);	
+			$this->builder->where('group_id', $group_id);
 			$this->builder->delete();
 		}
 	}
 
 	function deleteUserFromAllOtherNetworkGroups($network_key, $users) {
 		$this->builder = $this->db->table('users_groups_networks');
-		$this->builder->where('network_key', $network_key);	
+		$this->builder->where('network_key', $network_key);
 		$this->builder->whereNotIn('user_id', $users);
 		$this->builder->delete();
 	}
 
 	function deleteAllSourcesFromNetworkGroup($group_id, $installation_key) {
 		$this->builder = $this->db->table('network_groups_sources');
-		$this->builder->where('group_id', $group_id);	
-		$this->builder->where('installation_key', $installation_key);	
+		$this->builder->where('group_id', $group_id);
+		$this->builder->where('installation_key', $installation_key);
 		$this->builder->delete();
 	}
 
@@ -313,7 +313,7 @@ class Network extends Model{
 		else {
 			return array("error" => "No network groups are available for this installation");
 		}
-	}	
+	}
 
 	public function deleteSourceFromNetworkGroups(int $source_id, bool $delete_master = false)
 	{
@@ -328,7 +328,7 @@ class Network extends Model{
 		$this->builder->delete();
 	}
 
-	public function addSourceFromInstallationToMultipleNetworkGroups(int $source_id, array $groups_exploded)
+	function addSourceFromInstallationToMultipleNetworkGroups(int $source_id, array $groups_exploded)
 	{
 		foreach ( $groups_exploded as $group_data ) {
 			$groups_exploded = explode(',', $group_data);
@@ -412,10 +412,10 @@ class Network extends Model{
 
 	/**
 	 * getSourcesForNetworkPartOfGroup
-	 * 
+	 *
 	 * @param string $installation_key
 	 * @param string $network_key
-	 * 
+	 *
 	 * @author Mehdi Mehtarizadeh
 	 */
 	function getSourcesForNetworkPartOfGroup(string $installation_key, string $network_key) {
@@ -425,7 +425,7 @@ class Network extends Model{
 		$this->builder->join("network_groups g", "g.id = s.group_id");
 		$this->builder->where("g.network_key" ,$network_key);
 		$this->builder->where("s.installation_key", $installation_key);
-		
+
 		$data = $this->builder->get()->getResultArray();
 		$sources = array();
 
@@ -439,7 +439,7 @@ class Network extends Model{
 
 	/**
 	 * getSourcesForNetworkPartOfGroup
-	 * 
+	 *
 	 * @param int $user_id
 	 * @return array|null
 	 * @author Mehdi Mehtarizadeh
@@ -453,7 +453,7 @@ class Network extends Model{
 		if (!$query) {
 			return $query;
 		}
-		
+
 		$groupIds = array();
 		foreach ($query as $gid) {
 			array_push($groupIds, $gid['group_id']);
@@ -492,12 +492,12 @@ class Network extends Model{
 		$this->builder->join('networks', 'networks.network_key = users_groups_networks.network_key');
 		$this->builder->where('user_id', $user_id);
 		$query = $this->builder->get()->getResultArray();
-		
+
 		return $query;
 	}
 
 	/**
-	 * New methods added for HDR Sprint 
+	 * New methods added for HDR Sprint
 	 * @author Gregory Warren
 	 */
 
