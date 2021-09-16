@@ -47,7 +47,7 @@
 <div class="row mb-5">
 	<div class="col">
 		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Attribute/List/' . $source_id) ?>">
-			<i class="fa fa-arrow-left"></i> Go Back to List of Values for <?= $attribute_name ?>
+			<i class="fa fa-arrow-left"></i> Go Back to List of Attributes for <?= $source_name ?>
 		</a>
 	</div>
 </div>
