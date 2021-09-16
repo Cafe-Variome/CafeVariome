@@ -61,6 +61,7 @@ class Value extends CVUI_Controller
 		$values = $this->valueModel->getValuesByAttributeId($attribute_id);
 
 		$uidata->data['source_id'] = $source_id;
+		$uidata->data['source_name'] = $this->sourceModel->getSourceNameById($source_id);
 		$uidata->data['attribute_name'] = $attribute_name;
 		$uidata->data['values'] = $values;
 
