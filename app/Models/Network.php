@@ -124,7 +124,7 @@ class Network extends Model{
 	}
 
     /**
-     * 
+     * @deprecated
      */
     function isUserMemberOfMasterNetworkGroupForNetwork($user_id, $network_key) {
 
@@ -136,10 +136,10 @@ class Network extends Model{
 							'ng.network_key' => $network_key,
 							'ng.group_type' => 'master'
 				));
-		
-		
+
+
 		$num_results = $this->db->count_all_results();
-		
+
 		if ($num_results){
 
 			return true;
