@@ -32,7 +32,7 @@
 <hr>
 <div class="row mb-5">
 	<div class="col">
-		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Attribute/List/' . $attribute_id) ?>">
+		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Value/List/' . $attribute_id) ?>">
 			<i class="fa fa-arrow-left"></i> Go Back to List of Values for <?= $attribute_name?>
 		</a>
 
