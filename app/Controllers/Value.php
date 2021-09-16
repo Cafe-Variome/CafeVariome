@@ -44,12 +44,14 @@ class Value extends CVUI_Controller
 		$uidata->title = "Values";
 
 		$attribute_name = $this->attributeModel->getAttributeNameById($attribute_id);
+		$source_id = $this->attributeModel->getSourceIdByAttributeId($attribute_id);
 
 		if ($attribute_name == null || $attribute_id <= 0){
 			return redirect()->to(base_url('Source'));
 		}
 		$values = $this->valueModel->getValuesByAttributeId($attribute_id);
 
+		$uidata->data['source_id'] = $source_id;
 		$uidata->data['attribute_name'] = $attribute_name;
 		$uidata->data['values'] = $values;
 
