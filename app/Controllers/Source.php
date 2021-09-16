@@ -435,11 +435,11 @@ class Source extends CVUI_Controller{
                 }
                 if (count($group_data_array) > 0) {
                     $group_post_data = implode("|", $group_data_array);
-                    $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],$group_post_data);
+                    $networkModel->updateNetworkGroupsBySourceId($update_data['source_id'], $group_post_data);
 
                 }
                 else {
-                    $networkModel->modify_current_network_groups_for_source_in_installation($update_data['source_id'],null);
+                    $networkModel->updateNetworkGroupsBySourceId($update_data['source_id']);
                 }
                 $this->setStatusMessage("Source '$source_name' was updated.", STATUS_SUCCESS);
 
