@@ -111,7 +111,7 @@ class Source extends CVUI_Controller{
             ],
             'owner_name' => [
                     'label'  => 'Owner Name',
-                    'rules'  => 'required|alpha',
+                    'rules'  => 'required|alpha_numeric_space',
                     'errors' => [
                         'required' => '{field} is required.'
                     ]
