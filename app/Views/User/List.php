@@ -64,12 +64,12 @@
                 <!-- <td><?php echo $user['ip_address']; ?></td> -->
                 <td>
                     <a data-toggle="tooltip" data-placement="top" title="View User" href="<?php echo base_url($controllerName . '/Details') . "/" . $user['id']; ?>">
-                        <i class="fa fa-info text-info">&nbsp;&nbsp;</i></a>
+                        <i class="fa fa-eye text-info">&nbsp;&nbsp;</i></a>
                     <a data-toggle="tooltip" data-placement="top" title="Edit User" href="<?php echo base_url($controllerName . '/Update') . "/" . $user['id']; ?>">
                         <i class="fa fa-edit text-warning">&nbsp;&nbsp;</i></a>
                     <a data-toggle="tooltip" data-placement="top" title="Delete User" href="<?php echo base_url($controllerName . '/Delete') . "/" . $user['id']; ?>">
                         <i class="fa fa-trash text-danger">&nbsp;&nbsp;</i></a>
-                </td>  
+                </td>
             </tr>
         <?php endforeach; ?>
     </tbody>
