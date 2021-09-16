@@ -50,6 +50,16 @@ class Value extends Model
 		return null;
 	}
 
+	public function updateValue(int $value_id, string $display_name, bool $show_in_interface, bool $include_in_interface_index)
+	{
+		$this->builder->where('id', $value_id);
+		$this->builder->update([
+			'display_name' => $display_name,
+			'show_in_interface' => $show_in_interface,
+			'include_in_interface_index' => $include_in_interface_index
+		]);
+	}
+
 	public function getValueIdByNameAndAttributeId(string $name, int $attribute_id): int
 	{
 		$value_id = -1;
