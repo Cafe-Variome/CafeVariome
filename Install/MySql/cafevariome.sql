@@ -259,7 +259,7 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 --
 
 CREATE TABLE `sources` (
-  `source_id` int(11) UNSIGNED NOT NULL,
+  `source_id` int(11) NOT NULL,
   `owner_name` mediumtext NOT NULL,
   `email` mediumtext NOT NULL,
   `name` varchar(30) NOT NULL,
@@ -637,7 +637,7 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `sources`
 --
 ALTER TABLE `sources`
-  MODIFY `source_id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `source_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `uploaddatastatus`
