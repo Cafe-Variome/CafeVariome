@@ -19,6 +19,13 @@ class Value extends CVUI_Controller
 	private $valueModel;
 
 	/**
+	 * Validation list template.
+	 *
+	 * @var string
+	 */
+	protected $validationListTemplate = 'list';
+
+	/**
 	 * Constructor
 	 *
 	 */
