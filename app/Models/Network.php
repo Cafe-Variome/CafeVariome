@@ -395,14 +395,19 @@ class Network extends Model{
 	 * @param int $source_id
 	 * @param int $group_id
 	 * @param string $installation_key
-	 * 
+	 *
 	 * @author Mehdi Mehtarizadeh
 	 */
-	function addSourceToNetworkGroup(int $source_id, int $group_id, string $installation_key) {
-		$networkGroupModel = new NetworkGroup($this->db);
-		$network_key = $networkGroupModel->getNetworkGroups("network_key", ['id' => $group_id]);
+	public function addSourceToNetworkGroup(int $source_id, int $group_id, int $network_key, ?string $installation_key = null)
+	{
+		$installation_key ?? $installation_key = $this->setting->settingData['installation_key'];
 		$this->builder = $this->db->table('network_groups_sources');
-		$this->builder->insert(array('source_id' => $source_id, 'group_id' => $group_id, 'installation_key' => $installation_key, 'network_key' => $network_key[0]['network_key']));
+		$this->builder->insert([
+			'source_id' => $source_id,
+			'group_id' => $group_id,
+			'installation_key' => $installation_key,
+			'network_key' => $network_key
+		]);
 	}
 
 	/**
