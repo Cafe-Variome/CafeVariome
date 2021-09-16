@@ -107,7 +107,6 @@ class Attribute extends CVUI_Controller
 			try {
 				$this->attributeModel->updateAttribute($attribute_id, $display_name, $show_in_interface, $include_in_interface_index);
 				$this->setStatusMessage("Attribute '$name' was updated.", STATUS_SUCCESS);
-
 			}
 			catch (\Exception $ex) {
 				$this->setStatusMessage("There was a problem updating '$name'.", STATUS_ERROR);
