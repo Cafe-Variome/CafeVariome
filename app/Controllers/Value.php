@@ -16,6 +16,7 @@ class Value extends CVUI_Controller
 {
 	private $validation;
 	private $attributeModel;
+	private $sourceModel;
 	private $valueModel;
 
 	/**
@@ -37,6 +38,7 @@ class Value extends CVUI_Controller
 
 		$this->validation = Services::validation();
 		$this->attributeModel = new \App\Models\Attribute();
+		$this->sourceModel = new \App\Models\Source();
 		$this->valueModel = new \App\Models\Value();
 	}
 
