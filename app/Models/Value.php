@@ -24,7 +24,7 @@ class Value extends Model
 	}
 
 	public function createValue(string $name, int $attribute_id, string $display_name = '', int $frequency = 0,
-								bool $show_in_interface = true, bool $include_in_interface_index = false): int
+								bool $show_in_interface = true, bool $include_in_interface_index = true): int
 	{
 		$this->builder->insert([
 			'name' => $name,
