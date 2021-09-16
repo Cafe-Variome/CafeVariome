@@ -19,6 +19,13 @@ class Attribute extends CVUI_Controller
 	private $attributeModel;
 
 	/**
+	 * Validation list template.
+	 *
+	 * @var string
+	 */
+	protected $validationListTemplate = 'list';
+
+	/**
 	 * Constructor
 	 *
 	 */
