@@ -68,7 +68,7 @@ class Value extends Model
 		$result = $this->builder->get()->getResultArray();
 
 		if (count($result) == 1) {
-			$value_id = $result[0]['id'];;
+			$value_id = $result[0]['id'];
 		}
 
 		return $value_id;
