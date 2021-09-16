@@ -133,7 +133,7 @@ class Source extends CVUI_Controller{
             ],
             'desc' => [
                 'label'  => 'Source Description',
-                'rules'  => 'required',
+                'rules'  => 'required|alpha_numeric_space',
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
@@ -362,7 +362,7 @@ class Source extends CVUI_Controller{
             ],
             'desc' => [
                 'label'  => 'Source Description',
-                'rules'  => 'required',
+                'rules'  => 'required|alpha_numeric_space',
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
