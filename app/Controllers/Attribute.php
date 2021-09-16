@@ -74,4 +74,86 @@ class Attribute extends CVUI_Controller
 		return view($this->viewDirectory.'/List', $data);
 	}
 
+	public function Update(int $attribute_id)
+	{
+		$uidata = new UIData();
+		$uidata->title = 'Edit Attribute';
+
+		$attribute = $this->attributeModel->getAttributeById($attribute_id);
+		if ($attribute == null || $attribute_id <= 0){
+			return redirect()->to(base_url('Source'));
+		}
+
+		$uidata->data['attribute_id'] = $attribute['id'];
+		$source_id = $attribute['source_id'];
+		$uidata->data['source_id'] = $source_id;
+
+		$this->validation->setRules([
+			'display_name' => [
+				'label'  => 'Display Name',
+				'rules'  => 'required|alpha_numeric_space',
+				'errors' => [
+					'required' => '{field} is required.'
+				]
+			]
+		]);
+
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+			$name = $this->request->getVar('name');
+			$display_name = $this->request->getVar('display_name');
+			$show_in_interface = ($this->request->getVar('show_in_interface') != null) ? true :  false;
+			$include_in_interface_index = ($this->request->getVar('include_in_interface_index') != null) ? true :  false;
+
+			try {
+				$this->attributeModel->updateAttribute($attribute_id, $display_name, $show_in_interface, $include_in_interface_index);
+				$this->setStatusMessage("Attribute '$name' was updated.", STATUS_SUCCESS);
+
+			}
+			catch (\Exception $ex) {
+				$this->setStatusMessage("There was a problem updating '$name'.", STATUS_ERROR);
+			}
+			return redirect()->to(base_url($this->controllerName.'/List/' . $source_id));
+
+		}
+		else{
+			$uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+
+			$uidata->data['name'] = array(
+				'name' => 'name',
+				'id' => 'name',
+				'type' => 'text',
+				'class' => 'form-control',
+				'readonly' => 'true', // Don't allow the user to edit the attribute name
+				'value' => set_value('name', $attribute['name']),
+			);
+
+			$uidata->data['display_name'] = array(
+				'name' => 'display_name',
+				'id' => 'display_name',
+				'type' => 'text',
+				'class' => 'form-control',
+				'value' => set_value('name', $attribute['display_name']),
+			);
+
+			$uidata->data['show_in_interface'] = array(
+				'name' => 'show_in_interface',
+				'id' => 'show_in_interface',
+				'class' => 'custom-control-input',
+				'value' => set_value('show_in_interface', $attribute['show_in_interface']),
+				'checked' => $attribute['show_in_interface'] ? true : false
+			);
+
+			$uidata->data['include_in_interface_index'] = array(
+				'name' => 'include_in_interface_index',
+				'id' => 'include_in_interface_index',
+				'class' => 'custom-control-input',
+				'value' => set_value('include_in_interface_index', $attribute['include_in_interface_index']),
+				'checked' => $attribute['include_in_interface_index'] ? true : false
+			);
+
+			$data = $this->wrapData($uidata);
+			return view($this->viewDirectory.'/Update', $data);
+		}
+	}
+
 }
