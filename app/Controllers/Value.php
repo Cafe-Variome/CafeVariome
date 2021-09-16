@@ -148,6 +148,27 @@ class Value extends CVUI_Controller
 			$data = $this->wrapData($uidata);
 			return view($this->viewDirectory.'/Update', $data);
 		}
+	}
 
+	public function Details(int $value_id)
+	{
+		$value = $this->valueModel->getValueById($value_id);
+		if ($value == null || $value <= 0){
+			return redirect()->to(base_url('Source'));
+		}
+
+		$uidata = new UIData();
+		$uidata->title = 'Attribute Details';
+		$uidata->data['value_id'] = $value['id'];
+		$attribute_id = $value['attribute_id'];
+		$uidata->data['attribute_id'] = $attribute_id;
+		$uidata->data['attribute_name'] = $this->attributeModel->getAttributeNameById($attribute_id);
+		$uidata->data['name'] = $value['name'];
+		$uidata->data['display_name'] = $value['display_name'];
+		$uidata->data['show_in_interface'] = $value['show_in_interface'];
+		$uidata->data['include_in_interface_index'] = $value['include_in_interface_index'];
+
+		$data = $this->wrapData($uidata);
+		return view($this->viewDirectory.'/Details', $data);
 	}
 }
