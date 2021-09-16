@@ -68,6 +68,19 @@ class Attribute extends Model
 		return $this->builder->get()->getResultArray();
 	}
 
+	public function getAttributeById(int $attribute_id)
+	{
+		$this->builder->select();
+		$this->builder->where('id', $attribute_id);
+		$result = $this->builder->get()->getResultArray();
+
+		if (count($result) == 1){
+			return $result[0];
+		}
+
+		return null;
+	}
+
 	public function getAttributesBySourceId(int $source_id): array
 	{
 		$this->builder->where('source_id', $source_id);
