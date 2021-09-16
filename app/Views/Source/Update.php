@@ -97,4 +97,5 @@
 		</a>
 	</div>
 </div>
+<?= form_close() ?>
 <?= $this->endSection() ?>
