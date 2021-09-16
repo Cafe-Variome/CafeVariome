@@ -135,7 +135,7 @@ class Value extends Model
 
 	public function getValuesByAttributeId(int $attribute_id): array
 	{
-		$this->builder->select('name, display_name, frequency');
+		$this->builder->select('id, name, display_name, frequency');
 		$this->builder->where('attribute_id', $attribute_id);
 
 		return $this->builder->get()->getResultArray();
