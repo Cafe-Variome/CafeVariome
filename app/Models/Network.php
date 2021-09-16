@@ -328,36 +328,13 @@ class Network extends Model{
 		$this->builder->delete();
 	}
 
-	function addSourceFromInstallationToNetworkGroup($data) {
-		$this->builder = $this->db->table('network_groups_sources');
-		$this->builder->insert($data);
-		$insert_id = $this->db->insertID();
-		return $insert_id;
-	}
-
-	function addSourceFromInstallationToMultipleNetworkGroups($source_id,$groups_exploded) {
-		$installation_key = $this->setting->settingData['installation_key'];
-		
-		$return_flag = 1;
+	public function addSourceFromInstallationToMultipleNetworkGroups(int $source_id, array $groups_exploded)
+	{
 		foreach ( $groups_exploded as $group_data ) {
 			$groups_exploded = explode(',', $group_data);
 			$group_id = $groups_exploded[0];
-			$network_key = $groups_exploded[1];		
-			$data = array ( 'group_id' => $group_id,
-							'source_id' => $source_id,
-							'installation_key' => $installation_key,
-							'network_key' => $network_key,
-						);
-			$id = $this->addSourceFromInstallationToNetworkGroup($data);
-			if (!$id) {
-				$return_flag = 0;
-			}
-		}
-		if ($return_flag) {
-			return $return_flag;
-		}
-		else {
-			return array("error" => "Could not add source to all (or any) network groups");
+			$network_key = $groups_exploded[1];
+			$this->addSourceToNetworkGroup($source_id, $group_id, $network_key);
 		}
 	}
 
