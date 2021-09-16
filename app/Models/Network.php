@@ -364,26 +364,18 @@ class Network extends Model{
 		}
 	}
 
-	function modify_current_network_groups_for_source_in_installation($source_id,$group_post_data) {
-		$installation_key = $this->setting->settingData['installation_key'];
+	public function updateNetworkGroupsBySourceId(int $source_id, string $group_post_data = "")
+	{
 		$this->deleteSourceFromNetworkGroups($source_id);
-		if($group_post_data) {
+		if($group_post_data != "") {
 			foreach ( explode('|', $group_post_data) as $group ) {
-
 				$group_exploded = explode(',', $group);
 				$group_id = $group_exploded[0];
 				$network_key = $group_exploded[1];
 
-				$data = array ( 
-						'group_id' => $group_id,
-						'source_id' => $source_id,
-						'installation_key' => $installation_key,
-						'network_key' => $network_key,
-					);
-
-					$id = $this->addSourceFromInstallationToNetworkGroup($data);
+				$this->addSourceToNetworkGroup($source_id, $group_id, $network_key);
 			}
-		} 
+		}
 	}
 
 	function getAllNetworksSourcesBySourceId(int $source_id) {
