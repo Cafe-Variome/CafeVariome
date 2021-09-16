@@ -109,4 +109,12 @@ class Value extends Model
 		$this->builder->where('frequency', 0); // Frequency = 0 indicates a value is absent and is no more needed.
 		$this->builder->delete();
 	}
+
+	public function getValuesByAttributeId(int $attribute_id): array
+	{
+		$this->builder->select('name, display_name, frequency');
+		$this->builder->where('attribute_id', $attribute_id);
+
+		return $this->builder->get()->getResultArray();
+	}
 }
