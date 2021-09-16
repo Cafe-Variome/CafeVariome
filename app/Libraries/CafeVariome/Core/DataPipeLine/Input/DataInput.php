@@ -229,7 +229,7 @@ abstract class DataInput
 
 		foreach ($this->attributes as $attribute => $attribute_details){
 			foreach ($this->attributes[$attribute]['values'] as $value => $value_details){
-				$this->valueModel->updateFrequencyByName($value, $this->attributes[$attribute]['values'][$value]['frequency']);
+				$this->valueModel->updateFrequencyByNameAndAttributeId($value, $this->attributes[$attribute]['id'], $this->attributes[$attribute]['values'][$value]['frequency']);
 			}
 		}
 
