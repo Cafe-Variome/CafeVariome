@@ -151,7 +151,7 @@ abstract class DataInput
 	{
 		$value_id = $this->valueModel->getValueIdByNameAndAttributeId($value, $attribute_id);
 		if ($value_id == -1){
-			$value_id = $this->valueModel->createValue($value, $attribute_id);
+			$value_id = $this->valueModel->createValue($value, $attribute_id, $value);
 		}
 
 		return $value_id;
