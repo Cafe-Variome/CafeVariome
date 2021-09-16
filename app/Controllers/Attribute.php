@@ -156,4 +156,27 @@ class Attribute extends CVUI_Controller
 		}
 	}
 
+	public function Details(int $attribute_id)
+	{
+		$attribute = $this->attributeModel->getAttributeById($attribute_id);
+		if ($attribute == null || $attribute_id <= 0){
+			return redirect()->to(base_url('Source'));
+		}
+
+		$uidata = new UIData();
+		$uidata->title = 'Attribute Details';
+		$uidata->data['attribute_id'] = $attribute['id'];
+		$source_id = $attribute['source_id'];
+		$uidata->data['source_id'] = $source_id;
+		$uidata->data['source_name'] = $this->sourceModel->getSourceNameById($source_id);
+		$uidata->data['name'] = $attribute['name'];
+		$uidata->data['display_name'] = $attribute['display_name'];
+		$uidata->data['type'] = AttributeHelper::getAttributeType($attribute['type']);
+		$uidata->data['storage_location'] = AttributeHelper::getAttributeStorageLocation($attribute['storage_location']);
+		$uidata->data['show_in_interface'] = $attribute['show_in_interface'];
+		$uidata->data['include_in_interface_index'] = $attribute['include_in_interface_index'];
+
+		$data = $this->wrapData($uidata);
+		return view($this->viewDirectory.'/Details', $data);
+	}
 }
