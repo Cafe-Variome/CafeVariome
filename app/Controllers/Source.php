@@ -309,7 +309,7 @@ class Source extends CVUI_Controller{
         }
     }
 
-    public function Update(int $source_id = NULL) {
+    public function Update(int $source_id = null) {
 
         $uidata = new UIData();
         $uidata->stickyFooter = false;
@@ -345,6 +345,13 @@ class Source extends CVUI_Controller{
                     'required' => '{field} is required.'
                 ]
             ],
+			'owner_name' => [
+				'label'  => 'Owner Name',
+				'rules'  => 'required|alpha_numeric_space',
+				'errors' => [
+					'required' => '{field} is required.'
+				]
+			],
             'email' => [
                 'label'  => 'Owner Email',
                 'rules'  => 'valid_email|required',
@@ -395,14 +402,14 @@ class Source extends CVUI_Controller{
         ]
         );
 
-
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             //check to see if we are creating the user
             //redirect them back to the admin page
             $source_name = $this->request->getVar('name');
             $update_data['source_id'] = $this->request->getVar('source_id');
             $update_data['name'] = $source_name;
-            $update_data['email'] = $this->request->getVar('email');
+			$update_data['owner_name'] = $this->request->getVar('owner_name');
+			$update_data['email'] = $this->request->getVar('email');
             $update_data['uri'] = $this->request->getVar('uri');
             $update_data['description'] = $this->request->getVar('desc');
             $update_data['long_description'] = $this->request->getVar('long_description');
@@ -442,8 +449,9 @@ class Source extends CVUI_Controller{
 
             return redirect()->to(base_url($this->controllerName.'/List'));
 
-        } else {
-
+        }
+		else
+		{
             // Get all the network groups that this source from this installation is currently in so that these can be pre selected in the multiselect list
             $networkGroups = $networkModel->getCurrentNetworkGroupsForSourceInInstallation($source_id);
             $selected_source_display = [];
@@ -464,7 +472,7 @@ class Source extends CVUI_Controller{
             // Get all the data for this source
             $source_data = $this->sourceModel->getSource($source_id);
 
-            if ($source_data != Null) {
+            if ($source_data != null) {
                 $uidata->data['source_data'] = $source_data;
                 $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
                 $uidata->data['name'] = array(
