@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($statusMessage): ?>
@@ -33,7 +33,7 @@
 			<td>
 			<?php if($pipeline['subject_id_location'] == '0'): ?>
 				Attribute in File
-			<?php elseif($pipeline['subject_id_location'] == '1'): ?> 
+			<?php elseif($pipeline['subject_id_location'] == '1'): ?>
 				File Name
 			<?php endif; ?>
 			</td>
@@ -41,7 +41,7 @@
 			<td>
 			<?php if($pipeline['grouping'] == '0'): ?>
 				Group Individually
-			<?php elseif($pipeline['grouping'] == '1'): ?> 
+			<?php elseif($pipeline['grouping'] == '1'): ?>
 				Custom
 			<?php endif; ?>
 			</td>
@@ -50,13 +50,13 @@
 					<i class="fa fa-edit text-warning"></i>
 				</a>
 				<a href="<?php echo base_url($controllerName. '/Details'). "/" . $pipeline['id']; ?>" data-toggle="tooltip" data-placement="top" title="View Pipeline">
-					<i class="fa fa-list text-info"></i>
+					<i class="fa fa-eye text-info"></i>
 				</a>
 				<a href="<?php echo base_url($controllerName. '/Delete'). "/" . $pipeline['id']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Pipeline">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 			</td>
-		</tr>		
+		</tr>
 		<?php endforeach; ?>
 	</tbody>
 </table>
