@@ -315,19 +315,16 @@ class Network extends Model{
 		}
 	}	
 
-	function deleteSourceFromNetworkGroups(int $source_id, bool $delete_master = false) {
-
+	public function deleteSourceFromNetworkGroups(int $source_id, bool $delete_master = false)
+	{
 		$masterNetworkGroupIds = $this->networkGroupModel->getMasterNetworkGroupsBySourceId($source_id);
-		
+
 		$this->builder = $this->db->table('network_groups_sources');
 
-		if (!$delete_master) {
+		if (!$delete_master && count($masterNetworkGroupIds) > 0) {
 			$this->builder->whereNotIn('group_id', $masterNetworkGroupIds);
-
 		}
-
 		$this->builder->where('source_id', $source_id);
-
 		$this->builder->delete();
 	}
 
