@@ -37,6 +37,19 @@ class Value extends Model
 		return $this->db->insertID();
 	}
 
+	public function getValueById(int $value_id)
+	{
+		$this->builder->select();
+		$this->builder->where('id', $value_id);
+		$result = $this->builder->get()->getResultArray();
+
+		if (count($result) == 1) {
+			return $result[0];
+		}
+
+		return null;
+	}
+
 	public function getValueIdByNameAndAttributeId(string $name, int $attribute_id): int
 	{
 		$value_id = -1;
