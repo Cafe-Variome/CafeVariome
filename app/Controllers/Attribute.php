@@ -44,7 +44,7 @@ class Attribute extends CVUI_Controller
 
 		$source_name = $this->sourceModel->getSourceNameByID($source_id);
 
-		if ($source_name == null && $source_id <= 0){
+		if ($source_name == null || $source_id <= 0){
 			return redirect()->to(base_url('Source'));
 		}
 

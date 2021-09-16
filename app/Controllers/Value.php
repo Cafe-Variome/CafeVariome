@@ -45,7 +45,7 @@ class Value extends CVUI_Controller
 
 		$attribute_name = $this->attributeModel->getAttributeNameById($attribute_id);
 
-		if ($attribute_name == null && $attribute_id <= 0){
+		if ($attribute_name == null || $attribute_id <= 0){
 			return redirect()->to(base_url('Source'));
 		}
 		$values = $this->valueModel->getValuesByAttributeId($attribute_id);
