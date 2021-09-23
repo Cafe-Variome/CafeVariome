@@ -261,7 +261,7 @@ abstract class DataInput
 		foreach ($this->attributes as $attribute => $attribute_details){
 			$attribute_type = $this->attributeModel->getAttributeTypeByName($attribute);
 			if ($attribute_type == ATRRIBUTE_TYPE_STRING) continue; // If attribute has already values that are string, then skip and go to the next value.
-			$assumed_type = ATRRIBUTE_TYPE_NUMERIC_NATURAL;
+			$assumed_type = count($this->attributes[$attribute]['values']) > 0 ? ATRRIBUTE_TYPE_NUMERIC_NATURAL : $attribute_type;
 
 			$c = 0;
 			foreach ($this->attributes[$attribute]['values'] as $value => $value_details){
