@@ -142,4 +142,24 @@ class Attribute extends Model
 
 		return -1;
 	}
+
+	public function getAttributeTypeByName(string $name): int
+	{
+		$this->builder->select('type');
+		$this->builder->where('name', $name);
+
+		$result = $this->builder->get()->getResultArray();
+
+		if (count($result) == 1){
+			return $result[0]['type'];
+		}
+
+		return -1;
+	}
+
+	public function setAttributeTypeByName(string $name, int $type)
+	{
+		$this->builder->where('name', $name);
+		$this->builder->update(['type' => $type]);
+	}
 }
