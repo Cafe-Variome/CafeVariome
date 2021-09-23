@@ -171,6 +171,12 @@ class Attribute extends CVUI_Controller
 		$uidata->data['name'] = $attribute['name'];
 		$uidata->data['display_name'] = $attribute['display_name'];
 		$uidata->data['type'] = AttributeHelper::getAttributeType($attribute['type']);
+		$uidata->data['minimum'] = null;
+		$uidata->data['maximum'] = null;
+		if ($attribute['type'] == ATRRIBUTE_TYPE_NUMERIC_REAL || $attribute['type'] == ATRRIBUTE_TYPE_NUMERIC_INTEGER || $attribute['type'] == ATRRIBUTE_TYPE_NUMERIC_NATURAL){
+			$uidata->data['minimum'] = $attribute['min'];
+			$uidata->data['maximum'] = $attribute['max'];
+		}
 		$uidata->data['storage_location'] = AttributeHelper::getAttributeStorageLocation($attribute['storage_location']);
 		$uidata->data['show_in_interface'] = $attribute['show_in_interface'];
 		$uidata->data['include_in_interface_index'] = $attribute['include_in_interface_index'];

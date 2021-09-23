@@ -22,6 +22,16 @@
 				<th>Type</th>
 				<td><?= $type ?></td>
 			</tr>
+			<?php if($minimum != null && $maximum != null): ?>
+				<tr>
+					<th>Minumum</th>
+					<td><?= $minimum ?></td>
+				</tr>
+				<tr>
+					<th>Maximum</th>
+					<td><?= $maximum ?></td>
+				</tr>
+			<?php endif; ?>
 			<tr>
 				<th>Storage Location</th>
 				<td><?= $storage_location ?></td>
