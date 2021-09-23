@@ -160,7 +160,7 @@ abstract class DataInput
 	protected function sanitiseString(string $dirty_string, string $soap = ''): string
 	{
 		$malicious_chars = ['\\', chr(39), chr(34), '/', '’', '<', '>', '&', ';'];
-		return str_replace($malicious_chars, $soap, $dirty_string);
+		return htmlentities(str_replace($malicious_chars, $soap, $dirty_string));
 	}
 
 	protected function getAttributeIdByName(string $attribute): int
@@ -255,4 +255,48 @@ abstract class DataInput
 		}
 		$db->transComplete();
 	}
+
+	protected function determineAttributesType()
+	{
+		foreach ($this->attributes as $attribute => $attribute_details){
+			$attribute_type = $this->attributeModel->getAttributeTypeByName($attribute);
+			if ($attribute_type == ATRRIBUTE_TYPE_STRING) continue; // If attribute has already values that are string, then skip and go to the next value.
+			$assumed_type = ATRRIBUTE_TYPE_NUMERIC_NATURAL;
+
+			$c = 0;
+			foreach ($this->attributes[$attribute]['values'] as $value => $value_details){
+				if ($c == 0){
+					//preset minimum and maximum
+					$minimum_value = $value;
+					$maximum_value = $value;
+				}
+
+				if ($value == intval($value)) $value = intval($value);
+				else if ($value == floatval($value)) $value = floatval($value);
+
+				if (is_numeric($value)){
+					if (is_integer($value) && $value < 0){
+						$assumed_type = ATRRIBUTE_TYPE_NUMERIC_INTEGER;
+					}
+					elseif (is_float($value)){
+						$assumed_type = ATRRIBUTE_TYPE_NUMERIC_REAL;
+					}
+					if ($value > $maximum_value) $maximum_value = $value;
+					if ($value < $minimum_value) $minimum_value = $value;
+				}
+				elseif (is_string($value)){
+					$assumed_type = ATRRIBUTE_TYPE_STRING;
+					$minimum_value = null;
+					$maximum_value = null;
+					break;
+				}
+				$c++;
+			}
+			$this->attributeModel->setAttributeTypeByName($attribute, $assumed_type);
+			if (is_numeric($minimum_value) && is_numeric($maximum_value)){
+				$this->attributeModel->setAttributeMinimumAndMaximumByName($attribute, $minimum_value, $maximum_value);
+			}
+		}
+	}
+
 }
