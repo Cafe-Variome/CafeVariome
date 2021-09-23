@@ -264,6 +264,13 @@ abstract class DataInput
 			$assumed_type = count($this->attributes[$attribute]['values']) > 0 ? ATRRIBUTE_TYPE_NUMERIC_NATURAL : $attribute_type;
 
 			$c = 0;
+			$minMaxArray = $this->attributeModel->getAttributeMinimumAndMaximumByName($attribute);
+			if (count($minMaxArray) == 2){
+				$minimum_value = $minMaxArray[0];
+				$maximum_value = $minMaxArray[1];
+				$c++; // to skip the initialization in the below loop
+			}
+
 			foreach ($this->attributes[$attribute]['values'] as $value => $value_details){
 				if ($c == 0){
 					//preset minimum and maximum
