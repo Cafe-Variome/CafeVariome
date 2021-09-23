@@ -15,12 +15,14 @@ class AttributeHelper
 		switch ($type){
 			case ATRRIBUTE_TYPE_UNDEFINED:
 				return 'Undefined';
-			case ATRRIBUTE_TYPE_NUMERIC:
-				return 'Numeric';
-			case ATRRIBUTE_TYPE_ALPHANUMERIC:
-				return 'Alpha-numeric';
-			case ATRRIBUTE_TYPE_ALPHABETIC:
-				return 'Alphabrtic';
+			case ATRRIBUTE_TYPE_STRING:
+				return 'String';
+			case ATRRIBUTE_TYPE_NUMERIC_REAL:
+				return 'Real Number';
+			case ATRRIBUTE_TYPE_NUMERIC_INTEGER:
+				return 'Integer';
+			case ATRRIBUTE_TYPE_NUMERIC_NATURAL:
+				return 'Natural Number';
 		}
 		return 'Undefined';
 	}
