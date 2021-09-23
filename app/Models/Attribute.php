@@ -162,4 +162,27 @@ class Attribute extends Model
 		$this->builder->where('name', $name);
 		$this->builder->update(['type' => $type]);
 	}
+
+	public function getAttributeMinimumAndMaximumByName(string $name): array
+	{
+		$this->builder->select('min, max');
+		$this->builder->where('name', $name);
+
+		$result = $this->builder->get()->getResultArray();
+
+		if (count($result) == 1){
+			return [$result[0]['min'], $result[0]['max']];
+		}
+
+		return [];
+	}
+
+	public function setAttributeMinimumAndMaximumByName(string $name, float $minimum, float $maximum)
+	{
+		$this->builder->where('name', $name);
+		$this->builder->update([
+			'min' => $minimum,
+			'max' => $maximum
+		]);
+	}
 }
