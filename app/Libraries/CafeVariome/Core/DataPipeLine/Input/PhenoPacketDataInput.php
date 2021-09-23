@@ -152,6 +152,9 @@ class PhenoPacketDataInput extends DataInput
 
 		//Update value frequencies
 		$this->updateValueFrequencies();
+
+		//Set attributes types, minimum, and maximum values if applicable
+		$this->determineAttributesType();
     }
 
     /**

@@ -136,6 +136,9 @@ class SpreadsheetDataInput extends DataInput
 		//Update value frequencies
 		$this->updateValueFrequencies();
 
+		//Set attributes types, minimum, and maximum values if applicable
+		$this->determineAttributesType();
+
     }
 
 	private function processRow($row, $attgroups, $subject_id, $file_id, & $counter)
