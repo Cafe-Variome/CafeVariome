@@ -166,30 +166,6 @@ class Pipeline extends CVUI_Controller
                     'max_length' => 'Maximum length is 200 digits.'
                 ]
             ],
-            'hpo_attribute_name' => [
-                'label' => 'HPO Attribute Name',
-                'rules' => 'permit_empty|alpha_dash|max_length[100]',
-                'errors' => [
-                    'alpha_dash' => 'The only valid input for {field} is alphanumeric characters, dashes, and underscores.',
-                    'max_length' => 'Maximum length is 100 characters.'
-                ]
-            ],
-            'negated_hpo_attribute_name' => [
-                'label' => 'Negated HPO Attribute Name',
-                'rules' => 'permit_empty|alpha_dash|max_length[100]',
-                'errors' => [
-                    'alpha_dash' => 'The only valid input for {field} is alphanumeric characters, dashes, and underscores.',
-                    'max_length' => 'Maximum length is 100 characters.'
-                ]
-            ],
-            'orpha_attribute_name' => [
-                'label' => 'ORPHA Attribute Name',
-                'rules' => 'permit_empty|alpha_dash|max_length[100]',
-                'errors' => [
-                    'alpha_dash' => 'The only valid input for {field} is alphanumeric characters, dashes, and underscores.',
-                    'max_length' => 'Maximum length is 100 characters.'
-                ]
-            ],
             'internal_delimiter' => [
                 'label' => 'Internal Delimiter',
                 'rules' => 'permit_empty|valid_delimiter[' . $this->request->getVar('internal_delimiter') . ']|max_length[1]',
@@ -209,9 +185,6 @@ class Pipeline extends CVUI_Controller
                 $subject_id_attribute_name = $this->request->getVar('subject_id_attribute_name');
                 $grouping = $this->request->getVar('grouping');
                 $group_columns = $this->request->getVar('group_columns');
-                $hpo_attribute_name = $this->request->getVar('hpo_attribute_name');
-                $negated_hpo_attribute_name =$this->request->getVar('negated_hpo_attribute_name');
-                $orpha_attribute_name = $this->request->getVar('orpha_attribute_name');
                 $internal_delimiter = $this->request->getVar('internal_delimiter');
 
                 $pipelineModel = new \App\Models\Pipeline();
@@ -222,9 +195,6 @@ class Pipeline extends CVUI_Controller
                     'subject_id_attribute_name' => $subject_id_attribute_name,
                     'grouping' => $grouping,
                     'group_columns' => $group_columns,
-                    'hpo_attribute_name' => $hpo_attribute_name,
-                    'negated_hpo_attribute_name' => $negated_hpo_attribute_name,
-                    'orpha_attribute_name' => $orpha_attribute_name,
                     'internal_delimiter' => $internal_delimiter
                 ];
 
@@ -280,30 +250,6 @@ class Pipeline extends CVUI_Controller
                 'type' => 'text',
                 'class' => 'form-control',
                 'value' =>set_value('group_columns'),
-            );
-            
-            $uidata->data['hpo_attribute_name'] = array(
-                'name' => 'hpo_attribute_name',
-                'id' => 'hpo_attribute_name',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' =>set_value('hpo_attribute_name'),
-            );
-
-            $uidata->data['negated_hpo_attribute_name'] = array(
-                'name' => 'negated_hpo_attribute_name',
-                'id' => 'negated_hpo_attribute_name',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' =>set_value('negated_hpo_attribute_name'),
-            );
-            
-            $uidata->data['orpha_attribute_name'] = array(
-                'name' => 'orpha_attribute_name',
-                'id' => 'orpha_attribute_name',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' =>set_value('orpha_attribute_name'),
             );
 
             $uidata->data['internal_delimiter'] = array(
@@ -394,30 +340,6 @@ class Pipeline extends CVUI_Controller
                     'max_length' => 'Maximum length is 200 digits.'
                 ]
             ],
-            'hpo_attribute_name' => [
-                'label' => 'HPO Attribute Name',
-                'rules' => 'permit_empty|alpha_dash|max_length[100]',
-                'errors' => [
-                    'alpha_dash' => 'The only valid input for {field} is alphanumeric characters, dashes, and underscores.',
-                    'max_length' => 'Maximum length is 100 characters.'
-                ]
-            ],
-            'negated_hpo_attribute_name' => [
-                'label' => 'Negated HPO Attribute Name',
-                'rules' => 'permit_empty|alpha_dash|max_length[100]',
-                'errors' => [
-                    'alpha_dash' => 'The only valid input for {field} is alphanumeric characters, dashes, and underscores.',
-                    'max_length' => 'Maximum length is 100 characters.'
-                ]
-            ],
-            'orpha_attribute_name' => [
-                'label' => 'ORPHA Attribute Name',
-                'rules' => 'permit_empty|alpha_dash|max_length[100]',
-                'errors' => [
-                    'alpha_dash' => 'The only valid input for {field} is alphanumeric characters, dashes, and underscores.',
-                    'max_length' => 'Maximum length is 100 characters.'
-                ]
-            ],
             'internal_delimiter' => [
                 'label' => 'Internal Delimiter',
                 'rules' => 'permit_empty|valid_delimiter[' . $this->request->getVar('internal_delimiter') . ']|max_length[1]',
@@ -437,9 +359,6 @@ class Pipeline extends CVUI_Controller
                 $subject_id_attribute_name = $this->request->getVar('subject_id_attribute_name');
                 $grouping = $this->request->getVar('grouping');
                 $group_columns = $this->request->getVar('group_columns');
-                $hpo_attribute_name = $this->request->getVar('hpo_attribute_name');
-                $negated_hpo_attribute_name =$this->request->getVar('negated_hpo_attribute_name');
-                $orpha_attribute_name = $this->request->getVar('orpha_attribute_name');
                 $internal_delimiter = $this->request->getVar('internal_delimiter');
 
                 $data = [
@@ -448,9 +367,6 @@ class Pipeline extends CVUI_Controller
                     'subject_id_attribute_name' => $subject_id_attribute_name,
                     'grouping' => $grouping,
                     'group_columns' => $group_columns,
-                    'hpo_attribute_name' => $hpo_attribute_name,
-                    'negated_hpo_attribute_name' => $negated_hpo_attribute_name,
-                    'orpha_attribute_name' => $orpha_attribute_name,
                     'internal_delimiter' => $internal_delimiter
                 ];
 
@@ -517,30 +433,6 @@ class Pipeline extends CVUI_Controller
                 'type' => 'text',
                 'class' => 'form-control',
                 'value' =>set_value('group_columns',  $pipeline['group_columns']),
-            );
-            
-            $uidata->data['hpo_attribute_name'] = array(
-                'name' => 'hpo_attribute_name',
-                'id' => 'hpo_attribute_name',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' =>set_value('hpo_attribute_name', $pipeline['hpo_attribute_name']),
-            );
-
-            $uidata->data['negated_hpo_attribute_name'] = array(
-                'name' => 'negated_hpo_attribute_name',
-                'id' => 'negated_hpo_attribute_name',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' =>set_value('negated_hpo_attribute_name', $pipeline['negated_hpo_attribute_name']),
-            );
-            
-            $uidata->data['orpha_attribute_name'] = array(
-                'name' => 'orpha_attribute_name',
-                'id' => 'orpha_attribute_name',
-                'type' => 'text',
-                'class' => 'form-control',
-                'value' =>set_value('orpha_attribute_name', $pipeline['orpha_attribute_name']),
             );
 
             $uidata->data['internal_delimiter'] = array(

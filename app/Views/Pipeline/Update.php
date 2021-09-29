@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($statusMessage): ?>
@@ -52,23 +52,10 @@
 
 <div class="form-group row">
     <div class="col-6">
-        <?php echo form_label('HPO Attribute Name', 'hpo_attribute_name'); ?>
-        <?php echo form_input($hpo_attribute_name); ?>
+		<?php echo form_label('Internal Delimiter', 'internal_delimiter'); ?>
+		<?php echo form_input($internal_delimiter); ?>
     </div>
     <div class="col-6">
-        <?php echo form_label('Negated HPO Attribute Name', 'negated_hpo_attribute_name'); ?>
-        <?php echo form_input($negated_hpo_attribute_name); ?>
-    </div>
-</div>
-
-<div class="form-group row">
-    <div class="col-6">
-        <?php echo form_label('ORPHA Attribute Name', 'orpha_attribute_name'); ?>
-        <?php echo form_input($orpha_attribute_name); ?>
-    </div>
-    <div class="col-6">
-        <?php echo form_label('Internal Delimiter', 'internal_delimiter'); ?>
-        <?php echo form_input($internal_delimiter); ?>
     </div>
 </div>
 
