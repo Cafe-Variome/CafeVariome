@@ -2,17 +2,17 @@
 
 /**
  * Name: Pipeline.php
- * 
+ *
  * Created: 18/05/2021
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
 
-class Pipeline 
+class Pipeline
 {
     protected $db;
-    protected $table      = 'pipeline';
+    protected $table      = 'pipelines';
     protected $builder;
 
     protected $primaryKey = 'id';
@@ -48,7 +48,7 @@ class Pipeline
         }
 
         $query = $this->builder->get()->getResultArray();
-        return $query; 
+        return $query;
     }
 
     public function getPipeline(int $id)
