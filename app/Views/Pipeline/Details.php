@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($statusMessage): ?>
@@ -27,7 +27,7 @@
                 <th>Name</th>
                 <td><?= $pipeline['name'] ?></td>
             </tr>
-            </tr>
+            <tr>
                 <th>Subject ID Location</th>
                 <td>
                     <?php if($pipeline['subject_id_location'] == 0): ?>
@@ -84,12 +84,21 @@
                 </td>
             </tr>
         </table>
-        <hr />
-        <a href="<?php echo base_url($controllerName . '/Update') . "/" . $pipeline['id']; ?>" class="btn btn-warning">
-            <i class="fa fa-edit"></i>&nbsp;Edit</a>
-        <a href="<?php echo base_url($controllerName . '/List'); ?>" class="btn btn-secondary"><i class="fa fa-backward"></i> Go back</a>
-        <hr />
+
     </div>
 </div>
-
+<hr>
+<div class="row mb-5">
+	<div class="col">
+		<a href="<?= base_url($controllerName . '/List'); ?>" class="btn btn-secondary bg-gradient-secondary">
+			<i class="fa fa-grip-lines-vertical"></i> View Pipelines
+		</a>
+		<a href="<?= base_url($controllerName . '/Update') . "/" . $pipeline['id']; ?>" class="btn btn-warning bg-gradient-warning">
+			<i class="fa fa-edit"></i>&nbsp;Edit Pipeline
+		</a>
+		<a href="<?= base_url($controllerName . '/Delete') . "/" . $pipeline['id']; ?>" class="btn btn-danger bg-gradient-danger">
+			<i class="fa fa-trash"></i>&nbsp;Delete Pipeline
+		</a>
+	</div>
+</div>
 <?= $this->endSection() ?>

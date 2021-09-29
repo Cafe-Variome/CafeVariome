@@ -63,8 +63,8 @@
 
 <div class="row">
 	<div class="col">
-		<a href="<?php echo base_url($controllerName.'/Create') ?>" class="btn btn-primary bg-gradient-primary">
-			<i class="fa fa-file"></i>  Create Pipeline
+		<a href="<?= base_url($controllerName.'/Create') ?>" class="btn btn-success bg-gradient-success">
+			<i class="fa fa-plus"></i>  Create Pipeline
 		</a>
 	</div>
 </div>

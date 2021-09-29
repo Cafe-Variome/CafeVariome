@@ -60,8 +60,12 @@
 
 <div class="form-group row">
 	<div class="col">
-	<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">Create Pipeline</button>
-	<a href="<?php echo base_url($controllerName);?>" class="btn btn-secondary  bg-gradient-secondary" >Go back</a>	
+	<button type="submit" name="submit" class="btn btn-success bg-gradient-success">
+		<i class="fa fa-plus"></i> Create Pipeline
+	</button>
+	<a href="<?= base_url($controllerName);?>" class="btn btn-secondary bg-gradient-secondary" >
+		<i class="fa fa-grip-lines-vertical"></i> View Pipelines
+	</a>
 	</div>
 </div>
 

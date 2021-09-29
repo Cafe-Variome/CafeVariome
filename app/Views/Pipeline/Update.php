@@ -61,8 +61,12 @@
 
 <div class="form-group row">
 	<div class="col">
-	<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">Save Pipeline</button>
-	<a href="<?php echo base_url($controllerName);?>" class="btn btn-secondary  bg-gradient-secondary" >Go back</a>	
+		<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
+			<i class="fa fa-save" ></i> Save Changes
+		</button>
+		<a href="<?= base_url($controllerName . '/List'); ?>" class="btn btn-secondary bg-gradient-secondary">
+			<i class="fa fa-grip-lines-vertical"></i> View Pipelines
+		</a>
 	</div>
 </div>
 
