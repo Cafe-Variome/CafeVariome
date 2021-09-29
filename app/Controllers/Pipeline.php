@@ -65,15 +65,15 @@ class Pipeline extends CVUI_Controller
                     'required' => '{field} is required.'
                 ]
             ],
-            
+
             'pipeline_id' => [
-                'label'  => 'Page Id',
+                'label'  => 'Pipeline Id',
                 'rules'  => 'required|alpha_dash',
                 'errors' => [
                     'required' => '{field} is required.',
                     'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
-            ]            
+            ]
         ]);
 
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {      
