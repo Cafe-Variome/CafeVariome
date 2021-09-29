@@ -74,4 +74,18 @@ class Ontology extends Model
 		$this->builder->where('id', $id);
 		$this->builder->delete();
 	}
+
+	public function getOntologyNameById(int $id): ?string
+	{
+		$this->builder->select('name');
+		$this->builder->where('id', $id);
+
+		$result =  $this->builder->get()->getResultArray();
+
+		if (count($result) == 1){
+			return $result[0]['name'];
+		}
+
+		return null;
+	}
 }
