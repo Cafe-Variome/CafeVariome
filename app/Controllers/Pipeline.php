@@ -2,9 +2,9 @@
 
 /**
  * Name: Pipeline.php
- * 
+ *
  * Created: 15/05/2021
- * 
+ *
  * @author Mehdi Mehtarizadeh
  */
 
@@ -76,10 +76,10 @@ class Pipeline extends CVUI_Controller
             ]
         ]);
 
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {      
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             $pipeline_id = $this->request->getVar('pipeline_id');
             $confirm = $this->request->getVar('confirm');
-            if ($confirm == 'yes') {         
+            if ($confirm == 'yes') {
                 try {
                     $pipeline = $pipelineModel->getPipeline($pipeline_id);
                     if ($pipeline)  {
@@ -120,11 +120,10 @@ class Pipeline extends CVUI_Controller
         $uidata->title = "Create Data Pipeline";
         $uidata->javascript = array(JS.'cafevariome/pipeline.js');
 
-        $this->validation->setRules(
-        [
+        $this->validation->setRules([
             'name' => [
                 'label'  => 'Name',
-                'rules'  => 'required|alpha_space|is_unique[pipeline.name]|max_length[50]',
+                'rules'  => 'required|alpha_space|is_unique[pipelines.name]|max_length[50]',
                 'errors' => [
                     'required' => '{field} is required.',
                     'alpha_space' => 'The only valid characters for {field} are alphabetical characters and spaces.',
@@ -209,7 +208,7 @@ class Pipeline extends CVUI_Controller
         }
         else {
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-            
+
             $uidata->data['name'] = array(
                 'name' => 'name',
                 'id' => 'name',
@@ -294,11 +293,10 @@ class Pipeline extends CVUI_Controller
 
         $pipelineModel = new \App\Models\Pipeline();
 
-        $this->validation->setRules(
-        [
+        $this->validation->setRules(        [
             'name' => [
                 'label'  => 'Name',
-                'rules'  => 'required|alpha_space|is_unique[pipeline.name,id,{id}]|max_length[50]',
+                'rules'  => 'required|alpha_space|is_unique[pipelines.name,id,{id}]|max_length[50]',
                 'errors' => [
                     'required' => '{field} is required.',
                     'alpha_space' => 'The only valid characters for {field} are alphabetical characters and spaces.',
@@ -381,7 +379,7 @@ class Pipeline extends CVUI_Controller
         }
         else {
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-            
+
             $pipeline = $pipelineModel->getPipeline($id);
 
             if($pipeline == null){
