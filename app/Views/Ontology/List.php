@@ -40,6 +40,12 @@
 				<a href="<?= base_url($controllerName. '/Details'). "/" . $ontology['id']; ?>" data-toggle="tooltip" data-placement="top" title="View Ontology">
 					<i class="fa fa-eye text-info"></i>
 				</a>
+				<a href="<?= base_url('OntologyRelationship/List'). "/" . $ontology['id']; ?>" data-toggle="tooltip" data-placement="top" title="View Relationships">
+					<i class="fa fa-bezier-curve text-success"></i>
+				</a>
+				<a href="<?= base_url('OntologyPrefix/List'). "/" . $ontology['id']; ?>" data-toggle="tooltip" data-placement="top" title="View Prefixes">
+					<i class="fa fa-scroll text-primary"></i>
+				</a>
 				<a href="<?= base_url($controllerName. '/Delete'). "/" . $ontology['id']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Ontology">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
