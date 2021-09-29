@@ -7,7 +7,6 @@
  * Model class for Attribute entities.
  */
 
-use CodeIgniter\Database\ConnectionInterface;
 use \CodeIgniter\Model;
 
 class Attribute extends Model
