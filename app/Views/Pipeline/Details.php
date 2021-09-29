@@ -60,24 +60,6 @@
                 </td>
             </tr>
             <tr>
-                <th>HPO Attribute Name</th>
-                <td>
-                    <?= $pipeline['hpo_attribute_name'] ?>
-                </td>
-            </tr>
-            <tr>
-                <th>Negated HPO Attribute Name</th>
-                <td>
-                    <?= $pipeline['negated_hpo_attribute_name'] ?>
-                </td>
-            </tr>
-            <tr>
-                <th>ORPHA Attribute Name</th>
-                <td>
-                    <?= $pipeline['orpha_attribute_name'] ?>
-                </td>
-            </tr>
-            <tr>
                 <th>Internal Delimiter</th>
                 <td>
                     <?= $pipeline['internal_delimiter'] ?>
