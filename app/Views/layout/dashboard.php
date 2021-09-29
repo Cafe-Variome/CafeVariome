@@ -122,6 +122,19 @@
                 </div>
             </li>
 
+			<li class="nav-item <?= $controllerName == 'Ontology' ? 'active' : ''?>">
+				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOntology" aria-expanded="true" aria-controls="collapseOntology">
+					<i class="fas fa-fw fa-project-diagram"></i>
+					<span>Ontologies</span>
+				</a>
+				<div id="collapseOntology" class="collapse <?= $controllerName == 'Ontology' ? 'show' : ''?>" aria-labelledby="headingOntology" data-parent="#accordionSidebar">
+					<div class="bg-white py-2 collapse-inner rounded">
+						<a class="collapse-item" href="<?= base_url('Ontology/Create') ?>">Create an Ontology</a>
+						<a class="collapse-item" href="<?= base_url('Ontology/List') ?>">View Ontologies</a>
+					</div>
+				</div>
+			</li>
+
             <!-- Divider -->
             <hr class="sidebar-divider">
 
