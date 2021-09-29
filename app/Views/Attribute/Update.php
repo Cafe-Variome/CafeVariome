@@ -1,20 +1,20 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
 
-	<div class="row">
-		<div class="col">
-			<h2><?= $title ?></h2>
-		</div>
+<div class="row">
+	<div class="col">
+		<h2><?= $title ?></h2>
 	</div>
-	<hr>
+</div>
+<hr>
 <?php if($statusMessage): ?>
-	<div class="row">
-		<div class="col">
-			<div class="alert alert-<?= $statusMessageType ?>">
-				<?php echo $statusMessage ?>
-			</div>
+<div class="row">
+	<div class="col">
+		<div class="alert alert-<?= $statusMessageType ?>">
+			<?php echo $statusMessage ?>
 		</div>
 	</div>
+</div>
 <?php endif; ?>
 <?= form_open($controllerName . '/Update/' . $attribute_id) ?>
 <div class="form-group row">
