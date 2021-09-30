@@ -57,7 +57,7 @@ class OntologyPrefix extends CVUI_Controller
 		$uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
 		$uidata->javascript = array(JS.'cafevariome/ontologyprefix.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
-		$uidata->data['prefixes'] = $this->prefixModel->getOntologyPrefixes();
+		$uidata->data['prefixes'] = $this->prefixModel->getOntologyPrefixes($ontology_id);
 		$uidata->data['ontology_name'] = $ontology_name;
 		$uidata->data['ontology_id'] = $ontology_id;
 
@@ -78,11 +78,11 @@ class OntologyPrefix extends CVUI_Controller
 		$this->validation->setRules([
 			'name' => [
 				'label'  => 'Name',
-				'rules'  => 'required|alpha_numeric_punct|is_unique[ontology_prefixes.name,id,{id}]|max_length[50]',
+				'rules'  => 'required|alpha_numeric_punct|unique_ontology_prefix[ontology_id]|max_length[50]',
 				'errors' => [
 					'required' => '{field} is required.',
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.',
-					'is_unique' => '{field} already exists.',
+					'unique_ontology_prefix' => '{field} already exists.',
 					'max_length' => 'Maximum length is 50 characters.'
 				]
 			]
@@ -140,11 +140,11 @@ class OntologyPrefix extends CVUI_Controller
 		$this->validation->setRules([
 			'name' => [
 				'label'  => 'Name',
-				'rules'  => 'required|alpha_numeric_punct|is_unique[ontology_prefixes.name,id,{id}]|max_length[50]',
+				'rules'  => 'required|alpha_numeric_punct|unique_ontology_prefix[ontology_id, prefix_id]|max_length[50]',
 				'errors' => [
 					'required' => '{field} is required.',
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.',
-					'is_unique' => '{field} already exists.',
+					'unique_ontology_prefix' => '{field} already exists.',
 					'max_length' => 'Maximum length is 50 characters.'
 				]
 			]
@@ -153,14 +153,14 @@ class OntologyPrefix extends CVUI_Controller
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
 			try {
 				$name = $this->request->getVar('name');
-				$id = $this->request->getVar('id');
+				$id = $this->request->getVar('prefix_id');
 				$this->prefixModel->updateOntologyPrefix($id, $name);
 
 				$this->setStatusMessage("Ontology prefix '$name' was updated.", STATUS_SUCCESS);
 			}
 			catch (\Exception $ex)
 			{
-				$this->setStatusMessage("There was a problem updated ontology prefix"  . $ex->getMessage(), STATUS_ERROR);
+				$this->setStatusMessage("There was a problem updating ontology prefix"  . $ex->getMessage(), STATUS_ERROR);
 			}
 
 			return redirect()->to(base_url($this->controllerName.'/List/' . $ontology_id));
@@ -174,7 +174,7 @@ class OntologyPrefix extends CVUI_Controller
 				'id' => 'name',
 				'type' => 'text',
 				'class' => 'form-control',
-				'value' =>set_value('name', $ontologyPrefix['name']),
+				'value' =>set_value('name', $ontologyPrefix['name'])
 			);
 		}
 
