@@ -125,4 +125,19 @@ class ValidationHelper{
 		}
 	}
 
+	public function unique_ontology_relationship(string $str, string $fields, array $data, & $err): bool
+	{
+		$relationshipModel = new \App\Models\OntologyRelationship();
+		if (strpos($fields, ',') !== false){
+			$fieldsArr = explode(',', $fields);
+			$ontology_id = $data['ontology_id'];
+			$relationship_id = $data['relationship_id'];
+			return !$relationshipModel->ontologyRelationshipExists($str, $ontology_id, $relationship_id);
+
+		}
+		else{
+			$ontology_id = $data[$fields];
+			return !$relationshipModel->ontologyRelationshipExists($str, $ontology_id);
+		}
+	}
 }
