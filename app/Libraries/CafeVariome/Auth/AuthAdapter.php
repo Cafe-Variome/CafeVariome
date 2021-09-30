@@ -4,9 +4,9 @@ namespace App\Libraries\CafeVariome\Auth;
 /**
  * Name: AuthAdapter.php
  * Created: 17/07/2019
- * 
+ *
  * @author: Mehdi Mehtarizadeh
- * 
+ *
  * This adapter class provides a simple and unified interface for auhentication.
  * It is an abstraction layer for all authentication engines used in the software.
  */
@@ -34,7 +34,7 @@ class AuthAdapter{
                 $this->authEngine = new KeyCloak();
                 if(!$this->authEngine->ping()){
                     //Keycloak Server not available
-                    //Switch to Ion Auth 
+                    //Switch to Ion Auth
                     $this->authEngine = new IonAuth();
                 }
             break;
@@ -42,8 +42,8 @@ class AuthAdapter{
                 $this->authEngine = new KeyCloak();
                 if(!$this->authEngine->ping()){
                     //Keycloak Server not available
-                    //Switch to Ion Auth 
-                    throw new Exception('KeyCloak Server is not available.'); 
+                    //Switch to Ion Auth
+                    throw new Exception('KeyCloak Server is not available.');
                 }
             break;
             case 'OAuth':
@@ -68,7 +68,7 @@ class AuthAdapter{
         $password = uniqid();
         //Add special character, uppercase, lowercase and number to meet requirements imposed by Keycloak API
         $password .= "!Kc1";
-        
+
         return $this->authEngine->register($email, $username, $password, $additionaldata, $groups);
     }
 
@@ -108,7 +108,7 @@ class AuthAdapter{
         $id ? $id : $id = $this->getUserId();
         return $userModel->getName($id, $fullName);
     }
-    
+
     /**
      * getToken()
      * Retrieves Keycloak Token
@@ -123,7 +123,7 @@ class AuthAdapter{
      * geyUserIdByToken()
      * Retrieves Keycloak Token
      * Only valid when Keycloak is enabled.
-     * @param League\OAuth2\Client\Token\AccessToken $token 
+     * @param League\OAuth2\Client\Token\AccessToken $token
      * @return int
      */
     public function getUserIdByToken(\League\OAuth2\Client\Token\AccessToken $token): int
@@ -132,7 +132,12 @@ class AuthAdapter{
             $user = $this->authEngine->getUser($token);
 
             if($user != null){
-                $email = $user->getEmail();
+				if($this->getAuthEngineName() == "app\libraries\keycloak"){
+					$email = $user->getEmail();
+				}
+				else{
+					$email = $user->toArray()['email'];
+				}
                 return $this->authEngine->getUserIdByEmail($email);
             }
         }
