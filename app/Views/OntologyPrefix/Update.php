@@ -18,7 +18,8 @@
 <?php endif; ?>
 
 <?php echo form_open($controllerName.'/Update/' . $prefix_id); ?>
-<?php echo form_hidden(['id' => $prefix_id]); ?>
+<?php echo form_hidden(['prefix_id' => $prefix_id]); ?>
+<?php echo form_hidden(['ontology_id' => $ontology_id]); ?>
 	<div class="form-group row">
 		<div class="col-6">
 			<?php echo form_label('Ontology Name:', 'ontology_name'); ?>
