@@ -108,4 +108,21 @@ class ValidationHelper{
 
         return false;
     }
+
+	public function unique_ontology_prefix(string $str, string $fields, array $data, & $err): bool
+	{
+		$prefixModel = new \App\Models\OntologyPrefix();
+		if (strpos($fields, ',') !== false){
+			$fieldsArr = explode(',', $fields);
+			$ontology_id = $data['ontology_id'];
+			$relationship_id = $data['prefix_id'];
+			return !$prefixModel->ontologyPrefixExists($str, $ontology_id, $relationship_id);
+
+		}
+		else{
+			$ontology_id = $data[$fields];
+			return !$prefixModel->ontologyPrefixExists($str, $ontology_id);
+		}
+	}
+
 }
