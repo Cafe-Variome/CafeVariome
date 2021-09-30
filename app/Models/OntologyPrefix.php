@@ -31,9 +31,11 @@ class OntologyPrefix extends Model
 		]);
 	}
 
-	public function getOntologyPrefixes()
+	public function getOntologyPrefixes(int $ontology_id)
 	{
 		$this->builder->select();
+		$this->builder->where('ontology_id', $ontology_id);
+
 		return $this->builder->get()->getResultArray();
 	}
 
@@ -49,6 +51,20 @@ class OntologyPrefix extends Model
 		}
 
 		return null;
+	}
+
+	public function ontologyPrefixExists(string $name, int $ontology_id, int $prefix_id = -1): bool
+	{
+		$this->builder->select();
+		$this->builder->where('name', $name);
+		$this->builder->where('ontology_id', $ontology_id);
+		if ($prefix_id > 0){
+			$this->builder->where('id!=', $prefix_id);
+		}
+
+		$result =  $this->builder->get()->getResultArray();
+
+		return count($result) > 0;
 	}
 
 	public function updateOntologyPrefix(int $id, string $name): bool
