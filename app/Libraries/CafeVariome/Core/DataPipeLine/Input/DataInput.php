@@ -229,7 +229,7 @@ abstract class DataInput
 
 		foreach ($this->attributes as $attribute => $attribute_details){
 			foreach ($this->attributes[$attribute]['values'] as $value => $value_details){
-				$this->valueModel->updateFrequencyByNameAndAttributeId($value, $this->attributes[$attribute]['id'], $this->attributes[$attribute]['values'][$value]['frequency']);
+				$this->valueModel->updateFrequency($value_details['id'], $this->attributes[$attribute]['values'][$value]['frequency']);
 			}
 		}
 
@@ -247,8 +247,8 @@ abstract class DataInput
 			for ($i = 0; $i < $valueCount; $i++){
 				$value_id = $valueFrequencies[$i]['value_id'];
 				$value_frequency = $valueFrequencies[$i]['frequency'];
-				$this->valueModel->updateFrequencyById($value_id, -$value_frequency);
-				$this->valueModel->deleteAbsentValueById($value_id); // Delete value if frequency is 0
+				$this->valueModel->updateFrequency($value_id, -$value_frequency);
+				$this->valueModel->deleteAbsentValue($value_id); // Delete value if frequency is 0
 				unset($valueFrequencies[$i]);
 			}
 			unset($value_id);
@@ -259,12 +259,19 @@ abstract class DataInput
 	protected function determineAttributesType()
 	{
 		foreach ($this->attributes as $attribute => $attribute_details){
-			$attribute_type = $this->attributeModel->getAttributeTypeByName($attribute);
-			if ($attribute_type == ATRRIBUTE_TYPE_STRING) continue; // If attribute has already values that are string, then skip and go to the next value.
-			$assumed_type = count($this->attributes[$attribute]['values']) > 0 ? ATRRIBUTE_TYPE_NUMERIC_NATURAL : $attribute_type;
+			$attribute_id = $attribute_details['id'];
+			$attribute_type = $this->attributeModel->getAttributeType($attribute_id);
+
+			if ($attribute_type == ATTRIBUTE_TYPE_STRING && $this->valueModel->countValuesByAttributeId($attribute_id) > 0)
+			{
+				$this->attributes[$attribute]['type'] = $attribute_type;
+				continue; // If attribute has already values that are string, then skip and go to the next value.
+			}
+
+			$assumed_type = count($this->attributes[$attribute]['values']) > 0 ? ATTRIBUTE_TYPE_NUMERIC_NATURAL : $attribute_type; //Start with natural number and switch to other types if any instance is found
 
 			$c = 0;
-			$minMaxArray = $this->attributeModel->getAttributeMinimumAndMaximumByName($attribute);
+			$minMaxArray = $this->attributeModel->getAttributeMinimumAndMaximum($attribute_id);
 			if (count($minMaxArray) == 2){
 				$minimum_value = $minMaxArray[0];
 				$maximum_value = $minMaxArray[1];
@@ -299,9 +306,10 @@ abstract class DataInput
 				}
 				$c++;
 			}
-			$this->attributeModel->setAttributeTypeByName($attribute, $assumed_type);
+			$this->attributes[$attribute]['type'] = $assumed_type;
+			$this->attributeModel->setAttributeType($attribute_id,  $assumed_type);
 			if (is_numeric($minimum_value) && is_numeric($maximum_value)){
-				$this->attributeModel->setAttributeMinimumAndMaximumByName($attribute, $minimum_value, $maximum_value);
+				$this->attributeModel->setAttributeMinimumAndMaximum($attribute_id, $minimum_value, $maximum_value);
 			}
 		}
 	}
