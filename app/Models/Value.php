@@ -114,4 +114,12 @@ class Value extends Model
 
 		return $this->builder->get()->getResultArray();
 	}
+
+	public function countValuesByAttributeId(int $attribute_id): int
+	{
+		$this->builder->select('id, name, display_name, frequency');
+		$this->builder->where('attribute_id', $attribute_id);
+
+		return $this->builder->countAll();
+	}
 }
