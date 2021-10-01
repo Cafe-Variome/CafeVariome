@@ -36,7 +36,6 @@ abstract class DataInput
     protected $sourceModel;
     protected $elasticModel;
     protected $eavModel;
-    protected $neo4jModel;
     protected $pipelineModel;
     protected $pipeline_id;
     protected $fileName;
