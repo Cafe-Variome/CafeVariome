@@ -13,16 +13,18 @@ class AttributeHelper
 	public static function getAttributeType(int $type): string
 	{
 		switch ($type){
-			case ATRRIBUTE_TYPE_UNDEFINED:
+			case ATTRIBUTE_TYPE_UNDEFINED:
 				return 'Undefined';
-			case ATRRIBUTE_TYPE_STRING:
+			case ATTRIBUTE_TYPE_STRING:
 				return 'String';
-			case ATRRIBUTE_TYPE_NUMERIC_REAL:
+			case ATTRIBUTE_TYPE_NUMERIC_REAL:
 				return 'Real Number';
-			case ATRRIBUTE_TYPE_NUMERIC_INTEGER:
+			case ATTRIBUTE_TYPE_NUMERIC_INTEGER:
 				return 'Integer';
-			case ATRRIBUTE_TYPE_NUMERIC_NATURAL:
+			case ATTRIBUTE_TYPE_NUMERIC_NATURAL:
 				return 'Natural Number';
+			case ATTRIBUTE_TYPE_ONTOLOGY_TERM:
+				return 'Ontology Term';
 		}
 		return 'Undefined';
 	}
@@ -30,11 +32,11 @@ class AttributeHelper
 	public static function getAttributeStorageLocation(int $storage_location): string
 	{
 		switch ($storage_location){
-			case ATRRIBUTE_STORAGE_UNDEFINED:
+			case ATTRIBUTE_STORAGE_UNDEFINED:
 				return 'Undefined';
-			case ATRRIBUTE_STORAGE_ELASTICSEARCH:
+			case ATTRIBUTE_STORAGE_ELASTICSEARCH:
 				return 'Elasticsearch';
-			case ATRRIBUTE_STORAGE_NEO4J:
+			case ATTRIBUTE_STORAGE_NEO4J:
 				return 'Neo4J';
 		}
 		return 'Undefined';
