@@ -155,4 +155,12 @@ class Attribute extends Model
 			'max' => $maximum
 		]);
 	}
+
+	public function setAttributeStorageLocation(int $attribute_id, int $storage_location)
+	{
+		$this->builder->where('id', $attribute_id);
+		$this->builder->update([
+			'storage_location' => $storage_location
+		]);
+	}
 }
