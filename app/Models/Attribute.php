@@ -43,31 +43,7 @@ class Attribute extends Model
 		return $this->db->insertID();
 	}
 
-	private function getAttributes(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1)
-	{
-		if ($cols) {
-			$this->builder->select($cols);
-		}
-		if ($conds) {
-			$this->builder->where($conds);
-		}
-		if ($groupby) {
-			$this->builder->groupBy($groupby);
-		}
-		if ($isDistinct) {
-			$this->builder->distinct();
-		}
-		if ($limit > 0) {
-			if ($offset > 0) {
-				$this->builder->limit($limit, $offset);
-			}
-			$this->builder->limit($limit);
-		}
-
-		return $this->builder->get()->getResultArray();
-	}
-
-	public function getAttributeById(int $attribute_id)
+	public function getAttribute(int $attribute_id)
 	{
 		$this->builder->select();
 		$this->builder->where('id', $attribute_id);
@@ -93,11 +69,6 @@ class Attribute extends Model
 	public function getAttributesBySourceId(int $source_id): array
 	{
 		$this->builder->where('source_id', $source_id);
-		return $this->builder->get()->getResultArray();
-	}
-
-	public function getAllAttributes(): array
-	{
 		return $this->builder->get()->getResultArray();
 	}
 
