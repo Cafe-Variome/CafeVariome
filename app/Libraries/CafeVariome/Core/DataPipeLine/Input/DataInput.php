@@ -11,6 +11,7 @@
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Database;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
+use App\Models\OntologyPrefix;
 use App\Models\Upload;
 use App\Models\Source;
 use App\Models\EAV;
@@ -28,7 +29,8 @@ abstract class DataInput
     protected $sourceId;
 
     protected $basePath;
-    protected $db;
+	protected array $configuration;
+	protected $db;
     protected $fileMan;
     protected $uploadModel;
     protected $sourceModel;
@@ -43,6 +45,7 @@ abstract class DataInput
 	protected Attribute $attributeModel;
 	protected Value $valueModel;
 	protected array $attributes;
+	private OntologyPrefix $ontologyPrefixModel;
 
 	public function __construct(int $source_id)
     {
@@ -60,6 +63,8 @@ abstract class DataInput
 		$this->attributeModel = new Attribute();
 		$this->valueModel = new Value();
 		$this->attributes = [];
+		$this->configuration = [];
+		$this->ontologyPrefixModel = new OntologyPrefix();
 	}
 
     abstract public function absorb(int $fileId);
