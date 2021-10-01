@@ -77,6 +77,9 @@ abstract class DataInput
         }
     }
 
+	/**
+	 * @deprecated
+	 */
     public function dumpAttributesAndValues(int $file_id)
     {
         $attributeValueList = $this->eavModel->getUniqueAttributesAndValuesByFileIdAndSourceId($file_id, $this->sourceId);
@@ -86,6 +89,9 @@ abstract class DataInput
         $this->fileMan->Write($fileNameWithoutExtension . "_uniq.json", json_encode($attributeValueList));
     }
 
+	/**
+	 * @deprecated
+	 */
     public function removeAttribuesAndValuesFiles(string $file_name = null)
     {
         $path = FCPATH . UPLOAD . UPLOAD_DATA . $this->sourceId . DIRECTORY_SEPARATOR;
