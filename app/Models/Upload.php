@@ -611,9 +611,9 @@ use CodeIgniter\Database\ConnectionInterface;
 	 {
 		 $this->builder = $this->db->table($this->table);
 
-		 $this->builder->select($this->table . '.*,users.email,pipeline.id as pipelineId, pipeline.name as pipelineName');
+		 $this->builder->select($this->table . '.*,users.email,pipelines.id as pipelineId, pipelines.name as pipelineName');
 		 $this->builder->join('users', $this->table . '.user_id=users.id', 'inner');
-		 $this->builder->join('pipeline', $this->table . '.pipeline_id=pipeline.id', 'inner');
+		 $this->builder->join('pipelines', $this->table . '.pipeline_id=pipelines.id', 'inner');
 		 $this->builder->where($this->table . '.source_id', $source_id);
 
 		 return $this->builder->get()->getResultArray();
