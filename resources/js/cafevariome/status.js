@@ -90,16 +90,19 @@ function reloadTable(param,first, chkBox = false) {
                 else if(response.Files[i].Status == 'Success'){
                     $('#file_' + response.Files[i].ID).append("<td><a href='#' data-toggle='tooltip' data-placement='top' title='Data has been successfully processed for this file.'><i class='fa fa-check text-success'></i></a> <a href='#' data-toggle='tooltip' data-placement='top' data-html='true' title='Upload Start:" + response.Files[i].uploadStart + " <br/> Upload End: " + response.Files[i].uploadEnd + "'><i class='fa fa-info text-info'></i></a> </td>");
                 }
-                else if (response.Error.length > 0) {
-                    ErrorString = "";
+                else if(response.Files[i].Status == 'Failed'){
+                    $('#file_' + response.Files[i].ID).append("<td><a href='#' data-toggle='tooltip' data-placement='top' title='File was not processed successfully.'><i class='fa fa-times text-danger'></i></a></td>");
+                    if (response.Error.length > 0) {
+                        ErrorString = '';
 
-                    for (var t = 0; t < response.Error.length; t++) {
-                        if (response.Files[i].ID == response.Error[t].error_id) {
-                            ErrorString += response.Error[t].message + '<br/>'
-                            response.Error.splice(t, 1); 
+                        for (var t = 0; t < response.Error.length; t++) {
+                            if (response.Files[i].ID == response.Error[t].error_id) {
+                                ErrorString += response.Error[t].message + '<br/>';
+                                response.Error.splice(t, 1);
+                            }
                         }
+                        $('#file_' + response.Files[i].ID).append("<td><a href='#' data-toggle='tooltip' data-html='true' data-placement='top' title='" + ErrorString + "'><i class='fa fa-exclamation-triangle text-warning'></i></a> </td>");
                     }
-                    $('#file_' + response.Files[i].ID).append("<td><a href='#' data-toggle='tooltip' data-html='true' data-placement='top' title='" + ErrorString + "'><i class='fa fa-exclamation-triangle text-warning'></i></a> </td>");
                 }
 
                 actionStr = "<td id='action-" + response.Files[i].ID + "'><a href='#' data-toggle='tooltip' data-placement='top' title='Remove Records and Re-process File' class='reprocess' onclick='processFile(" + response.Files[i].ID + ", 1)'><i class='fa fa-redo-alt text-info'></i></a>";
