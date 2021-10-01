@@ -24,9 +24,9 @@ class Attribute extends Model
 
 	}
 
-	public function createAttribute(string $name, int $source_id, string $display_name = '', int $type = 0,
+	public function createAttribute(string $name, int $source_id, string $display_name = '', int $type = ATTRIBUTE_TYPE_UNDEFINED,
 									float $min = 0.0, float $max = 0.0, bool $show_in_interface = true,
-									bool $include_in_interface_index = true, int $storage_location = ATRRIBUTE_STORAGE_UNDEFINED): int
+									bool $include_in_interface_index = true, int $storage_location = ATTRIBUTE_STORAGE_UNDEFINED): int
 	{
 		$this->builder->insert([
 			'name' => $name,

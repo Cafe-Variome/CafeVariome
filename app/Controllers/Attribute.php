@@ -173,7 +173,7 @@ class Attribute extends CVUI_Controller
 		$uidata->data['type'] = AttributeHelper::getAttributeType($attribute['type']);
 		$uidata->data['minimum'] = null;
 		$uidata->data['maximum'] = null;
-		if ($attribute['type'] == ATRRIBUTE_TYPE_NUMERIC_REAL || $attribute['type'] == ATRRIBUTE_TYPE_NUMERIC_INTEGER || $attribute['type'] == ATRRIBUTE_TYPE_NUMERIC_NATURAL){
+		if ($attribute['type'] == ATTRIBUTE_TYPE_NUMERIC_REAL || $attribute['type'] == ATTRIBUTE_TYPE_NUMERIC_INTEGER || $attribute['type'] == ATTRIBUTE_TYPE_NUMERIC_NATURAL){
 			$uidata->data['minimum'] = $attribute['min'];
 			$uidata->data['maximum'] = $attribute['max'];
 		}
