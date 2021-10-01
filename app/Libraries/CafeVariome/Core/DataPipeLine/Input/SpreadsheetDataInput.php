@@ -16,7 +16,7 @@ class SpreadsheetDataInput extends DataInput
 {
     private $delete;
     protected $serviceInterface;
-    protected $configuration;
+    protected array $configuration;
     private $column_count;
     protected $pipeline_id;
 
