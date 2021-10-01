@@ -65,7 +65,9 @@ abstract class DataInput
     abstract public function absorb(int $fileId);
     abstract public function save(int $fileId);
 
-    protected function getSourceFiles(int $fileId = -1)
+	abstract protected function initializeConfiguration();
+
+	protected function getSourceFiles(int $fileId = -1)
     {
         if ($fileId != -1) {
             return $this->uploadModel->getFiles('FileName, pipeline_id', ['id' => $fileId]);
