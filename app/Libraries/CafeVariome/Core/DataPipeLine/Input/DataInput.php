@@ -271,6 +271,11 @@ abstract class DataInput
 
 	protected function determineAttributesType()
 	{
+		$db = \Config\Database::connect();
+
+		$ontologyPrefixes = $this->ontologyPrefixModel->getDistinctOntologyPrefixes();
+
+		$db->transStart();
 		foreach ($this->attributes as $attribute => $attribute_details){
 			$attribute_id = $attribute_details['id'];
 			$attribute_type = $this->attributeModel->getAttributeType($attribute_id);
@@ -303,19 +308,24 @@ abstract class DataInput
 
 				if (is_numeric($value)){
 					if (is_integer($value) && $value < 0){
-						$assumed_type = ATRRIBUTE_TYPE_NUMERIC_INTEGER;
+						$assumed_type = ATTRIBUTE_TYPE_NUMERIC_INTEGER;
 					}
 					elseif (is_float($value)){
-						$assumed_type = ATRRIBUTE_TYPE_NUMERIC_REAL;
+						$assumed_type = ATTRIBUTE_TYPE_NUMERIC_REAL;
 					}
 					if ($value > $maximum_value) $maximum_value = $value;
 					if ($value < $minimum_value) $minimum_value = $value;
 				}
 				elseif (is_string($value)){
-					$assumed_type = ATRRIBUTE_TYPE_STRING;
-					$minimum_value = null;
-					$maximum_value = null;
-					break;
+					if ($this->valueStartsWithOntologyPrefix($value, $ontologyPrefixes)){
+						$assumed_type = ATTRIBUTE_TYPE_ONTOLOGY_TERM;
+					}
+					else {
+						$assumed_type = ATTRIBUTE_TYPE_STRING;
+						$minimum_value = null;
+						$maximum_value = null;
+						break; // String is the most general type. If the code reaches this point, there is no need to iterate more.
+					}
 				}
 				$c++;
 			}
@@ -325,6 +335,7 @@ abstract class DataInput
 				$this->attributeModel->setAttributeMinimumAndMaximum($attribute_id, $minimum_value, $maximum_value);
 			}
 		}
+		$db->transComplete();
 	}
 
 	protected function determineAttributesStorageLocation()
