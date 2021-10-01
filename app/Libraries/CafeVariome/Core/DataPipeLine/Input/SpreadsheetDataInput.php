@@ -139,6 +139,9 @@ class SpreadsheetDataInput extends DataInput
 		//Set attributes types, minimum, and maximum values if applicable
 		$this->determineAttributesType();
 
+		//Determine storage location of each attribute
+		$this->determineAttributesStorageLocation();
+
     }
 
 	private function processRow($row, $attgroups, $subject_id, $file_id, & $counter)
