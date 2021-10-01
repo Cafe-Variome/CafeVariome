@@ -323,4 +323,32 @@ abstract class DataInput
 		}
 	}
 
+	protected function determineAttributesStorageLocation()
+	{
+		$db = \Config\Database::connect();
+		$db->transStart();
+		foreach ($this->attributes as $attribute => $attribute_details) {
+			// If attribute exists in HPO, Negated HPO, ORPHA values of the pipeline, then it is stored in Neo4J
+			// Otherwise it is stored on Elasticsearch
+			$attribute_id = $attribute_details['id'];
+			if ($attribute_details['type'] == ATTRIBUTE_TYPE_ONTOLOGY_TERM){
+				$this->attributeModel->setAttributeStorageLocation($attribute_id, ATTRIBUTE_STORAGE_NEO4J);
+			}
+			else{
+				$this->attributeModel->setAttributeStorageLocation($attribute_id, ATTRIBUTE_STORAGE_ELASTICSEARCH);
+			}
+		}
+		$db->transComplete();
+	}
+
+	private function valueStartsWithOntologyPrefix(string $value, array $prefixes): bool
+	{
+		for ($i = 0; $i < count($prefixes); $i++){
+			if (str_starts_with($value, $prefixes[$i])){
+				return true;
+			}
+		}
+
+		return false;
+	}
 }
