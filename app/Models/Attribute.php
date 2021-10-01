@@ -142,10 +142,10 @@ class Attribute extends Model
 		return -1;
 	}
 
-	public function getAttributeTypeByName(string $name): int
+	public function getAttributeType(int $id): int
 	{
 		$this->builder->select('type');
-		$this->builder->where('name', $name);
+		$this->builder->where('id', $id);
 
 		$result = $this->builder->get()->getResultArray();
 
@@ -156,16 +156,16 @@ class Attribute extends Model
 		return -1;
 	}
 
-	public function setAttributeTypeByName(string $name, int $type)
+	public function setAttributeType(int $id, int $type)
 	{
-		$this->builder->where('name', $name);
+		$this->builder->where('id', $id);
 		$this->builder->update(['type' => $type]);
 	}
 
-	public function getAttributeMinimumAndMaximumByName(string $name): array
+	public function getAttributeMinimumAndMaximum(int $id): array
 	{
 		$this->builder->select('min, max');
-		$this->builder->where('name', $name);
+		$this->builder->where('id', $id);
 
 		$result = $this->builder->get()->getResultArray();
 
@@ -176,9 +176,9 @@ class Attribute extends Model
 		return [];
 	}
 
-	public function setAttributeMinimumAndMaximumByName(string $name, float $minimum, float $maximum)
+	public function setAttributeMinimumAndMaximum(int $id, float $minimum, float $maximum)
 	{
-		$this->builder->where('name', $name);
+		$this->builder->where('id', $id);
 		$this->builder->update([
 			'min' => $minimum,
 			'max' => $maximum

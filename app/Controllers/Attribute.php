@@ -79,7 +79,7 @@ class Attribute extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Edit Attribute';
 
-		$attribute = $this->attributeModel->getAttributeById($attribute_id);
+		$attribute = $this->attributeModel->getAttribute($attribute_id);
 		if ($attribute == null || $attribute_id <= 0){
 			return redirect()->to(base_url('Source'));
 		}
@@ -157,7 +157,7 @@ class Attribute extends CVUI_Controller
 
 	public function Details(int $attribute_id)
 	{
-		$attribute = $this->attributeModel->getAttributeById($attribute_id);
+		$attribute = $this->attributeModel->getAttribute($attribute_id);
 		if ($attribute == null || $attribute_id <= 0){
 			return redirect()->to(base_url('Source'));
 		}
