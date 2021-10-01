@@ -37,7 +37,7 @@ class Value extends Model
 		return $this->db->insertID();
 	}
 
-	public function getValueById(int $value_id)
+	public function getValue(int $value_id)
 	{
 		$this->builder->select();
 		$this->builder->where('id', $value_id);
@@ -74,34 +74,20 @@ class Value extends Model
 		return $value_id;
 	}
 
-	public function updateFrequencyByNameAndAttributeId(string $name, int $attribute_id, float $frequency, bool $add = true):bool
+	public function updateFrequency(int $id, float $frequency, bool $add = true):bool
 	{
 		if ($add) {
-			$currentFrequency = $this->getFrequencyByName($name);
+			$currentFrequency = $this->getFrequency($id);
 			if ($currentFrequency > 0) {
 				$frequency = $frequency + $currentFrequency;
 			}
 		}
-		$this->builder->where('name', $name);
-		$this->builder->where('attribute_id', $attribute_id);
+		$this->builder->where('id', $id);
 
 		return $this->builder->update(['frequency' => $frequency]);
 	}
 
-	public function getFrequencyByName(string $name): float
-	{
-		$this->builder->select('frequency');
-		$this->builder->where('name', $name);
-		$result = $this->builder->get()->getResultArray();
-
-		if(count($result) == 1){
-			return $result[0]['frequency'];
-		}
-
-		return -1;
-	}
-
-	public function getFrequencyById(int $id): float
+	public function getFrequency(int $id): float
 	{
 		$this->builder->select('frequency');
 		$this->builder->where('id', $id);
@@ -114,19 +100,7 @@ class Value extends Model
 		return -1;
 	}
 
-	public function updateFrequencyById(int $id, float $frequency, bool $add = true):bool
-	{
-		if ($add) {
-			$currentFrequency = $this->getFrequencyById($id);
-			if ($currentFrequency > 0) {
-				$frequency = $frequency + $currentFrequency;
-			}
-		}
-		$this->builder->where('id', $id);
-		return $this->builder->update(['frequency' => $frequency]);
-	}
-
-	public function deleteAbsentValueById(int $id)
+	public function deleteAbsentValue(int $id)
 	{
 		$this->builder->where('id', $id);
 		$this->builder->where('frequency', 0); // Frequency = 0 indicates a value is absent and is no more needed.
