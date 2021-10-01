@@ -75,7 +75,7 @@ class Value extends CVUI_Controller
 
 	public function Update(int $value_id)
 	{
-		$value = $this->valueModel->getValueById($value_id);
+		$value = $this->valueModel->getValue($value_id);
 		if ($value == null || $value_id <= 0){
 			return redirect()->to(base_url('Source'));
 		}
@@ -155,7 +155,7 @@ class Value extends CVUI_Controller
 
 	public function Details(int $value_id)
 	{
-		$value = $this->valueModel->getValueById($value_id);
+		$value = $this->valueModel->getValue($value_id);
 		if ($value == null || $value <= 0){
 			return redirect()->to(base_url('Source'));
 		}
