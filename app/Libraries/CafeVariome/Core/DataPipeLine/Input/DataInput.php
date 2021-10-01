@@ -183,6 +183,7 @@ abstract class DataInput
 			// Add attribute to the list
 			$this->attributes[$attribute] = [
 				'id' => $attribute_id,
+				'type' => ATTRIBUTE_TYPE_UNDEFINED,
 				'values' => []
 			];
 		}
