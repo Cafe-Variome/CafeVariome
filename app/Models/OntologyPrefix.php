@@ -53,6 +53,21 @@ class OntologyPrefix extends Model
 		return null;
 	}
 
+	public function getDistinctOntologyPrefixes(): array
+	{
+		$prefixes = [];
+		$this->builder->select('name');
+		$this->builder->distinct();
+
+		$result =  $this->builder->get()->getResultArray();
+
+		foreach ($result as $prefix){
+			array_push($prefixes, $prefix['name']);
+		}
+
+		return $prefixes;
+	}
+
 	public function ontologyPrefixExists(string $name, int $ontology_id, int $prefix_id = -1): bool
 	{
 		$this->builder->select();
