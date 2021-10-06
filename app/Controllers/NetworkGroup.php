@@ -284,14 +284,16 @@ class NetworkGroup extends CVUI_Controller{
             }
             if ($this->request->getVar('sources')) {
                 $group_id = $this->request->getVar('id');
-                $installation_key = $this->request->getVar('installation_key');
+				$network_key = $this->networkModel->getNetworkKeybyGroupId($group_id);
+
+				$installation_key = $this->request->getVar('installation_key');
 
                 try {
                     $this->networkModel->deleteAllSourcesFromNetworkGroup($group_id, $installation_key);
 
                     foreach ($this->request->getVar('sources') as $source_id)
                     {
-                        $this->networkModel->addSourceToNetworkGroup($source_id, $group_id, $installation_key);
+                        $this->networkModel->addSourceToNetworkGroup($source_id, $group_id, $network_key, $installation_key);
                     }
                     $this->setStatusMessage("Granted sources list was updated for '$name'.", STATUS_SUCCESS, true);
 

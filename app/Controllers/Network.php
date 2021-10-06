@@ -3,10 +3,10 @@
 /**
  * Name: Network.php
  * Created: 18/07/2019
- * 
+ *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
 
 use App\Models\User;
@@ -27,7 +27,7 @@ class Network extends CVUI_Controller{
 	 * @see https://bcit-ci.github.io/CodeIgniter4/libraries/validation.html#configuration
 	 */
     protected $validationListTemplate = 'list';
-    
+
     private $networkModel;
 
     private $userModel;
@@ -50,7 +50,7 @@ class Network extends CVUI_Controller{
     }
 
     /**
-     * 
+     *
      */
 
     public function List()
@@ -67,15 +67,15 @@ class Network extends CVUI_Controller{
                 $networks = $response->data;
             }
             $master_groups = $this->networkModel->getMasterGroups();
-    
+
             $uidata->data['groups'] = $master_groups;
         } catch (\Exception $ex) {
             $uidata->data['message'] = 'There was a problem retrieving networks. Please try again.';
         }
-        
-        
+
+
         $uidata->data['networks'] = $networks;
-            
+
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = array(JS.'cafevariome/network.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
@@ -162,7 +162,7 @@ class Network extends CVUI_Controller{
                     return redirect()->to(base_url($this->controllerName.'/List'));
                 }
             }
-       } 
+       }
        else {
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
        }
@@ -179,7 +179,7 @@ class Network extends CVUI_Controller{
         $data = $this->wrapData($uidata);
 
         return view($this->viewDirectory.'/Create', $data);
-        
+
     }
 
     function Update_Users(int $id, $isMaster = false) {
@@ -201,12 +201,12 @@ class Network extends CVUI_Controller{
                 try {
                     $this->networkModel->deleteAllUsersFromNetworkGroup($group_id);
                     $network_key = $this->networkModel->getNetworkKeybyGroupId($group_id);
-    
+
                     foreach ($this->request->getVar('users') as $user_id)
                     {
                         $this->networkModel->addUserToNetworkGroup($user_id, $group_id, $installation_key, $network_key);
                     }
-    
+
                     $this->networkModel->deleteUserFromAllOtherNetworkGroups($network_key, $this->request->getVar('users'));
                     $this->setStatusMessage("Granted users list was updated for '$name'.", STATUS_SUCCESS);
 
@@ -228,14 +228,15 @@ class Network extends CVUI_Controller{
             }
             if ($this->request->getVar('sources')) {
                 $group_id = $this->request->getVar('id');
-                $installation_key = $this->request->getVar('installation_key');
+				$network_key = $this->networkModel->getNetworkKeybyGroupId($group_id);
+				$installation_key = $this->request->getVar('installation_key');
 
                 try {
                     $this->networkModel->deleteAllSourcesFromNetworkGroup($group_id, $installation_key);
 
                     foreach ($this->request->getVar('sources') as $source_id)
                     {
-                        $this->networkModel->addSourceToNetworkGroup($source_id, $group_id, $installation_key);
+                        $this->networkModel->addSourceToNetworkGroup($source_id, $group_id, $network_key, $installation_key);
                     }
                     $this->setStatusMessage("Granted sources list was updated for '$name'.", STATUS_SUCCESS, true);
 
@@ -243,7 +244,7 @@ class Network extends CVUI_Controller{
                     $this->setStatusMessage("There was a problem updating granted sources list for '$name'.", STATUS_ERROR, true);
                 }
             }
-            else { 
+            else {
                 // No groups selected so remove the user from all network groups
                 $group_id = $this->request->getVar('id');
                 $installation_key = $this->request->getVar('installation_key');
@@ -255,23 +256,23 @@ class Network extends CVUI_Controller{
                     $this->setStatusMessage("There was a problem removing all sources from the list of granted sources for '$name'.", STATUS_ERROR, true);
                 }
             }
-    
-			return redirect()->to(base_url($this->controllerName.'/List'));            
+
+			return redirect()->to(base_url($this->controllerName.'/List'));
         }
         else{
 
             $uidata->data['user_id'] = $id;
-    
+
             //set the flash data error message if there is one
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
             $users = $this->userModel->getUsers();
             $selectedUsers = $this->networkModel->getNetworkGroupUsers($id);
             $group_details = $this->networkModel->getNetworkGroup($id);
-            $uidata->data['name'] = $group_details['name'];   
-            $uidata->data['group_type'] = $group_details['group_type']; 
-    
+            $uidata->data['name'] = $group_details['name'];
+            $uidata->data['group_type'] = $group_details['group_type'];
+
             $sourceModel = new Source();
-    
+
             $sources = $sourceModel->getSources();
             $selectedSources = $sourceModel->getSourceId($id);
 
@@ -288,7 +289,7 @@ class Network extends CVUI_Controller{
 
             $uidata->data['sources'] = $sourcesList;
             $uidata->data['selectedSources'] = $selectedSourcesList;
-            
+
             $usersList = [];
             $selectedUsersList = [];
 
@@ -305,8 +306,8 @@ class Network extends CVUI_Controller{
             }
 
             $uidata->data['users'] = $usersList;
-            $uidata->data['selectedUsers'] = $selectedUsersList;   
-            
+            $uidata->data['selectedUsers'] = $selectedUsersList;
+
             $uidata->data['remote_user_email'] = array(
                 'name' => 'remote_user_email',
                 'id' => 'remote_user_email',
@@ -314,20 +315,20 @@ class Network extends CVUI_Controller{
                 'class' => 'form-control',
                 'value' =>set_value('remote_user_email'),
             );
-            
+
             $uidata->data['isMaster'] = ($isMaster ? $isMaster : 0);
             $uidata->data['user_id'] = $id;
             $uidata->data['installation_key'] = $this->setting->getInstallationKey();
-    
+
             $uidata->javascript = array(JS."cafevariome/network.js", JS."cafevariome/components/transferbox.js");
-    
+
             $data = $this->wrapData($uidata);
             return view($this->viewDirectory.'/Update_Users', $data);
         }
     }
 
     /**
-     * 
+     *
      */
     function Join(){
 
@@ -385,7 +386,7 @@ class Network extends CVUI_Controller{
             );
 
             $networks_response = $networkInterface->GetAvailableNetworks();
-            
+
             $networks = [];
 
             if ($networks_response->status == 1) {
@@ -404,7 +405,7 @@ class Network extends CVUI_Controller{
      * @deprecated
      */
     function process_network_join_request() {
-        
+
         $result['network_key'] = $this->request->getVar('networks');
         $result['justification'] = $this->request->getVar('justification');
 
@@ -502,11 +503,11 @@ class Network extends CVUI_Controller{
         }
 
         $uidata->data['network_key'] = $network_key;
-    
+
         $uidata->javascript = array(JS."/cafevariome/network.js");
         $data = $this->wrapData($uidata);
 
-        return view($this->viewDirectory.'/Update_Threshold', $data); 
+        return view($this->viewDirectory.'/Update_Threshold', $data);
     }
 
     public function Leave(int $network_key)
@@ -530,7 +531,7 @@ class Network extends CVUI_Controller{
                     'errors' => [
                         'required' => '{field} is required.'
                     ]
-                ]          
+                ]
             ]);
 
             if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
@@ -546,7 +547,7 @@ class Network extends CVUI_Controller{
                             $this->networkModel->deleteNetwork($network_key);
                         } catch (\Exception $ex) {
                             $this->setStatusMessage("There was a problem removing local replica for '$name'.", STATUS_ERROR, true);
-                        }     
+                        }
                         return redirect()->to(base_url($this->controllerName.'/List'));
                     }
                 }
@@ -561,9 +562,9 @@ class Network extends CVUI_Controller{
 
             $uidata->data['network_key'] = $network_key;
             $uidata->data['network_name'] = $networkResponse->data->network_name;
-            
+
             $data = $this->wrapData($uidata);
-            return view($this->viewDirectory.'/Leave', $data); 
+            return view($this->viewDirectory.'/Leave', $data);
         }
     }
 
