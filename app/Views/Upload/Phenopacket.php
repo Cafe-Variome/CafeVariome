@@ -103,6 +103,9 @@
 		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
 			<i class="fa fa-database"></i> View Sources
 		</a>
+		<a class="btn btn-info bg-gradient-info" href="<?= base_url('Attribute/List/' . $source_id ) ?>">
+			<i class="fa fa-database"></i> View Data Attributes for <?= $source_name ?>
+		</a>
 	</div>
 </div>
 
