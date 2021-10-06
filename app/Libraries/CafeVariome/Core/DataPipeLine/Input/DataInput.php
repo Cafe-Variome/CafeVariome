@@ -26,8 +26,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 abstract class DataInput
 {
 
-    protected $sourceId;
-
+	protected $sourceId;
     protected $basePath;
 	protected array $configuration;
 	protected $db;
@@ -66,8 +65,8 @@ abstract class DataInput
 		$this->ontologyPrefixModel = new OntologyPrefix();
 	}
 
-    abstract public function absorb(int $fileId);
-    abstract public function save(int $fileId);
+    abstract public function absorb(int $fileId): bool;
+    abstract public function save(int $fileId): bool;
 
 	abstract protected function initializeConfiguration();
 
