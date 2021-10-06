@@ -703,4 +703,76 @@ class Source extends CVUI_Controller{
         return view($this->viewDirectory.'/Data', $data);
     }
 
+	public function Elasticsearch(int $source_id)
+	{
+		$uidata = new UIData();
+		$uidata->title = "Elasticsearch Index";
+
+		$source = $this->sourceModel->getSource($source_id);
+		if($source == null){
+			$this->setStatusMessage('Source was not found.', STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName.'/List'));
+		}
+
+		$indexUUID = '-';
+		$indexSize = '-';
+		$indexDocIndexed = '-';
+		$indexDocDeleted = '-';
+		$elasticStatus = ElasticsearchHelper::ping();
+		$indexStatus = ELASTICSEARCH_INDEX_STATUS_UNKNOWN;
+		if ($elasticStatus){
+			$elasticsearch = new ElasticSearch([$this->setting->getElasticSearchUri()]);
+			$indexName = ElasticsearchHelper::getSourceIndexName($source_id);
+			if ($elasticsearch->indexExists($indexName)){
+				$indexStatus = ELASTICSEARCH_INDEX_STATUS_CREATED;
+				$indexStats = $elasticsearch->getIndicesStats();
+				$indexStats = $indexStats['indices'][$indexName];
+				$indexUUID = $indexStats['uuid'];
+				$indexSize = $indexStats['total']['store']['size_in_bytes'];
+				$indexDocIndexed = $indexStats['total']['docs']['count'];
+				$indexDocDeleted = $indexStats['total']['docs']['deleted'];
+			}
+			else{
+				$indexStatus = ELASTICSEARCH_INDEX_STATUS_NOT_CREATED;
+			}
+		}
+
+		$eavModel = new EAV();
+		$dataStatus = ELASTICSEARCH_DATA_STATUS_UNKNOWN;
+		if($eavModel->recordsExistBySourceId($source_id)){
+			$indexedRecordsExist = $eavModel->indexedRecordsExistBySourceId($source_id);
+			$unindexedRecordsExist = $eavModel->unindexedRecordsExistBySourceId($source_id);
+			if($indexedRecordsExist && !$unindexedRecordsExist){
+				$dataStatus = ELASTICSEARCH_DATA_STATUS_FULLY_INDEXED;
+			}
+			else if($unindexedRecordsExist && !$indexedRecordsExist){
+				$dataStatus = ELASTICSEARCH_DATA_STATUS_NOT_INDEXED;
+			}
+		}
+		else{
+			$dataStatus = ELASTICSEARCH_DATA_STATUS_EMPTY;
+		}
+
+		$uidata->data['sourceName'] = $source['name'];
+		$uidata->data['sourceId'] = $source_id;
+		$uidata->data['isRunning'] = $elasticStatus;
+		$uidata->data['indexName'] = $indexName;
+		$uidata->data['indexStatus'] = $indexStatus;
+		$uidata->data['dataStatus'] = $dataStatus;
+		$uidata->data['indexStatusText'] = SourceHelper::getElasticsearchIndexStatus($indexStatus);
+		$uidata->data['dataStatusText'] = SourceHelper::getElasticsearchDataStatus($dataStatus);
+		$uidata->data['indexUUID'] = $indexUUID;
+		$uidata->data['indexSize'] = $indexSize == '-' ? $indexSize : SourceHelper::formatSize($indexSize);
+		$uidata->data['indexDocIndexed'] = $indexDocIndexed;
+		$uidata->data['indexDocDeleted'] = $indexDocDeleted;
+
+		$uidata->javascript = [
+			JS."cafevariome/elasticsearch.js",
+			JS."/bootstrap-notify.js"
+		];
+
+		$data = $this->wrapData($uidata);
+
+		return view($this->viewDirectory.'/Elasticsearch', $data);
+	}
 }
