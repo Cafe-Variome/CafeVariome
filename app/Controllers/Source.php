@@ -694,7 +694,10 @@ class Source extends CVUI_Controller{
         return view($this->viewDirectory.'/Status', $data);
     }
 
-    public function Data(int $source_id)
+	/**
+	 * @deprecated
+	 */
+    private function Data(int $source_id)
     {
         $uidata = new UIData();
         $uidata->title = "Data Attributes";
