@@ -55,10 +55,16 @@ class SpreadsheetDataInput extends DataInput
                 if (preg_match("/\.csv$|\.tsv$/", $file)) {
                     $line = fgets(fopen($filePath, 'r'));
                     preg_match("/^" . $this->configuration['subject_id_attribute_name'] . "(.)/", $line, $matches);
-                    $delimiter = $matches[1];
+					if (count($matches) < 2){
+						//The subject_id attribute name specified didn't exist.
+						return false;
+					}
+					else{
+						$delimiter = $matches[1];
 
-                    $this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
-                    $this->reader->setFieldDelimiter($delimiter);
+						$this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
+						$this->reader->setFieldDelimiter($delimiter);
+					}
                 }
                 elseif (preg_match("/\.xlsx$/", $file)) {
 
