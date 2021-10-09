@@ -677,7 +677,10 @@ class Source extends CVUI_Controller{
         return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-    public function Status(int $source_id = null) {
+	/**
+	 * @deprecated
+	 */
+    private function Status(int $source_id = null) {
         if (!$source_id) {
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
