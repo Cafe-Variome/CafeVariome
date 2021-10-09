@@ -197,7 +197,17 @@ class Source extends CVUI_Controller{
 			$username = $this->request->getVar('username');
 			$password = $this->request->getVar('password');
 
-            $source_data = array("name" => $name, "owner_name" => $owner_name, "email" => $email, "uri" => $uri, "description" => $description, "long_description" => $long_description, "status" => $status, 'username' => $username, 'password' => $password);
+            $source_data = [
+				'uid' => bin2hex(random_bytes(5)), // UID is used as a prefix in Elasticsearch index names, and in Neo4J subject node source attribute
+				'name' => $name,
+				'owner_name' => $owner_name,
+				'email' => $email,
+				'uri' => $uri,
+				'description' => $description,
+				'long_description' => $long_description,
+				'status' => $status,
+				'username' => $username,
+				'password' => $password];
             try {
                 $insert_id = $this->sourceModel->createSource($source_data);
 
