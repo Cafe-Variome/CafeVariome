@@ -10,6 +10,12 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\ElasticSearch;
+use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
+use App\Libraries\CafeVariome\Helpers\Core\Neo4JHelper;
+use App\Libraries\CafeVariome\Helpers\UI\SourceHelper;
+use App\Models\Attribute;
+use App\Models\EAV;
 use App\Models\UIData;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4J;
 use \App\Models\Elastic;
@@ -790,5 +796,72 @@ class Source extends CVUI_Controller{
 		$data = $this->wrapData($uidata);
 
 		return view($this->viewDirectory.'/Elasticsearch', $data);
+	}
+
+	public function Neo4J(int $source_id)
+	{
+		$uidata = new UIData();
+		$uidata->title = "Neo4J Index";
+
+		$source = $this->sourceModel->getSource($source_id);
+		if($source == null){
+			$this->setStatusMessage('Source was not found.', STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName.'/List'));
+		}
+
+		$neo4jStatus = Neo4JHelper::ping();
+
+		$indexedSubjectsCount = '-';
+		$relationshipsCount = '-';
+		$indexStatus = NEO4J_INDEX_STATUS_UNKNOWN;
+
+		if ($neo4jStatus){
+			$neo4j = new \App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J();
+			$indexedSubjectsCount = $neo4j->countSubjectsBySourceId($source_id, $source['uid']);
+			if ($indexedSubjectsCount > 0){
+				$indexStatus = NEO4J_INDEX_STATUS_CREATED;
+			}
+			else{
+				$indexStatus = NEO4J_INDEX_STATUS_NOT_CREATED;
+			}
+			$relationshipsCount = $neo4j->countRelationshipsBySourceId($source_id, $source['uid']);
+		}
+
+		$attributeModel = new Attribute();
+		$eavModel = new EAV();
+
+		$n4jAttributeIds = $attributeModel->getAttributeIdsBySourceIdAndStorageLocation($source_id, ATTRIBUTE_STORAGE_NEO4J);
+		$dataStatus = NEO4J_DATA_STATUS_UNKNOWN;
+		if(count($n4jAttributeIds) > 0 && $eavModel->recordsExistBySourceId($source_id, $n4jAttributeIds)){
+			$indexedRecordsExist = $eavModel->indexedRecordsExistBySourceId($source_id, $n4jAttributeIds);
+			$unindexedRecordsExist = $eavModel->unindexedRecordsExistBySourceId($source_id, $n4jAttributeIds);
+			if($indexedRecordsExist && !$unindexedRecordsExist){
+				$dataStatus = NEO4J_DATA_STATUS_FULLY_INDEXED;
+			}
+			else if($unindexedRecordsExist && !$indexedRecordsExist){
+				$dataStatus = NEO4J_DATA_STATUS_NOT_INDEXED;
+			}
+			else if($unindexedRecordsExist && $indexedRecordsExist){
+				$dataStatus = NEO4J_DATA_STATUS_PARTIALLY_INDEXED;
+			}
+		}
+		else{
+			$dataStatus = NEO4J_DATA_STATUS_EMPTY;
+		}
+
+		$uidata->data['sourceName'] = $source['name'];
+		$uidata->data['sourceId'] = $source_id;
+		$uidata->data['isRunning'] = $neo4jStatus;
+		$uidata->data['dataStatus'] = $dataStatus;
+		$uidata->data['dataStatusText'] = SourceHelper::getNeo4JDataStatus($dataStatus);
+		$uidata->data['indexStatusText'] = SourceHelper::getNeo4JIndexStatus($indexStatus);
+		$uidata->data['indexedSubjectsCount'] = $indexedSubjectsCount;
+		$uidata->data['relationshipsCount'] = $relationshipsCount;
+
+		$uidata->javascript = [JS."cafevariome/neo4j.js"];
+
+		$data = $this->wrapData($uidata);
+
+		return view($this->viewDirectory.'/Neo4J', $data);
 	}
 }
