@@ -110,18 +110,6 @@
                 </div>
             </li>
 
-            <li class="nav-item <?= $controllerName == 'Elastic' ? 'active' : ''?>">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseElastic" aria-expanded="true" aria-controls="collapseElastic">
-                <i class="fas fa-fw fa-search"></i>
-                <span>Elastic Search</span>
-                </a>
-                <div id="collapseElastic" class="collapse  <?= $controllerName == 'Elastic' ? 'show' : ''?>" aria-labelledby="headingElastic" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="<?= base_url('Elastic/Status') ?>">Status</a>
-                    </div>
-                </div>
-            </li>
-
 			<li class="nav-item <?= $controllerName == 'Ontology' ? 'active' : ''?>">
 				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOntology" aria-expanded="true" aria-controls="collapseOntology">
 					<i class="fas fa-fw fa-project-diagram"></i>
