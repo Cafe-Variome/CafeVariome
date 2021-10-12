@@ -268,4 +268,66 @@ class Attribute extends CVUI_Controller
 		return view($this->viewDirectory . '/OntologyAssociations', $data);
 	}
 
+	public function DeleteAssociation(int $association_id)
+	{
+		$association = $this->attributeModel->getAttributeOntologyAssociation($association_id);
+		if ($association == null || $association_id <= 0){
+			return redirect()->to(base_url('Source'));
+		}
+
+		$uidata = new UIData();
+		$uidata->title = 'Delete Ontology Association';
+		$uidata->data['association_id'] = $association_id;
+		$uidata->data['attribute_id'] = $association['attribute_id'];
+		$uidata->data['attribute_name'] = $association['attribute_name'];
+		$uidata->data['ontology_name'] = $association['ontology_name'];
+		$uidata->data['prefix_name'] = $association['prefix_name'];
+		$uidata->data['relationship_name'] = $association['relationship_name'];
+
+		$this->validation->setRules([
+			'confirm' => [
+				'label'  => 'confirmation',
+				'rules'  => 'required',
+				'errors' => [
+					'required' => '{field} is required.'
+				]
+			],
+
+			'association_id' => [
+				'label'  => 'Association Id',
+				'rules'  => 'required|alpha_dash',
+				'errors' => [
+					'required' => '{field} is required.',
+					'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
+				]
+			]
+		]);
+
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+			$association_id = $this->request->getVar('association_id');
+			$confirm = $this->request->getVar('confirm');
+			if ($confirm == 'yes') {
+				try {
+					$association = $this->attributeModel->getAttributeOntologyAssociation($association_id);
+					if ($association)  {
+						$attribute_id = $association['attribute_id'];
+						$this->attributeModel->deleteAttributeOntologyAssociation($association_id);
+						$this->setStatusMessage("Ontology association was deleted.", STATUS_SUCCESS);
+						return redirect()->to(base_url($this->controllerName.'/OntologyAssociations/' . $attribute_id));
+					}
+					else{
+						$this->setStatusMessage("Ontology association not exist.", STATUS_ERROR);
+					}
+				} catch (\Exception $ex) {
+					$this->setStatusMessage("There was a problem deleting the ontology association.", STATUS_ERROR);
+				}
+			}
+			return redirect()->to(base_url('Source'));
+		}
+
+
+		$data = $this->wrapData($uidata);
+
+		return view($this->viewDirectory.'/DeleteAssociation', $data);
+	}
 }
