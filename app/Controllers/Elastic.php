@@ -4,7 +4,7 @@
  * Elastic.php
  *
  * Created 08/08/2019
- *
+ * @deprecated
  * @author Mehdi Mehtarizadeh
  * @author Farid Yavari Dizjikan
  *
