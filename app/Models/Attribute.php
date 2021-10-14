@@ -213,4 +213,16 @@ class Attribute extends Model
 
 		return $result;
 	}
+	public function associateAttributeWithOntologyPrefixAndRelationship(int $attribute_id, int $prefix_id, int $relationship_id, int $ontology_id)
+	{
+		$this->builder = $this->db->table('attributes_ontology_prefixes_relationships');
+
+		$this->builder->insert([
+			'attribute_id' => $attribute_id,
+			'prefix_id' => $prefix_id,
+			'relationship_id' => $relationship_id,
+			'ontology_id' => $ontology_id
+		]);
+		$this->builder = $this->db->table($this->table);
+	}
 }
