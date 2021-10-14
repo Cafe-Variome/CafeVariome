@@ -3,8 +3,8 @@
 /**
  * Elastic.php
  * Created 26/07/2019
- * 
- * @author Owen Lancaster 
+ * @deprecated
+ * @author Owen Lancaster
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
  */
@@ -47,7 +47,7 @@ class Elastic extends Model{
         $params = [];
 
         $prefix = $this->getTitlePrefix();
-        $index_name = $prefix."_".$source_id."*";	    
+        $index_name = $prefix."_".$source_id."*";
 
         if($this->elasticInstance->indexExists($index_name)){
             $this->elasticInstance->deleteIndex($index_name);
@@ -83,7 +83,7 @@ class Elastic extends Model{
         $this->builder = $this->db->table('uploaddatastatus');
 
         $this->builder->select('FileName,tissue,patient');
-        $this->builder->like('FileName', '.vcf', 'before'); 
+        $this->builder->like('FileName', '.vcf', 'before');
         $this->builder->where('Status', 'Pending');
         $this->builder->where('source_id', $source_id);
         $vcf = $this->builder->get()->getResultArray();
@@ -91,11 +91,11 @@ class Elastic extends Model{
     }
 
     /**
-     * VCF Wrap - We have finished inserting data for a VCF file and it is time to update the status table. 
+     * VCF Wrap - We have finished inserting data for a VCF file and it is time to update the status table.
      * @deprecated
      * @param string $file   - The name of the file
      * @param int $source_id - The id of the source
-     * @return N/A 
+     * @return N/A
      */
     function vcfWrap($file, $source_id) {
         $this->builder = $this->db->table('uploaddatastatus');
@@ -113,10 +113,10 @@ class Elastic extends Model{
     /**
      * getTitlePrefix()
      * This funcion returns the first part of site_title variable in settings table in the database.
-     * 
+     *
      * @author Mehdi Mehtarizadeh
-     * 
-     * @param void 
+     * @deprecated
+     * @param void
      * @return string
      */
     public function getTitlePrefix(): string
@@ -135,7 +135,7 @@ class Elastic extends Model{
         $segments = explode('/', $baseUrl);
 
         $prefix = count($segments) > 1 ? $segments[1] : $title;
- 
+
         return strtolower($prefix);
     }
 }
