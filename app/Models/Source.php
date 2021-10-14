@@ -371,4 +371,20 @@ use CodeIgniter\Database\ConnectionInterface;
         return ($query) ? $query[0]->elastic_status : -1;
     }
 
+	 public function getSourceUID(int $source_id): ?string
+	 {
+		 $this->builder = $this->db->table($this->table);
+		 $this->builder->select('uid');
+		 $this->builder->where('source_id', $source_id);
+
+		 $query = $this->builder->get()->getResultArray();
+
+		 if (count($query) == 1){
+			 return $query[0]['uid'];
+		 }
+
+		 return null;
+
+	 }
+
  }
