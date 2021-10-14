@@ -269,4 +269,12 @@ class Attribute extends Model
 
 		return count($result) == 1;
 	}
+
+	public function deleteAttributeOntologyAssociation(int $association_id)
+	{
+		$this->builder = $this->db->table('attributes_ontology_prefixes_relationships');
+		$this->builder->where('id', $association_id);
+		$this->builder->delete();
+		$this->builder = $this->db->table($this->table);
+	}
 }
