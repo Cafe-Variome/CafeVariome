@@ -29,13 +29,15 @@
 		<th>Data Status</th>
 		<td><?= $dataStatusText ?></td>
 		<td id="action-<?= $sourceId ?>">
-			<?php if($dataStatus == NEO4J_DATA_STATUS_FULLY_INDEXED || $dataStatus == NEO4J_DATA_STATUS_NOT_INDEXED): ?>
-				<button onclick="regenNeo4J('<?= $sourceId; ?>', false);" class="btn btn-primary bg-gradient-primary">
-					<?= ($dataStatus == NEO4J_DATA_STATUS_NOT_INDEXED) ? 'Index Data' : 'Re-index Data' ?>
-				</button>
-			<?php endif; ?>
-			<?php if($dataStatus == NEO4J_DATA_STATUS_PARTIALLY_INDEXED): ?>
-				<button onclick="regenNeo4J('<?= $sourceId; ?>', true);" class="btn btn-success">Index Appended Data</button>
+			<?php if($isRunning): ?>
+				<?php if($dataStatus == NEO4J_DATA_STATUS_FULLY_INDEXED || $dataStatus == NEO4J_DATA_STATUS_NOT_INDEXED): ?>
+					<button onclick="regenNeo4J('<?= $sourceId; ?>', false);" class="btn btn-primary bg-gradient-primary">
+						<?= ($dataStatus == NEO4J_DATA_STATUS_NOT_INDEXED) ? 'Index Data' : 'Re-index Data' ?>
+					</button>
+				<?php endif; ?>
+				<?php if($dataStatus == NEO4J_DATA_STATUS_PARTIALLY_INDEXED): ?>
+					<button onclick="regenNeo4J('<?= $sourceId; ?>', true);" class="btn btn-success">Index Appended Data</button>
+				<?php endif; ?>
 			<?php endif; ?>
 		</td>
 	</tr>
