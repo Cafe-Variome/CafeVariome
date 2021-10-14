@@ -59,11 +59,14 @@
 				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Source">
 					<i class="fa fa-edit text-warning"></i>
 				</a>
-				<a href="<?php echo base_url($controllerName. '/Status'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Source File Status">
-					<i class="fa fa-info-circle text-primary"></i>
-				</a>
 				<a href="<?php echo base_url('Attribute/List'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Data Attributes and Values">
 					<i class="fa fa-database text-info"></i>
+				</a>
+				<a href="<?php echo base_url($controllerName. '/Elasticsearch'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Elasticsearch Index">
+					<i class="fa fa-search text-secondary"></i>
+				</a>
+				<a href="<?php echo base_url($controllerName. '/Neo4J'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Neo4J Index">
+					<i class="fa fa-project-diagram text-secondary"></i>
 				</a>
 				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] . "/" . $source['name']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Source">
 					<i class="fa fa-trash text-danger"></i>
