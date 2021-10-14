@@ -95,6 +95,21 @@ class Attribute extends Model
 		return $this->builder->get()->getResultArray();
 	}
 
+	public function getAttributeIdsBySourceIdAndStorageLocation(int $source_id, int $storage_location)
+	{
+		$this->builder->select('id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->where('storage_location', $storage_location);
+		$result = $this->builder->get()->getResultArray();
+
+		$ids = [];
+		foreach ($result as $id){
+			array_push($ids, $id['id']);
+		}
+
+		return $ids;
+	}
+
 	public function getAttributeIdByNameAndSourceId(string $name, string $source_id): int
 	{
 		$attribute_id = -1;
