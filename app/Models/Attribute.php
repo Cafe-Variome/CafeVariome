@@ -241,4 +241,19 @@ class Attribute extends Model
 		return $result;
 	}
 
+	public function getAttributeOntologyAssociation(int $association_id)
+	{
+		$this->builder = $this->db->table('attributes_ontology_prefixes_relationships as aop');
+		$this->builder->select('aop.id as id, ontologies.name as ontology_name, ontology_prefixes.name as prefix_name, ontology_relationships.name as relationship_name, ' . $this->table . '.name as attribute_name, ' . $this->table . '.id as attribute_id');
+		$this->builder->where('aop.id', $association_id);
+		$this->builder->join('ontologies', 'aop.ontology_id = ontologies.id');
+		$this->builder->join($this->table, 'aop.attribute_id = ' . $this->table . '.id');
+		$this->builder->join('ontology_prefixes', 'aop.prefix_id = ontology_prefixes.id');
+		$this->builder->join('ontology_relationships', 'aop.relationship_id = ontology_relationships.id');
+		$result = $this->builder->get()->getResultArray();
+		$this->builder = $this->db->table($this->table);
+
+		return count($result) == 1 ? $result[0] : null;
+	}
+
 }
