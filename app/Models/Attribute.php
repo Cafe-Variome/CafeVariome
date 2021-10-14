@@ -21,7 +21,6 @@ class Attribute extends Model
 	{
 		$this->db = \Config\Database::connect();
 		$this->builder = $this->db->table($this->table);
-
 	}
 
 	public function createAttribute(string $name, int $source_id, string $display_name = '', int $type = ATTRIBUTE_TYPE_UNDEFINED,
@@ -51,6 +50,30 @@ class Attribute extends Model
 
 		if (count($result) == 1){
 			return $result[0];
+		}
+
+		return null;
+	}
+
+	public function getAttributeAndValues(int $attribute_id)
+	{
+		$this->builder->select($this->table . '.name as attribute_name,' . $this->table . '.type as attribute_type, values.id as value_id, values.name as value_name');
+		$this->builder->where($this->table . '.id', $attribute_id);
+		$this->builder->join('values', $this->table . '.id = values.attribute_id');
+
+		$result = $this->builder->get()->getResultArray();
+
+		if (count($result) > 0){
+			$values = [];
+			foreach ($result as $attribute_value){
+				$values[$attribute_value['value_id']] = $attribute_value['value_name'];
+			}
+
+			return [
+				'name' => $result[0]['attribute_name'],
+				'type' => $result[0]['attribute_type'],
+				'values' => $values
+			];
 		}
 
 		return null;
