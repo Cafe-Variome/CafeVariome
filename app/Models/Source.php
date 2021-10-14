@@ -95,16 +95,12 @@ use CodeIgniter\Database\ConnectionInterface;
     /**
      *
      */
-    public function getSource(int $source_id) {
-
+    public function getSource(int $source_id)
+	{
         $this->builder = $this->db->table($this->table);
-        $query = $this->builder->where('source_id', $source_id);
+        $this->builder->where('source_id', $source_id);
         $query = $this->builder->get()->getResultArray();
-        if($query)
-        {
-            return $query[0];
-        }
-        return null;
+		return count($query) == 1 ? $query[0] : null;
     }
 
     /**
