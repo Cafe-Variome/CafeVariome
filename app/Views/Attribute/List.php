@@ -56,6 +56,12 @@
 		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
 			<i class="fa fa-database"></i> View Sources
 		</a>
+		<a class="btn btn-info bg-gradient-info" href="<?= base_url('Source/Elasticsearch/' . $sourceId) ?>">
+			<i class="fa fa-search"></i> Elasticsearch Index Status
+		</a>
+		<a class="btn btn-info bg-gradient-info" href="<?= base_url('Source/Neo4J/' . $sourceId) ?>">
+			<i class="fa fa-project-diagram"></i> Neo4J Index Status
+		</a>
 	</div>
 </div>
 <?= $this->endSection() ?>
