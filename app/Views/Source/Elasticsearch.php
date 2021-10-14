@@ -35,11 +35,15 @@
 		<th>Data Status</th>
 		<td><?= $dataStatusText ?></td>
 		<td id="action-<?= $sourceId ?>">
-			<?php if($dataStatus == ELASTICSEARCH_DATA_STATUS_FULLY_INDEXED || $dataStatus == ELASTICSEARCH_DATA_STATUS_NOT_INDEXED): ?>
-				<button onclick="regenElastic('<?= $sourceId; ?>', false);" class="btn btn-primary">Re-index Data</button>
-			<?php endif; ?>
-			<?php if($dataStatus == ELASTICSEARCH_DATA_STATUS_PARTIALLY_INDEXED): ?>
-				<button onclick="regenElastic('<?= $sourceId; ?>', true);" class="btn btn-success">Index Appended Data</button>
+			<?php if($isRunning): ?>
+				<?php if($dataStatus == ELASTICSEARCH_DATA_STATUS_FULLY_INDEXED || $dataStatus == ELASTICSEARCH_DATA_STATUS_NOT_INDEXED): ?>
+					<button onclick="regenElastic('<?= $sourceId; ?>', false);" class="btn btn-primary bg-gradient-primary">
+						<?= ($dataStatus == ELASTICSEARCH_DATA_STATUS_NOT_INDEXED) ? 'Index Data' : 'Re-index Data' ?>
+					</button>
+				<?php endif; ?>
+				<?php if($dataStatus == ELASTICSEARCH_DATA_STATUS_PARTIALLY_INDEXED): ?>
+					<button onclick="regenElastic('<?= $sourceId; ?>', true);" class="btn btn-success">Index Appended Data</button>
+				<?php endif; ?>
 			<?php endif; ?>
 		</td>
 	</tr>
