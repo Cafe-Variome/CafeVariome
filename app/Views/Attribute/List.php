@@ -42,6 +42,11 @@
 				<a href="<?= base_url($controllerName . '/Update') . '/' . $attribute['id']?>" data-toggle="tooltip" data-placement="top" title="Edit Attribute">
 					<i class="fa fa-edit text-warning"></i>
 				</a>
+				<?php if($attribute['type'] == ATTRIBUTE_TYPE_ONTOLOGY_TERM): ?>
+				<a href="<?= base_url($controllerName . '/OntologyAssociations') . '/' . $attribute['id']?>" data-toggle="tooltip" data-placement="top" title="View Related Ontologies">
+					<i class="fa fa-project-diagram text-secondary"></i>
+				</a>
+				<?php endif; ?>
 				<a href="<?= base_url($controllerName . '/Details') . '/' . $attribute['id']?>" data-toggle="tooltip" data-placement="top" title="View Attribute">
 					<i class="fa fa-eye text-info"></i>
 				</a>
