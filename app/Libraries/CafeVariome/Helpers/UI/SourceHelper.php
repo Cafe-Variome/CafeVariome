@@ -40,6 +40,36 @@ class SourceHelper
 		return 'Undefined';
 	}
 
+	public static function getNeo4JIndexStatus(int $status)
+	{
+		switch ($status){
+			case NEO4J_INDEX_STATUS_UNKNOWN:
+				return 'Unknown';
+			case NEO4J_INDEX_STATUS_CREATED:
+				return 'Created';
+			case NEO4J_INDEX_STATUS_NOT_CREATED:
+				return 'Not Created';
+		}
+		return 'Undefined';
+	}
+
+	public static function getNeo4JDataStatus(int $status)
+	{
+		switch ($status){
+			case NEO4J_DATA_STATUS_UNKNOWN:
+				return 'Unknown';
+			case NEO4J_DATA_STATUS_NOT_INDEXED:
+				return 'Not Indexed';
+			case NEO4J_DATA_STATUS_FULLY_INDEXED:
+				return 'Fully Indexed';
+			case NEO4J_DATA_STATUS_PARTIALLY_INDEXED:
+				return 'Partially Indexed';
+			case NEO4J_DATA_STATUS_EMPTY:
+				return 'Source Empty';
+		}
+		return 'Undefined';
+	}
+
 	public static function formatSize(int $size): string
 	{
 		if ($size < 0){
