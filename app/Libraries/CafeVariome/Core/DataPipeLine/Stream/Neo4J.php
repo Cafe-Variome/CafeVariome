@@ -3,7 +3,7 @@
 /**
  * Neo4J.php
  * Created: 18/02/2020
- *
+ * @deprecated
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
  */
