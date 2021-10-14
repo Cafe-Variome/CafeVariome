@@ -256,4 +256,17 @@ class Attribute extends Model
 		return count($result) == 1 ? $result[0] : null;
 	}
 
+	public function attributeAssociationExists(int $attribute_id, int $ontology_id, int $prefix_id, int $relationship_id): bool
+	{
+		$this->builder = $this->db->table('attributes_ontology_prefixes_relationships as aop');
+		$this->builder->where('aop.attribute_id', $attribute_id);
+		$this->builder->where('aop.ontology_id', $ontology_id);
+		$this->builder->where('aop.prefix_id', $prefix_id);
+		$this->builder->where('aop.relationship_id', $relationship_id);
+
+		$result = $this->builder->get()->getResultArray();
+		$this->builder = $this->db->table($this->table);
+
+		return count($result) == 1;
+	}
 }
