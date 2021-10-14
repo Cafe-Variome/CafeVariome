@@ -201,4 +201,16 @@ class Attribute extends Model
 			'storage_location' => $storage_location
 		]);
 	}
+
+	public function getOntologyPrefixIdsAndRelationshipIdsByAttributeId(int $attribute_id): array
+	{
+		$this->builder = $this->db->table('attributes_ontology_prefixes_relationships');
+		$this->builder->select('prefix_id, relationship_id');
+		$this->builder->where('attribute_id', $attribute_id);
+
+		$result = $this->builder->get()->getResultArray();
+		$this->builder = $this->db->table($this->table);
+
+		return $result;
+	}
 }
