@@ -60,6 +60,9 @@
 		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
 			<i class="fa fa-database"></i> View Sources
 		</a>
+		<a class="btn btn-info bg-gradient-info" href="<?= base_url('Attribute/List/' . $sourceId ) ?>">
+			<i class="fa fa-database"></i> View Data Attributes for <?= $sourceName ?>
+		</a>
 	</div>
 </div>
 <?= $this->endSection() ?>
