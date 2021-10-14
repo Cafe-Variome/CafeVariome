@@ -33,7 +33,7 @@
 			<td><?= $attribute['name'] ?></td>
 			<td><?= $attribute['display_name'] ?></td>
 			<td><?= $source_name ?></td>
-			<td><?= $attribute['type'] ?></td>
+			<td><?= $attribute['type_text'] ?></td>
 			<td><?= $attribute['storage_location'] ?></td>
 			<td>
 				<a href="<?= base_url('Value/List') . '/' . $attribute['id']?>" data-toggle="tooltip" data-placement="top" title="View Values">
