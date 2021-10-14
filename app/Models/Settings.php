@@ -17,7 +17,7 @@ class Settings extends Model{
 	protected $db;
 
   private static $_settings = null;
-    
+
   public $settingData = Array();
 
 	protected $table      = 'settings';
@@ -27,7 +27,7 @@ class Settings extends Model{
 
     /**
      * Constructor
-     * 
+     *
      * @param ConnectionInterface $db
      * @return object
      */
@@ -40,7 +40,7 @@ class Settings extends Model{
           else {
               $this->db = \Config\Database::connect();
           }
-          if (!$returnFull) {    
+          if (!$returnFull) {
           $settings = $this->findAll();
           $c = 0;
           foreach ($settings as $row) {
@@ -50,7 +50,7 @@ class Settings extends Model{
                 $this->settingData[$row['setting_key']] = false;
             }
             else {
-                $this->settingData[$row['setting_key']] =  $row['value'];               
+                $this->settingData[$row['setting_key']] =  $row['value'];
             }
           }
       }
@@ -62,12 +62,12 @@ class Settings extends Model{
       {
         self::$_settings = new Settings();
       }
-   
+
       return self::$_settings;
     }
 
     public function getSettings(string $cols = null, array $conds = null, int $limit = -1, int $offset = -1){
-        $builder = $this->db->table($this->table);		
+        $builder = $this->db->table($this->table);
 
         if ($cols) {
             $builder->select($cols);
@@ -83,7 +83,7 @@ class Settings extends Model{
         }
 
         $query = $builder->get()->getResultArray();
-        return $query; 
+        return $query;
     }
 
     public function getSettingsByGroup(string $group)
@@ -110,7 +110,7 @@ class Settings extends Model{
     }
 
     public function getElasticSearchUri()
-    { 
+    {
         return $this->settingData['elastic_url'];
     }
 
@@ -158,6 +158,11 @@ class Settings extends Model{
     {
         return $this->settingData["oidc_client_secret"];
     }
+
+	public function getSiteTitle()
+	{
+		return $this->settingData['site_title'];
+	}
 
     /**
      * @deprecated
