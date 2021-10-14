@@ -2,6 +2,7 @@
 
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4J;
+use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use App\Models\Settings;
 use Elasticsearch\ClientBuilder;
 
@@ -30,5 +31,10 @@ abstract class AbstractQuery
 
 		$hosts = array($setting->getElasticSearchUri());
 		return ClientBuilder::create()->setHosts($hosts)->build();
+	}
+
+	protected function getESIndexName(int $source_id): string
+	{
+		return ElasticsearchHelper::getSourceIndexName($source_id);
 	}
 }
