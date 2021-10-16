@@ -195,7 +195,7 @@ class AjaxApi extends Controller{
 
 	 /**
 	  * elasticCheck() - Checking function prior to update to determine type of update desired and whether it is needed.
-	  *
+	  * @deprecated
 	  * @param int $force     - Are we forcing the regnerate? 1 if so and 0 if not
 	  * @param int $id        - The source id for the elasticsearch index
 	  * @param int $add       - 1 if we are adding to index instead of fully regenerating
@@ -203,21 +203,13 @@ class AjaxApi extends Controller{
 	  */
 	 public function elasticCheck() {
 		 if ($this->request->getMethod() == 'post') {
-			 $uploadModel = new \App\Models\Upload();
 			 $eavModel = new EAV();
 
 			 $source_id = $this->request->getVar('source_id');
-			 $force = $this->request->getVar('force');
-			 $add = $this->request->getVar('add');
+			 $append = $this->request->getVar('append') == 'true' ? true : false;
 
-			 $unprocessedFilesCount = $uploadModel->getElasticsearchUnprocessedFilesBySourceId($source_id);
-
-			 if (!$unprocessedFilesCount) {
-				 $result = ['Status' => 'Empty'];
-				 return json_encode($result);
-			 }
-			 if ($add) {
-				 $unaddedEAVsCount = $eavModel->countUnaddedEAVs($source_id);
+			 if ($append) {
+				 $unaddedEAVsCount = $eavModel->countUnindexedRecordsBySourceId($source_id);
 				 if ($unaddedEAVsCount == 0) {
 					 $result = ['Status' => 'Fully Updated'];
 					 return json_encode($result);
@@ -225,14 +217,10 @@ class AjaxApi extends Controller{
 					 $result = ['Status' => 'Success'];
 					 return json_encode($result);
 				 }
-			 } else {
-				 if ($force) {
-					 $result = ['Status' => 'Success'];
-					 return json_encode($result);
-				 } else {
-					 $result = ['Status' => 'Fully Updated'];
-					 return json_encode($result);
-				 }
+			 }
+			 else {
+				 $result = ['Status' => 'Success'];
+				 return json_encode($result);
 			 }
 		 }
 	 }
