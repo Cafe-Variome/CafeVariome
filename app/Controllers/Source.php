@@ -864,4 +864,42 @@ class Source extends CVUI_Controller{
 
 		return view($this->viewDirectory.'/Neo4J', $data);
 	}
+
+	public function UserInterface(int $source_id)
+	{
+		$uidata = new UIData();
+		$uidata->title = "User Interface Index";
+
+		$source = $this->sourceModel->getSource($source_id);
+		if($source == null){
+			$this->setStatusMessage('Source was not found.', STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName.'/List'));
+		}
+
+		$indexName = $source_id . '_' . $source['uid'] . '.json';
+		$uiIndexPath = getcwd() . DIRECTORY_SEPARATOR . USER_INTERFACE_INDEX_DIR;
+
+		$fileMan = new SysFileMan($uiIndexPath);
+		$indexSize = '-';
+
+		if ($fileMan->Exists($indexName)){
+			$indexSize = $fileMan->getSize($indexName);
+			$indexStatus = USER_INTERFACE_INDEX_STATUS_CREATED;
+		}
+		else{
+			$indexStatus = USER_INTERFACE_INDEX_STATUS_NOT_CREATED;
+		}
+
+		$uidata->data['sourceName'] = $source['name'];
+		$uidata->data['sourceId'] = $source_id;
+		$uidata->data['indexName'] = $indexName;
+		$uidata->data['indexSize'] = $indexSize == '-' ? $indexSize : SourceHelper::formatSize($indexSize);
+		$uidata->data['indexStatusText'] = SourceHelper::getNeo4JIndexStatus($indexStatus);
+
+		$uidata->javascript = [JS."cafevariome/userinterfaceindex.js"];
+
+		$data = $this->wrapData($uidata);
+
+		return view($this->viewDirectory.'/UserInterface', $data);
+	}
 }
