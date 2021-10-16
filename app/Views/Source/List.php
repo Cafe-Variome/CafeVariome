@@ -50,6 +50,13 @@
 				?>
 			</td>
 			<td>
+				<?php if ( $source['status'] == "online" ): ?>
+					Online
+				<?php elseif ( $source['status'] == "offline" ): ?>
+					Offline
+				<?php endif; ?>
+			</td>
+			<td>
 				<a data-toggle="modal" data-target="#addVariantsModal" data-id="<?= $source['source_id'] ?>" data-srcname="<?= $source['name']; ?>" data-placement="top" title="Upload Data Files" id="ImportRecordsBtn">
 					<i class="fa fa-upload text-success"></i>
 				</a>
