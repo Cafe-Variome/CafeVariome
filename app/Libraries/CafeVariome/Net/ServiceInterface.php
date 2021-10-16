@@ -74,6 +74,20 @@ class ServiceInterface
 		return $results;
 	}
 
+	public function GetUserInterfaceIndexStatus()
+	{
+		$message = ['type' => 'uiindexstatus'];
+
+		$results = "";
+		$this->socket->Create()->Connect()->Write($message);
+		while ($out = $this->socket->Read(2048)) {
+			$results .= $out;
+		}
+		$this->socket->Close();
+
+		return $results;
+	}
+
     public function RegisterProcess(int $entity_id, int $total_records, string $name, string $status = "", string $message = "records_count"): bool
     {
         $message = [
