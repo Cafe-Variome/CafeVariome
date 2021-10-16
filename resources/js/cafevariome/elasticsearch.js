@@ -20,39 +20,25 @@ function callElastic(id, append) {
     var csrfTokenName = Object.keys(csrfTokenObj)[0];
     postData[csrfTokenName] = csrfTokenObj[csrfTokenName];
 
-    $.ajax({url: baseurl + 'AjaxApi/elasticCheck',
+    $.ajax({url  : baseurl + 'AjaxApi/elasticStart',
         type: 'POST',
         data : postData,
         dataType: 'json',
         success: function (data) {
-            if (data.Status == 'Success') {
-                $.ajax({url  : baseurl + 'AjaxApi/elasticStart',
-                    type: 'POST',
-                    data : postData,
-                    dataType: 'json',
-                    success: function (data) {
-                        $.notify({
-                            // options
-                            message: 'ElasticSearch is now regenerating.'},{
-                            // settings
-                            timer: 200
-                        });
-                    }
-                });
-
-                $('#status-' + id.toString()).empty();
-                $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div><p id='statusmessage-" + id.toString() + "' style='font-size: 10px'></p>");
-
-                $('#action-' + id.toString()).children().prop('disabled', true);
-            }
-            else if (data.Status == 'Empty') {
-                alert('This Source doesnt have any data uploaded to it yet. Please go to Data tab to rectify this.');
-            }
-            else {
-                alert('ElasticSearch is fully up to date. Upload more data first.');
-            }
+            $.notify({
+                // options
+                message: 'ElasticSearch is now regenerating.'},{
+                // settings
+                timer: 200
+            });
         }
     });
+
+    $('#status-' + id.toString()).empty();
+    $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div><p id='statusmessage-" + id.toString() + "' style='font-size: 10px'></p>");
+
+    $('#action-' + id.toString()).children().prop('disabled', true);
+
 }
 
 function getCSRFToken(format = 'string'){
