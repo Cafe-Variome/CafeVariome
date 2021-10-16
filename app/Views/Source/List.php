@@ -28,9 +28,7 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php $c = 0; ?>
 		<?php foreach ($sources as $source): ?>
-		<?php $c++; ?>
 			<td><?php echo $source['name']; ?></td>
 			<td><?php echo $source['description']; ?></td>
 			<td><?= $source['record_count']; ?></td>
@@ -63,28 +61,24 @@
 				<a href="<?php echo base_url('Upload/Import'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Import Files">
 					<i class="fa fa-file-import text-primary"></i>
 				</a>
-				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Source">
-					<i class="fa fa-edit text-warning"></i>
+				<a href="<?php echo base_url($controllerName. '/Elasticsearch'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Elasticsearch Index">
+					<i class="fa fa-search text-info"></i>
+				</a>
+				<a href="<?php echo base_url($controllerName. '/Neo4J'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Neo4J Index">
+					<i class="fa fa-project-diagram text-warning"></i>
+				</a>
+				<a href="<?php echo base_url($controllerName. '/UserInterface'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="User Interface Index">
+					<i class="fa fa-desktop text-secondary"></i>
 				</a>
 				<a href="<?php echo base_url('Attribute/List'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Data Attributes and Values">
 					<i class="fa fa-database text-info"></i>
 				</a>
-				<a href="<?php echo base_url($controllerName. '/Elasticsearch'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Elasticsearch Index">
-					<i class="fa fa-search text-secondary"></i>
-				</a>
-				<a href="<?php echo base_url($controllerName. '/Neo4J'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Neo4J Index">
-					<i class="fa fa-project-diagram text-secondary"></i>
+				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Source">
+					<i class="fa fa-edit text-warning"></i>
 				</a>
 				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] . "/" . $source['name']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Source">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
-			</td>
-			<td>
-			<?php if ( $source['status'] == "online" ): ?>
-				Online
-			<?php elseif ( $source['status'] == "offline" ): ?>
-				Offline
-			<?php endif; ?>
 			</td>
 		</tr>
 		<?php endforeach; ?>
