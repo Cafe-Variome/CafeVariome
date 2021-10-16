@@ -23,8 +23,8 @@
 			<th>Description</th>
 			<th>Record Count</th>
 			<th>Assigned Group(s)</th>
-			<th>Action</th>
 			<th>Status</th>
+			<th>Actions</th>
 		</tr>
 	</thead>
 	<tbody>
