@@ -100,6 +100,7 @@ define('VENDOR','vendor/');
 
 define('RESOURCES_DIR', "resources". DIRECTORY_SEPARATOR);
 define('JSON_DATA_DIR', RESOURCES_DIR . "phenotype_lookup_data" . DIRECTORY_SEPARATOR);
+define('USER_INTERFACE_INDEX_DIR', RESOURCES_DIR . "user_interface_index" . DIRECTORY_SEPARATOR);
 define('CV_BIN', RESOURCES_DIR . 'bin' . DIRECTORY_SEPARATOR);
 define('STATIC_DIR', 'static' . DIRECTORY_SEPARATOR);
 define('ORPHATERMS_SOURCE', 'orphaterms.txt');
