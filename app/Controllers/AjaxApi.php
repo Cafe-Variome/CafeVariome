@@ -1006,6 +1006,38 @@ class AjaxApi extends Controller{
 		}
     }
 
+	public function getOntologyPrefixesAndRelationships()
+	{
+		$ontology_id = $this->request->getVar('ontology_id');
+		$attribute_id = $this->request->getVar('attribute_id');
+
+		$attributeModel = new \App\Models\Attribute();
+		$prefixModel = new \App\Models\OntologyPrefix();
+		$relationshipModel = new \App\Models\OntologyRelationship();
+
+		$prefixList = $prefixModel->getOntologyPrefixes($ontology_id);
+		$relationshipList = $relationshipModel->getOntologyRelationships($ontology_id);
+
+		$prefixes = [];
+		$relationships = [];
+
+		foreach ($prefixList as $prefix){
+			$prefixes[$prefix['id']] = $prefix['name'];
+		}
+
+		foreach ($relationshipList as $relationship) {
+			$relationships[$relationship['id']] = $relationship['name'];
+		}
+
+		return json_encode([
+			'prefixes' =>$prefixes,
+			'relationships' => $relationships
+		]);
+	}
+
+	/**
+	 * @deprecated
+	 */
     public function getAttributeValueFromFile()
     {
         if ($this->request->isAJAX()) {
