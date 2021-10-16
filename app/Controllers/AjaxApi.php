@@ -238,9 +238,35 @@ class AjaxApi extends Controller{
 			 $source_id = $this->request->getVar('source_id');
 			 $add = $this->request->getVar('add');
 			 // rebuild the json list for interface
-			 $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task regenerateElasticsearchAndNeo4JIndex $source_id $add");
+			 $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task IndexDataToElasticsearch $source_id $append");
 	 	}
 	 }
+
+	/**
+	 * elasticStart - Begin Neo4J regeneration
+	 *
+	 * @param int $source_id        - The source id for the neo4j index
+	 * @param int $append       - 1 if we are adding to index instead of fully regenerating
+	 * @return void
+	 */
+	public function neo4jStart()
+	{
+		if ($this->request->getMethod() == 'post'){
+			$source_id = $this->request->getVar('source_id');
+			$append = $this->request->getVar('append');
+			// rebuild the json list for interface
+			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task IndexDataToNeo4J $source_id $append");
+		}
+	}
+
+	public function userInterfaceStart()
+	{
+		if ($this->request->getMethod() == 'post') {
+			$source_id = $this->request->getVar('source_id');
+			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
+
+		}
+	}
 
     /**
      * validateUpload - Ensure the source we are wanting to upload to is an actual source
