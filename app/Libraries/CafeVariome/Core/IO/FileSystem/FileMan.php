@@ -206,7 +206,7 @@
     }
 
 
-    protected function getSize(string $path, bool $isRelative = true): int
+    public function getSize(string $path, bool $isRelative = true): int
     {
         clearstatcache();
         return filesize(($isRelative ? $this->getFullPath() : "") . $path);
