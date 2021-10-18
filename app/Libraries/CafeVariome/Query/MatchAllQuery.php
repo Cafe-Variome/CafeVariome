@@ -27,8 +27,7 @@ class MatchAllQuery extends AbstractQuery
 	{
 		$elasticModel = new Elastic();
 		$es_client = $this->getESInstance();
-
-		$es_index = $elasticModel->getTitlePrefix() . "_" . $source_id;
+		$es_index = $this->getESIndexName($source_id);
 		$esQuery = ['index' => $es_index];
 		$esQuery['body']['query']['exists']['field'] = 'subject_id';
 		$esQuery['body']['aggs']['punique']['terms']=['field'=>'subject_id','size' => $this->aggregate_size];

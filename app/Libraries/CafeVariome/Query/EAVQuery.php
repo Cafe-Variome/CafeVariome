@@ -28,8 +28,7 @@ class EAVQuery extends AbstractQuery
 
 	public function execute(array $clause, int $source_id, bool $iscount)
 	{
-		$elasticModel = new Elastic();
-		$sourceModel = new Source();
+		$es_index = $this->getESIndexName($source_id);
 		$es_client = $this->getESInstance();
 
 		$source_name = $sourceModel->getSourceNameByID($source_id);
