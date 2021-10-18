@@ -72,31 +72,26 @@ class Compiler
 
 		$results = [];
 		foreach ($sources as $source) {
+			$source_id = $source['source_id'];
+			if(!in_array($source_id, $master_group_sources) && !in_array($source_id, $source_display_group_sources) && !in_array($source_id, $count_display_group_sources)) continue;
 
-			$elasticIndexName = $elasticModel->getTitlePrefix() . "_" . $source['source_id'];
-			if ($elasticSearch->indexExists($elasticIndexName))
+			$results[$source['name']]['records']['subjects'] = "Access Denied";
+			if (array_key_exists($source_id, $source_display_group_sources) || array_key_exists($source_id, $count_display_group_sources))
 			{
-				$source_id = $source['source_id'];
-				if(!in_array($source_id, $master_group_sources) && !in_array($source_id, $source_display_group_sources) && !in_array($source_id, $count_display_group_sources)) continue;
+				$ids = $this->execute_query($pointer_query, $source['source_id']);
+				$records = [];
+				$records['subjects'] = $ids;
 
-				$results[$source['name']]['records']['subjects'] = "Access Denied";
-				if (array_key_exists($source_id, $source_display_group_sources) || array_key_exists($source_id, $count_display_group_sources))
-				{
-					$ids = $this->execute_query($pointer_query, $source['source_id']);
-					$records = [];
-					$records['subjects'] = $ids;
-
-					$elasticResult = new ElasticsearchResult();
-					foreach ($attributes as $attribute){
-						$records['attributes'][$attribute] = $elasticResult->extract($ids, $attribute, $source_id);
-					}
-
-					$results[$source['name']] = [
-						'records' => $records,
-						'source_display' => array_key_exists($source_id, $source_display_group_sources),
-						'details' => $source
-					];
+				$elasticResult = new ElasticsearchResult();
+				foreach ($attributes as $attribute){
+					$records['attributes'][$attribute] = $elasticResult->extract($ids, $attribute, $source_id);
 				}
+
+				$results[$source['name']] = [
+					'records' => $records,
+					'source_display' => array_key_exists($source_id, $source_display_group_sources),
+					'details' => $source
+				];
 			}
 		}
 
