@@ -17,8 +17,7 @@ use App\Libraries\CafeVariome\Helpers\UI\SourceHelper;
 use App\Models\Attribute;
 use App\Models\EAV;
 use App\Models\UIData;
-use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4J;
-use \App\Models\Elastic;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
 use \App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use CodeIgniter\Config\Services;
 
@@ -616,8 +615,8 @@ class Source extends CVUI_Controller{
                 }
                 //delete Elasticsearch index associated with the source
                 try {
-                    $elasticModel = new Elastic();
-                    $elasticModel->deleteIndex($source_id);
+                    $elasticModel = new ElasticSearch();
+                    $elasticModel->deleteIndex(ElasticsearchHelper::getSourceIndexName($source_id));
                 } catch (\Exception $ex) {
                     $this->setStatusMessage("There was an error in deleting Elasticsearch index.", STATUS_ERROR);
                     $error_flag = true;
