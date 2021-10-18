@@ -107,11 +107,13 @@ class Value extends Model
 		$this->builder->delete();
 	}
 
-	public function getValuesByAttributeId(int $attribute_id): array
+	public function getValuesByAttributeId(int $attribute_id, ?bool $include_in_interface_index = null): array
 	{
 		$this->builder->select('id, name, display_name, frequency');
 		$this->builder->where('attribute_id', $attribute_id);
-
+		if ($include_in_interface_index != null){
+			$this->builder->where('include_in_interface_index ', $include_in_interface_index);
+		}
 		return $this->builder->get()->getResultArray();
 	}
 
