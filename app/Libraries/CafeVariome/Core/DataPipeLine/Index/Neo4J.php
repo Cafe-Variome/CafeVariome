@@ -127,10 +127,11 @@ class Neo4J
 		$this->transactionStack->runStatement(Statement::create("CREATE (n:Subject{ subjectid: '" . $subject_id . "', source_id: '" . $source_id . "', file_id: '" . $file_id . "', uid: '" . $uid . "' })"));
 	}
 
-	public function ConnectSubject(string $subject_id, string $node_type, string $node_key, string $node_id, string $relationship_label)
+	public function ConnectSubject(string $subject_id, string $node_type, string $node_key, string $node_id, string $relationship_label, bool $allow_duplicate = false)
 	{
 		$this->transactionStack = $this->transactionStack ?? $this->neo4jClient->beginTransaction();
-		$this->transactionStack->runStatement(Statement::create("MATCH (a:Subject),(b:" . $node_type . ") WHERE a.subjectid = '" . $subject_id . "' AND b." . $node_key . " = '" . $node_id . "' CREATE (a)<-[r:" . $relationship_label . "]-(b)"));
+		$avoidDuplicateString = $allow_duplicate ? '' : " AND NOT (a)<-[:" . $relationship_label . "]-(b)";
+		$this->transactionStack->runStatement(Statement::create("MATCH (a:Subject),(b:" . $node_type . ") WHERE a.subjectid = '" . $subject_id . "' AND b." . $node_key . " = '" . $node_id . "' " . $avoidDuplicateString .  " CREATE (a)<-[r:" . $relationship_label . "]-(b)"));
 	}
 
 	public function countSubjectsBySourceId(int $source_id, string $uid): int
