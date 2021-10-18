@@ -158,8 +158,7 @@ class Neo4J
 
     public function deleteSource(int $source_id)
 	{
-        $query = 'MATCH (n:Subject { source_id: "'.$source_id.'" }) DETACH DELETE n';
-        $result = $this->neo4jClient->run($query);
+        $result = $this->neo4jClient->run('MATCH (n:Subject { source_id: "'.$source_id.'" }) DETACH DELETE n');
     }
 
     public function commitTransaction(bool $destroy = false)
