@@ -89,9 +89,12 @@ class Attribute extends Model
 		]);
 	}
 
-	public function getAttributesBySourceId(int $source_id): array
+	public function getAttributesBySourceId(int $source_id, ?bool $include_in_interface_index = null): array
 	{
 		$this->builder->where('source_id', $source_id);
+		if ($include_in_interface_index != null){
+			$this->builder->where('include_in_interface_index ', $include_in_interface_index);
+		}
 		return $this->builder->get()->getResultArray();
 	}
 
