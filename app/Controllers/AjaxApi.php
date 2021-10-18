@@ -104,7 +104,7 @@ class AjaxApi extends Controller{
     public function getPhenotypeAttributes(string $network_key) {
         if ($this->request->getMethod() == 'post')
         {
-            $basePath = FCPATH . JSON_DATA_DIR;
+            $basePath = FCPATH . USER_INTERFACE_INDEX_DIR;
 
             $fileMan = new SysFileMan($basePath);
             $networkInterface = new NetworkInterface();
@@ -116,80 +116,90 @@ class AjaxApi extends Controller{
                 $installations = $response->data;
             }
 
-            $data = array();
+            $UIData = [
+				'source_ids' => [],
+				'attributes_values' => [],
+				'attributes_display_names' => [],
+				'values_display_names' => [],
+			];
 
             foreach ($installations as $installation) {
                 $queryNetInterface = new QueryNetworkInterface($installation->base_url);
-                $eavJson = $queryNetInterface->getEAVJSON($network_key, $fileMan->GetModificationTimeStamp("local_" . $network_key . ".json"));
+                $eavJson = $queryNetInterface->getEAVJSON($network_key, $fileMan->GetModificationTimeStamp($network_key . '_local.json'));
                 $status = $eavJson->status;
 
                 if ($status) {
                 	if ($eavJson->data->modified) {
                 		$result = $eavJson->data->json;
 						$resultArr = json_decode($result, true);
-                		if (is_array($resultArr)){
-							foreach ($resultArr as $res) {
-								if (array_key_exists($res['attribute'], $data)) {
-									foreach (explode("|", strtolower($res['value'])) as $val) {
-										if (!in_array($val, $data[$res['attribute']]))
-											array_push($data[$res['attribute']], $val);
+						if (
+							is_array($resultArr) &&
+							array_key_exists('attributes_values', $resultArr) &&
+							array_key_exists('attributes_display_names', $resultArr) &&
+							array_key_exists('values_display_names', $resultArr)
+						)
+						{
+							$attributes_values = $resultArr['attributes_values'];
+							$attributes_display_names = $resultArr['attributes_display_names'];
+							$values_display_names = $resultArr['values_display_names'];
+
+							foreach ($attributes_values as $attribute => $values) {
+								if (array_key_exists($attribute, $UIData['attributes_values'])) {
+									foreach ($values as $value) {
+										if (!in_array($value, $UIData['attributes_values'][$attribute])) {
+											array_push($UIData['attributes_values'][$attribute], $value);
+										}
 									}
-								} else {
-									$data[$res['attribute']] = explode("|", strtolower($res['value']));
+								}
+								else {
+									$UIData['attributes_values'][$attribute] = $values;
+								}
+							}
+
+							foreach ($attributes_display_names as $attribute => $display_name) {
+								if (array_key_exists($attribute, $UIData['attributes_display_names'])) {
+									if (!in_array($display_name, $UIData['attributes_display_names'][$attribute])) {
+										array_push($UIData['attributes_display_names'][$attribute], $display_name);
+									}
+								}
+								else{
+									$UIData['attributes_display_names'][$attribute] = [$display_name];
+								}
+							}
+
+							foreach ($values_display_names as $value => $display_names) {
+								if (array_key_exists($value, $UIData['values_display_names'])) {
+									foreach ($display_names as $display_name) {
+										if (!in_array($display_name, $UIData['values_display_names'][$value])) {
+											array_push($UIData['values_display_names'][$value], $display_name);
+										}
+									}
+								}
+								else {
+									$UIData['values_display_names'][$value] = $display_names;
 								}
 							}
 						}
-
 					}
                 }
             }
 
-            foreach(array_keys($data) as $key){
-                sort($data[$key]);
-            }
-
-            ksort($data);
-
-			if ($fileMan->Exists("local_" . $network_key . ".json")){
-				$currentData = json_decode($fileMan->Read("local_" . $network_key . ".json"), true);
-				$data = array_merge($currentData, $data);
+			if (
+				count($UIData['attributes_values']) > 0 &&
+				count($UIData['attributes_display_names']) > 0 &&
+				count($UIData['values_display_names']) > 0
+			)
+			{
+				$fileMan->Write($network_key . '_local.json', json_encode($UIData, JSON_INVALID_UTF8_SUBSTITUTE));
 			}
 
-			$fileMan->Write("local_" . $network_key . ".json", json_encode($data, JSON_INVALID_UTF8_SUBSTITUTE));
-
-
-            $hpoData = array();
-            foreach ($installations as $installation) {
-                $queryNetInterface = new QueryNetworkInterface($installation->base_url);
-                $hpoJson = $queryNetInterface->getHPOJSON($network_key, $fileMan->GetModificationTimeStamp("local_" . $network_key . "_hpo_ancestry.json"));
-				$status = $hpoJson->status;
-
-				if ($status) {
-					if ($hpoJson->data->modified) {
-						$hpoData = array_merge($hpoData, json_decode($hpoJson->data->json, true));
-					}
-				}
-            }
-
-			if ($fileMan->Exists("local_" . $network_key . "_hpo_ancestry.json")){
-				$currentHPOData = json_decode($fileMan->Read("local_" . $network_key . "_hpo_ancestry.json"), true);
-				$hpoData = array_merge($currentHPOData, $hpoData);
+			if (!$fileMan->Exists($network_key . '_local.json')) {
+				$fileMan->Write($network_key . '_local.json', json_encode($UIData, JSON_INVALID_UTF8_SUBSTITUTE));
 			}
-			$fileMan->Write("local_" . $network_key . "_hpo_ancestry.json", json_encode($hpoData));
 
+			$localData = json_decode($fileMan->Read($network_key . '_local.json'), true);
 
-            $phen_data = [];
-            $hpo_data = [];
-
-            if ($fileMan->Exists("local_" . $network_key . ".json")) {
-                $phen_data = json_decode($fileMan->Read("local_" . $network_key . ".json"), 1);
-            }
-
-            if ($fileMan->Exists("local_" . $network_key . "_hpo_ancestry.json")) {
-                $hpo_data = json_decode($fileMan->Read("local_" . $network_key . "_hpo_ancestry.json"), 1);
-            }
-
-            return json_encode([$phen_data, $hpo_data]);
+            return json_encode($localData);
         }
     }
 
