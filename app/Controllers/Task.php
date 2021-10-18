@@ -257,7 +257,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
     /**
      * univUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
-     *
+     * @deprecated
      * @param string $file        - The File We are uploading
      * @param int $delete         - 0: We do not need to delete data from eavs | 1: We do need to
      * @param string $source      - The name of the source we are uploading to
