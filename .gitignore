@@ -129,6 +129,10 @@ resources/phenotype_lookup_data/*
 !resources/phenotype_lookup_data/.htaccess
 !resources/phenotype_lookup_data/index.html
 
+resources/user_interface_index/*
+!resources/user_interface_index/.htaccess
+!resources/user_interface_index/index.html
+
 upload/settings/*
 !upload/settings/index.html
 
