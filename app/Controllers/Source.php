@@ -700,31 +700,6 @@ class Source extends CVUI_Controller{
         return view($this->viewDirectory.'/Status', $data);
     }
 
-	/**
-	 * @deprecated
-	 */
-    private function Data(int $source_id)
-    {
-        $uidata = new UIData();
-        $uidata->title = "Data Attributes";
-
-        $source = $this->sourceModel->getSource($source_id);
-        if($source == null){
-            $this->setStatusMessage('Source was not found.', STATUS_ERROR);
-            return redirect()->to(base_url($this->controllerName.'/List'));
-        }
-
-        $uidata->data['sourceName'] = $source['name'];
-        $uidata->data['source_id'] = $source_id;
-
-        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-        $uidata->javascript = array(JS.'cafevariome/data.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
-
-        $data = $this->wrapData($uidata);
-
-        return view($this->viewDirectory.'/Data', $data);
-    }
-
 	public function Elasticsearch(int $source_id)
 	{
 		$uidata = new UIData();
