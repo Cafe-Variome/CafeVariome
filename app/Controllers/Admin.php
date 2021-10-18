@@ -15,7 +15,7 @@ use App\Models\Network;
 use App\Models\Source;
 use App\Models\User;
 use App\Libraries\ElasticSearch;
-use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4J;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
 use App\Libraries\CafeVariome\Auth\KeyCloak;
 use App\Models\NetworkRequest;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
