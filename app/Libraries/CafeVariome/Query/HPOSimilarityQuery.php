@@ -24,9 +24,6 @@ class HPOSimilarityQuery extends AbstractQuery
 
 	public function execute(array $clause, int $source_id, bool $iscount)
 	{
-		$sourceModel = new Source();
-		$source_name = $sourceModel->getSourceNameByID($source_id);
-
 		if (array_key_exists('r',$clause))
 		{
 			$r = $clause['r'];
@@ -48,10 +45,10 @@ class HPOSimilarityQuery extends AbstractQuery
 
 			$neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[:PHENOTYPE_OF]->(s:Subject) ";
 			if ($orpha == 'true'){
-				$neo_query = $neo_query . "where (" . $id_str . ") and s.source = \"" . $source_name . "\" and (link:HPOterm or link:ORPHAterm) ";
+				$neo_query = $neo_query . "where (" . $id_str . ") and s.source_id = \"" . $source_id . "\" and (link:HPOterm or link:ORPHAterm) ";
 			}
 			else{
-				$neo_query = $neo_query . "where (" . $id_str . ") and s.source = \"" . $source_name . "\" and (link:HPOterm) ";
+				$neo_query = $neo_query . "where (" . $id_str . ") and s.source_id = \"" . $source_id . "\" and (link:HPOterm) ";
 			}
 			$neo_query = $neo_query . "with s.subjectid as subjectid, n.hpoid as hpoid with subjectid as subjectid, count(distinct(hpoid)) as hpoid where hpoid >=  $s  return subjectid, hpoid";
 			// $neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()<-[:IS_A*0..20]-()-[r2:PHENOTYPE_OF]->(m) where (" . $id_str . ") and m.source = \"" . $source . "\" with m.subjectid as subjectid, n.hpoid as hpoid with subjectid as subjectid, count(distinct(hpoid)) as hpoid where hpoid >=  $s  return subjectid, hpoid";
@@ -66,10 +63,10 @@ class HPOSimilarityQuery extends AbstractQuery
 			if ($r < 1) {
 				$neo_query = "Match (n:HPOterm)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY]-(j:HPOterm) Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[r2:PHENOTYPE_OF]->(s:Subject) ";
 				if ($orpha == 'true'){
-					$neo_query = $neo_query . "where r.rel >  $r and (" . $id_str . ") and (s.source = \"" . $source_name . "\" and (link:HPOterm or link:ORPHAterm)) ";
+					$neo_query = $neo_query . "where r.rel >  $r and (" . $id_str . ") and (s.source_id = \"" . $source_id . "\" and (link:HPOterm or link:ORPHAterm)) ";
 				}
 				else{
-					$neo_query = $neo_query . "where r.rel >  $r and (" . $id_str . ") and (s.source = \"" . $source_name . "\" and (link:HPOterm)) ";
+					$neo_query = $neo_query . "where r.rel >  $r and (" . $id_str . ") and (s.source_id = \"" . $source_id . "\" and (link:HPOterm)) ";
 				}
 
 				$neo_query = $neo_query . " with s.subjectid as subjectid, count(distinct(n.hpoid)) as hpoid where hpoid >= $s with hpoid as hpoid, subjectid as subjectid return subjectid, hpoid ORDER BY hpoid DESC";
