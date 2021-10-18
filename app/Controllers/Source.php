@@ -109,7 +109,7 @@ class Source extends CVUI_Controller{
         $this->validation->setRules([
             'name' => [
                 'label'  => 'Source Name',
-                'rules'  => 'required|alpha_dash|is_unique[sources.name]',
+                'rules'  => 'required|alpha_numeric_space|is_unique[sources.name]',
                 'errors' => [
                     'required' => '{field} is required.',
                     'uniquename_check' => '{field} already exists.'
