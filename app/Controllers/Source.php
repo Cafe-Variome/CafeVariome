@@ -683,23 +683,6 @@ class Source extends CVUI_Controller{
         return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-	/**
-	 * @deprecated
-	 */
-    private function Status(int $source_id = null) {
-        if (!$source_id) {
-            return redirect()->to(base_url($this->controllerName.'/List'));
-        }
-        $uidata = new UIData();
-        $uidata->title = "Status";
-        $uidata->data['source_id'] = $source_id;
-        $uidata->javascript = array(JS. 'bootstrap-notify.js', JS.'cafevariome/status.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
-        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-
-        $data = $this->wrapData($uidata);
-        return view($this->viewDirectory.'/Status', $data);
-    }
-
 	public function Elasticsearch(int $source_id)
 	{
 		$uidata = new UIData();
