@@ -26,7 +26,7 @@ class Neo4JDataIndex extends AbstractDataIndex
 	public function __construct(int $source_id, bool $append)
 	{
 		parent::__construct($source_id);
-		$this->initiateSource($source_id);
+		$this->initiateSource();
 		$this->append = $append;
 		$this->dbInstance = new Neo4J();
 		$this->jobName = 'neo4jindex';
