@@ -121,7 +121,7 @@ class Value extends CVUI_Controller
 				'type' => 'text',
 				'class' => 'form-control',
 				'readonly' => 'true', // Don't allow the user to edit the attribute name
-				'value' => set_value('name', $value['name']),
+				'value' => set_value('name', html_entity_decode($value['name'])),
 			);
 
 			$uidata->data['display_name'] = array(
@@ -129,7 +129,7 @@ class Value extends CVUI_Controller
 				'id' => 'display_name',
 				'type' => 'text',
 				'class' => 'form-control',
-				'value' => set_value('name', $value['display_name']),
+				'value' => set_value('name', html_entity_decode($value['display_name'])),
 			);
 
 			$uidata->data['show_in_interface'] = array(
