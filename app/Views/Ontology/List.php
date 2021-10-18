@@ -58,7 +58,7 @@
 <div class="row">
 	<div class="col">
 		<a href="<?= base_url($controllerName.'/Create') ?>" class="btn btn-success bg-gradient-success">
-			<i class="fa fa-plus"></i>  Create Ontology
+			<i class="fa fa-plus"></i>  Create an Ontology
 		</a>
 	</div>
 </div>
