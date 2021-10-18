@@ -228,15 +228,15 @@ class AjaxApi extends Controller{
 	 /**
 	  * elasticStart - Begin ElasticSearch regeneration
 	  *
-	  * @param int $id        - The source id for the elasticsearch index
-	  * @param int $add       - 1 if we are adding to index instead of fully regenerating
+	  * @param int $source_id        - The source id for the elasticsearch index
+	  * @param int $append       - 1 if we are adding to index instead of fully regenerating
 	  * @return void
 	  */
 	 public function elasticStart()
 	 {
 		 if ($this->request->getMethod() == 'post'){
 			 $source_id = $this->request->getVar('source_id');
-			 $add = $this->request->getVar('add');
+			 $append = $this->request->getVar('append') === 'true' ? 1 : 0;
 			 // rebuild the json list for interface
 			 $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task IndexDataToElasticsearch $source_id $append");
 	 	}
@@ -253,7 +253,7 @@ class AjaxApi extends Controller{
 	{
 		if ($this->request->getMethod() == 'post'){
 			$source_id = $this->request->getVar('source_id');
-			$append = $this->request->getVar('append');
+			$append = $this->request->getVar('append') === 'true' ? 1 : 0;
 			// rebuild the json list for interface
 			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task IndexDataToNeo4J $source_id $append");
 		}
