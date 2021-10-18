@@ -13,6 +13,9 @@
  *
  */
 
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\ElasticsearchDataIndex;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4JDataIndex;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceDataIndex;
 use CodeIgniter\Controller;
 use CodeIgniter\CLI\CLI;
 use App\Models\Upload;
@@ -233,6 +236,24 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             error_log(print_r($ex->getMessage(), 1));
         }
     }
+
+	public function IndexDataToElasticsearch(int $source_id, bool $append)
+	{
+	 $esDataIndex = new ElasticsearchDataIndex($source_id, $append);
+	 $esDataIndex->IndexSource();
+	}
+
+	public function IndexDataToNeo4J(int $source_id, bool $append)
+	{
+	 $n4jDataIndex = new Neo4JDataIndex($source_id, $append);
+	 $n4jDataIndex->IndexSource();
+	}
+
+	public function CreateUserInterfaceIndex(int $source_id)
+	{
+	 $uiDataIndex = new UserInterfaceDataIndex($source_id);
+	 $uiDataIndex->IndexSource();
+	}
 
     /**
      * univUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
