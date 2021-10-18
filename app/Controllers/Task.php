@@ -217,6 +217,9 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 		}
 	}
 
+	 /**
+	  * @deprecated
+	  */
     public function regenerateElasticsearchAndNeo4JIndex(int $source_id, $add)
     {
         try {
