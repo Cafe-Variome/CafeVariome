@@ -711,6 +711,7 @@ class Source extends CVUI_Controller{
 			return redirect()->to(base_url($this->controllerName.'/List'));
 		}
 
+		$indexName = '-';
 		$indexUUID = '-';
 		$indexSize = '-';
 		$indexDocIndexed = '-';
@@ -734,16 +735,22 @@ class Source extends CVUI_Controller{
 			}
 		}
 
+		$attributeModel = new Attribute();
 		$eavModel = new EAV();
+
+		$esAttributeIds = $attributeModel->getAttributeIdsBySourceIdAndStorageLocation($source_id, ATTRIBUTE_STORAGE_ELASTICSEARCH);
 		$dataStatus = ELASTICSEARCH_DATA_STATUS_UNKNOWN;
-		if($eavModel->recordsExistBySourceId($source_id)){
-			$indexedRecordsExist = $eavModel->indexedRecordsExistBySourceId($source_id);
-			$unindexedRecordsExist = $eavModel->unindexedRecordsExistBySourceId($source_id);
+		if(count($esAttributeIds) && $eavModel->recordsExistBySourceId($source_id, $esAttributeIds)){
+			$indexedRecordsExist = $eavModel->indexedRecordsExistBySourceId($source_id, $esAttributeIds);
+			$unindexedRecordsExist = $eavModel->unindexedRecordsExistBySourceId($source_id, $esAttributeIds);
 			if($indexedRecordsExist && !$unindexedRecordsExist){
 				$dataStatus = ELASTICSEARCH_DATA_STATUS_FULLY_INDEXED;
 			}
 			else if($unindexedRecordsExist && !$indexedRecordsExist){
 				$dataStatus = ELASTICSEARCH_DATA_STATUS_NOT_INDEXED;
+			}
+			else if($unindexedRecordsExist && $indexedRecordsExist){
+				$dataStatus = ELASTICSEARCH_DATA_STATUS_PARTIALLY_INDEXED;
 			}
 		}
 		else{
