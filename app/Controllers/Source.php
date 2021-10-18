@@ -788,10 +788,7 @@ class Source extends CVUI_Controller{
 		$uidata->data['indexDocIndexed'] = $indexDocIndexed;
 		$uidata->data['indexDocDeleted'] = $indexDocDeleted;
 
-		$uidata->javascript = [
-			JS."cafevariome/elasticsearch.js",
-			JS."/bootstrap-notify.js"
-		];
+		$uidata->javascript = [JS."cafevariome/elasticsearch.js"];
 
 		$data = $this->wrapData($uidata);
 
