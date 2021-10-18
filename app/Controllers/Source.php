@@ -856,7 +856,7 @@ class Source extends CVUI_Controller{
 		$uidata->data['sourceId'] = $source_id;
 		$uidata->data['indexName'] = $indexName;
 		$uidata->data['indexSize'] = $indexSize == '-' ? $indexSize : SourceHelper::formatSize($indexSize);
-		$uidata->data['indexStatusText'] = SourceHelper::getNeo4JIndexStatus($indexStatus);
+		$uidata->data['indexStatusText'] = SourceHelper::getUserInterfaceIndexStatus($indexStatus);
 
 		$uidata->javascript = [JS."cafevariome/userinterfaceindex.js"];
 

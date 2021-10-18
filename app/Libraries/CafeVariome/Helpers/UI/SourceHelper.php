@@ -70,6 +70,19 @@ class SourceHelper
 		return 'Undefined';
 	}
 
+	public static function getUserInterfaceIndexStatus(int $status)
+	{
+		switch ($status){
+			case USER_INTERFACE_INDEX_STATUS_UNKNOWN:
+				return 'Unknown';
+			case USER_INTERFACE_INDEX_STATUS_CREATED:
+				return 'Created';
+			case USER_INTERFACE_INDEX_STATUS_NOT_CREATED:
+				return 'Not Created';
+		}
+		return 'Undefined';
+	}
+
 	public static function formatSize(int $size): string
 	{
 		if ($size < 0){
