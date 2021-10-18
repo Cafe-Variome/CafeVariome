@@ -1,13 +1,13 @@
 <?php namespace App\Libraries\CafeVariome\Core\IO\FileSystem;
 
 /**
- * FileMan.php 
+ * FileMan.php
  * Created: 13/08/2020
- * 
+ *
  * @author Mehdi Mehtarizadeh
  * @author Farid Yavari Dizjikan
- * 
- * File Manager Class 
+ *
+ * File Manager Class
  */
 
  class FileMan implements IFileMan
@@ -132,7 +132,7 @@
      * isValid(File $path)
      * @param File : File object to be valiadated
      * @return bool
-     * 
+     *
      * This function validates uploaded files before they are moved to software directories.
      * Currently, XLSX, XLS, VCF, and CSV files are supported.
      */
@@ -159,7 +159,7 @@
 
             $fcontent = $this->Read($path, -1, false);
 
-            return json_decode($fcontent) != null; 
+            return json_decode($fcontent) != null;
         }
         else if($fExt === 'xls' || $fExt === 'xlsx' || $fExt === 'vcf'){
             // Signatures of allowed files as follows: XLSX, XLS and VCF
