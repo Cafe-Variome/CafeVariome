@@ -148,9 +148,13 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
             }
 
             $inputPipeLine = new SpreadsheetDataInput($sourceId, $overwrite);
-            $inputPipeLine->absorb($fileId);
-            $inputPipeLine->save($fileId);
-			$inputPipeLine->finalize($fileId);
+            if($inputPipeLine->absorb($fileId)){
+				$inputPipeLine->save($fileId);
+				$inputPipeLine->finalize($fileId);
+			}
+			else{
+				error_log('There was an issue');
+			}
         }
         else{
             error_log('File not found.');
