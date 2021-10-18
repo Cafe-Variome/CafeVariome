@@ -25,7 +25,6 @@ class MatchAllQuery extends AbstractQuery
 
 	public function execute(array $clause, int $source_id, bool $iscount)
 	{
-		$elasticModel = new Elastic();
 		$es_client = $this->getESInstance();
 		$es_index = $this->getESIndexName($source_id);
 		$esQuery = ['index' => $es_index];
