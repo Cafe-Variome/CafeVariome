@@ -22,8 +22,6 @@ class ORPHASimilarityQuery extends AbstractQuery
 
 	public function execute(array $clause, int $source_id, bool $iscount)
 	{
-		$sourceModel = new Source();
-		$source_name = $sourceModel->getSourceNameByID($source_id);
 		$neo4jClient = $this->getNeo4JInstance();
 		if (array_key_exists('r',$clause)){
 			$r = $clause['r'];
@@ -33,7 +31,7 @@ class ORPHASimilarityQuery extends AbstractQuery
 
 			// if just orpha
 			if($r == 1 && $s == 100 && $hpo == 'false'){
-				$neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})<-[:IS_A*0..20]-(:ORPHAterm)-[:PHENOTYPE_OF]-(s) where s.source = \"" . $source_name . "\" return s.subjectid as subjectid";
+				$neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})<-[:IS_A*0..20]-(:ORPHAterm)-[:PHENOTYPE_OF]-(s) where s.source_id = \"" . $source_id . "\" return s.subjectid as subjectid";
 				$records = $neo4jClient->runQuery($neo_query);
 				$pat_ids = [];
 				foreach ($records as $record) {
@@ -53,7 +51,7 @@ class ORPHASimilarityQuery extends AbstractQuery
 				$IC = False;
 
 				//get totals
-				$neo_query = $this->create_neo($source_name, $orpha_id, 1, 0, false, true, false);
+				$neo_query = $this->create_neo($source_id, $orpha_id, 1, 0, false, true, false);
 				$records = $neo4jClient->runQuery($neo_query);
 				foreach ($records as $record) {
 					$orphatotals[$record->get('ORPHA')] = [
@@ -65,7 +63,7 @@ class ORPHASimilarityQuery extends AbstractQuery
 						'branch_hpos' => $record->get('ahs')
 					];
 				}
-				$neo_query = $this->create_neo($source_name, $orpha_id, 1, 0, false, true, true);
+				$neo_query = $this->create_neo($source_id, $orpha_id, 1, 0, false, true, true);
 				$records = $neo4jClient->runQuery($neo_query);
 				foreach ($records as $record) {
 					if (array_key_exists($record->get('ORPHA'),$orphatotals)){
@@ -109,20 +107,20 @@ class ORPHASimilarityQuery extends AbstractQuery
 					//Get exact matches
 					if($r == 1 && $hpo == 'true'){
 						error_log("NO SIM HPO and ORHPA");
-						$neo_query = $this->create_neo($source_name, $orpha_id, 1, $ICLIM, true, false, false);
+						$neo_query = $this->create_neo($source_id, $orpha_id, 1, $ICLIM, true, false, false);
 					}
 					elseif($r == 1 && $hpo == 'false'){
 						error_log("NO SIM ORPHA");
-						$neo_query = $this->create_neo($source_name, $orpha_id, 1, $ICLIM, false, false, false);
+						$neo_query = $this->create_neo($source_id, $orpha_id, 1, $ICLIM, false, false, false);
 
 					}
 					elseif($r < 1 && $hpo == 'true'){
 						error_log("SIM HPO and ORPHA");
-						$neo_query = $this->create_neo($source_name, $orpha_id, $r, $ICLIM, true, false, false);
+						$neo_query = $this->create_neo($source_id, $orpha_id, $r, $ICLIM, true, false, false);
 					}
 					elseif($r < 1 && $hpo == 'false'){
 						error_log("SIM ORPHA only");
-						$neo_query = $this->create_neo($source_name, $orpha_id, $r, $ICLIM, false, false, false);
+						$neo_query = $this->create_neo($source_id, $orpha_id, $r, $ICLIM, false, false, false);
 					}
 
 					$records = $neo4jClient->runQuery($neo_query);
@@ -167,20 +165,20 @@ class ORPHASimilarityQuery extends AbstractQuery
 					if ($IC  == True){
 						if($r == 1 && $hpo == 'true'){
 							error_log("IC NO SIM HPO and ORHPA");
-							$neo_query = $this->create_neo($source_name, $orpha_id, $r, $ICLIM, true, False,True);
+							$neo_query = $this->create_neo($source_id, $orpha_id, $r, $ICLIM, true, False,True);
 						}
 						elseif($r == 1 && $hpo == 'false'){
 							error_log("IC NO SIM ORPHA");
-							$neo_query = $this->create_neo($source_name, $orpha_id, $r, $ICLIM, 1, False, True);
+							$neo_query = $this->create_neo($source_id, $orpha_id, $r, $ICLIM, 1, False, True);
 
 						}
 						elseif($r < 1 && $hpo == 'true'){
 							error_log("IC SIM HPO and ORPHA");
-							$neo_query = $this->create_neo($source_name, $orpha_id, $r, $ICLIM, True, False, True);
+							$neo_query = $this->create_neo($source_id, $orpha_id, $r, $ICLIM, True, False, True);
 						}
 						elseif($r < 1 && $hpo == 'false'){
 							error_log("IC SIM ORPHA only");
-							$neo_query = $this->create_neo($source_name, $orpha_id, $r, $ICLIM, False, False, True);
+							$neo_query = $this->create_neo($source_id, $orpha_id, $r, $ICLIM, False, False, True);
 
 						}
 
@@ -257,7 +255,7 @@ class ORPHASimilarityQuery extends AbstractQuery
 		}
 	}
 
-	private function create_neo(string $source, string $orpha_id, $r = 1, $ICLIM = 0, $hpo = false, $total = true, $IC = false): string
+	private function create_neo(int $source_id, string $orpha_id, $r = 1, $ICLIM = 0, $hpo = false, $total = true, $IC = false): string
 	{
 		$neo_query = "";
 		if ($IC == false){
@@ -268,16 +266,16 @@ class ORPHASimilarityQuery extends AbstractQuery
 				$neo_query = $neo_query . "with o,oh,ah,ob ";
 
 				if ($r == 1 && $hpo == true){
-					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[:PHENOTYPE_OF]->(s:Subject) where s.source = "' . $source . '" and (link:HPOterm or link:ORPHAterm) ';
+					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[:PHENOTYPE_OF]->(s:Subject) where s.source_id = "' . $source_id . '" and (link:HPOterm or link:ORPHAterm) ';
 				}
 				elseif ($r == 1 && $hpo == false){
-					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[:PHENOTYPE_OF]->(s:Subject) where s.source = "' . $source . '" ';
+					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[:PHENOTYPE_OF]->(s:Subject) where s.source_id = "' . $source_id . '" ';
 				}
 				elseif ($r < 1 && $hpo == true){
-					$neo_query = $neo_query . 'Match (oh)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY]-(j:HPOterm) with o,j, oh, ah,r,ob Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[r2:PHENOTYPE_OF]->(s:Subject) where r.rel >= ' . $r . ' and s.source = "' . $source . '" and (link:HPOterm or link:ORPHAterm) ';
+					$neo_query = $neo_query . 'Match (oh)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY]-(j:HPOterm) with o,j, oh, ah,r,ob Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[r2:PHENOTYPE_OF]->(s:Subject) where r.rel >= ' . $r . ' and s.source_id = "' . $source_id . '" and (link:HPOterm or link:ORPHAterm) ';
 				}
 				elseif ($r < 1 && $hpo == false){
-					$neo_query = $neo_query . 'Match (oh)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY]-(j:HPOterm) with o,j, oh, ah,r,ob Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[r2:PHENOTYPE_OF]->(s:Subject) where r.rel >= ' . $r . ' and s.source = "' . $source . '" ';
+					$neo_query = $neo_query . 'Match (oh)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY]-(j:HPOterm) with o,j, oh, ah,r,ob Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[r2:PHENOTYPE_OF]->(s:Subject) where r.rel >= ' . $r . ' and s.source_id = "' . $source_id . '" ';
 				}
 
 				$neo_query = $neo_query . 'with o,s, collect(distinct(oh)) as coh, count(distinct(oh)) as ohn, ob.frequencycode as fc,collect(distinct([oh.hpoid,ob.frequencycode,oh.ICvsOMIM, oh.ICvsORPHA,link.hpoid, link.orphaid])) as hlink, collect(distinct(ah.hpoid)) as cah unwind coh as oh with  o,s.subjectid as subjectid,hlink,fc as FrequencyCode, sum(oh.ICvsOMIM) as OMIM_IC, sum(oh.ICvsORPHA) as ORPHA_IC,cah, ohn with o,subjectid, collect(hlink) as link, collect([FrequencyCode,OMIM_IC, ORPHA_IC]) as FrequencyCode, sum(OMIM_IC) as OMIM_IC, sum(ORPHA_IC) as ORPHA_IC,collect(cah) as hcah, sum(ohn) as ohn where ORPHA_IC > ' . $ICLIM . ' unwind link as hlink unwind hlink as olink unwind hcah as cah unwind cah as ah with o.orphaid as oid,subjectid, collect(distinct(olink)) as olink, FrequencyCode, ORPHA_IC, OMIM_IC, collect(distinct(ah)) as cah, ohn, count(distinct(ah)) as ccah optional match (fs:Subject)<-[:PHENOTYPE_OF]-(sh:HPOterm) where fs.subjectid in [subjectid] return oid as ORPHA,subjectid, olink as LINK, FrequencyCode, ORPHA_IC, OMIM_IC, cah as ahs, ohn as MATCHN, ccah as PA_Branches, collect([sh.hpoid, sh.ICvsOMIM, sh.ICvsORPHA]) as SHPO';
@@ -295,22 +293,22 @@ class ORPHASimilarityQuery extends AbstractQuery
 
 				if ($r == 1 && $hpo == true){
 					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[:PHENOTYPE_OF]->(s:Subject)
-                                                        where s.source = "' . $source . '" and (link:HPOterm or link:ORPHAterm) ';
+                                                        where s.source_id = "' . $source_id . '" and (link:HPOterm or link:ORPHAterm) ';
 				}
 				elseif ($r == 1 and $hpo == false){
-					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[:PHENOTYPE_OF]->(s:Subject) where s.source = "' . $source . '" ';
+					$neo_query = $neo_query . 'Match (oh)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[:PHENOTYPE_OF]->(s:Subject) where s.source_id = "' . $source_id . '" ';
 				}
 				elseif ($r < 1 and $hpo == true){
 					$neo_query = $neo_query . 'Match (oh)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY|SELF]-(j:HPOterm)
                                                         with o,j, oh,r,ob
                                                         Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[r2:PHENOTYPE_OF]->(s:Subject)
-                                                        where r.rel >= ' . $r . ' and s.source = "' . $source . '" and (link:HPOterm or link:ORPHAterm) ';
+                                                        where r.rel >= ' . $r . ' and s.source_id = "' . $source_id . '" and (link:HPOterm or link:ORPHAterm) ';
 				}
 				elseif ($r < 1 && $hpo == false){
 					$neo_query = $neo_query . 'Match (oh)-[:REPLACED_BY*0..1]->(:HPOterm)-[:SIM_AS*0..10]->(:HPOterm)-[r:SIMILARITY|SELF]-(j:HPOterm)
                                                         with o,j, oh,r,ob
                                                         Match (j)<-[:REPLACED_BY*0..1]-(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link:ORPHAterm)-[r2:PHENOTYPE_OF]->(s:Subject)
-                                                        where r.rel >= ' . $r . ' and s.source = "' . $source . '" ';
+                                                        where r.rel >= ' . $r . ' and s.source_id = "' . $source_id . '" ';
 				}
 				$neo_query = $neo_query . 'with o,s, collect(distinct(oh)) as coh, count(distinct(oh)) as ohn, ob.frequencycode as fc,collect(distinct([oh.hpoid,ob.frequencycode,oh.ICvsOMIM, oh.ICvsORPHA,link.hpoid, link.orphaid])) as hlink
                                         unwind coh as oh

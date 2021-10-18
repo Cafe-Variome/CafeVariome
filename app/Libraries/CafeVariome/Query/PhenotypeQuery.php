@@ -26,11 +26,9 @@ class PhenotypeQuery extends AbstractQuery
 
 	public function execute(array $clause, int $source_id, bool $iscount)
 	{
-		$elasticModel = new Elastic();
-		$sourceModel = new Source();
 		$es_client = $this->getESInstance();
+		$es_index = $this->getESIndexName($source_id);
 
-		$source_name = $sourceModel->getSourceNameByID($source_id);
 		$operator = $clause['operator'];
 		$value = $clause['value'];
 
@@ -49,12 +47,10 @@ class PhenotypeQuery extends AbstractQuery
 			break;
 		}
 
-		$es_index = $elasticModel->getTitlePrefix() . "_" . $source_id;
-
 		// Elasticsearch query
 		$paramsnew = ['index' => $es_index];
 
-		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source_name . "_eav"; // for source
+		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source_id;
 		$paramsnew['body']['query']['bool']['must'][1]['has_child']['type'] = 'eav';
 		$paramsnew['body']['query']['bool']['must'][1]['has_child']['query']['bool']['must'] = $tmp;
 

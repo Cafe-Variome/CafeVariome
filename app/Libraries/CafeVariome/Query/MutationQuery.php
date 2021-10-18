@@ -23,15 +23,11 @@ class MutationQuery extends AbstractQuery
 
 	public function execute(array $clause, int $source_id, bool $iscount)
 	{
-		$elasticModel = new Elastic();
-		$sourceModel = new Source();
 		$es_client = $this->getESInstance();
-
-		$source_name = $sourceModel->getSourceNameByID($source_id);
-		$es_index = $elasticModel->getTitlePrefix() . "_" . $source_id;
+		$es_index = $this->getESIndexName($source_id);
 
 		$paramsnew = ['index' => $es_index];
-		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source_name . "_eav";
+		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source_id;
 
 		$glist = $clause['genes'];
 

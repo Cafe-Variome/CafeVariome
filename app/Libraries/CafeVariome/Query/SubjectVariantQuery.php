@@ -23,11 +23,8 @@ class SubjectVariantQuery extends AbstractQuery
 
 	public function execute(array $clause, int $source_id, bool $iscount)
 	{
-		$elasticModel = new Elastic();
-		$sourceModel = new Source();
 		$es_client = $this->getESInstance();
-
-		$source_name = $sourceModel->getSourceNameByID($source_id);
+		$es_index = $this->getESIndexName($source_id);
 
 		$arr = [];
 		foreach ($clause as $key => $value) { // replace with actual parameters
@@ -40,10 +37,8 @@ class SubjectVariantQuery extends AbstractQuery
 			$arr[] = $arr_child;
 		}
 
-		$es_index = $elasticModel->getTitlePrefix() . "_" . $source_id;
-
 		$paramsnew = ['index' => $es_index, 'size' => 0];
-		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source_name . "_eav"; // for source
+		$paramsnew['body']['query']['bool']['must'][0]['term']['source_id'] = $source_id;
 		$paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
 		$paramsnew['body']['aggs']['punique']['terms'] = ['field' => 'subject_id', 'size' => $this->aggregate_size];
 

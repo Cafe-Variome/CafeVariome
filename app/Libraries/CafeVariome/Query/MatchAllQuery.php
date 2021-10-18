@@ -29,7 +29,7 @@ class MatchAllQuery extends AbstractQuery
 		$es_index = $this->getESIndexName($source_id);
 		$esQuery = ['index' => $es_index];
 		$esQuery['body']['query']['exists']['field'] = 'subject_id';
-		$esQuery['body']['aggs']['punique']['terms']=['field'=>'subject_id','size' => $this->aggregate_size];
+		$esQuery['body']['aggs']['punique']['terms'] = ['field' => 'subject_id', 'size' => $this->aggregate_size];
 
 		$results = $es_client->search($esQuery);
 

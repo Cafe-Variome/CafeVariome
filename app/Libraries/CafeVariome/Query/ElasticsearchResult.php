@@ -25,15 +25,13 @@ class ElasticsearchResult extends AbstractResult
 
     public function extract(array $ids, string $attribute, int $source_id): array
     {
-		$elasticModel = new Elastic();
-		$sourceModel = new Source();
+		$elasticClient = $this->getESInstance();
+		$es_index = $this->getESIndexName($source_id);
 
-		$source_name = $sourceModel->getSourceNameByID($source_id);
-		$es_index = $elasticModel->getTitlePrefix() . "_" . $source_id;
 		$paramsnew = ['index' => $es_index];
 
 		$paramsnew['size'] = $this->aggregate_size;
-		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source_name . '_eav'; // for source
+		$paramsnew['body']['query']['bool']['must'][0]['term']['source_id'] = $source_id;
 		$paramsnew['body']['query']['bool']['must'][1]['term']['type'] = "eav";
 		$paramsnew['body']['query']['bool']['must'][2]['term']['attribute'] = $attribute;
 		foreach ($ids as $id) {
@@ -42,7 +40,6 @@ class ElasticsearchResult extends AbstractResult
 
 		$paramsnew['body']['query']['bool']["minimum_should_match"] = 1;
 
-		$elasticClient = $this->getESInstance();
 		$results = $elasticClient->search($paramsnew);
 
 		$final = [];
