@@ -3,6 +3,9 @@ $('#reset_query').click(function() {
 });
 var result_data = {};
 var source_data = {};
+var attributesValues = {};
+var attributesDisplayNames = {};
+var valuesDisplayNames = {};
 
 $( function() {
     $( "#age-range" ).slider({
@@ -97,7 +100,7 @@ $(function() {
     const urls = {'qb_config': baseurl + 'resources/js/config.json',
                   'qb_json': baseurl + 'resources/js/querybuilder.json',
                   'phen_json': baseurl + 'AjaxApi/getPhenotypeAttributes/' + $('#network_key').val()
-                }
+                };
     // error object
     const error = {
         'load_config': 'Error: Unable to load query builder config file.',
@@ -134,32 +137,14 @@ $(function() {
             data:query_builder_post,
             dataType: 'json'
         })
-        .done((jsonData)=> { 
-            phen_data = jsonData[0];
+        .done((jsonData)=> {
+            attributesValues = jsonData['attributes_values'];
+            attributesDisplayNames = jsonData['attributes_display_names'];
+            valuesDisplayNames = jsonData['values_display_names'];
 
-            $.each( jsonData[0].chr, function( key, value ) {
-                $('select.values_chr').append($('<option></option>').attr('value', value.toLowerCase()).text('Chr:' + value));
-            });
-
-            $.each( jsonData[0].alternatebases,function( key, value ){
-                $('select.values_altall').append($('<option></option>').attr('value', value.toLowerCase()).text(value))
-            });
-
-            $.each(jsonData[0].referencebases,function( key, value ) {
-                $('select.values_refall').append($('<option></option>').attr('value', value.toLowerCase()).text(value))
-            });
-
-            $.each(jsonData[1], (hpo, ancestry) => {
-                $('select#values_phen_left').append($('<option></option>').attr('value', ancestry).text(hpo))
-            })
-
-            // $.each(attributes, function(k, v) {
-            //     $('select.keys_pat').append($('<option></option>').attr('value', v.toLowerCase()).text(k))
-            // })
-            
-            $.each(phen_data, function(k, v) {
-                $('select.keys_pat').append($('<option></option>').attr('value', k).text(k))
-            })
+            for (const [attribute, values] of Object.entries(attributesValues)) {
+                $('select.keys_pat').append($('<option></option>').attr('value', attribute).text(attributesDisplayNames[attribute][0]))
+            }
 
             template['patient'] = $('.rule')[0].outerHTML
             template['genotype'] = $('.rule')[1].outerHTML
@@ -225,10 +210,10 @@ $(function() {
         $val.empty()
         $val.append('<option></option>');
 
-        phen_data[$(this).val()].forEach(function(val) {
+        attributesValues[$(this).val()].forEach(function(val) {
             $val.append($('<option>', {
                 value: val,
-                text: val.toUpperCase()
+                text: valuesDisplayNames[val][0]
             }));    
         })
         $val.select2({ allowClear: true, placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
