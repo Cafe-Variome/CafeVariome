@@ -1,7 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-use App\Libraries\ElasticSearch;
-use App\Models\EAV;
 use App\Models\Elastic;
 use App\Models\Settings;
 use App\Models\Source;
@@ -30,11 +28,8 @@ class Compiler
 	public function CompileAndRunQuery(string $query, int $network_key, int $user_id): string
 	{
 		$sourceModel = new Source();
-		$elasticModel = new Elastic();
 		$session = \Config\Services::session();
 		$setting = Settings::getInstance();
-		$hosts = (array)$setting->getElasticSearchUri();
-		$elasticSearch = new ElasticSearch($hosts);
 
 		$query = Sanitizer::Sanitize($query);
 		$query_array = json_decode($query, 1);
