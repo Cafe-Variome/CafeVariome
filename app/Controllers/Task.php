@@ -21,14 +21,10 @@ use CodeIgniter\CLI\CLI;
 use App\Models\Upload;
 use App\Models\Source;
 use App\Models\Settings;
-use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\DataStream;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\SpreadsheetDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\PhenoPacketDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
-use App\Libraries\CafeVariome\Core\DataPipeLine\Input\UniversalDataInput;
-use CodeIgniter\Config;
 
-use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
  class Task extends Controller{
 
@@ -222,23 +218,6 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 		}
 	}
 
-	 /**
-	  * @deprecated
-	  */
-    public function regenerateElasticsearchAndNeo4JIndex(int $source_id, $add)
-    {
-        try {
-            $dataStream = new DataStream($source_id);
-            $dataStream->generateAttributeValueIndex($source_id);
-            $dataStream->generateHPOIndex($source_id);
-            $dataStream->generateElasticSearchIndex($source_id, $add);
-            $dataStream->Neo4JInsert($source_id);
-            $dataStream->Finalize($source_id);
-        } catch (\Exception $ex) {
-            error_log(print_r($ex->getMessage(), 1));
-        }
-    }
-
 	public function IndexDataToElasticsearch(int $source_id, bool $append)
 	{
 	 $esDataIndex = new ElasticsearchDataIndex($source_id, $append);
@@ -256,32 +235,4 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 	 $uiDataIndex = new UserInterfaceDataIndex($source_id);
 	 $uiDataIndex->IndexSource();
 	}
-
-    /**
-     * univUploadInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
-     * @deprecated
-     * @param string $file        - The File We are uploading
-     * @param int $delete         - 0: We do not need to delete data from eavs | 1: We do need to
-     * @param string $source      - The name of the source we are uploading to
-     * @param string $settingsFile
-     * @return array $return_data - Basic information on the status of the upload
-     */
-    public function univUploadInsert(int $fileId, int $overWrite) {
-        $uploadModel = new Upload();
-        $fileRec = $uploadModel->getFiles('ID, source_id, setting_file', ['ID' => $fileId]);
-
-        if (count($fileRec) == 1) {
-            $sourceId = $fileRec[0]['source_id'];
-            $settingFile = $fileRec[0]['setting_file'];
-
-            $inputPipeLine = new UniversalDataInput($sourceId, $overWrite, $settingFile);
-            $inputPipeLine->absorb($fileId);
-            $inputPipeLine->save($fileId);
-        }
-        else{
-            error_log('File not found.');
-        }
-
-    }
-
  }
