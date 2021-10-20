@@ -10,6 +10,7 @@
  */
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Database;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceSourceIndex;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 use App\Models\OntologyPrefix;
 use App\Models\Upload;
@@ -130,8 +131,11 @@ abstract class DataInput
 		$this->uploadModel->clearErrorForFile($file_id);
 		$this->sourceModel->unlockSource($this->sourceId);
 		$this->reportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
-	}
 
+		// (Re-)Create the UI index
+		$uiDataIndex = new UserInterfaceSourceIndex($this->sourceId);
+		$uiDataIndex->IndexSource();
+	}
 
 	protected function registerProcess(int $file_id, string $job ='bulkupload', string $message ='Starting')
 	{
