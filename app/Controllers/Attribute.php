@@ -1,5 +1,6 @@
 <?php namespace App\Controllers;
 
+use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 use App\Models\UIData;
 use App\Libraries\CafeVariome\Helpers\UI\AttributeHelper;
 use CodeIgniter\Config\Services;
@@ -108,6 +109,17 @@ class Attribute extends CVUI_Controller
 
 			try {
 				$this->attributeModel->updateAttribute($attribute_id, $display_name, $show_in_interface, $include_in_interface_index);
+
+				if(
+					$attribute['display_name'] != $display_name ||
+					$attribute['show_in_interface'] !== $show_in_interface ||
+					$attribute['include_in_interface_index'] !== $include_in_interface_index
+				)
+				{
+					$phpshellHelperInstance = new PHPShellHelper();
+					$phpshellHelperInstance->runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
+				}
+
 				$this->setStatusMessage("Attribute '$name' was updated.", STATUS_SUCCESS);
 			} catch (\Exception $ex) {
 				$this->setStatusMessage("There was a problem updating '$name'.", STATUS_ERROR);
