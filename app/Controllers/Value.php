@@ -1,5 +1,6 @@
 <?php namespace App\Controllers;
 
+use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 use App\Models\UIData;
 use App\Libraries\CafeVariome\Helpers\UI\AttributeHelper;
 use CodeIgniter\Config\Services;
@@ -104,6 +105,19 @@ class Value extends CVUI_Controller
 
 			try {
 				$this->valueModel->updateValue($value_id, $display_name, $show_in_interface, $include_in_interface_index);
+
+				$source_id = $this->attributeModel->getSourceIdByAttributeId($attribute_id);
+
+				if(
+					$value['display_name'] != $display_name ||
+					$value['show_in_interface'] !== $show_in_interface ||
+					$value['include_in_interface_index'] !== $include_in_interface_index
+				)
+				{
+					$phpshellHelperInstance = new PHPShellHelper();
+					$phpshellHelperInstance->runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
+				}
+
 				$this->setStatusMessage("Value '$name' was updated.", STATUS_SUCCESS);
 			}
 			catch (\Exception $ex) {
