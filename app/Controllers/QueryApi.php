@@ -11,6 +11,8 @@
  * This controller contains RESTful listeners for network operations.
  * Most methods are ported from netauth.php in the previous version.
  */
+
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceNetworkIndex;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 use CodeIgniter\Controller;
@@ -116,6 +118,7 @@ class QueryApi extends ResourceController
         $network_key = $this->request->getVar('network_key');
 
         $apiResponseBundle = new APIResponseBundle();
+		$userInterfaceNetworkIndex = new UserInterfaceNetworkIndex($network_key);
 
         try {
             $resp = [];
@@ -123,91 +126,22 @@ class QueryApi extends ResourceController
 
             $resp['modified'] = false;
             $resp['json'] = '';
-            if ($fileMan->Exists($network_key . '.json')) {
-            	if ($fileMan->GetModificationTimeStamp($network_key . '.json') > $modification_time){
-					$resp['json'] = $fileMan->Read($network_key . '.json');
-					$resp['modified'] = true;
-				}
-            }
-            else {
-				$sourceModel = new \App\Models\Source();
-				$sources = $sourceModel->getSourcesByNetwork($network_key); // Get sources that are in the network
 
-				$sourcesIndexData = [
-					'source_ids' => [],
-					'attributes_values' => [],
-					'attributes_display_names' => [],
-					'values_display_names' => [],
-				];
-
-				foreach ($sources as $source) {
-					$source_id = $source['source_id'];
-					$uid = $sourceModel->getSourceUID($source_id);
-					$indexName = $source_id . '_' . $uid . '.json';
-					if ($fileMan->Exists($indexName)){
-						$indexData = json_decode($fileMan->Read($indexName), true);
-						if (
-							is_array($indexData) &&
-							array_key_exists('source_id', $indexData) &&
-							array_key_exists('attributes_values', $indexData) &&
-							array_key_exists('attributes_display_names', $indexData) &&
-							array_key_exists('values_display_names', $indexData)
-						)
-						{
-							$attributes_values = $indexData['attributes_values'];
-							$attributes_display_names = $indexData['attributes_display_names'];
-							$values_display_names = $indexData['values_display_names'];
-
-							array_push($sourcesIndexData['source_ids'], $source_id);
-
-							foreach ($attributes_values as $attribute => $values) {
-								if (array_key_exists($attribute, $sourcesIndexData['attributes_values'])) {
-									foreach ($values as $value) {
-										if (!in_array($value, $sourcesIndexData['attributes_values'][$attribute])) {
-											array_push($sourcesIndexData['attributes_values'][$attribute], $value);
-										}
-									}
-								}
-								else {
-									$sourcesIndexData['attributes_values'][$attribute] = $values;
-								}
-							}
-
-							foreach ($attributes_display_names as $attribute => $display_name) {
-								if (array_key_exists($attribute, $sourcesIndexData['attributes_display_names'])) {
-									if (!in_array($display_name, $sourcesIndexData['attributes_display_names'][$attribute])) {
-										array_push($sourcesIndexData['attributes_display_names'][$attribute], $display_name);
-									}
-								}
-								else{
-									$sourcesIndexData['attributes_display_names'][$attribute] = [$display_name];
-								}
-							}
-
-							foreach ($values_display_names as $value => $display_names) {
-								if (array_key_exists($value, $sourcesIndexData['values_display_names'])) {
-									foreach ($display_names as $display_name) {
-										if (!in_array($display_name, $sourcesIndexData['values_display_names'][$value])) {
-											array_push($sourcesIndexData['values_display_names'][$value], $display_name);
-										}
-									}
-								}
-								else {
-									$sourcesIndexData['values_display_names'][$value] = $display_names;
-								}
-							}
-						}
-					}
-				}
-
-				$fileMan->Write($network_key . '.json', json_encode($sourcesIndexData));
-
-                $resp['json'] = json_encode($sourcesIndexData);
+			if(!$fileMan->Exists($network_key . '.json') || $userInterfaceNetworkIndex->SourceIndicesUpdated()){
+				// Create network index
+				$userInterfaceNetworkIndex->IndexNetwork();
+				$resp['json'] = $fileMan->Read($network_key . '.json');
+				$resp['modified'] = true;
+			}
+			else if($fileMan->GetModificationTimeStamp($network_key . '.json') > $modification_time)
+			{
+				$resp['json'] = $fileMan->Read($network_key . '.json');
 				$resp['modified'] = true;
 			}
 
             $apiResponseBundle->initiateResponse(1, $resp);
-        } catch (\Exception $ex) {
+        }
+		catch (\Exception $ex) {
             error_log($ex->getMessage());
             $apiResponseBundle->initiateResponse(0);
             $apiResponseBundle->setResponseMessage($ex->getMessage());
