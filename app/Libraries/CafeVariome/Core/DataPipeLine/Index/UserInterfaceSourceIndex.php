@@ -11,7 +11,7 @@ use App\Models\Value;
  *
  */
 
-class UserInterfaceDataIndex extends AbstractDataIndex
+class UserInterfaceSourceIndex extends AbstractSourceIndex
 {
 	private Value $valueModel;
 
