@@ -103,267 +103,163 @@ class EAV extends Model{
         $this->builder->update($data);
     }
 
-    /*
-     * @deprecated
-     */
-    public function getHPOTermsWithNegatedBySourceId(int $source_id, array $hpo_attribute_names = [], array $negated_hpo_attribute_names = [])
-    {
-        $subjectHPOWithNegatedArray = [];
-
-        $uidSubjectIds = $this->getEAVs('uid, subject_id', ['source_id' => $source_id], true);
-        $uids = [];
-        foreach ($uidSubjectIds as $uid_sid) {
-            $uids[$uid_sid['uid']] = $uid_sid['subject_id'];
-        }
-
-        $uidHPOTerms = $this->getHPOTermsBySourceId($source_id, $hpo_attribute_names);
-
-        $uidHPOArray = [];
-        foreach ($uidHPOTerms as $hpo) {
-            $uidHPOArray[$hpo['uid']] = $hpo['value'];
-        }
-
-        $negatedHPOTerms = $this->getNegatedHPOTermsBySourceId($source_id, $negated_hpo_attribute_names);
-
-        $uidNegatedHPOArray = [];
-        foreach ($negatedHPOTerms as $negated_hpo) {
-            $uidNegatedHPOArray[$negated_hpo['uid']] = $negated_hpo['value'];
-        }
-
-        foreach ($uids as $uid => $subject_id) {
-            if (array_key_exists($uid, $uidHPOArray)) {
-                if (array_key_exists($uid, $uidNegatedHPOArray)) {
-                    $subjectHPOWithNegatedArray[$subject_id][] = ['hpo' => $uidHPOArray[$uid], 'negated' => $uidNegatedHPOArray[$uid]];
-                }
-                else {
-                    $subjectHPOWithNegatedArray[$subject_id][] = ['hpo' => $uidHPOArray[$uid], 'negated' => null];
-                }
-            }
-
-        }
-
-        return $subjectHPOWithNegatedArray;
-    }
-
-    public function getORPHATermsBySourceId(int $source_id, array $orpha_attribute_names = [], int $limit = -1, int $offset = -1)
-    {
-        $this->builder = $this->db->table($this->table);
-        $this->builder->select('id, subject_id, value');
-		$this->builder->where('source_id', $source_id);
-
-		if ($offset > 0){
-			$this->builder->where('id>', $offset);
+	public function getEAVsByFileIdAndAttributeIds(int $file_id, array $attribute_ids, int $limit, int $offset, bool $unindexedOnly = true)
+	{
+		$this->builder->select('id, uid, subject_id, attribute_id, value_id');
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		$this->builder->where('file_id', $file_id);
+		if($unindexedOnly){
+			$this->builder->where('indexed', false);
 		}
+		$this->builder->where('id>', $offset);
+		$this->builder->limit($limit);
 
-        if (count($orpha_attribute_names) > 0) {
-            $this->builder->whereIn('attribute', $orpha_attribute_names);
-        }
-        else {
-            $this->builder->like('value', "orpha:", 'after');
-			$this->builder->orLike('value', "ordo:", 'after');
-		}
-
-		if ($limit > 0) {
-			$this->builder->limit($limit);
-		}
-
-		$query = $this->builder->get()->getResultArray();
-
-		//Loop over results to make sure terms start with the correct prefix.
-		for($c = 0; $c < count($query); $c++)
-		{
-			if (is_numeric($query[$c]['value'])){
-				$query[$c]['value'] = 'ORPHA:' . $query[$c]['value'];
-			}
-			else if(stripos($query[$c]['value'], 'ordo:')){
-				$query[$c]['value'] = str_ireplace('ordo:', 'ORPHA:', $query[$c]['value']);
-			}
-		}
-
-        return $query;
-    }
-
-    public function getHPOTermsBySourceId(int $source_id, array $hpo_attribute_names = [], int $limit = -1, int $offset = -1)
-    {
-        $this->builder = $this->db->table($this->table);
-        $this->builder->select('id, subject_id, value');
-        $this->builder->where('source_id', $source_id);
-        $this->builder->where('attribute !=', 'ancestor_hpo_id'); // attribute != "ancestor_hpo_id"
-        $this->builder->where('attribute !=', 'classOfOnset_id'); // attribute != 'classOfOnset_id'
-
-		if ($offset > 0){
-			$this->builder->where('id>', $offset);
-		}
-        if (count($hpo_attribute_names) > 0) {
-            $this->builder->whereIn('attribute', $hpo_attribute_names);
-        }
-        else {
-            $this->builder->like('value', 'hp:', 'after');
-        }
-
-        if ($limit > 0) {
-			$this->builder->limit($limit);
-		}
-
-        $data = $this->builder->get()->getResultArray();
-
-		//Loop over results to make sure terms start with the correct prefix.
-		for($c = 0; $c < count($data); $c++)
-		{
-			if (is_numeric($data[$c]['value'])){
-				$data[$c]['value'] = 'HP:' . $data[$c]['value'];
-			}
-		}
-
-		return $data;
-    }
-
-    public function getNegatedHPOTermsBySourceId(int $source_id, array $negated_hpo_attribute_names = [], int $limit = -1, int $offset = -1)
-    {
-        $this->builder = $this->db->table($this->table);
-		$this->builder->select('id, subject_id, value');
-        $this->builder->where('source_id', $source_id);
-
-		if ($offset > 0){
-			$this->builder->where('id>', $offset);
-		}
-        if (count($negated_hpo_attribute_names) > 0) {
-            $this->builder->whereIn('attribute', $negated_hpo_attribute_names);
-        }
-        else {
-            $this->builder->where('attribute', 'negated');
-        }
-
-		if ($limit > 0) {
-			$this->builder->limit($limit);
-		}
-
-        $data = $this->builder->get()->getResultArray();
-
-		//Loop over results to make sure terms start with the correct prefix.
-		for($c = 0; $c < count($data); $c++)
-		{
-			if (is_numeric($data[$c]['value'])){
-				$data[$c]['value'] = 'HP:' . $data[$c]['value'];
-			}
-		}
-
-        return $data;
-    }
-
-    public function getHPOTermsForSources(array $source_ids, array $hpo_attribute_names = [])
-    {
-        $this->builder = $this->db->table($this->table);
-        $this->builder->select('value');
-        $this->builder->distinct();
-        $this->builder->whereIn('source_id', $source_ids);
-
-        if (count($hpo_attribute_names) > 0) {
-            $this->builder->whereIn('attribute', $hpo_attribute_names);
-        }
-        else {
-            $this->builder->like('value', 'hp:', 'after');
-        }
-
-        $terms = $this->builder->get()->getResultArray();
-
-        $hpo_terms = [];
-		foreach ($terms as $term) {
-			$hpo_terms[] = $term['value'];
-		}
-		return $hpo_terms;
+		return $this->builder->get()->getResultArray();
 	}
 
-    public function getUniqueAttributesAndValuesByFileIdAndSourceId(int $file_id, int $source_id)
-    {
-        $this->builder = $this->db->table($this->table);
+	public function getUniqueUIDsAndSubjectIdsByFileIdAndAttributeIds(int $file_id, array $attribute_ids, int $limit, int $offset, bool $unindexedOnly = true)
+	{
+		$this->builder->select('uid, subject_id');
+		$this->builder->distinct();
+		$this->builder->where('file_id', $file_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		if($unindexedOnly){
+			$this->builder->where('indexed', false);
+		}
+		$this->builder->where('id>', $offset);
+		$this->builder->limit($limit);
 
-        $this->builder->select("attribute, value, count(*) AS count");
-        $this->builder->where("source_id", $source_id);
-        $this->builder->where("file_id",$file_id);
-        $this->builder->groupBy(["attribute","value"]);
+		return $this->builder->get()->getResultArray();
+	}
 
-        $query = $this->builder->get()->getResultArray();
+	public function countEAVsByFileIdAndAttributeIds(int $file_id, array $attribute_ids, bool $unindexedOnly = true): int
+	{
+		$this->builder->select('id');
+		$this->builder->where('file_id', $file_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		if($unindexedOnly){
+			$this->builder->where('indexed', false);
+		}
 
-        $data = [];
-        $attributeValueArray = [];
+		return $this->builder->countAllResults();
+	}
 
-        foreach ($query as $row) {
-            $data[] = $row;
-        }
+	public function countUniqueUIDsByFileIdAndAttributeIds(int $file_id, array $attribute_ids, bool $unindexedOnly = true): int
+	{
+		$this->builder->select('uid, subject_id');
+		$this->builder->where('file_id', $file_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		if($unindexedOnly){
+			$this->builder->where('indexed', false);
+		}
+		$this->builder->distinct();
 
-        $currAtt = "";
-        for ($i=0; $i < count($data); $i++) {
-            if ($data[$i]["attribute"] != $currAtt){
-                $currAtt = $data[$i]["attribute"];
-                $attributeValueArray[$data[$i]["attribute"]] = array();
-                $attributeValueArray[$data[$i]["attribute"]][$data[$i]['value']] = $data[$i]['count'];
-            }
-            else {
-                $attributeValueArray[$data[$i]["attribute"]][$data[$i]['value']] = $data[$i]['count'];
-            }
-        }
+		return $this->builder->countAllResults();
+	}
 
-        return $attributeValueArray;
-    }
+	public function countUniqueUIDsBySourceIdAndAttributeIds(int $source_id, array $attribute_ids, bool $unindexedOnly = true): int
+	{
+		$this->builder->select('uid, subject_id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+
+		if($unindexedOnly){
+			$this->builder->where('indexed', false);
+		}
+		$this->builder->distinct();
+
+		return $this->builder->countAllResults();
+	}
+
+	public function countUniqueSubjectIdsBySourceIdAndAttributeIds(int $source_id, array $attribute_ids, bool $unindexedOnly = true): int
+	{
+		$this->builder->select('subject_id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+
+		if($unindexedOnly){
+			$this->builder->where('indexed', false);
+		}
+		$this->builder->distinct();
+
+		return $this->builder->countAllResults();
+	}
+
+	public function countEAVsBySourceIdAndAttributeIds(int $source_id, array $attribute_ids, bool $unindexedOnly = true): int
+	{
+		$this->builder->select('id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		if($unindexedOnly){
+			$this->builder->where('indexed', false);
+		}
+
+		return $this->builder->countAllResults();
+	}
+
+	public function getUniqueUIDsAndSubjectIdsBySourceIdAndAttributeIds(int $source_id, array $attribute_ids, int $limit, int $offset, bool $unindexedOnly = true)
+	{
+		$this->builder->select('uid, subject_id, file_id');
+		$this->builder->distinct();
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		if($unindexedOnly){
+			$this->builder->where('indexed', false);
+		}
+		$this->builder->where('id>', $offset);
+		$this->builder->limit($limit);
+
+		return $this->builder->get()->getResultArray();
+	}
+
+	public function getEAVsBySourceIdAndAttributeIds(int $source_id, array $attribute_ids, int $limit, int $offset, bool $unindexedOnly = true)
+	{
+		$this->builder->select('id, uid, subject_id, file_id, attribute_id, value_id');
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		$this->builder->where('source_id', $source_id);
+		if($unindexedOnly){
+			$this->builder->where('indexed', false);
+		}
+		$this->builder->where('id>', $offset);
+		$this->builder->limit($limit);
+
+		return $this->builder->get()->getResultArray();
+	}
+
+	public function getUniqueSubjectIdsBySourceIdAndAttributeIds(int $source_id, array $attribute_ids, int $limit, int $offset, bool $unindexedOnly = true)
+	{
+		$this->builder->select('subject_id, file_id');
+		$this->builder->distinct();
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		if($unindexedOnly){
+			$this->builder->where('indexed', false);
+		}
+		$this->builder->where('id>', $offset);
+		$this->builder->limit($limit);
+
+		return $this->builder->get()->getResultArray();
+	}
 
     public function deleteRecordsBySourceId(int $source_id)
     {
-        $this->builder = $this->db->table($this->table);
         $this->builder->where('source_id', $source_id);
         $this->builder->delete();
     }
 
     public function deleteRecordsByFileId(int $file_id)
     {
-        $this->builder = $this->db->table($this->table);
         $this->builder->where('file_id', $file_id);
         $this->builder->delete();
     }
 
-    /**
-     * resetElasticFlag
-     * Set Elastic boolean to false for all data in a given source
-     *
-     * @param int $source_id  - The id of the source
-     * @return N/A
-     */
-    function resetElasticFlag(int $source_id) {
-        $this->builder = $this->db->table($this->table);
-        $data = ['elastic' => 0];
-
-        $this->builder->where('source_id', $source_id);
-        $this->builder->update($data);
-    }
-
-    public function setElasticFlag(int $source_id)
-    {
-        $this->builder = $this->db->table($this->table);
-        $data = ['elastic' => 1];
-
-        $this->builder->where('source_id', $source_id);
-        $this->builder->update($data);
-    }
-
-    /**
-     * countUnaddedEAVs
-     * For a given source check whether there is any data in MySQL which isnt in ElasticSearch
-     *
-     * @param int $source_id  - The name of the source
-     * @return int $noOfRecords    - Count of how many records there are which arent in ElasticSearch
-     */
-    public function countUnaddedEAVs(int $source_id):int
-    {
-        $this->builder = $this->db->table($this->table);
-
-        $this->builder->where('elastic', 0);
-        $this->builder->where('source_id', $source_id);
-
-        $count = 0;
-        $count = $this->builder->countAllResults();
-
-        return $count;
-    }
+	public function setIndexedFlagBySourceIdAndAttributeIds(int $source_id, array $attribute_ids)
+	{
+		$data = ['indexed' => 1];
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		$this->builder->update($data);
+	}
 
     /**
      * Check Negated for HPO - For given list of HPO terms check if the group they belong to has a
