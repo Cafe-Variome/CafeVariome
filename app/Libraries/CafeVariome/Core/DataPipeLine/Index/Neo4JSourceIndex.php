@@ -13,7 +13,7 @@ use App\Models\OntologyRelationship;
  *
  */
 
-class Neo4JDataIndex extends AbstractDataIndex
+class Neo4JSourceIndex extends AbstractSourceIndex
 {
 	private Ontology $ontologyModel;
 	private OntologyPrefix $prefixModel;

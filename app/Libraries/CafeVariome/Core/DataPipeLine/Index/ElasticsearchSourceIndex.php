@@ -12,7 +12,7 @@
 use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use \App\Models\Settings;
 
-class ElasticsearchDataIndex extends AbstractDataIndex
+class ElasticsearchSourceIndex extends AbstractSourceIndex
 {
 	public function __construct(int $source_id, bool $append)
 	{

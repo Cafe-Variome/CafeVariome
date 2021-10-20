@@ -13,9 +13,9 @@
  *
  */
 
-use App\Libraries\CafeVariome\Core\DataPipeLine\Index\ElasticsearchDataIndex;
-use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4JDataIndex;
-use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceDataIndex;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\ElasticsearchSourceIndex;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4JSourceIndex;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceSourceIndex;
 use CodeIgniter\Controller;
 use CodeIgniter\CLI\CLI;
 use App\Models\Upload;
@@ -220,19 +220,19 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 
 	public function IndexDataToElasticsearch(int $source_id, bool $append)
 	{
-	 $esDataIndex = new ElasticsearchDataIndex($source_id, $append);
-	 $esDataIndex->IndexSource();
+		 $esDataIndex = new ElasticsearchSourceIndex($source_id, $append);
+		 $esDataIndex->IndexSource();
 	}
 
 	public function IndexDataToNeo4J(int $source_id, bool $append)
 	{
-	 $n4jDataIndex = new Neo4JDataIndex($source_id, $append);
-	 $n4jDataIndex->IndexSource();
+		 $n4jDataIndex = new Neo4JSourceIndex($source_id, $append);
+		 $n4jDataIndex->IndexSource();
 	}
 
 	public function CreateUserInterfaceIndex(int $source_id)
 	{
-	 $uiDataIndex = new UserInterfaceDataIndex($source_id);
-	 $uiDataIndex->IndexSource();
+		 $uiDataIndex = new UserInterfaceSourceIndex($source_id);
+		 $uiDataIndex->IndexSource();
 	}
  }

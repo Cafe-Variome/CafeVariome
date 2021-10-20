@@ -6,14 +6,14 @@ use App\Models\EAV;
 use App\Models\Source;
 
 /**
- * Name AbstractDataIndex.php
+ * Name AbstractSourceIndex.php
  *
  * Created 01/10/2021
  * @author Mehdi Mehtarizadeh
  *
  */
 
-abstract class AbstractDataIndex
+abstract class AbstractSourceIndex
 {
 	protected Attribute $attributeModel;
 	protected bool $append;
@@ -29,7 +29,6 @@ abstract class AbstractDataIndex
 	protected int $totalEAVsCount;
 	protected int $totalRecords;
 	protected int $processedRecords;
-
 
 	public function __construct(int $source_id)
 	{
