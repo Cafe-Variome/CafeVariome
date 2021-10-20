@@ -13,6 +13,7 @@
  * Code must be more secure. Some of the methods here must be moved to back-end layers for security reasons.
  */
 
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceNetworkIndex;
 use CodeIgniter\Controller;
 use Config\Database;
 use App\Models\Settings;
@@ -101,139 +102,20 @@ class AjaxApi extends Controller{
      * @return string in json format, phenotype and hpo data
      *
      */
-    public function getPhenotypeAttributes(string $network_key) {
+    public function getPhenotypeAttributes(int $network_key) {
         if ($this->request->getMethod() == 'post')
         {
-            $basePath = FCPATH . USER_INTERFACE_INDEX_DIR;
+			$userInterfaceNetworkIndex = new UserInterfaceNetworkIndex($network_key);
+			$userInterfaceNetworkIndex->IndexNetworkInstallations();
 
-            $fileMan = new SysFileMan($basePath);
-            $networkInterface = new NetworkInterface();
-            $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key);
-
-            $installations = [];
-
-            if ($response->status) {
-                $installations = $response->data;
-            }
-
-            $UIData = [
-				'source_ids' => [],
-				'attributes_values' => [],
-				'attributes_display_names' => [],
-				'values_display_names' => [],
-			];
-
-            foreach ($installations as $installation) {
-                $queryNetInterface = new QueryNetworkInterface($installation->base_url);
-                $eavJson = $queryNetInterface->getEAVJSON($network_key, $fileMan->GetModificationTimeStamp($network_key . '_local.json'));
-                $status = $eavJson->status;
-
-                if ($status) {
-                	if ($eavJson->data->modified) {
-                		$result = $eavJson->data->json;
-						$resultArr = json_decode($result, true);
-						if (
-							is_array($resultArr) &&
-							array_key_exists('attributes_values', $resultArr) &&
-							array_key_exists('attributes_display_names', $resultArr) &&
-							array_key_exists('values_display_names', $resultArr)
-						)
-						{
-							$attributes_values = $resultArr['attributes_values'];
-							$attributes_display_names = $resultArr['attributes_display_names'];
-							$values_display_names = $resultArr['values_display_names'];
-
-							foreach ($attributes_values as $attribute => $values) {
-								if (array_key_exists($attribute, $UIData['attributes_values'])) {
-									foreach ($values as $value) {
-										if (!in_array($value, $UIData['attributes_values'][$attribute])) {
-											array_push($UIData['attributes_values'][$attribute], $value);
-										}
-									}
-								}
-								else {
-									$UIData['attributes_values'][$attribute] = $values;
-								}
-							}
-
-							foreach ($attributes_display_names as $attribute => $display_name) {
-								if (array_key_exists($attribute, $UIData['attributes_display_names'])) {
-									if (!in_array($display_name, $UIData['attributes_display_names'][$attribute])) {
-										array_push($UIData['attributes_display_names'][$attribute], $display_name);
-									}
-								}
-								else{
-									$UIData['attributes_display_names'][$attribute] = [$display_name];
-								}
-							}
-
-							foreach ($values_display_names as $value => $display_names) {
-								if (array_key_exists($value, $UIData['values_display_names'])) {
-									foreach ($display_names as $display_name) {
-										if (!in_array($display_name, $UIData['values_display_names'][$value])) {
-											array_push($UIData['values_display_names'][$value], $display_name);
-										}
-									}
-								}
-								else {
-									$UIData['values_display_names'][$value] = $display_names;
-								}
-							}
-						}
-					}
-                }
-            }
-
-			if (
-				count($UIData['attributes_values']) > 0 &&
-				count($UIData['attributes_display_names']) > 0 &&
-				count($UIData['values_display_names']) > 0
-			)
-			{
-				$fileMan->Write($network_key . '_local.json', json_encode($UIData, JSON_INVALID_UTF8_SUBSTITUTE));
-			}
-
-			if (!$fileMan->Exists($network_key . '_local.json')) {
-				$fileMan->Write($network_key . '_local.json', json_encode($UIData, JSON_INVALID_UTF8_SUBSTITUTE));
-			}
+			$basePath = FCPATH . USER_INTERFACE_INDEX_DIR;
+			$fileMan = new SysFileMan($basePath);
 
 			$localData = json_decode($fileMan->Read($network_key . '_local.json'), true);
 
             return json_encode($localData);
         }
     }
-
-	 /**
-	  * elasticCheck() - Checking function prior to update to determine type of update desired and whether it is needed.
-	  * @deprecated
-	  * @param int $force     - Are we forcing the regnerate? 1 if so and 0 if not
-	  * @param int $id        - The source id for the elasticsearch index
-	  * @param int $add       - 1 if we are adding to index instead of fully regenerating
-	  * @return array $result - Various parameters to allow front end decision
-	  */
-	 public function elasticCheck() {
-		 if ($this->request->getMethod() == 'post') {
-			 $eavModel = new EAV();
-
-			 $source_id = $this->request->getVar('source_id');
-			 $append = $this->request->getVar('append') == 'true' ? true : false;
-
-			 if ($append) {
-				 $unaddedEAVsCount = $eavModel->countUnindexedRecordsBySourceId($source_id);
-				 if ($unaddedEAVsCount == 0) {
-					 $result = ['Status' => 'Fully Updated'];
-					 return json_encode($result);
-				 } else {
-					 $result = ['Status' => 'Success'];
-					 return json_encode($result);
-				 }
-			 }
-			 else {
-				 $result = ['Status' => 'Success'];
-				 return json_encode($result);
-			 }
-		 }
-	 }
 
 	 /**
 	  * elasticStart - Begin ElasticSearch regeneration
