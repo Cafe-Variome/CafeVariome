@@ -26,7 +26,8 @@ class SpreadsheetDataInput extends DataInput
         $this->initializeConfiguration();
     }
 
-    public function absorb(int $file_id){
+    public function absorb(int $file_id): bool
+	{
 
         $this->registerProcess($file_id);
 
@@ -86,7 +87,7 @@ class SpreadsheetDataInput extends DataInput
         }
     }
 
-    public function save(int $file_id)
+    public function save(int $file_id): bool
     {
         $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Counting records');
 
