@@ -56,9 +56,7 @@ class Attribute extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Attributes';
 
-		if ($source_id > 0) {
-			$attributes = $this->attributeModel->getAttributesBySourceId($source_id);
-		}
+		$attributes = $this->attributeModel->getAttributesBySourceId($source_id);
 
 		foreach ($attributes as &$attribute) {
 			$attribute['type_text'] = AttributeHelper::getAttributeType($attribute['type']);
