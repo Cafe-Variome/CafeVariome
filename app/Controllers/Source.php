@@ -842,9 +842,11 @@ class Source extends CVUI_Controller{
 
 		$fileMan = new SysFileMan($uiIndexPath);
 		$indexSize = '-';
+		$indexCreationDate = '-';
 
 		if ($fileMan->Exists($indexName)){
 			$indexSize = $fileMan->getSize($indexName);
+			$indexCreationDate = date("D M j G:i:s T Y", $fileMan->GetModificationTimeStamp($indexName));
 			$indexStatus = USER_INTERFACE_INDEX_STATUS_CREATED;
 		}
 		else{
@@ -855,6 +857,7 @@ class Source extends CVUI_Controller{
 		$uidata->data['sourceId'] = $source_id;
 		$uidata->data['indexName'] = $indexName;
 		$uidata->data['indexSize'] = $indexSize == '-' ? $indexSize : SourceHelper::formatSize($indexSize);
+		$uidata->data['indexCreationDate'] = $indexCreationDate;
 		$uidata->data['indexStatusText'] = SourceHelper::getUserInterfaceIndexStatus($indexStatus);
 
 		$uidata->javascript = [JS."cafevariome/userinterfaceindex.js"];

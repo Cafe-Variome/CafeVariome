@@ -29,6 +29,7 @@
 		<th>Index Details</th>
 		<td>
 			Size: <?= $indexSize ?></br>
+			Last Modified: <?= $indexCreationDate ?>
 		</td>
 		<td></td>
 	</tr>
