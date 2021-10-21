@@ -292,19 +292,6 @@ class EAV extends Model{
         return $count;
     }
 
-	public function countUnaddedRecordsByAttributeNames(int $source_id, array $attribute_names): int
-	{
-		$this->builder = $this->db->table($this->table);
-
-		$this->builder->whereIn('attribute', $attribute_names);
-		$this->builder->where('source_id', $source_id);
-
-		$count = 0;
-		$count = $this->builder->countAllResults();
-
-		return $count;
-    }
-
 	public function getLastIdByUID(string $uid): int
 	{
 		$this->builder->select('id');
