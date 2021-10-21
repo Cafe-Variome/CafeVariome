@@ -319,4 +319,61 @@ class EAV extends Model{
 
 		return -1;
 	}
+
+	public function getLastIdBySubjectId(string $subject_id): int
+	{
+		$this->builder->select('id');
+		$this->builder->where('subject_id', $subject_id);
+		$this->builder->orderBy('id', 'DESC');
+		$this->builder->limit(1);
+
+		$query = $this->builder->get()->getResultArray();
+		if (count($query) == 1){
+			return $query[0]['id'];
+		}
+
+		return -1;
+	}
+
+	public function getValueFrequenciesBySourceIdAndFileId(int $source_id, int $file_id)
+	{
+		$this->builder->select('value_id, count(value_id) as frequency');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->where('file_id', $file_id);
+		$this->builder->groupBy('value_id');
+
+		return $this->builder->get()->getResultArray();
+	}
+
+	public function recordsExistBySourceId(int $source_id, array $attribute_ids): bool
+	{
+		$this->builder->select('id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		$this->builder->limit(1);
+
+		return count($this->builder->get()->getResultArray()) == 1;
+	}
+
+	public function indexedRecordsExistBySourceId(int $source_id, array $attribute_ids): bool
+	{
+		$this->builder->select('id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		$this->builder->where('indexed', true);
+		$this->builder->limit(1);
+
+		return count($this->builder->get()->getResultArray()) == 1;
+	}
+
+	public function unindexedRecordsExistBySourceId(int $source_id, array $attribute_ids): bool
+	{
+		$this->builder->select('id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		$this->builder->where('indexed', false);
+		$this->builder->limit(1);
+
+		return count($this->builder->get()->getResultArray()) == 1;
+	}
 }
