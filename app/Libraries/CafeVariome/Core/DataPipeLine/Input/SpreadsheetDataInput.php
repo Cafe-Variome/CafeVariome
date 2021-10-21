@@ -80,11 +80,15 @@ class SpreadsheetDataInput extends DataInput
                     $message = "File did not conform to allowed types.";
                     $error_code = 2;
                     $this->uploadModel->errorInsert($file_id, $message, $error_code, true);
+
+					return false;
                 }
 
                 $this->reader->open($filePath);
+				return true;
             }
         }
+		return false; // If the control reaches this section, the file has not been absorbed successfully.
     }
 
     public function save(int $file_id): bool
