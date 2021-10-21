@@ -458,7 +458,7 @@ $(function() {
                                     trow += '</td>';
                                 }
                                 else{
-                                    trow += '<td>Access Denied</td>';
+                                    trow += '<td>Access Denied</td><td>-</td>';
                                 }
                                 trow += "</tr>";
                                     $('#query_result tbody').append(trow);
