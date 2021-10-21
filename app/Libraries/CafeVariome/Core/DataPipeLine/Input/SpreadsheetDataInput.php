@@ -89,66 +89,66 @@ class SpreadsheetDataInput extends DataInput
 
     public function save(int $file_id): bool
     {
-        $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Counting records');
+		try{
+			$this->reportProgress($file_id, 0, 1, 'bulkupload', 'Counting records');
+			$recordCount = $this->countRecords();
+			$this->reportProgress($file_id, 0, $recordCount, 'bulkupload', 'Importing data');
+			list($linerow, $counter) = array(1, 0);
 
-        $recordCount = $this->countRecords();
+			if ($this->configuration['subject_id_location'] == SUBJECT_ID_IN_FILE_NAME) {
+				if (strpos($this->fileName, '.')) {
+					$subject_id = explode('.', $this->fileName)[0];
+				}
+			}
 
-        $this->reportProgress($file_id, 0, $recordCount, 'bulkupload', 'Importing data');
+			foreach ($this->reader->getSheetIterator() as $sheet) {
+				$recordsProcessed = -1;  // set counter to -1 initially to avoid counting header of the file
+				$attgroups = [];
+				$temphash = [];
 
-        list($linerow, $counter) = array(1, 0);
+				foreach ($sheet->getRowIterator() as $row) {
+					$row = $row->toArray();
+					if ($recordsProcessed == -1) {
+						if (!$this->checkHeader($file_id, $row, $attgroups, $temphash)){
+							break;
+						}
+						$this->db->begin_transaction();
+					}
+					else {
+						if ($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE) {
+							$subject_id = $row[0];
+						}
+						if ($subject_id == ""){
+							$message = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
+							$error_code = 3;
+							$this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
+							$this->sourceModel->unlockSource($this->sourceId);
+						}
+						$this->processRow($row, $attgroups, $subject_id, $file_id, $counter);
+					}
+					$recordsProcessed++;
+					$this->reportProgress($file_id, $recordsProcessed, $recordCount, 'bulkupload');
+				}
+				$linerow++;
+			}
 
-        if ($this->configuration['subject_id_location'] == SUBJECT_ID_IN_FILE_NAME) {
-            if (strpos($this->fileName, '.')) {
-                $subject_id = explode('.', $this->fileName)[0];
-            }
-        }
+			$this->reader->close();
+			$this->db->commit();
 
-        foreach ($this->reader->getSheetIterator() as $sheet) {
-            $recordsProcessed = -1;  // set counter to -1 initially to avoid counting header of the file
+			//Update value frequencies
+			$this->updateValueFrequencies();
 
-            $attgroups = [];
-            $temphash = [];
+			//Set attributes types, minimum, and maximum values if applicable
+			$this->determineAttributesType();
 
-            foreach ($sheet->getRowIterator() as $row) {
-				$row = $row->toArray();
-				if ($recordsProcessed == -1) {
-                    if (!$this->checkHeader($file_id, $row, $attgroups, $temphash)){
-                        break;
-                    }
-                    $this->db->begin_transaction();
-                }
-                else {
-                    if ($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE) {
-                        $subject_id = $row[0];
-                    }
-                    if ($subject_id == ""){
-                        $message = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
-                        $error_code = 3;
-                        $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
-                        $this->sourceModel->unlockSource($this->sourceId);
-                    }
-                    $this->processRow($row, $attgroups, $subject_id, $file_id, $counter);
-                }
-                $recordsProcessed++;
+			//Determine storage location of each attribute
+			$this->determineAttributesStorageLocation();
 
-                $this->reportProgress($file_id, $recordsProcessed, $recordCount, 'bulkupload');
-            }
-
-            $linerow++;
-        }
-
-        $this->reader->close();
-        $this->db->commit();
-
-		//Update value frequencies
-		$this->updateValueFrequencies();
-
-		//Set attributes types, minimum, and maximum values if applicable
-		$this->determineAttributesType();
-
-		//Determine storage location of each attribute
-		$this->determineAttributesStorageLocation();
-
+			return true;
+		}
+		catch (\Exception $ex) {
+			return false;
+		}
     }
 
 	private function processRow($row, $attgroups, $subject_id, $file_id, & $counter)
