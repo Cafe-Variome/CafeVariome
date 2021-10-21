@@ -85,7 +85,7 @@ class EAV extends Model{
     }
 
     public function updateEAVs(array $data, array $conds = null)
-    {        $this->builder = $this->db->table($this->table);
+    {
         if ($conds) {
             $this->builder->where($conds);
         }
