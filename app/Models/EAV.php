@@ -29,23 +29,12 @@ class EAV extends Model{
         else {
             $this->db = \Config\Database::connect();
         }
-    }
 
-    public function getEAVsForSource(int $source_id, int $limit, int $offset){
-        $this->builder = $this->db->table($this->table);
-        $this->builder->select('id,attribute,value');
-        $this->builder->where('source_id', $source_id);
-        $this->builder->where('id>', $offset);
-
-        $this->builder->limit($limit);
-        $query = $this->builder->get()->getResultArray();
-
-        return $query;
-    }
+		$this->builder = $this->db->table($this->table);
+	}
 
     public function getEAVs($cols, array $conds = null, bool $isDistinct = false, int $limit = -1, int $offset = -1)
     {
-        $this->builder = $this->db->table($this->table);
         if ($cols) {
             $this->builder->select($cols);
         }
