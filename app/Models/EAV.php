@@ -307,8 +307,6 @@ class EAV extends Model{
 
 	public function getLastIdByUID(string $uid): int
 	{
-		$this->builder = $this->db->table($this->table);
-
 		$this->builder->select('id');
 		$this->builder->where('uid', $uid);
 		$this->builder->orderBy('id', 'DESC');
