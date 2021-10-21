@@ -9,12 +9,12 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use App\Models\UIData;
 use App\Models\Settings;
 use App\Models\Network;
 use App\Models\Source;
 use App\Models\User;
-use App\Libraries\ElasticSearch;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
 use App\Libraries\CafeVariome\Auth\KeyCloak;
 use App\Models\NetworkRequest;
@@ -61,7 +61,6 @@ class Admin extends CVUI_Controller{
         $userModel = new User();
         $networkRequestModel = new NetworkRequest();
 
-        $elasticSearch = new ElasticSearch(array($this->setting->getElasticSearchUri()));
         $neo4j = new Neo4J();
         $keyCloak = new KeyCloak();
         $service = new ServiceInterface();
@@ -104,7 +103,7 @@ class Admin extends CVUI_Controller{
         $uidata->data['usersCount'] = count($userModel->getUsers('id'));
         $uidata->data['networkRequestCount'] = count($networkRequestModel->getNetworkRequests('id', ['status' => -1]));
 
-        $elasticStatus = $elasticSearch->ping();
+        $elasticStatus = ElasticsearchHelper::ping();
         $uidata->data['elasticStatus'] = $elasticStatus;
         $uidata->data['elasticMsg'] = null;
         if (!$elasticStatus) {
