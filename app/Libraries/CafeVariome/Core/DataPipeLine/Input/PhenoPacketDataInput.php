@@ -31,7 +31,7 @@ class PhenoPacketDataInput extends DataInput
         $this->initializeConfiguration();
     }
 
-    public function absorb(int $file_id)
+    public function absorb(int $file_id): bool
     {
 		$this->registerProcess($file_id);
 
@@ -78,7 +78,7 @@ class PhenoPacketDataInput extends DataInput
         }
     }
 
-    public function save(int $file_id)
+    public function save(int $file_id): bool
     {
         $steps = 3;
         $neo4jInterface = new Neo4J();
