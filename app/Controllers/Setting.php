@@ -10,12 +10,6 @@
 
 use App\Models\UIData;
 use App\Models\Settings;
-use App\Models\User;
-use App\Libraries\ElasticSearch;
-use App\Libraries\CafeVariome\Auth\KeyCloak;
-use App\Models\NetworkRequest;
-use App\Libraries\CafeVariome\Net\NetworkInterface;
-use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Config\Services;
 
 class Setting extends CVUI_Controller{
