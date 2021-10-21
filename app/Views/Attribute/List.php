@@ -67,6 +67,9 @@
 		<a class="btn btn-info bg-gradient-info" href="<?= base_url('Source/Neo4J/' . $sourceId) ?>">
 			<i class="fa fa-project-diagram"></i> Neo4J Index Status
 		</a>
+		<a class="btn btn-info bg-gradient-info" href="<?= base_url('Source/UserInterface/' . $sourceId) ?>">
+			<i class="fa fa-desktop"></i> User Interface Index Status
+		</a>
 	</div>
 </div>
 <?= $this->endSection() ?>
