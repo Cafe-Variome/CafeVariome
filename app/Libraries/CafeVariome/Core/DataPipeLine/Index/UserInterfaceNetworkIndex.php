@@ -11,7 +11,6 @@ class UserInterfaceNetworkIndex extends AbstractNetworkIndex
 	public function __construct(int $network_key)
 	{
 		parent::__construct($network_key);
-
 	}
 
     public function IndexNetwork()
