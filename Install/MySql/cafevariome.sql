@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 15, 2021 at 11:18 AM
--- Server version: 5.7.35-0ubuntu0.18.04.1
--- PHP Version: 8.0.10
+-- Generation Time: Oct 22, 2021 at 01:08 AM
+-- Server version: 5.7.35-0ubuntu0.18.04.2
+-- PHP Version: 8.0.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -38,7 +38,33 @@ CREATE TABLE `attributes` (
   `show_in_interface` bit(1) NOT NULL,
   `include_in_interface_index` bit(1) NOT NULL,
   `storage_location` tinyint(3) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `attributes_ontology_prefixes_relationships`
+--
+
+CREATE TABLE `attributes_ontology_prefixes_relationships` (
+  `id` int(11) NOT NULL,
+  `attribute_id` int(11) NOT NULL,
+  `prefix_id` int(11) NOT NULL,
+  `relationship_id` int(11) NOT NULL,
+  `ontology_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `attribute_mappings`
+--
+
+CREATE TABLE `attribute_mappings` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `attribute_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -139,7 +165,7 @@ CREATE TABLE `network_groups` (
 
 CREATE TABLE `network_groups_sources` (
   `id` int(11) UNSIGNED NOT NULL,
-  `source_id` int(11) UNSIGNED NOT NULL,
+  `source_id` int(11) NOT NULL,
   `group_id` int(11) UNSIGNED NOT NULL,
   `installation_key` varchar(32) CHARACTER SET latin1 NOT NULL,
   `network_key` int(11) NOT NULL
@@ -162,6 +188,71 @@ CREATE TABLE `network_requests` (
   `token` varchar(32) NOT NULL,
   `status` tinyint(4) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ontologies`
+--
+
+CREATE TABLE `ontologies` (
+  `id` int(11) NOT NULL,
+  `name` varchar(200) NOT NULL,
+  `description` varchar(500) DEFAULT NULL,
+  `node_key` varchar(100) NOT NULL,
+  `node_type` varchar(100) NOT NULL,
+  `key_prefix` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `ontologies`
+--
+
+INSERT INTO `ontologies` (`id`, `name`, `description`, `node_key`, `node_type`, `key_prefix`) VALUES
+(1, 'Human Phenotype Ontology', 'The Human Phenotype Ontology (HPO) is a formal ontology of human phenotypes. Developed in collaboration with members of the Open Biomedical Ontologies Foundry, HPO currently contains over 13,000 terms and over 156,000 annotations to hereditary diseases. Data from Online Mendelian Inheritance in Man and medical literature were used to generate the terms currently in the HPO. The ontology contains over 50,000 annotations between phenotypes and hereditary disease. ', 'hpoid', 'HPOterm', 'HP:'),
+(2, 'ORPHA Net', 'Orphanet is a unique resource, gathering and improving knowledge on rare diseases so as to improve the diagnosis, care and treatment of patients with rare diseases. Orphanet aims to provide high-quality information on rare diseases, and ensure equal access to knowledge for all stakeholders. Orphanet also maintains the Orphanet rare disease nomenclature (ORPHAcode), essential in improving the visibility of rare diseases in health and research information systems.', 'orphaid', 'ORPHAterm', 'ORPHA:');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ontology_prefixes`
+--
+
+CREATE TABLE `ontology_prefixes` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL,
+  `ontology_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `ontology_prefixes`
+--
+
+INSERT INTO `ontology_prefixes` (`id`, `name`, `ontology_id`) VALUES
+(1, 'hp:', 1),
+(2, 'orpha:', 2),
+(3, 'ordo:', 2);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ontology_relationships`
+--
+
+CREATE TABLE `ontology_relationships` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `ontology_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `ontology_relationships`
+--
+
+INSERT INTO `ontology_relationships` (`id`, `name`, `ontology_id`) VALUES
+(1, 'NOT_PHENOTYPE_OF', 1),
+(2, 'PHENOTYPE_OF', 1),
+(3, 'PHENOTYPE_OF', 2);
 
 -- --------------------------------------------------------
 
@@ -189,10 +280,10 @@ INSERT INTO `pages` (`id`, `Title`, `Content`, `Author`, `Active`, `Removable`) 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pipeline`
+-- Table structure for table `pipelines`
 --
 
-CREATE TABLE `pipeline` (
+CREATE TABLE `pipelines` (
   `id` int(11) NOT NULL,
   `name` varchar(50) NOT NULL,
   `subject_id_location` tinyint(3) NOT NULL DEFAULT '0',
@@ -200,9 +291,6 @@ CREATE TABLE `pipeline` (
   `grouping` tinyint(4) NOT NULL DEFAULT '0',
   `group_columns` varchar(200) DEFAULT NULL,
   `dateformat` tinyint(4) DEFAULT NULL,
-  `hpo_attribute_name` varchar(100) DEFAULT NULL,
-  `negated_hpo_attribute_name` varchar(100) DEFAULT NULL,
-  `orpha_attribute_name` varchar(100) DEFAULT NULL,
   `internal_delimiter` char(1) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -227,7 +315,7 @@ CREATE TABLE `settings` (
 --
 
 INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `info`, `setting_group`, `validation_rules`) VALUES
-(1, 'site_title', 'Cafe Variome 2', 'Site Title', 'Title as it appears in the web browser and on top left side of all pages.', 'main', 'required'),
+(1, 'site_title', 'Cafe Variome', 'Site Title', 'Title as it appears in the web browser and on top left side of all pages.', 'main', 'required'),
 (2, 'site_description', 'Cafe Variome - Description', 'Site Description', 'Description of the website that appears as metadata in the structure of public pages.', 'main', 'required'),
 (3, 'site_author', 'Bioinformatics Research Group - University of Leicester', 'Site Author', 'Name of the owner of the website, whether a person or an organisation, that appears as metadata on public pages.', 'main', 'required'),
 (4, 'site_keywords', 'healthcare data discovery, bioinformatics', 'Keywords', 'Keywords explaining activity of the website that appear as metadata on public pages. They help search engines find this website.', 'main', 'required'),
@@ -260,6 +348,7 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 
 CREATE TABLE `sources` (
   `source_id` int(11) NOT NULL,
+  `uid` varchar(11) NOT NULL,
   `owner_name` mediumtext NOT NULL,
   `email` mediumtext NOT NULL,
   `name` varchar(30) NOT NULL,
@@ -407,7 +496,19 @@ CREATE TABLE `values` (
   `frequency` int(11) NOT NULL,
   `show_in_interface` bit(1) NOT NULL,
   `include_in_interface_index` bit(1) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `value_mappings`
+--
+
+CREATE TABLE `value_mappings` (
+  `id` int(11) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `value_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Indexes for dumped tables
@@ -417,7 +518,25 @@ CREATE TABLE `values` (
 -- Indexes for table `attributes`
 --
 ALTER TABLE `attributes`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `SourceIDAttribute_FK` (`source_id`);
+
+--
+-- Indexes for table `attributes_ontology_prefixes_relationships`
+--
+ALTER TABLE `attributes_ontology_prefixes_relationships`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Relationship_FK` (`relationship_id`),
+  ADD KEY `Prefix_FK` (`prefix_id`),
+  ADD KEY `Ontology_Attribute_FK` (`ontology_id`),
+  ADD KEY `Attribute_Ontology_FK` (`attribute_id`);
+
+--
+-- Indexes for table `attribute_mappings`
+--
+ALTER TABLE `attribute_mappings`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Attribute_Mapping_FK` (`attribute_id`);
 
 --
 -- Indexes for table `eavs`
@@ -484,6 +603,26 @@ ALTER TABLE `network_requests`
   ADD KEY `NetworkRequest_NetworkKey_FK` (`network_key`);
 
 --
+-- Indexes for table `ontologies`
+--
+ALTER TABLE `ontologies`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indexes for table `ontology_prefixes`
+--
+ALTER TABLE `ontology_prefixes`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `OntologyPrefix_FK` (`ontology_id`);
+
+--
+-- Indexes for table `ontology_relationships`
+--
+ALTER TABLE `ontology_relationships`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `OntologyRelationhip_FK` (`ontology_id`);
+
+--
 -- Indexes for table `pages`
 --
 ALTER TABLE `pages`
@@ -491,9 +630,9 @@ ALTER TABLE `pages`
   ADD KEY `Author_FK` (`Author`);
 
 --
--- Indexes for table `pipeline`
+-- Indexes for table `pipelines`
 --
-ALTER TABLE `pipeline`
+ALTER TABLE `pipelines`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -507,8 +646,7 @@ ALTER TABLE `settings`
 --
 ALTER TABLE `sources`
   ADD PRIMARY KEY (`source_id`),
-  ADD UNIQUE KEY `name` (`name`),
-  ADD KEY `status` (`status`);
+  ADD UNIQUE KEY `name` (`name`);
 
 --
 -- Indexes for table `uploaddatastatus`
@@ -564,6 +702,13 @@ ALTER TABLE `values`
   ADD KEY `Attribute_FK` (`attribute_id`);
 
 --
+-- Indexes for table `value_mappings`
+--
+ALTER TABLE `value_mappings`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `Value_Mapping_FK` (`value_id`);
+
+--
 -- AUTO_INCREMENT for dumped tables
 --
 
@@ -571,6 +716,18 @@ ALTER TABLE `values`
 -- AUTO_INCREMENT for table `attributes`
 --
 ALTER TABLE `attributes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `attributes_ontology_prefixes_relationships`
+--
+ALTER TABLE `attributes_ontology_prefixes_relationships`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `attribute_mappings`
+--
+ALTER TABLE `attribute_mappings`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -616,15 +773,33 @@ ALTER TABLE `network_requests`
   MODIFY `id` int(10) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `ontologies`
+--
+ALTER TABLE `ontologies`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `ontology_prefixes`
+--
+ALTER TABLE `ontology_prefixes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `ontology_relationships`
+--
+ALTER TABLE `ontology_relationships`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
 -- AUTO_INCREMENT for table `pages`
 --
 ALTER TABLE `pages`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT for table `pipeline`
+-- AUTO_INCREMENT for table `pipelines`
 --
-ALTER TABLE `pipeline`
+ALTER TABLE `pipelines`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
@@ -661,13 +836,13 @@ ALTER TABLE `upload_jobs`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT for table `users_groups`
 --
 ALTER TABLE `users_groups`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=41;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `users_groups_networks`
@@ -682,8 +857,35 @@ ALTER TABLE `values`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `value_mappings`
+--
+ALTER TABLE `value_mappings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- Constraints for dumped tables
 --
+
+--
+-- Constraints for table `attributes`
+--
+ALTER TABLE `attributes`
+  ADD CONSTRAINT `SourceIDAttribute_FK` FOREIGN KEY (`source_id`) REFERENCES `sources` (`source_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `attributes_ontology_prefixes_relationships`
+--
+ALTER TABLE `attributes_ontology_prefixes_relationships`
+  ADD CONSTRAINT `Attribute_Ontology_FK` FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `Ontology_Attribute_FK` FOREIGN KEY (`ontology_id`) REFERENCES `ontologies` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `Prefix_FK` FOREIGN KEY (`prefix_id`) REFERENCES `ontology_prefixes` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `Relationship_FK` FOREIGN KEY (`relationship_id`) REFERENCES `ontology_relationships` (`id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `attribute_mappings`
+--
+ALTER TABLE `attribute_mappings`
+  ADD CONSTRAINT `Attribute_Mapping_FK` FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `menu_items`
@@ -705,6 +907,18 @@ ALTER TABLE `network_requests`
   ADD CONSTRAINT `NetworkRequest_NetworkKey_FK` FOREIGN KEY (`network_key`) REFERENCES `networks` (`network_key`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
+-- Constraints for table `ontology_prefixes`
+--
+ALTER TABLE `ontology_prefixes`
+  ADD CONSTRAINT `OntologyPrefix_FK` FOREIGN KEY (`ontology_id`) REFERENCES `ontologies` (`id`) ON UPDATE CASCADE;
+
+--
+-- Constraints for table `ontology_relationships`
+--
+ALTER TABLE `ontology_relationships`
+  ADD CONSTRAINT `OntologyRelationhip_FK` FOREIGN KEY (`ontology_id`) REFERENCES `ontologies` (`id`) ON UPDATE CASCADE;
+
+--
 -- Constraints for table `pages`
 --
 ALTER TABLE `pages`
@@ -714,7 +928,7 @@ ALTER TABLE `pages`
 -- Constraints for table `uploaddatastatus`
 --
 ALTER TABLE `uploaddatastatus`
-  ADD CONSTRAINT `Pipeline_Id_FK` FOREIGN KEY (`pipeline_id`) REFERENCES `pipeline` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
+  ADD CONSTRAINT `Pipeline_Id_FK` FOREIGN KEY (`pipeline_id`) REFERENCES `pipelines` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
 -- Constraints for table `users_groups`
@@ -735,6 +949,12 @@ ALTER TABLE `users_groups_networks`
 --
 ALTER TABLE `values`
   ADD CONSTRAINT `Attribute_FK` FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `value_mappings`
+--
+ALTER TABLE `value_mappings`
+  ADD CONSTRAINT `Value_Mapping_FK` FOREIGN KEY (`value_id`) REFERENCES `values` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
