@@ -12,6 +12,7 @@ setfacl -m u:$apacheUser:rwx writable/cache/
 setfacl -m u:$apacheUser:rwx writable/uploads/
 setfacl -m u:$apacheUser:rwx writable/session/
 setfacl -m u:$apacheUser:rwx resources/phenotype_lookup_data/
+setfacl -m u:$apacheUser:rwx resources/user_interface_index/
 setfacl -m u:$apacheUser:rwx upload/
 setfacl -m u:$apacheUser:rwx upload/pairings/
 setfacl -m u:$apacheUser:rwx upload/UploadData/
