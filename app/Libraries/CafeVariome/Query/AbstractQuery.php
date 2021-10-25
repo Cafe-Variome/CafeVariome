@@ -21,8 +21,7 @@ abstract class AbstractQuery
 
 	protected function getNeo4JInstance(): Neo4J
 	{
-		$neo4j = new Neo4J();
-		return $neo4j;
+		return new Neo4J();
 	}
 
 	protected function getESInstance(): \Elasticsearch\Client
