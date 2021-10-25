@@ -1,7 +1,7 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
 
-use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4J;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
 use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use App\Models\Settings;
 use Elasticsearch\ClientBuilder;
