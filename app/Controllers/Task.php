@@ -137,9 +137,6 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 
         if (count($fileRec) == 1) {
             $sourceId = $fileRec[0]['source_id'];
-            if($overwrite){
-                $sourceModel->updateSource(['record_count' => 0], ['source_id' => $sourceId]);
-            }
 
             $inputPipeLine = new SpreadsheetDataInput($sourceId, $overwrite);
             if($inputPipeLine->absorb($fileId)){
