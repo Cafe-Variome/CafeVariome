@@ -117,6 +117,7 @@ class Attribute extends Model
 	{
 		$attribute_id = -1;
 
+		$this->builder->select('id');
 		$this->builder->where(['name' => $name, 'source_id' => $source_id]);
 		$result = $this->builder->get()->getResultArray();
 
