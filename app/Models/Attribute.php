@@ -198,6 +198,20 @@ class Attribute extends Model
 		]);
 	}
 
+	public function getAttributeStorageLocation(int $id): int
+	{
+		$this->builder->select('storage_location');
+		$this->builder->where('id', $id);
+
+		$result = $this->builder->get()->getResultArray();
+
+		if (count($result) == 1){
+			return $result[0]['storage_location'];
+		}
+
+		return -1;
+	}
+
 	public function setAttributeStorageLocation(int $attribute_id, int $storage_location)
 	{
 		$this->builder->where('id', $attribute_id);
