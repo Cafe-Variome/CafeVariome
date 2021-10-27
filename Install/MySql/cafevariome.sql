@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 22, 2021 at 01:08 AM
--- Server version: 5.7.35-0ubuntu0.18.04.2
+-- Generation Time: Oct 27, 2021 at 03:10 PM
+-- Server version: 5.7.36-0ubuntu0.18.04.1
 -- PHP Version: 8.0.11
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -201,16 +201,17 @@ CREATE TABLE `ontologies` (
   `description` varchar(500) DEFAULT NULL,
   `node_key` varchar(100) NOT NULL,
   `node_type` varchar(100) NOT NULL,
-  `key_prefix` varchar(100) DEFAULT NULL
+  `key_prefix` varchar(100) DEFAULT NULL,
+  `term_name` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `ontologies`
 --
 
-INSERT INTO `ontologies` (`id`, `name`, `description`, `node_key`, `node_type`, `key_prefix`) VALUES
-(1, 'Human Phenotype Ontology', 'The Human Phenotype Ontology (HPO) is a formal ontology of human phenotypes. Developed in collaboration with members of the Open Biomedical Ontologies Foundry, HPO currently contains over 13,000 terms and over 156,000 annotations to hereditary diseases. Data from Online Mendelian Inheritance in Man and medical literature were used to generate the terms currently in the HPO. The ontology contains over 50,000 annotations between phenotypes and hereditary disease. ', 'hpoid', 'HPOterm', 'HP:'),
-(2, 'ORPHA Net', 'Orphanet is a unique resource, gathering and improving knowledge on rare diseases so as to improve the diagnosis, care and treatment of patients with rare diseases. Orphanet aims to provide high-quality information on rare diseases, and ensure equal access to knowledge for all stakeholders. Orphanet also maintains the Orphanet rare disease nomenclature (ORPHAcode), essential in improving the visibility of rare diseases in health and research information systems.', 'orphaid', 'ORPHAterm', 'ORPHA:');
+INSERT INTO `ontologies` (`id`, `name`, `description`, `node_key`, `node_type`, `key_prefix`, `term_name`) VALUES
+(1, 'Human Phenotype Ontology', 'The Human Phenotype Ontology (HPO) is a formal ontology of human phenotypes. Developed in collaboration with members of the Open Biomedical Ontologies Foundry, HPO currently contains over 13,000 terms and over 156,000 annotations to hereditary diseases. Data from Online Mendelian Inheritance in Man and medical literature were used to generate the terms currently in the HPO. The ontology contains over 50,000 annotations between phenotypes and hereditary disease. ', 'hpoid', 'HPOterm', 'HP:', 'term'),
+(2, 'ORPHA Net', 'Orphanet is a unique resource, gathering and improving knowledge on rare diseases so as to improve the diagnosis, care and treatment of patients with rare diseases. Orphanet aims to provide high-quality information on rare diseases, and ensure equal access to knowledge for all stakeholders. Orphanet also maintains the Orphanet rare disease nomenclature (ORPHAcode), essential in improving the visibility of rare diseases in health and research information systems.', 'orphaid', 'ORPHAterm', 'ORPHA:', 'term');
 
 -- --------------------------------------------------------
 
@@ -448,7 +449,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `email`, `activation_selector`, `activation_code`, `forgotten_password_selector`, `forgotten_password_code`, `forgotten_password_time`, `remember_selector`, `remember_code`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`, `is_admin`, `token`, `remote`) VALUES
-(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1620741180, 1, 'Admin', 'Admin', 'Brookes Lab', '', 1, NULL, 0);
+(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', NULL, '', NULL, NULL, NULL, NULL, NULL, 1268889823, 1635243567, 1, 'Admin', 'Admin', 'Brookes Lab', '', 1, NULL, 0);
 -- --------------------------------------------------------
 
 --
@@ -782,13 +783,13 @@ ALTER TABLE `ontologies`
 -- AUTO_INCREMENT for table `ontology_prefixes`
 --
 ALTER TABLE `ontology_prefixes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `ontology_relationships`
 --
 ALTER TABLE `ontology_relationships`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `pages`
