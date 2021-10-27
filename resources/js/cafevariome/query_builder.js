@@ -160,7 +160,8 @@ $(function() {
     $('#search_filter_phen_left').keyup(function() {
         if($search_str == $(this).val()) return;
         $('select#values_phen_left').empty()
-        str = $(this).val().trim().split(' ').filter((term) => term.length != 1).reduce((v1, v2) => v1 + " " + v2)
+        var arrayToReduce = $(this).val().trim().split(' ').filter((term) => term.length != 1);
+        str = (arrayToReduce.length > 0) ? arrayToReduce.reduce((v1, v2) => v1 + " " + v2) : '';
         $.getJSON('https://www185.lamp.le.ac.uk/EpadGreg/hpo/query/' + (str) + '/0/1', (data) => {
             $('select#values_phen_left').empty()
             data.forEach((term) => {
