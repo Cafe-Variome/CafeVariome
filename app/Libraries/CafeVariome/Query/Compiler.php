@@ -359,41 +359,4 @@ class Compiler
 				return $mutationQuery->execute($clause, $source_id, $iscount);
 		}
 	}
-
-	private function elasticVal (array $ids, string $attribute, string $source, $flag = 'id') {
-		$elasticModel = new Elastic();
-		$sourceModel = new Source();
-
-		$paramsnew = [];
-		$sourceId = $sourceModel->getSourceIDByName($source);
-		$es_index = $elasticModel->getTitlePrefix() . "_" . $sourceId;
-		$paramsnew = ['index' => $es_index];
-
-		$paramsnew['size'] = 10000;
-		//$paramsnew['type'] = 'subject';
-		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source . '_eav'; // for source
-		$paramsnew['body']['query']['bool']['must'][1]['term']['type'] = "eav";
-		$paramsnew['body']['query']['bool']['must'][2]['term']['attribute'] = $attribute;
-		foreach ($ids as $id) {
-			$paramsnew['body']['query']['bool']['should'][] = ['term'=>['subject_id' => $id]];
-		}
-
-		$paramsnew['body']['query']['bool']["minimum_should_match"] = 1;
-
-		$jp = json_encode($paramsnew);
-
-		$resultsnew = $this->elasticClient->search($paramsnew);
-
-		$final = [];
-		foreach ($resultsnew['hits']['hits'] as $hit) {
-			$id =  $hit['_source']['subject_id'];
-			$val =  $hit['_source']['value'];
-			$final[$flag === 'value' ? $val : $id][] = $flag === 'value' ? $id : $val;
-		}
-		foreach ($final as $key => $value) {
-			$final[$key] = array_unique($final[$key]);
-		}
-		return $final;
-
-	}
 }
