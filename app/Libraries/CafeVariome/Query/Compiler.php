@@ -1,5 +1,6 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
+use App\Models\Attribute;
 use App\Models\Elastic;
 use App\Models\Settings;
 use App\Models\Source;
@@ -27,6 +28,7 @@ class Compiler
 
 	public function CompileAndRunQuery(string $query, int $network_key, int $user_id): string
 	{
+		$attributeModel = new Attribute();
 		$sourceModel = new Source();
 		$session = \Config\Services::session();
 		$setting = Settings::getInstance();
@@ -76,10 +78,31 @@ class Compiler
 				$ids = $this->execute_query($pointer_query, $source['source_id']);
 				$records = [];
 				$records['subjects'] = $ids;
+				$records['attributes'] = [];
 
-				$elasticResult = new ElasticsearchResult();
 				foreach ($attributes as $attribute){
-					$records['attributes'][$attribute] = $elasticResult->extract($ids, $attribute, $source_id);
+					if (count($ids) > 0) {
+						$attributeId = $attributeModel->getAttributeIdByNameAndSourceId($attribute, $source_id);
+						$attributeObject = $attributeModel->getAttribute($attributeId);
+
+						if ($attributeObject != null) {
+							switch ($attributeObject['storage_location']) {
+								case ATTRIBUTE_STORAGE_ELASTICSEARCH:
+									$elasticResult = new ElasticsearchResult();
+									$records['attributes'][$attribute] = $elasticResult->extract($ids, $attribute, $source_id);
+									break;
+								case ATTRIBUTE_STORAGE_NEO4J:
+									if ($attributeObject['type'] == ATTRIBUTE_TYPE_ONTOLOGY_TERM) {
+										$neo4jOntologyResult = new Neo4JOntologyResult();
+										$records['attributes'][$attribute] = $neo4jOntologyResult->extract($ids, $attribute, $source_id);
+									}
+									break;
+							}
+						}
+					}
+					else{
+						$records['attributes'][$attribute] = [];
+					}
 				}
 
 				$results[$source['name']] = [
