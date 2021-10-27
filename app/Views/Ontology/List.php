@@ -23,6 +23,7 @@
 		<th>Node Type</th>
 		<th>Node Key</th>
 		<th>Key Prefix</th>
+		<th>Term Name</th>
 		<th>Action</th>
 	</tr>
 	</thead>
@@ -33,6 +34,7 @@
 			<td><?= $ontology['node_type']; ?></td>
 			<td><?= $ontology['node_key']; ?></td>
 			<td><?= $ontology['key_prefix']; ?></td>
+			<td><?= $ontology['term_name']; ?></td>
 			<td>
 				<a href="<?= base_url($controllerName. '/Update'). "/" . $ontology['id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Ontology">
 					<i class="fa fa-edit text-warning"></i>

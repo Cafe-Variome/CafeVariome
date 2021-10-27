@@ -85,9 +85,16 @@ class Ontology extends CVUI_Controller
 			],
 			'key_prefix' => [
 				'label'  => 'Key Prefix',
-				'rules'  => 'required|alpha_numeric_punct|max_length[100]',
+				'rules'  => 'permit_empty|alpha_numeric_punct|max_length[100]',
 				'errors' => [
-					'required' => '{field} is required.',
+					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, punctuation characters, and spaces.',
+					'max_length' => 'Maximum length is 100 characters.'
+				]
+			],
+			'term_name' => [
+				'label'  => 'Term Name',
+				'rules'  => 'permit_empty|alpha_numeric_punct|max_length[100]',
+				'errors' => [
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, punctuation characters, and spaces.',
 					'max_length' => 'Maximum length is 100 characters.'
 				]
@@ -102,9 +109,10 @@ class Ontology extends CVUI_Controller
 				$node_key = $this->request->getVar('node_key');
 				$node_type = $this->request->getVar('node_type');
 				$key_prefix = $this->request->getVar('key_prefix');
+				$term_name = $this->request->getVar('term_name');
 
 				$ontologyModel = new \App\Models\Ontology();
-				$ontologyModel->createOntology($name, $node_key, $node_type, $key_prefix, $description);
+				$ontologyModel->createOntology($name, $node_key, $node_type, $key_prefix, $term_name, $description);
 
 				$this->setStatusMessage("Ontology '$name' was created.", STATUS_SUCCESS);
 			}
@@ -157,6 +165,14 @@ class Ontology extends CVUI_Controller
 				'type' => 'text',
 				'class' => 'form-control',
 				'value' =>set_value('key_prefix'),
+			);
+
+			$uidata->data['term_name'] = array(
+				'name' => 'term_name',
+				'id' => 'term_name',
+				'type' => 'text',
+				'class' => 'form-control',
+				'value' =>set_value('term_name'),
 			);
 
 		}
@@ -235,6 +251,14 @@ class Ontology extends CVUI_Controller
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, punctuation characters, and spaces.',
 					'max_length' => 'Maximum length is 100 characters.'
 				]
+			],
+			'term_name' => [
+				'label'  => 'Term Name',
+				'rules'  => 'permit_empty|alpha_numeric_punct|max_length[100]',
+				'errors' => [
+					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, punctuation characters, and spaces.',
+					'max_length' => 'Maximum length is 100 characters.'
+				]
 			]
 		]);
 
@@ -246,8 +270,9 @@ class Ontology extends CVUI_Controller
 				$node_key = $this->request->getVar('node_key');
 				$node_type = $this->request->getVar('node_type');
 				$key_prefix = $this->request->getVar('key_prefix');
+				$term_name = $this->request->getVar('term_name');
 
-				$ontologyModel->updateOntology($id, $name, $node_key, $node_type, $key_prefix, $description);
+				$ontologyModel->updateOntology($id, $name, $node_key, $node_type, $key_prefix, $term_name, $description);
 
 				$this->setStatusMessage("Ontology '$name' was updated.", STATUS_SUCCESS);
 			}
@@ -308,6 +333,14 @@ class Ontology extends CVUI_Controller
 				'type' => 'text',
 				'class' => 'form-control',
 				'value' =>set_value('key_prefix', $ontology['key_prefix']),
+			);
+
+			$uidata->data['term_name'] = array(
+				'name' => 'term_name',
+				'id' => 'term_name',
+				'type' => 'text',
+				'class' => 'form-control',
+				'value' =>set_value('term_name', $ontology['term_name']),
 			);
 
 		}

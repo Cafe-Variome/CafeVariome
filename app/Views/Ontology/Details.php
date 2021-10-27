@@ -41,6 +41,10 @@
 				<td><?= $ontology['key_prefix'] ?></td>
 			</tr>
 			<tr>
+				<th>Term Name</th>
+				<td><?= $ontology['term_name'] ?></td>
+			</tr>
+			<tr>
 				<th>Description</th>
 				<td><?= $ontology['description'] ?></td>
 			</tr>

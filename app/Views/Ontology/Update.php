@@ -45,6 +45,8 @@
 		<?php echo form_input($key_prefix); ?>
 	</div>
 	<div class="col-6">
+		<?php echo form_label('Term Name', 'term_name'); ?>
+		<?php echo form_input($term_name); ?>
 	</div>
 </div>
 

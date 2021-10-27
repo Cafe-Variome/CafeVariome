@@ -24,14 +24,15 @@ class Ontology extends Model
 
 	}
 
-	public function createOntology(string $name, string $node_key, string $node_type, string $key_prefix, string $description = ''): int
+	public function createOntology(string $name, string $node_key, string $node_type, string $key_prefix, string $term_name, string $description = ''): int
 	{
 		$this->builder->insert([
 			'name' => $name,
 			'description' => $description,
 			'node_key' => $node_key,
 			'node_type' => $node_type,
-			'key_prefix' => $key_prefix
+			'key_prefix' => $key_prefix,
+			'term_name' => $term_name
 		]);
 
 		return $this->db->insertID();
@@ -57,7 +58,7 @@ class Ontology extends Model
 		return null;
 	}
 
-	public function updateOntology(int $id, string $name, string $node_key, string $node_type, string $key_prefix, string $description): bool
+	public function updateOntology(int $id, string $name, string $node_key, string $node_type, string $key_prefix, string $term_name, string $description): bool
 	{
 		$this->builder->where('id', $id);
 		return $this->builder->update([
@@ -65,6 +66,7 @@ class Ontology extends Model
 			'node_key' => $node_key,
 			'node_type' => $node_type,
 			'key_prefix' => $key_prefix,
+			'term_name' => $term_name,
 			'description' => $description
 		]);
 	}
