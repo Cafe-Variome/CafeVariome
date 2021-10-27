@@ -418,7 +418,7 @@ $(function() {
                     source_data = {};
                     $.each(data, function(key, val) {
                         if(key == 'error'){
-                            trow = "<tr><td>Error</td><td>" + val + "</td></tr>";
+                            trow = "<tr><td>Error</td><td>" + val + "</td><td></td></tr>";
                             $('#query_result tbody').append(trow);
                         }
                         else if (key == 'timeout') {
