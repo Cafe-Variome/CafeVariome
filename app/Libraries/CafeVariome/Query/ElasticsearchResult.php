@@ -1,8 +1,6 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-use App\Models\Elastic;
 use App\Models\Settings;
-use App\Models\Source;
 use Elasticsearch\ClientBuilder;
 
 /**
