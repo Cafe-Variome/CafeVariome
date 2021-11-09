@@ -126,7 +126,6 @@ class AttributeMapping extends CVUI_Controller
 				'class' => 'form-control',
 				'value' =>set_value('name'),
 			);
-
 		}
 
 		$data = $this->wrapData($uidata);
@@ -137,7 +136,7 @@ class AttributeMapping extends CVUI_Controller
 	public function Delete(int $id)
 	{
 		$attributeMapping = $this->attributeMappingModel->getAttributeMapping($id);
-		if ($attributeMapping == null || $attributeMapping <= 0) {
+		if ($attributeMapping == null || $id <= 0) {
 			return redirect()->to(base_url('Source'));
 		}
 
