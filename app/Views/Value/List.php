@@ -35,6 +35,9 @@
 				<a href="<?= base_url($controllerName . '/Update') . '/' . $value['id']?>" data-toggle="tooltip" data-placement="top" title="Edit Value">
 					<i class="fa fa-edit text-warning"></i>
 				</a>
+				<a href="<?= base_url('ValueMapping/List') . '/' . $value['id']?>" data-toggle="tooltip" data-placement="top" title="View Mappings">
+					<i class="fa fa-map-signs text-danger"></i>
+				</a>
 				<a href="<?= base_url($controllerName . '/Details') . '/' . $value['id']?>" data-toggle="tooltip" data-placement="top" title="View Value">
 					<i class="fa fa-eye text-info"></i>
 				</a>
