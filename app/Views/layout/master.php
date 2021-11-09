@@ -19,7 +19,6 @@
 	<meta name="author" content="<?php echo $author ?>" />
 	<meta name="description" content="<?php echo $description ?>" />
 
-    <!-- Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh 11/6/2019 -->
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "twbs/bootstrap/dist/css/bootstrap.css");?>" />
     <link rel="stylesheet" href="<?php echo base_url(CSS . "site.css");?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/fontawesome.css"); ?>" />
