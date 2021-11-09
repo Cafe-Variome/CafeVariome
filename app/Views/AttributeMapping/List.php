@@ -41,7 +41,7 @@
 		<a class="btn btn-success bg-gradient-success" href="<?= base_url($controllerName . '/Create/' . $attributeId) ?>">
 			<i class="fa fa-plus"></i> Create an Attribute Mapping
 		</a>
-		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url($controllerName . '/List/' . $sourceId) ?>">
+		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('/Attribute/List/' . $sourceId) ?>">
 			<i class="fa fa-arrow-left"></i> Go Back to List of Attributes for <?= $sourceName ?>
 		</a>
 	</div>
