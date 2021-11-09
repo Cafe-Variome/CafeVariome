@@ -2,6 +2,7 @@
 
 /**
     *@author Mehdi Mehtarizadeh
+    *@author Farid Yavari Dizjikan
     *
     *This is the master layout for all pages.
 */
@@ -19,8 +20,8 @@
 	<meta name="author" content="<?php echo $author ?>" />
 	<meta name="description" content="<?php echo $description ?>" />
 
-    <!-- Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh 11/6/2019 -->
-    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "twbs/bootstrap/dist/css/bootstrap.css");?>" />
+    <!-- Initial step to upgrade to boostrap 4.3.1 by Mehdi Mehtarizadeh & Farid Yavari Dizjikan 09/11/2021 -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" href="<?php echo base_url(CSS . "site.css");?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/fontawesome.css"); ?>" />
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/brands.css"); ?>" />
