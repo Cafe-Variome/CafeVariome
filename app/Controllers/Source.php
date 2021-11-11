@@ -615,7 +615,8 @@ class Source extends CVUI_Controller{
                 }
                 //delete Elasticsearch index associated with the source
                 try {
-                    $elasticModel = new ElasticSearch();
+					$hosts = [$this->setting->getElasticSearchUri()];
+                    $elasticModel = new ElasticSearch($hosts);
                     $elasticModel->deleteIndex(ElasticsearchHelper::getSourceIndexName($source_id));
                 } catch (\Exception $ex) {
                     $this->setStatusMessage("There was an error in deleting Elasticsearch index.", STATUS_ERROR);
