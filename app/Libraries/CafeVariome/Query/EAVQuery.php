@@ -35,9 +35,7 @@ class EAVQuery extends AbstractQuery
 		$operator = $clause['operator'];
 		$value = $clause['value'];
 
-		$isnot = ($iscount == true && (substr($operator,0,6) === 'is not' || $operator === '!=')) ? true : false;
-
-		$es_index = $elasticModel->getTitlePrefix() . "_" . $source_id;
+		$isnot =  (substr($operator,0,6) === 'is not' || $operator === '!=') ? true : false;
 
 		$paramsnew = ['index' => $es_index];
 		$paramsnew['body']['query']['bool']['must'][0]['term']['source_id'] = $source_id;
