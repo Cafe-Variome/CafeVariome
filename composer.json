@@ -5,7 +5,7 @@
     "homepage": "https://discoverynexus.org/",
     "license": "MIT",
     "require": {
-		"php": "^7.4||^8.0",
+		"php": "^8.0",
         "codeigniter4/framework": "^4.1",
         "stevenmaguire/oauth2-keycloak": "^2.2.1",
         "components/font-awesome": "^5.9.0",
