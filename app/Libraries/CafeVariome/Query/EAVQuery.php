@@ -31,7 +31,6 @@ class EAVQuery extends AbstractQuery
 		$es_index = $this->getESIndexName($source_id);
 		$es_client = $this->getESInstance();
 
-		$source_name = $sourceModel->getSourceNameByID($source_id);
 		$attribute = $clause['attribute'];
 		$operator = $clause['operator'];
 		$value = $clause['value'];
@@ -41,7 +40,8 @@ class EAVQuery extends AbstractQuery
 		$es_index = $elasticModel->getTitlePrefix() . "_" . $source_id;
 
 		$paramsnew = ['index' => $es_index];
-		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source_name . "_eav"; // for source
+		$paramsnew['body']['query']['bool']['must'][0]['term']['source_id'] = $source_id;
+		$arr = [];
 
 		$tmp[]['match'] = ['attribute' => $attribute];
 
