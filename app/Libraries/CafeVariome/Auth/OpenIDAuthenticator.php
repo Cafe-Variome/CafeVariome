@@ -123,7 +123,8 @@ abstract class OpenIDAuthenticator extends Authenticator
 
         if($authenticatedUser)
         {
-            if($authenticatedUser->active == 0 && $authenticatedUser->remote == 1){
+	    // Changed Operator from && to ||
+            if($authenticatedUser->active == 0 || $authenticatedUser->remote == 1){
                 $this->logout();
             }
             
