@@ -41,6 +41,24 @@ class AttributeMapping extends Model
 		return count($result) == 1 ? $result[0] : null;
 	}
 
+	public function getAttributeByMappingNameAndSourceId(string $name, int $source_id)
+	{
+		$this->builder->select('attributes.id as attribute_id, attributes.name as attribute_name');
+		$this->builder->where($this->table . '.name', $name);
+		$this->builder->join('attributes', $this->table . '.attribute_id = attributes.id');
+		$this->builder->where('attributes.source_id', $source_id);
+		$result = $this->builder->get()->getResultArray();
+
+		if (count($result) == 1){
+			return [
+				'id' => $result[0]['attribute_id'],
+				'name' => $result[0]['attribute_name'],
+			];
+		}
+
+		return null;
+	}
+
 	public function getAttributeMappingsByAttributeId(int $attribute_id): array
 	{
 		$this->builder->where('attribute_id', $attribute_id);
