@@ -84,17 +84,18 @@ class AttributeMapping extends CVUI_Controller
 		$uidata->title = 'Create Attribute Mapping';
 
 		$attributeName = $attribute['name'];
+		$uidata->data['sourceId'] = $attribute['source_id'];
 		$uidata->data['attributeId'] = $attribute_id;
 		$uidata->data['attributeName'] = $attributeName;
 
 		$this->validation->setRules([
 			'name' => [
 				'label'  => 'Name',
-				'rules'  => 'required|alpha_numeric_punct|is_unique[attribute_mappings.name]|max_length[100]',
+				'rules'  => 'required|alpha_numeric_punct|unique_attribute_mapping[source_id]|max_length[100]',
 				'errors' => [
 					'required' => '{field} is required.',
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and spaces.',
-					'is_unique' => '{field} already exists.',
+					'unique_attribute_mapping' => '{field} has already been mapped to an attribute.',
 					'max_length' => 'Maximum length is 100 characters.'
 				]
 			]
