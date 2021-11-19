@@ -116,11 +116,9 @@ class ValidationHelper{
 	{
 		$prefixModel = new \App\Models\OntologyPrefix();
 		if (strpos($fields, ',') !== false){
-			$fieldsArr = explode(',', $fields);
 			$ontology_id = $data['ontology_id'];
 			$relationship_id = $data['prefix_id'];
 			return !$prefixModel->ontologyPrefixExists($str, $ontology_id, $relationship_id);
-
 		}
 		else{
 			$ontology_id = $data[$fields];
@@ -132,11 +130,9 @@ class ValidationHelper{
 	{
 		$relationshipModel = new \App\Models\OntologyRelationship();
 		if (strpos($fields, ',') !== false){
-			$fieldsArr = explode(',', $fields);
 			$ontology_id = $data['ontology_id'];
 			$relationship_id = $data['relationship_id'];
 			return !$relationshipModel->ontologyRelationshipExists($str, $ontology_id, $relationship_id);
-
 		}
 		else{
 			$ontology_id = $data[$fields];
