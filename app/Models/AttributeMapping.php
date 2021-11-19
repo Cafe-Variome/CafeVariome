@@ -65,12 +65,23 @@ class AttributeMapping extends Model
 		return $this->builder->get()->getResultArray();
 	}
 
+	public function attributeMappingExists(string $name, int $source_id, int $id = -1)
+	{
+		$this->builder->select($this->table . '.name');
+		$this->builder->where($this->table . '.name', $name);
+		if($id > 0){
+			$this->builder->where($this->table . '.id!=', $id);
+		}
+		$this->builder->join('attributes', $this->table . '.attribute_id = attributes.id');
+		$this->builder->where('attributes.source_id', $source_id);
+		$result = $this->builder->get()->getResultArray();
+
+		return count($result) > 0;
+	}
+
 	public function deleteAttributeMapping(int $id)
 	{
 		$this->builder->where('id',  $id);
 		$this->builder->delete();
 	}
-
-
-
 }
