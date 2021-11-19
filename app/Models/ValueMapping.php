@@ -47,6 +47,20 @@ class ValueMapping extends Model
 		return $this->builder->get()->getResultArray();
 	}
 
+	public function valueMappingExists(string $name, int $attribute_id, int $id = 1): bool
+	{
+		$this->builder->select($this->table . '.name');
+		$this->builder->where($this->table . '.name', $name);
+		if($id > 0){
+			$this->builder->where($this->table . '.id!=', $id);
+		}
+		$this->builder->join('values', $this->table . '.value_id = values.id');
+		$this->builder->where('values.attribute_id', $attribute_id);
+		$result = $this->builder->get()->getResultArray();
+
+		return count($result) > 0;
+	}
+
 	public function deleteValueMapping(int $id)
 	{
 		$this->builder->where('id',  $id);
