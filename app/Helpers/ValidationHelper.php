@@ -1,5 +1,8 @@
 <?php namespace App\Helpers;
 
+use App\Models\AttributeMapping;
+use App\Models\ValueMapping;
+
 /**
  * ValidationHelper.php
  *
@@ -139,5 +142,19 @@ class ValidationHelper{
 			$ontology_id = $data[$fields];
 			return !$relationshipModel->ontologyRelationshipExists($str, $ontology_id);
 		}
+	}
+
+	public function unique_attribute_mapping(string $str, string $fields, array $data, & $err): bool
+	{
+		$attributeMappingModel = new AttributeMapping();
+		$source_id = $data[$fields];
+		return !$attributeMappingModel->attributeMappingExists($str, $source_id);
+	}
+
+	public function unique_value_mapping(string $str, string $fields, array $data, & $err): bool
+	{
+		$valueMappingModel = new ValueMapping();
+		$attribute_id = $data[$fields];
+		return !$valueMappingModel->valueMappingExists($str, $attribute_id);
 	}
 }
