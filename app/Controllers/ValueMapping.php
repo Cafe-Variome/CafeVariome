@@ -85,17 +85,18 @@ class ValueMapping extends CVUI_Controller
 		$uidata->title = 'Create Value Mapping';
 
 		$valueName = $value['name'];
+		$uidata->data['attributeId'] = $value['attribute_id'];
 		$uidata->data['valueId'] = $value_id;
 		$uidata->data['valueName'] = $valueName;
 
 		$this->validation->setRules([
 			'name' => [
 				'label'  => 'Name',
-				'rules'  => 'required|alpha_numeric_punct|is_unique[value_mappings.name]|max_length[100]',
+				'rules'  => 'required|alpha_numeric_punct|unique_value_mapping[attribute_id]|max_length[100]',
 				'errors' => [
 					'required' => '{field} is required.',
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and spaces.',
-					'is_unique' => '{field} already exists.',
+					'unique_value_mapping' => '{field} already exists.',
 					'max_length' => 'Maximum length is 100 characters.'
 				]
 			]
