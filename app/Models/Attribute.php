@@ -113,6 +113,22 @@ class Attribute extends Model
 		return $ids;
 	}
 
+	public function getAttributeByNameAndSourceId(string $name, string $source_id)
+	{
+		$this->builder->select('id, name');
+		$this->builder->where(['name' => $name, 'source_id' => $source_id]);
+		$result = $this->builder->get()->getResultArray();
+
+		if (count($result) == 1){
+			return [
+				'id' => $result[0]['id'],
+				'name' => $result[0]['name']
+			];
+		}
+
+		return null;
+	}
+
 	public function getAttributeIdByNameAndSourceId(string $name, string $source_id): int
 	{
 		$attribute_id = -1;
