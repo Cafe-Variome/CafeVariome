@@ -16,6 +16,7 @@
 	</div>
 <?php endif; ?>
 <?php echo form_open($controllerName.'/Create/' . $valueId); ?>
+<?php echo form_hidden(['attribute_id' => $attributeId]); ?>
 <?php echo form_hidden(['value_id' => $valueId]); ?>
 
 <div class="form-group row">

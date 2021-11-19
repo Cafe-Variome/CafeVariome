@@ -17,7 +17,7 @@
 <?php endif; ?>
 <?php echo form_open($controllerName.'/Create/' . $attributeId); ?>
 <?php echo form_hidden(['attribute_id' => $attributeId]); ?>
-
+<?php echo form_hidden(['source_id' => $sourceId]); ?>
 <div class="form-group row">
 	<div class="col-6">
 		<?php echo form_label('Name', 'name'); ?>
