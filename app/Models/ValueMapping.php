@@ -41,6 +41,24 @@ class ValueMapping extends Model
 		return count($result) == 1 ? $result[0] : null;
 	}
 
+	public function getValueByMappingNameAndAttributeId(string $name, int $attribute_id)
+	{
+		$this->builder->select('values.id as value_id, values.name as value_name');
+		$this->builder->where($this->table . '.name', $name);
+		$this->builder->join('values', $this->table . '.value_id = values.id');
+		$this->builder->where('values.attribute_id', $attribute_id);
+		$result = $this->builder->get()->getResultArray();
+
+		if (count($result) == 1){
+			return [
+				'id' => $result[0]['value_id'],
+				'name' => $result[0]['value_name'],
+			];
+		}
+
+		return null;
+	}
+
 	public function getValueMappingsByValueId(int $value_id): array
 	{
 		$this->builder->where('value_id', $value_id);
