@@ -1,5 +1,6 @@
 <?php namespace App\Helpers;
 
+use App\Models\Attribute;
 use App\Models\AttributeMapping;
 use App\Models\ValueMapping;
 
@@ -138,6 +139,14 @@ class ValidationHelper{
 			$ontology_id = $data[$fields];
 			return !$relationshipModel->ontologyRelationshipExists($str, $ontology_id);
 		}
+	}
+
+	public function duplicate_attribute_and_mapping(string $str, string $fields, array $data, & $err): bool
+	{
+		$attributeModel = new Attribute();
+		$source_id = $data[$fields];
+		$attributeId = $attributeModel->getAttributeIdByNameAndSourceId($str, $source_id);
+		return !($attributeId > 0);
 	}
 
 	public function unique_attribute_mapping(string $str, string $fields, array $data, & $err): bool
