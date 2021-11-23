@@ -2,6 +2,7 @@
 
 use App\Models\Attribute;
 use App\Models\AttributeMapping;
+use App\Models\Value;
 use App\Models\ValueMapping;
 
 /**
@@ -161,5 +162,13 @@ class ValidationHelper{
 		$valueMappingModel = new ValueMapping();
 		$attribute_id = $data[$fields];
 		return !$valueMappingModel->valueMappingExists($str, $attribute_id);
+	}
+
+	public function duplicate_value_and_mapping(string $str, string $fields, array $data, & $err): bool
+	{
+		$valueModel = new Value();
+		$attribute_id = $data[$fields];
+		$valueId = $valueModel->getValueIdByNameAndAttributeId($str, $attribute_id);
+		return !($valueId > 0);
 	}
 }
