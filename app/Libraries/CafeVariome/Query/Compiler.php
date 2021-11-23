@@ -20,10 +20,11 @@ use App\Models\Source;
 class Compiler
 {
 	private $query;
+	private array $uniqueSubjectIds;
 
 	public function __construct()
 	{
-
+		$this->uniqueSubjectIds = [];
 	}
 
 	public function CompileAndRunQuery(string $query, int $network_key, int $user_id): string
@@ -134,83 +135,65 @@ class Compiler
 				// here we are going to query each '[]' and keep counts for each one.
 				//remove any parantheses or brackets
 				$pointer = trim($pointer, "()[]/");
-				$type = explode('/', $pointer)[2];
-				$clause = $this->getVal($this->query, $pointer);
 
 				if (array_key_exists($pointer, $countCache)) {
 					$element[$numor]["$pointer"] = $countCache[$pointer];
 				}
 				else{
-					$qCount = $this->execute_clause($type, $clause, $source_id, true);
-					$element[$numor]["$pointer"] = $qCount;
-					$countCache[$pointer] = $qCount;
+					$element[$numor][] = $pointer;
+					$countCache[$pointer] = 0;
 				}
 			}
 			$numor++;
 		}
 
 		$outids = []; // final output of ids that match query, return count of this.
-		foreach ($element as $current) {
+		foreach ($element as $current)
+		{
 			$noids = 0;
-			asort($current); //sort the counts in an or statement so only need to keep array of smallest number of ids
-			if (reset($current) == 0) continue; // if smallest is 0 then no need to continue as answer is 0
-			$andids=[]; //array of ids for current or statement
+			$andids = []; //array of ids for current or statement
 
-			foreach ($current as $pointer => $val){
-				if ($noids == 1) {
+			foreach ($current as $pointer)
+			{
+				if ($noids == 1)
+				{
 					break;
 				}
 				$lookup = $this->getVal($this->query, $pointer);
 				$type = explode('/', $pointer)[2];
 
-				if (array_key_exists('operator',$lookup) === false || (substr($lookup['operator'],0,6) !== 'is not' && $lookup['operator'] !== '!=')){
-					// IS
-					if (array_key_exists($pointer, $idsCache)) {
-						$ids = $idsCache[$pointer];
+				if (array_key_exists($pointer, $idsCache))
+				{
+					$ids = $idsCache[$pointer];
+				}
+				else
+				{
+					$isNot = false;
+					if (array_key_exists('operator',$lookup))
+					{
+						$isNot = substr($lookup['operator'], 0, 6) === 'is not' || $lookup['operator'] === '!=';
 					}
-					else{
-						$ids = $this->execute_clause($type, $lookup, $source_id, false);
-						$idsCache[$pointer] = $ids;
+					if ($isNot)
+					{
+						$matchAllQuery = new MatchAllQuery();
+						$this->uniqueSubjectIds = $matchAllQuery->execute([], $source_id, false);
 					}
+					$ids = $this->execute_clause($type, $lookup, $source_id, false);
+					$idsCache[$pointer] = $ids;
 
-					if (count($andids) > 0){
-						$andids = array_intersect($andids, $ids);
-						if (count($andids) == 0){
-							$noids = 1;
-						}
-					}
-					else{
-						$andids = $ids;
+				}
+
+				if (count($andids) > 0)
+				{
+					$andids = array_intersect($andids, $ids);
+					if (count($andids) == 0)
+					{
+						$noids = 1;
 					}
 				}
-			}
-
-			foreach ($current as $pointer => $val){
-				if ($noids == 1) {
-					break;
-				}
-				$type = explode('/', $pointer)[2];
-
-				$lookup = $this->getVal($this->query, $pointer);
-				if (array_key_exists('operator',$lookup) === true && (substr($lookup['operator'],0,6) === 'is not' || $lookup['operator'] === '!=')){
-					// IS NOT
-					$ids = $this->execute_clause($type, $lookup, $source_id,false);
-
-					if (count($andids) > 0){
-						$andids = array_values(array_diff($andids, $ids));
-						if (count($andids) == 0){
-							$noids = 1;
-						}
-					}
-					else{
-						$eavModel = new EAV();
-						$uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $source_id, 'elastic' => 1], true);
-						$uniqueSubjectIds = [];
-						foreach ($uniqueSubjectIdsArray as $uid) {
-							array_push($uniqueSubjectIds, $uid['subject_id']);
-						}
-						$andids = array_values(array_diff($uniqueSubjectIds, $ids));
-					}
+				else
+				{
+					$andids = $ids;
 				}
 			}
 
@@ -337,7 +320,7 @@ class Compiler
 		switch (strtolower($type))
 		{
 			case 'eav':
-				$eavQuery = new EAVQuery();
+				$eavQuery = new EAVQuery($this->uniqueSubjectIds);
 				return $eavQuery->execute($clause, $source_id, $iscount);
 			case 'sim':
 				$HPOSimilarityQuery = new HPOSimilarityQuery();

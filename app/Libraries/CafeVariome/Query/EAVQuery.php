@@ -1,12 +1,6 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-use App\Models\Attribute;
-use App\Models\AttributeMapping;
-use App\Models\EAV;
 use App\Models\Elastic;
-use App\Models\Settings;
-use App\Models\Source;
-use Elasticsearch\ClientBuilder;
 
 /**
  * EAVQuery.php
@@ -22,10 +16,12 @@ use Elasticsearch\ClientBuilder;
 class EAVQuery extends AbstractQuery
 {
 	private $aggregate_size;
+	protected array $uniqueSubjectIds;
 
-	public function __construct()
+	public function __construct(array $uniqueSubjectIds)
 	{
 		$this->aggregate_size = ELASTICSERACH_AGGREGATE_SIZE;
+		$this->uniqueSubjectIds = $uniqueSubjectIds;
 	}
 
 	public function execute(array $clause, int $source_id, bool $iscount)
@@ -34,35 +30,44 @@ class EAVQuery extends AbstractQuery
 		$es_client = $this->getESInstance();
 
 		$attribute = $clause['attribute'];
+		$operator = $clause['operator'];
+		$isnot =  (substr($operator,0,6) === 'is not' || $operator === '!=') ? true : false;
+
 		$attributeObj = $this->getAttribute($attribute, $source_id);
+
 		if ($attributeObj == null)
 		{
-			// No attribute or mapping for the incoming attribute in the source exists. No need to query ES
+			// No attribute or mapping for the incoming attribute in the source exists. No need to query ES.
 			return $iscount ? 0 : [];
 		}
 		else
 		{
-			//Query ES
 			$attribute = $attributeObj['name'];
-			$operator = $clause['operator'];
+			$attributeId = $attributeObj['id'];
+
 			$value = $clause['value'];
 
-			$isnot =  (substr($operator,0,6) === 'is not' || $operator === '!=') ? true : false;
-
-			$paramsnew = ['index' => $es_index];
-			$paramsnew['body']['query']['bool']['must'][0]['term']['source_id'] = $source_id;
-			$arr = [];
-
-			if($isnot){
-				$arr['has_child']['query']['bool']['must']['match'] = ['attribute' => $attribute];
-				$arr['has_child']['query']['bool']['must_not']['match'] = ['value.raw' => $value];
+			$valueObj = $this->getValue($value, $attributeId);
+			if ($valueObj == null)
+			{
+				// No value or mapping for the incoming value in the source exists. No need to query ES.
+				return $iscount ? 0 : [];
 			}
-			else {
+			else
+			{
+				$value = $valueObj['name'];
+
+				//Query ES
+				$arr = [];
+				$paramsnew = ['index' => $es_index];
+				$paramsnew['body']['query']['bool']['must'][0]['term']['source_id'] = $source_id;
 				$tmp[]['match'] = ['attribute' => $attribute];
 
 				switch ($operator) {
 					case 'is':
+					case 'is not':
 					case '=':
+					case '!=':
 						$tmp[]['match'] = ['value.raw' => $value];
 						break;
 					case 'is like':
@@ -94,55 +99,32 @@ class EAVQuery extends AbstractQuery
 						$tmp[]['range'] = ['value.dt' => ['lte' => $value]];
 						break;
 				}
+
 				$arr['has_child']['query']['bool']['must'] = $tmp;
-			}
+				$arr['has_child']['type'] = 'eav';
+				$paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
+				$paramsnew['body']['aggs']['punique']['terms'] = ['field' => 'subject_id', 'size' => $this->aggregate_size];
 
-			$arr['has_child']['type'] = 'eav';
+				$esquery = $es_client->search($paramsnew);
 
-			$paramsnew['body']['query']['bool']['must'][1]['bool']['must'] = $arr;
-			$paramsnew['body']['aggs']['punique']['terms'] = ['field' => 'subject_id', 'size' => $this->aggregate_size]; //NEW
-
-			$esquery = $es_client->search($paramsnew);
-
-			if ($iscount)
-			{
-				$result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
-			}
-			else
-			{
 				$result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
+
+				if ($isnot)
+				{
+					$all_ids = ($iscount == true) ? count($this->uniqueSubjectIds) : $this->uniqueSubjectIds;
+					$result = ($iscount == true) ? $all_ids - $result : array_diff($all_ids, $result) ;
+				}
+				else
+				{
+					if ($iscount)
+					{
+						$result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
+					}
+				}
+
+
+				return $result;
 			}
-
-			return $result;
 		}
-
-//		if ($isnot)
-//		{
-//			$eavModel = new EAV();
-//			$uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $source_id, 'elastic' => 1], true);
-//			$uniqueSubjectIds = [];
-//			foreach ($uniqueSubjectIdsArray as $uid)
-//			{
-//				array_push($uniqueSubjectIds, $uid['subject_id']);
-//			}
-//
-//			$all_ids = ($iscount==true) ? count($uniqueSubjectIds) : $uniqueSubjectIds;
-//			$result = $iscount==true ? $all_ids - $result : array_diff($all_ids, $result) ;
-//		}
-
-	}
-
-	private function getAttribute(string $attribute, int $source_id)
-	{
-		// If attribute exists, return it
-		$attributeModel = new Attribute();
-		$attribute = $attributeModel->getAttributeByNameAndSourceId($attribute, $source_id);
-		if ($attribute != null) {
-			return $attribute;
-		}
-
-		// If attribute mapping exists, return the corresponding atribute
-		$attributeMappingModel = new AttributeMapping();
-		return $attributeMappingModel->getAttributeByMappingNameAndSourceId($attribute, $source_id);
 	}
 }
