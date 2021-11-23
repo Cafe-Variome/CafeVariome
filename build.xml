@@ -35,6 +35,7 @@
     <!-- Target: Copy Files                            -->
     <!-- ============================================  -->
     <target name="copyfiles" description="copy project source files">
+        <mkdir dir="${builddir}" />
         <copy todir="${builddir}">
             <fileset refid="allfiles" />
         </copy>
