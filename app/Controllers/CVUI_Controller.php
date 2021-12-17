@@ -5,7 +5,7 @@
  * @author:Mehdi Mehtarizadeh
  * Created: 15/06/2019
  * This class extends CodeIgniter4 Controller class.
- * 
+ *
  */
 use CodeIgniter\Controller;
 use App\Models\UIData;
@@ -17,7 +17,7 @@ use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Config\Services;
 
 class CVUI_Controller extends Controller{
-	
+
 	private $isProtected = false;
 	private $isAdmin = false;
 	protected $db;
@@ -51,7 +51,7 @@ class CVUI_Controller extends Controller{
 
 		$this->authAdapterConfig = config('AuthAdapter');
 		$this->authAdapter = new AuthAdapter($this->authAdapterConfig->authRoutine);
-		
+
         // If the controller needs authorisation, initiate AuthAdapater object accordingly.
 		if ($this->isProtected) {
 			$this->checkAuthentication($this->isAdmin);
@@ -81,26 +81,41 @@ class CVUI_Controller extends Controller{
 		$config = new \Config\App();
 
 		$session = \Config\Services::session($config);
-		$setting =  Settings::getInstance($this->db);
-		
+		$setting =  Settings::getInstance();
+
         $authAdapterConfig = config('AuthAdapter');
         $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
-		$data = Array();
+
+		$headerImage = "";
+		$headerImageFile = $setting->settingData['logo'];
+		if (is_file(FCPATH . HEADER_IMAGE_DIR . $headerImageFile))
+		{
+			if (strpos($headerImageFile, '.') !== false)
+			{
+				$headerImageArray = explode('.', $headerImageFile);
+				$headerImageExtension = strtolower($headerImageArray[count($headerImageArray) - 1]);
+
+				if (in_array($headerImageExtension, ['jpg', 'jpeg', 'png', 'bmp', 'svg', 'gif']))
+				{
+					$headerImage = HEADER_IMAGE_DIR . $headerImageFile;
+				}
+			}
+		}
+
+		$data = [];
 
 		$data["heading"] = $setting->settingData['site_title'];
 		$data["title"] = $uidata->title;
 		$data["description"] = $uidata->description;
 		$data["keywords"] = $uidata->keywords;
 		$data["author"] = $uidata->author;
-
 		$data["javascript"] = $uidata->javascript;
 		$data["css"] = $uidata->css;
 		$data["stickyFooter"] = $uidata->stickyFooter;
-
 		$data['statusMessage'] = $this->getStatusMessage();
 		$data['statusMessageType'] = $this->getStatusMessageTypeAlertEquivalent();
-
 		$data["uriSegments"] = $this->getURISegments();
+		$data['headerImage'] = $headerImage;
 
 		//Include additional data attributes specific to each view
 		foreach ($uidata->data as $dataKey => $dataValue) {
@@ -115,7 +130,7 @@ class CVUI_Controller extends Controller{
 
 		return $data;
 
-	}	
+	}
 
 	protected function setAuthLevel(bool $protected, bool $isAdmin){
 		$this->isProtected = $protected;
@@ -158,7 +173,7 @@ class CVUI_Controller extends Controller{
 				exit;
 			}
 		}
-		
+
 
 
 	}
@@ -176,7 +191,7 @@ class CVUI_Controller extends Controller{
 			if (count($segments) > 1) {
 				$uriSegments->methodName = $segments[1];
 				if (count($segments) > 2) {
-					for ($i=2; $i < count($segments); $i++) { 
+					for ($i=2; $i < count($segments); $i++) {
 						$uriSegments->params[$i] = $segments[$i];
 					}
 				}
@@ -188,12 +203,12 @@ class CVUI_Controller extends Controller{
 	private function getClassName()
 	{
 		$className = get_class($this);
-		
+
 		try {
 			$classNameArray = explode('\\', $className);
 			return $classNameArray[count($classNameArray) - 1];
 		} catch (\Throwable $th) {
-			return $className; 
+			return $className;
 		}
 	}
 
