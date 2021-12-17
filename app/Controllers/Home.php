@@ -10,7 +10,7 @@ class Home extends CVUI_Controller
 	{
 		$uidata = new UIData();
 		$uidata->title = 'Home';
-
+		$uidata->stickyFooter = false;
 		$pageModel = new Page();
 		$uidata->data['pageContent'] = '';
 		if (is_numeric($page_id)) {
