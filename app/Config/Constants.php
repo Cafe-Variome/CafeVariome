@@ -99,6 +99,7 @@ define('UPLOAD_PAIRINGS', 'pairings'. DIRECTORY_SEPARATOR);
 define('VENDOR','vendor/');
 
 define('RESOURCES_DIR', "resources". DIRECTORY_SEPARATOR);
+define('HEADER_IMAGE_DIR', RESOURCES_DIR . 'images' . DIRECTORY_SEPARATOR . 'logos' . DIRECTORY_SEPARATOR);
 define('JSON_DATA_DIR', RESOURCES_DIR . "phenotype_lookup_data" . DIRECTORY_SEPARATOR);
 define('USER_INTERFACE_INDEX_DIR', RESOURCES_DIR . "user_interface_index" . DIRECTORY_SEPARATOR);
 define('CV_BIN', RESOURCES_DIR . 'bin' . DIRECTORY_SEPARATOR);
