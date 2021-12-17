@@ -57,8 +57,16 @@
 
     <footer id="footer" class="footer <?= ($stickyFooter) ? 'footer-sticky' : '' ?> mt-auto py-3">
         <div class="container">
-            <span class="text-muted">Powered by CafeVariome</span>
-        </div>
+			<div class="row">
+				<div class="col text-center">
+					<span>
+						Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a>
+						<br> By <a target="_blank" href="https://le.ac.uk/health-data-research">Bioinformatics and Health Data Science Group</a>
+						<br> Copyright &copy; <?= date("Y") ?>, <a target="_blank" href="https://le.ac.uk">University of Leicester</a>
+					</span>
+				</div>
+			</div>
+		</div>
     </footer>
 
     <script src="<?php echo base_url(VENDOR."twbs/bootstrap/dist/js/bootstrap.bundle.js");?>"></script>
