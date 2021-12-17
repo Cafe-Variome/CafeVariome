@@ -50,7 +50,7 @@
         </header>
     </div>
     <main role="main">
-        <div class="container">
+        <div class="content container">
             <?= $this->renderSection('content') ?>
         </div>
     </main>
