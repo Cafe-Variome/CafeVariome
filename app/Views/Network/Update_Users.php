@@ -10,7 +10,7 @@
 <?php if($statusMessage): ?>
 	<div class="row">
 		<div class="col">
-			<div class="alert alert-info">
+			<div class="alert alert-<?= $statusMessageType ?>">
 			<?php echo $statusMessage ?>
 			</div>
 		</div>
@@ -26,7 +26,7 @@
     </div>
 </div>
 <?php echo form_open($controllerName.'/Update_Users/' . $user_id . '/' . $isMaster, ['name' => 'editUser']); ?>
-<?php echo form_hidden(['installation_key' => $installation_key]); ?>  
+<?php echo form_hidden(['installation_key' => $installation_key]); ?>
 
 <div class="form-group row">
 	<div class=col-6>
@@ -45,23 +45,23 @@
 	</div>
 </div>
 
-<?php echo form_hidden('isMaster', $isMaster); ?>                
-<?php echo form_hidden('name', $name); ?>                
+<?php echo form_hidden('isMaster', $isMaster); ?>
+<?php echo form_hidden('name', $name); ?>
 <?php echo form_hidden('id', $user_id); ?>
 <div class="form-group row">
 	<div class="col">
-		<button type="submit" name="submit" class="btn btn-primary" onclick="edit_user_network_groups_sources();">
+		<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary" onclick="edit_user_network_groups_sources();">
 			<i class="fa fa-save"></i>  Save
 		</button>
 		<?php if($group_type === 'master'): ?>
-			<a href="<?php echo base_url($controllerName); ?>" class="btn btn-secondary" >
-				<i class="fa fa-backward"></i> Go back
+			<a href="<?= base_url($controllerName);?>" class="btn btn-secondary bg-gradient-secondary">
+				Cancel
 			</a>
 		<?php else: ?>
-			<a href="<?php echo base_url('NetworkGroup'); ?>" class="btn btn-secondary" >
-			<i class="fa fa-backward"></i> Go back
+			<a href="<?= base_url('NetworkGroup');?>" class="btn btn-secondary bg-gradient-secondary">
+				Cancel
 			</a>
-		<?php endif; ?>        
+		<?php endif; ?>
 	</div>
 </div>
 

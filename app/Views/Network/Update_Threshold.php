@@ -25,8 +25,10 @@
 
 <div class="form-group row">
 	<div class="col">
-		<button type="submit" class="btn btn-primary"><i class="fa fa-save"></i>  Save</button>
-		<a href="<?php echo base_url() . '/Network'; ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>        
+		<button type="submit" class="btn btn-primary bg-gradient-primary"><i class="fa fa-save"></i>  Save</button>
+		<a href="<?= base_url($controllerName);?>" class="btn btn-secondary bg-gradient-secondary">
+			Cancel
+		</a>
 	</div>
 </div>
 
