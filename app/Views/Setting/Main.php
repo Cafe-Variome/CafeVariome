@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($statusMessage): ?>
@@ -47,9 +47,9 @@
 
 <div class="form-group row">
     <div class="col">
-    <button type="submit" name="submit" class="btn btn-primary">
-        <i class="fa fa-file"></i>  Save Settings
-        </button>       
+		<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
+			<i class="fa fa-save"></i>  Save Settings
+		</button>
     </div>
 </div>
 <?php echo form_close(); ?>
