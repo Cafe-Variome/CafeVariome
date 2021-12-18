@@ -64,15 +64,15 @@ function detailsUser(int $user_id, &$authadapter){
     /**
      * Gets user object by Email.
      * @param string email User Email
-     * @return object|null
+     * @return array|null
      */
-    public function getUserByEmail($email){
-
+    public function getUserByEmail(string $email)
+	{
         $this->builder = $this->db->table($this->table);
         $this->builder->where('email', $email);
-        $query = $this->builder->get()->getResult();
+        $result = $this->builder->get()->getResultArray();
 
-        return ($query) ? $query : null;
+        return (count($result) == 1) ? $result[0] : null;
     }
 
     /**
