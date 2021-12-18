@@ -3,19 +3,19 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <div class="row">
 	<div class="col">
 		<p>Please enter the network group information below.</p>
 	</div>
-</div>	
+</div>
 <?php if($statusMessage): ?>
 	<div class="row">
 		<div class="col">
-			<div class="alert alert-info">
+			<div class="alert alert-<?= $statusMessageType ?>">
 			<?php echo $statusMessage ?>
 			</div>
 		</div>
@@ -61,8 +61,10 @@
 
 <div class="form-group row">
 	<div class="col">
-	<button type="submit" name="submit" class="btn btn-primary"> Create Group</button>
-	<a href="<?php echo base_url($controllerName);?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>	
+	<button type="submit" name="submit" class="btn btn-success bg-gradient-success">
+		<i class="fa fa-plus"></i> Create Network Group
+	</button>
+		<a href="<?php echo base_url($controllerName); ?>" class="btn btn-secondary bg-gradient-secondary"><i class="fas fa-fw fa-user-friends"></i> View Network Groups</a>
 	</div>
 </div>
 

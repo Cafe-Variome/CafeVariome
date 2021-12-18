@@ -3,8 +3,8 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($statusMessage): ?>
@@ -38,12 +38,12 @@
             <?php if($isMaster): ?>
                 <a data-toggle="tooltip" data-placement="top" title="Assign sources to network group" href="<?= base_url('NetworkGroup/Update_Users'). "/" . $group['id'] . '/1'; ?>" >
                     <i class="fa fa-database text-warning"></i>
-                </a> 
+                </a>
             <?php else: ?>
                 <a data-toggle="tooltip" data-placement="top" title="Assign sources to network group" href="<?= base_url('NetworkGroup/Update_Users'). "/" . $group['id']; ?>" >
                     <i class="fa fa-database text-warning"></i>
-                </a>             
-            <?php endif; ?>          
+                </a>
+            <?php endif; ?>
             <?php if ( $group['group_type'] == "master" ): ?>
                 <i class="fa fa-trash" data-toggle="tooltip" data-placement="top" title="Unable to delete master network group"></i>
                 <!-- Unable to delete master network group -->
@@ -63,8 +63,8 @@
 
 <div class="row">
     <div class="col">
-        <a href="<?php echo base_url($controllerName) .'/Create';?>" class="btn btn-primary" >
-            <i class="fa fa-file"></i> Create new network group
+        <a href="<?php echo base_url($controllerName) .'/Create';?>" class="btn btn-success bg-gradient-success" >
+            <i class="fa fa-plus"></i> Create a Network Group
         </a>
     </div>
 </div>

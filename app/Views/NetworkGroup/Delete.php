@@ -3,8 +3,8 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($statusMessage): ?>
@@ -32,13 +32,13 @@
 </div>
 <?php echo form_hidden(array('id' => $group_id)); ?>
 
-<br/>
-
 <div class="form-group row">
     <div class="col">
-        <button type="submit" name="submit" class="btn btn-primary"><i class="fa fa-trash"></i>  Delete Group</button>
-        <a href="<?php echo base_url($controllerName);?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
-    </div>
+        <button type="submit" name="submit" class="btn btn-danger bg-gradient-danger"><i class="fa fa-trash"></i>  Delete Network Group</button>
+		<a href="<?= base_url($controllerName);?>" class="btn btn-secondary bg-gradient-secondary">
+			Cancel
+		</a>
+	</div>
 </div>
 
 <?php echo form_close(); ?>
