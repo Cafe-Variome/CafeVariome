@@ -7,7 +7,7 @@ namespace App\Libraries\CafeVariome\Auth;
  * @author Gregory Warren
  * @author Owen Lancaster
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
 
 use App\Models\User;
@@ -67,7 +67,7 @@ class KeyCloak extends OpenIDAuthenticator /*implements IAuthenticator*/{
     }
 
     /**
-     * 
+     *
      */
     public function register(string $email, string $username, string $password, array $additionaldata, array $groups){
         $ionAuth = new IonAuth();
@@ -85,14 +85,14 @@ class KeyCloak extends OpenIDAuthenticator /*implements IAuthenticator*/{
             //         $id = $networkModel->addUserToNetworkGroup($result, $group_id, $installation_key, $network_key);
             //     }
             // }
-            // Create user in Keycloak H2 database 
+            // Create user in Keycloak H2 database
 
             // $keyCloakApi = new KeyCloakApi($this);
             // if (!$keyCloakApi->userExists($email)) {
             //     $first_name = $additionaldata['first_name'];
             //     $last_name = $additionaldata['last_name'];
             //     $keyCloakApi->createUser($email, $first_name, $last_name);
-                
+
             //     $user_id =  $keyCloakApi->getUserId($email);
             //     $keyCloakApi->setPassword($user_id, $password);
             //     $keyCloakApi->logout();
@@ -117,21 +117,6 @@ class KeyCloak extends OpenIDAuthenticator /*implements IAuthenticator*/{
             $user_groups = $networkModel->getNetworkGroupsForInstallationForUser($user_id);
             $installation_key = $this->setting->settingData["installation_key"];
 
-            foreach ($groups as $g) {
-                $found = false;
-                $group_id = explode(',', $g)[0];
-                $network_key = explode(',', $g)[1];
-
-                foreach ($user_groups as $ug) {
-                    if (explode(',', $g)[0] == $ug['group_id']){
-                        $found = true;
-                    }
-                }
-                if(!$found){
-                    //add user to new groups
-                    $networkModel->addUserToNetworkGroup($user_id, $group_id, $installation_key, $network_key);
-                }
-            }
             foreach ($user_groups as $ug) {
                 $found = false;
                 $network_key = $ug['network_key'];
