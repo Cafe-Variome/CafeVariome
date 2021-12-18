@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($statusMessage): ?>
@@ -45,21 +45,21 @@
 						<a href="<?php echo base_url($controllerName.'/Activate'). "/" . $page['id']; ?>" data-toggle="tooltip" data-placement="top" title="Activate Page">
 						<i class="fa fa-eye text-success"></i>
 					</a>
-					<?php endif ?>				
+					<?php endif ?>
 				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $page['id']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Page">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 				<?php endif ?>
 			</td>
-		</tr>		
+		</tr>
 		<?php endforeach; ?>
 	</tbody>
 </table>
 
 <div class="row">
 	<div class="col">
-		<a href="<?php echo base_url($controllerName.'/Create') ?>" class="btn btn-primary bg-gradient-primary">
-			<i class="fa fa-file"></i>  Create Page
+		<a href="<?= base_url($controllerName.'/Create') ?>" class="btn btn-success bg-gradient-success">
+			<i class="fa fa-file"></i>  Create a Page
 		</a>
 	</div>
 </div>

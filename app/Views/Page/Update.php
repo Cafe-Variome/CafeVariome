@@ -2,8 +2,8 @@
 <?= $this->section('content') ?>
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($statusMessage): ?>
@@ -42,8 +42,11 @@
 <div class="form-group row">
 	<div class="col">
         <button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
-            <i class="fa fa-file"></i>  Update Page
+            <i class="fa fa-save"></i>  Save Changes
         </button>
+		<a href="<?= base_url($controllerName);?>" class="btn btn-secondary bg-gradient-secondary" >
+			<i class="fa fa-file"></i> View Pages
+		</a>
 	</div>
 </div>
 

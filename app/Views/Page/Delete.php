@@ -3,8 +3,8 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 
@@ -26,12 +26,12 @@
 
 <div class="form-group row">
 	<div class="col">
-		<button type="submit" name="submit" class="btn btn-danger">
+		<button type="submit" name="submit" class="btn btn-danger bg-gradient-danger">
 			<i class="fa fa-trash"></i>  Delete Page
 		</button>
-		<a href="<?php echo base_url($controllerName);?>" class="btn btn-secondary" >
-			<i class="fa fa-backward"></i> Go back
-		</a>	
+		<a href="<?= base_url($controllerName);?>" class="btn btn-secondary bg-gradient-secondary">
+			Cancel
+		</a>
 	</div>
 
 </div>
