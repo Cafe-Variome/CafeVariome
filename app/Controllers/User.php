@@ -43,16 +43,17 @@ class User extends CVUI_Controller{
 
     }
 
-    function Index(){
+    public function Index()
+	{
         return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-    function Create(){
-
+    public function Create()
+	{
         $uidata = new UIData();
         $uidata->title = "Create New User";
         $uidata->stickyFooter = false;
-        $networkModel = new Network($this->db);
+        $networkModel = new Network();
 
         $groups = $networkModel->getNetworkGroupsForInstallation();
 
@@ -181,7 +182,8 @@ class User extends CVUI_Controller{
         return view($this->viewDirectory. '/Create', $data);
     }
 
-    function List(){
+    public function List()
+	{
         $uidata = new UIData();
         $uidata->title = "Users";
         $uidata->stickyFooter = false;
@@ -212,7 +214,8 @@ class User extends CVUI_Controller{
         return view($this->viewDirectory. '/List', $data);
     }
 
-    function Update(int $id){
+    public function Update(int $id)
+	{
         $uidata = new UIData();
         $uidata->title = "Edit User";
         $uidata->stickyFooter = false;
@@ -360,9 +363,10 @@ class User extends CVUI_Controller{
         }
     }
 
-    function Delete(int $id){
+    public function Delete(int $id)
+	{
         $uidata = new UIData();
-        $userModel = new \App\Models\User($this->db);
+        $userModel = new \App\Models\User();
 
         $uidata->title = "Delete User";
 
@@ -405,13 +409,14 @@ class User extends CVUI_Controller{
         }
     }
 
-    function Details(int $id){
-	$uidata = new UIData();
+    public function Details(int $id)
+	{
+		$uidata = new UIData();
         $uidata->title = "User Details";
         $uidata->stickyFooter = false;
 
-        $userModel = new \App\Models\User($this->db);
-        $networkModel = new Network($this->db);
+        $userModel = new \App\Models\User();
+        $networkModel = new Network();
 
         $user = $userModel->getUsers('id, email, first_name, last_name,company,active,remote,phone,last_login,created_on,is_admin,ip_address', ["id" => $id]);
         $user = $user[0];
