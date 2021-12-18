@@ -65,14 +65,13 @@
 		<?php endforeach; ?>
 	</tbody>
 </table>
-				
+
 <?php endif; ?>
-<br />
 
 <div class="row">
 	<div class="col">
-		<a href="<?php echo base_url($controllerName.'/Create'); ?>" class="btn btn-primary" ><i class="fa fa-file"></i> Create Network </a>
-		<a href="<?php echo base_url($controllerName.'/Join'); ?>" class="btn btn-primary" ><i class="fa fa-sign-in-alt"></i> Join an Existing Network</a>
+		<a href="<?= base_url($controllerName.'/Create'); ?>" class="btn btn-success bg-gradient-success" ><i class="fa fa-plus"></i> Create a Network </a>
+		<a href="<?= base_url($controllerName.'/Join'); ?>" class="btn btn-primary bg-gradient-primary" ><i class="fa fa-sign-in-alt"></i> Join an existing Network</a>
 	</div>
 </div>
 

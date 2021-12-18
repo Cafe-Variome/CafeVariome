@@ -10,7 +10,7 @@
 <?php if($statusMessage): ?>
 	<div class="row">
 		<div class="col">
-			<div class="alert alert-info">
+			<div class="alert alert-<?= $statusMessageType ?>">
 			<?php echo $statusMessage ?>
 			</div>
 		</div>
@@ -40,8 +40,8 @@
 			<?php echo form_textarea($justification); ?>
 		</div>
 
-		<button type="submit" class="btn btn-primary"><i class="fa fa-file"></i>  Join Network</button>
-		<a href="<?php echo base_url($controllerName); ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
+		<button type="submit" class="btn btn-primary bg-gradient-primary"><i class="fa fa-sign-in-alt"></i>  Join Network</button>
+		<a href="<?php echo base_url('Network'); ?>" class="btn btn-secondary bg-gradient-secondary"><i class="fas fa-fw fa-network-wired"></i> View Networks</a>
 		<?php echo form_close(); ?>
 	<?php endif; ?>
 <?php else: ?>

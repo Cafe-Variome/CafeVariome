@@ -9,7 +9,7 @@
 <hr>
 
 <?php echo form_open($controllerName."/Leave/$network_key"); ?>
-<?php echo form_hidden('name', $network_name); ?>                
+<?php echo form_hidden('name', $network_name); ?>
 
 <div class="form-group">
   <span class="text-danger">Warning: Are you sure you want to leave <?= $network_name ?>?</span>
@@ -27,8 +27,10 @@
 </div>
 <div class="form-group row">
 	<div class="col">
-		<button type="submit" class="btn btn-primary"><i class="fa fa-door-open"></i>  Leave Network</button>
-		<a href="<?php echo base_url($controllerName); ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>        
+		<button type="submit" class="btn btn-primary bg-gradient-primary"><i class="fa fa-door-open"></i>  Leave Network</button>
+		<a href="<?= base_url($controllerName);?>" class="btn btn-secondary bg-gradient-secondary">
+			Cancel
+		</a>
 	</div>
 </div>
 

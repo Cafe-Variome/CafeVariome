@@ -11,12 +11,12 @@
 	<div class="col">
 		<p>Please enter the network information below.</p>
 	</div>
-</div>	
+</div>
 <?php if($statusMessage): ?>
 	<div class="row">
 		<div class="col">
-			<div class="alert alert-info">
-			<?php echo $statusMessage ?>
+			<div class="alert alert-<?= $statusMessageType ?>">
+				<?php echo $statusMessage ?>
 			</div>
 		</div>
 	</div>
@@ -32,10 +32,10 @@
 </div>
 <div class="form-group row">
 	<div class="col">
-	<button type="submit" name="submit" class="btn btn-primary">
-		<i class="fa fa-file"></i>  Create Network
+	<button type="submit" name="submit" class="btn btn-success bg-gradient-success">
+		<i class="fa fa-plus"></i>  Create Network
 	</button>
-	<a href="<?php echo base_url($controllerName); ?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a></p>
+	<a href="<?php echo base_url('Network'); ?>" class="btn btn-secondary bg-gradient-secondary"><i class="fas fa-fw fa-network-wired"></i> View Networks</a>
 	</div>
 </div>
 <?php echo form_close(); ?>
