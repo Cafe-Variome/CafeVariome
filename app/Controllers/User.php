@@ -430,10 +430,8 @@ class User extends CVUI_Controller{
         $uidata->data['active'] = $user['active'];
         $uidata->data['remote'] = $user['remote'];
         $uidata->data['phone'] = $user['phone'];
-        $uidata->data['last_login'] = $user['last_login'];
-        //$uidata->data['last_login'] = Time::createFromTimestamp($user['last_login'],'Europe/London','en_US');
-        $uidata->data['created_on'] = $user['created_on'];
-        //$uidata->data['created_on'] = Time::createFromTimestamp($user['created_on'],'Europe/London','en_US');
+        $uidata->data['last_login'] = $user['last_login'] != null ? date("H:i:s d-m-Y T", $user['last_login']) : 'The user has not logged in yet.';
+        $uidata->data['created_on'] = date("H:i:s d-m-Y T", $user['created_on']);
         $uidata->data['is_admin'] = $user['is_admin'];
         $uidata->data['ip_address'] = $user['ip_address'];
         $users_groups_data = $networkModel->getCurrentNetworkGroupsForUsers();

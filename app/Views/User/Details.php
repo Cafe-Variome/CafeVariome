@@ -3,7 +3,7 @@
 
 <div class="row">
     <div class="col">
-        <h2><?php echo $first_name; ?> <?= $title ?></h2>
+        <h2><?= $title ?></h2>
     </div>
 </div>
 <hr>
@@ -48,10 +48,10 @@
             </td>
             </tr>
             <th>Last Login</th>
-            <td><?php echo date("H:i:s d-m-Y T", $last_login); ?></td>
+            <td><?= $last_login; ?></td>
             </tr>
             <th>Created On</th>
-            <td><?php echo date("H:i:s d-m-Y T", $created_on); ?></td>
+            <td><?= $created_on; ?></td>
             </tr>
             <th>Role</th>
             <td>
