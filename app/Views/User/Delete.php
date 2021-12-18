@@ -3,14 +3,14 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php echo form_open($controllerName.'/Delete/'.$id); ?>
 <div class="form-group">
     <span class="text-danger">
-        Warning: Are you sure you want to delete user <?= $first_name . ' ' . $last_name ?>?  
+        Warning: Are you sure you want to delete user <?= $first_name . ' ' . $last_name ?>?
     </span>
 </div>
 <div class="form-group">
@@ -24,10 +24,12 @@
 	</div>
 </div>
 <div class="form-group">
-    <button type="submit" name="submit" class="btn btn-primary">
+    <button type="submit" name="submit" class="btn btn-danger bg-gradient-danger">
         <i class="fa fa-trash"></i>  Delete User
     </button>
-    <a href="<?php echo base_url($controllerName.'/List');?>" class="btn btn-secondary" ><i class="fa fa-backward"></i> Go back</a>
+	<a href="<?= base_url($controllerName);?>" class="btn btn-secondary bg-gradient-secondary">
+		Cancel
+	</a>
 </div>
 
 <?php echo form_close(); ?>

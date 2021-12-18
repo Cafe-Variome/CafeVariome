@@ -34,7 +34,7 @@
     </thead>
     <tbody>
         <?php foreach ($users as $user) : ?>
-            <tr style="font-size:12px;">
+            <tr>
                 <td style="height:80px;"><?php echo $user['id']; ?></td>
                 <td><?php echo $user['first_name'] . " " . $user['last_name']; ?></td>
                 <td><?php echo $user['company']; ?></td>
@@ -76,8 +76,8 @@
 </table>
 <div class="form-group row">
     <div class="col">
-        <a href="<?php echo base_url($controllerName . '/Create'); ?>" class="btn btn-primary">
-            <i class="icon-user icon-white"></i> Create new user</a>
+        <a href="<?php echo base_url($controllerName . '/Create'); ?>" class="btn btn-success bg-gradient-success">
+            <i class="fa fa-plus"></i> Create a User</a>
     </div>
 </div>
 

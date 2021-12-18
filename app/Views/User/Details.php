@@ -75,10 +75,13 @@
 
         </table>
         <hr />
-        <a href="<?php echo base_url($controllerName . '/Update') . "/" . $id; ?>" class="btn btn-warning">
-            <i class="fa fa-edit"></i>&nbsp;Edit</a>
-        <a href="<?php echo base_url($controllerName . '/List'); ?>" class="btn btn-secondary"><i class="fa fa-backward"></i> Go back</a>
-        <hr />
+        <a href="<?= base_url($controllerName . '/Update') . "/" . $id; ?>" class="btn btn-warning bg-gradient-warning">
+            <i class="fa fa-edit"></i>&nbsp;Edit
+		</a>
+		<a href="<?php echo base_url($controllerName); ?>" class="btn btn-secondary bg-gradient-secondary">
+			<i class="fas fa-fw fa-user"></i> View Users
+		</a>
+		<hr />
     </div>
 </div>
 

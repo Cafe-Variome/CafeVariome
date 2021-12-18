@@ -3,8 +3,8 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?></h2>	
-	</div>	
+		<h2><?= $title ?></h2>
+	</div>
 </div>
 <hr>
 <?php if($statusMessage): ?>
@@ -48,15 +48,13 @@
     </div>
     <div class="form-group row">
         <div class="col">
-            <button type="submit" name="submit" class="btn btn-primary">
-                <i class="fa fa-file"></i>  Create User
+            <button type="submit" name="submit" class="btn btn-success bg-gradient-success">
+                <i class="fa fa-plus"></i>  Create User
             </button>
-            <button type="reset" class="btn btn-secondary">
-                <i class="fa fa-minus"></i> Clear
-            </button>
-            <a href="<?php echo base_url($controllerName.'/List'); ?>" class="btn btn-secondary" >
-                <i class="fa fa-backward"></i> Go back
-            </a>
+			<a href="<?php echo base_url($controllerName); ?>" class="btn btn-secondary bg-gradient-secondary">
+				<i class="fas fa-fw fa-user"></i> View Users
+			</a>
+
         </div>
     </div>
 <?php echo form_close(); ?>
