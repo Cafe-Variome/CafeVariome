@@ -5,8 +5,10 @@ namespace App\Libraries\CafeVariome\Auth;
  * Name: OpenIDAuthenticator.php
  * Created: 02/10/2020
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
+
+use App\Models\IonAuthModel;
 use App\Models\User;
 use App\Libraries\CafeVariome\Net\cURLAdapter;
 
@@ -58,15 +60,15 @@ abstract class OpenIDAuthenticator extends Authenticator
     }
 
     /**
-     * Login - Begin Keycloak login process when called first time. If redirected from 
-     *         keycloak upon successful login pull out tokens for success process 
+     * Login - Begin Keycloak login process when called first time. If redirected from
+     *         keycloak upon successful login pull out tokens for success process
      *
      * @param N/A
      * @return N/A
      */
 
     public function login():bool
-    {  
+    {
         if (!isset($_GET['code'])) {
 
             $authUrl = $this->provider->getAuthorizationUrl();
@@ -75,10 +77,10 @@ abstract class OpenIDAuthenticator extends Authenticator
 
             exit;
         } elseif (empty($_GET['state']) || ($_GET['state'] !== $this->session->get('oauth2state'))) {
-        
+
             $this->session->remove('oauth2state');
             exit('Invalid state, make sure HTTP sessions are enabled.');
-        
+
         } else {
             try {
                 $token = $this->provider->getAccessToken('authorization_code', [
@@ -89,13 +91,15 @@ abstract class OpenIDAuthenticator extends Authenticator
             } catch (\Exception $e) {
                 exit('Failed to get access token: '.$e->getMessage());
             }
-        
+
             try {
                 $user = $this->provider->getResourceOwner($token);
                 $userArray = $user->toArray();
-                $this->recordSession($token, $userArray['email']);     
+				$IonAuthModel = new IonAuthModel();
+				$IonAuthModel->updateLastLogin($this->getUserIdByEmail($userArray['email'])); // Update last login
+                $this->recordSession($token, $userArray['email']);
                 return true;
-  
+
             } catch (\Exception $e) {
                 exit('Failed to get resource owner: '.$e->getMessage());
             }
@@ -110,12 +114,12 @@ abstract class OpenIDAuthenticator extends Authenticator
     /**
 	 * Get user id
 	 * @return integer|null The user's ID from the session user data or NULL if not found
-	 * 
+	 *
 	 **/
     public function getUserId(){
         return $this->session->get('user_id');
     }
-    
+
     protected function recordSession($keys, string $email){
 
         $userModel = new User();
@@ -127,8 +131,8 @@ abstract class OpenIDAuthenticator extends Authenticator
             if($authenticatedUser->active == 0 || $authenticatedUser->remote == 1){
                 $this->logout();
             }
-            
-            $sess = $this->_get_Unique_Identifier();                               
+
+            $sess = $this->_get_Unique_Identifier();
             $session_data = array(
                 'identity'                  => $authenticatedUser->username,
                 'user_id'                   => $authenticatedUser->id,
@@ -152,12 +156,12 @@ abstract class OpenIDAuthenticator extends Authenticator
                 'query_builder_basic'		=> 'yes',
                 'state_bool'                => 1,
                 'state'						=> $keys
-            );  
+            );
             $this->session->set($session_data);
         }
         else {
             $this->logout();
-        }	
+        }
     }
 
     public function loggedIn(): bool {
@@ -177,7 +181,7 @@ abstract class OpenIDAuthenticator extends Authenticator
                 catch (\Exception $ex) {
                     error_log($ex->getMessage());
                 }
-            }      
+            }
         }
 
         return false;
@@ -185,23 +189,23 @@ abstract class OpenIDAuthenticator extends Authenticator
 
     /**
 	 * Check to see if the currently logged in user is an admin.
-     * 
+     *
 	 * @author Mehdi Mehtarizadeh
 	 * @param integer $id User id
 	 *
 	 * @return boolean Whether the user is an administrator
-	 * 
+	 *
 	 */
 	public function isAdmin(): bool
 	{
         return $this->session->get('is_admin');
     }
-    
+
     /**
      * ping
      * Checks the availability of auth server.
      * @param N/A
-     * @return bool 
+     * @return bool
      */
     public function ping(){
 
@@ -222,10 +226,10 @@ abstract class OpenIDAuthenticator extends Authenticator
             $cURLAdapter->setOption(CURLOPT_HTTPPROXYTUNNEL, 1);
             $cURLAdapter->setOption(CURLOPT_PROXY, $proxyDetails['hostname']);
             $cURLAdapter->setOption(CURLOPT_PROXYPORT, $proxyDetails['port']);
-    
+
             if ($proxyDetails['username'] != '' && $proxyDetails['password'] != '') {
                 $cURLAdapter->setOption(CURLOPT_PROXYUSERPWD, $proxyDetails['username'] . ':' . $proxyDetails['password']);
-            } 
+            }
         }
 
         $cURLAdapter->Send();
@@ -253,5 +257,5 @@ abstract class OpenIDAuthenticator extends Authenticator
             .chr(125);// "}"
         return $uuid;
     }
-    
+
 }

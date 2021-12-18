@@ -5,7 +5,7 @@ namespace App\Libraries\CafeVariome\Auth;
  * Name: Authenticator.php
  * Created: 09/10/2020
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
 
 use App\Models\Settings;
@@ -22,7 +22,7 @@ abstract class Authenticator{
     protected $db;
     protected $setting;
 
-    protected $provider; 
+    protected $provider;
 
     public function __construct() {
         $this->adapterClassName = get_class($this);
@@ -37,7 +37,7 @@ abstract class Authenticator{
         $userModel = new User();
         $user = $userModel->getUserByEmail($email);
 
-        return $user ? $user[0]->id : -1;
+        return $user ? $user['id'] : -1;
     }
 
     abstract public function getToken();
