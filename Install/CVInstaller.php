@@ -104,7 +104,7 @@ class CVInstaller
 	   $con->close();
    }
 
-	public static function Deploy(string $base_url, string $installation_key, string $php_bin_path, array $database_info)
+	public static function Deploy(string $base_url, string $installation_key, string $php_bin_path, array $database_info): int
 	{
 		// Valid PHP Version?
 		$minPHPVersion = '7.4';
@@ -174,8 +174,6 @@ class CVInstaller
 			$con->query("Update settings set value = '$installation_key' where setting_key = 'installation_key';");
 		}
 
-
-
 		$con->close();
 
 		$envFile = $appPath . '.env';
@@ -192,6 +190,7 @@ class CVInstaller
 		fwrite($envFileHandle, $envData);
 		fclose($envFileHandle);
 
+		return 0;
 	}
 
 }
