@@ -4,8 +4,8 @@ namespace CafeVariomeSetup;
 
 class CVInstaller
 {
-   	public static function InstallDB()
-   {
+	public static function InstallDB()
+	{
 	   // Valid PHP Version?
 	   $minPHPVersion = '7.4';
 	   if (phpversion() < $minPHPVersion) {
@@ -102,9 +102,9 @@ class CVInstaller
 
 	   print("Setup completed. Remember that you must remove the Install directory completely. \n");
 	   $con->close();
-   }
+	}
 
-	public static function Deploy(string $base_url, string $installation_key, string $php_bin_path, array $database_info)
+	public static function Deploy(string $base_url, string $installation_key, string $php_bin_path, string $apache_config_file, string $deployment_directory, array $database_info)
 	{
 		// Valid PHP Version?
 		$minPHPVersion = '7.4';
@@ -204,21 +204,49 @@ class CVInstaller
 		{
 			echo 'Error in creating a handle for .env file';
 		}
+
+		$apacheConfFileHandle = fopen($apache_config_file, 'a+');
+
+		if ($apacheConfFileHandle !== false)
+		{
+			// Options None AllowOverride All  Require all granted </Directory>
+			$apacheConfData = '<Directory "/local/www/htdocs/' . $deployment_directory . '">' . PHP_EOL;
+			$apacheConfData .= "Options None" . PHP_EOL;
+			$apacheConfData .= "AllowOverride All" . PHP_EOL;
+			$apacheConfData .= "Require all granted" . PHP_EOL;
+			$apacheConfData .= "</Directory>";
+
+			if (fwrite($apacheConfFileHandle, $apacheConfData) !== false)
+			{
+				echo 'Apache config file was modified successfully.';
+			}
+			else
+			{
+				echo 'Error in writing to Apache config file.';
+			}
+			fclose($apacheConfFileHandle);
+		}
+		else
+		{
+			echo 'Error in creating a handle for Apache config file';
+		}
+
 	}
 
 }
 
 if (isset($argc)) {
-	if($argc == 9){
+	if($argc == 11){
 		$base_url = $argv[1];
 		$installation_key = $argv[2];
 		$php_bin_path = $argv[3];
-
-		$dbHost = $argv[4];
-		$dbRootUser = $argv[5];
-		$dbRootPassword = $argv[6];
-		$dbName = $argv[7];
-		$dbUsername = $argv[8];
+		$apache_config_file = $argv[4];
+		$deployment_directory = $argv[5];
+		$dbHost = $argv[6];
+		$dbRootUser = $argv[7];
+		$dbRootPassword = $argv[8];
+		$dbName = $argv[9];
+		$dbUsername = $argv[10];
 
 		$dbInfo = [
 			'host' => $dbHost,
@@ -228,7 +256,7 @@ if (isset($argc)) {
 			'username' => $dbUsername
 		];
 
-		CVInstaller::Deploy($base_url , $installation_key, $php_bin_path, $dbInfo);
+		CVInstaller::Deploy($base_url , $installation_key, $php_bin_path, $apache_config_file, $deployment_directory, $dbInfo);
 	}
 	else{
 		echo 'Incorrect number of arguments passed.';
