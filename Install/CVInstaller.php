@@ -168,9 +168,6 @@ class CVInstaller
 					$templine = '';
 				}
 			}
-
-			echo "Tables imported successfully \n";
-
 			$con->query("Update settings set value = '$installation_key' where setting_key = 'installation_key';");
 		}
 
