@@ -147,31 +147,34 @@ class CVInstaller
 			echo "Failed to connect to MySQL: " . $con->connect_errno;
 			echo "<br/>Error: " . $con->connect_error;
 		}
+		else{
+			// Temporary variable, used to store current query
+			$templine = '';
+			// Read in entire file
+			$lines = file($filename);
+			// Loop through each line
+			foreach ($lines as $line) {
+				// Skip it if it's a comment
+				if (substr($line, 0, 2) == '--' || $line == '')
+					continue;
 
-		// Temporary variable, used to store current query
-		$templine = '';
-		// Read in entire file
-		$lines = file($filename);
-		// Loop through each line
-		foreach ($lines as $line) {
-			// Skip it if it's a comment
-			if (substr($line, 0, 2) == '--' || $line == '')
-				continue;
-
-			// Add this line to the current segment
-			$templine .= $line;
-			// If it has a semicolon at the end, it's the end of the query
-			if (substr(trim($line), -1, 1) == ';') {
-				// Perform the query
-				$con->query($templine);
-				// Reset temp variable to empty
-				$templine = '';
+				// Add this line to the current segment
+				$templine .= $line;
+				// If it has a semicolon at the end, it's the end of the query
+				if (substr(trim($line), -1, 1) == ';') {
+					// Perform the query
+					$con->query($templine);
+					// Reset temp variable to empty
+					$templine = '';
+				}
 			}
+
+			echo "Tables imported successfully \n";
+
+			$con->query("Update settings set value = '$installation_key' where setting_key = 'installation_key';");
 		}
 
-		echo "Tables imported successfully \n";
 
-		$con->query("Update settings set value = '$installation_key' where setting_key = 'installation_key';");
 
 		$con->close();
 
