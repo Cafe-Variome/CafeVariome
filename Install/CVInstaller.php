@@ -104,7 +104,7 @@ class CVInstaller
 	   $con->close();
    }
 
-	public static function Deploy(string $base_url, string $installation_key, string $php_bin_path, array $database_info): int
+	public static function Deploy(string $base_url, string $installation_key, string $php_bin_path, array $database_info)
 	{
 		// Valid PHP Version?
 		$minPHPVersion = '7.4';
@@ -186,8 +186,6 @@ class CVInstaller
 
 		fwrite($envFileHandle, $envData);
 		fclose($envFileHandle);
-
-		return 0;
 	}
 
 }
@@ -213,6 +211,7 @@ if (isset($argc)) {
 		];
 
 		CVInstaller::Deploy($base_url , $installation_key, $php_bin_path, $dbInfo);
+		echo 'Success.';
 	}
 	else{
 		echo 'Incorrect number of arguments passed.';
