@@ -114,6 +114,8 @@ class CVInstaller
 
 		unset($minPHPVersion);
 
+		// Ensure the current directory is pointing to the front controller's directory
+		chdir(__DIR__);
 		$appPath = '../';
 
 		// Create the database and user
@@ -169,23 +171,39 @@ class CVInstaller
 				}
 			}
 			$con->query("Update settings set value = '$installation_key' where setting_key = 'installation_key';");
+
+			echo 'Database imported successfully.';
 		}
 
 		$con->close();
 
 		$envFile = $appPath . '.env';
 		$envFileHandle = fopen($envFile, 'a+');
-		$envData = "ENVIRONMENT = 'development'" . PHP_EOL;
-		$envData .= "app.baseURL = '$base_url'" . PHP_EOL;
-		$envData .= "app.baseURL = '$base_url'" . PHP_EOL;
-		$envData .= "database.default.hostname = $dbHost" . PHP_EOL;
-		$envData .= "database.default.database = $dbName" . PHP_EOL;
-		$envData .= "database.default.username = $dbUsername" . PHP_EOL;
-		$envData .= "database.default.password =  $dbPassword" . PHP_EOL;
-		$envData .= "database.default.DBDriver = MySQLi" . PHP_EOL;
+		if ($envFileHandle !== false)
+		{
+			$envData = "ENVIRONMENT = 'development'" . PHP_EOL;
+			$envData .= "app.baseURL = '$base_url'" . PHP_EOL;
+			$envData .= "app.baseURL = '$base_url'" . PHP_EOL;
+			$envData .= "database.default.hostname = $dbHost" . PHP_EOL;
+			$envData .= "database.default.database = $dbName" . PHP_EOL;
+			$envData .= "database.default.username = $dbUsername" . PHP_EOL;
+			$envData .= "database.default.password =  $dbPassword" . PHP_EOL;
+			$envData .= "database.default.DBDriver = MySQLi" . PHP_EOL;
 
-		fwrite($envFileHandle, $envData);
-		fclose($envFileHandle);
+			if (fwrite($envFileHandle, $envData) !== false)
+			{
+				echo '.env file was created successfully.';
+			}
+			else
+			{
+				echo 'Error in writing to .env file';
+			}
+			fclose($envFileHandle);
+		}
+		else
+		{
+			echo 'Error in creating a handle for .env file';
+		}
 	}
 
 }
@@ -211,7 +229,6 @@ if (isset($argc)) {
 		];
 
 		CVInstaller::Deploy($base_url , $installation_key, $php_bin_path, $dbInfo);
-		echo 'Success.';
 	}
 	else{
 		echo 'Incorrect number of arguments passed.';
