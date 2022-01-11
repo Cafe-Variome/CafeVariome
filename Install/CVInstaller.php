@@ -214,10 +214,6 @@ if (isset($argc)) {
 		];
 
 		CVInstaller::Deploy($base_url , $installation_key, $php_bin_path, $dbInfo);
-
-		for ($i = 0; $i < $argc; $i++) {
-			echo "Argument #" . $i . " - " . $argv[$i] . "\n";
-		}
 	}
 	else{
 		echo 'Incorrect number of arguments passed.';
