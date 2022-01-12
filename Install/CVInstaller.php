@@ -210,7 +210,7 @@ class CVInstaller
 		if ($apacheConfFileHandle !== false)
 		{
 			// Options None AllowOverride All  Require all granted </Directory>
-			$apacheConfData = '<Directory "/local/www/htdocs/' . $deployment_directory . '">' . PHP_EOL;
+			$apacheConfData = PHP_EOL . '<Directory "/local/www/htdocs/' . $deployment_directory . '">' . PHP_EOL;
 			$apacheConfData .= "Options None" . PHP_EOL;
 			$apacheConfData .= "AllowOverride All" . PHP_EOL;
 			$apacheConfData .= "Require all granted" . PHP_EOL;
