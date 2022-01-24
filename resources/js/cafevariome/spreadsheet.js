@@ -127,7 +127,7 @@ $("#uploadBulk").submit(function(event) {
                         }
                         else if (data.status == 'InvalidFile') {
                             $.notify({
-                                message: 'File is not valid.',
+                                message: 'File is not valid. ' + data.error,
                                 type: 'warning'
                               },{
                                 timer: 200

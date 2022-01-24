@@ -262,8 +262,10 @@ class AjaxApi extends Controller{
 
 			$files = $fileMan->getFiles();
 
-			foreach ($files as $file) {
-				if (!$fileMan->isValid($file)) {
+			foreach ($files as $file)
+			{
+				$error = '';
+				if (!$fileMan->isValid($file, $error)) {
 					return false;
 				}
 
@@ -613,8 +615,13 @@ class AjaxApi extends Controller{
 					}
 				}
 
-				if (!$fileMan->isValid($file)) {
-					$response_array = array('status' => "InvalidFile");
+				$error = '';
+				if (!$fileMan->isValid($file, $error))
+				{
+					$response_array = array(
+						'status' => "InvalidFile",
+						'error' => $error
+					);
 					return json_encode($response_array);
 				}
 
@@ -742,8 +749,11 @@ class AjaxApi extends Controller{
 			 $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
 			 $fileMan = new SysFileMan($basePath);
 
-			 foreach ($unsaved_files as $key => $file) {
-				 if ($fileMan->isValid($file)) {
+			 foreach ($unsaved_files as $key => $file)
+			 {
+				 $error = '';
+				 if ($fileMan->isValid($file, $error))
+				 {
 					 $source_path = $source_id . DIRECTORY_SEPARATOR;
 
 					 if (!$fileMan->Exists($source_id)) {
