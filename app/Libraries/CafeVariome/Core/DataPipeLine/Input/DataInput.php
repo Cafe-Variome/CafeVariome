@@ -175,6 +175,16 @@ abstract class DataInput
 	protected function sanitiseString(string $dirty_string, string $soap = ''): string
 	{
 		$malicious_chars = ['\\', chr(39), chr(34), '/', '’', '<', '>', '&', ';'];
+
+		if(
+			str_starts_with($dirty_string, 'http://') ||
+			str_starts_with($dirty_string, 'https://') ||
+			str_starts_with($dirty_string, 'ftp://') ||
+			str_starts_with($dirty_string, 'ntp://')
+		)
+		{
+			unset($malicious_chars[3]); // Remove / (slash) from $malicious_chars not to damage the URL
+		}
 		return htmlentities(str_replace($malicious_chars, $soap, $dirty_string));
 	}
 
