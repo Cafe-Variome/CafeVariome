@@ -137,31 +137,46 @@
      * Currently, XLSX, XLS, VCF, and CSV files are supported.
      */
 
-    public function isValid(File $file): bool
-    {
-        $fExt = strtolower($file->getExtension());
-        $path = $file->getTempPath();
-        if ($fExt === 'csv') {
-            $this->getHandle($path, 'r', false);
+	 public function isValid(File $file, string & $error): bool
+	 {
+		 $fExt = strtolower($file->getExtension());
+		 $path = $file->getTempPath();
+		 if ($fExt === 'csv')
+		 {
+			 $this->getHandle($path, 'r', false);
 
-            $heading = $this->ReadCSV($path, 0);
-            $columnCount = count($heading);
-            while (($line = $this->ReadCSV($path, 0)) !== false ) {
-                if($columnCount != count($line)){
-                    return false;
-                }
-            }
-            //$this->destroyHandle();
+			 $heading = $this->ReadCSV($path, 0);
+			 $columnCount = count($heading);
+			 $i = 1;
+			 while (($line = $this->ReadCSV($path, 0)) !== false )
+			 {
+				 if($columnCount != count($line)){
+					 $error = "Number of cells do not match number of columns at line: $i";
+					 return false;
+				 }
+				 $i++;
+			 }
+
             return true;
         }
-        elseif ($fExt === 'phenopacket' || $fExt === 'json') {
+        elseif ($fExt === 'phenopacket' || $fExt === 'json')
+		{
             $this->getHandle($path, 'r', false);
 
             $fcontent = $this->Read($path, -1, false);
 
-            return json_decode($fcontent) != null;
+            if( json_decode($fcontent) != null)
+			{
+				return true;
+			}
+			else
+			{
+				$error = 'File is not in a JSON format.';
+				return false;
+			}
         }
-        else if($fExt === 'xls' || $fExt === 'xlsx' || $fExt === 'vcf'){
+        else if($fExt === 'xls' || $fExt === 'xlsx' || $fExt === 'vcf')
+		{
             // Signatures of allowed files as follows: XLSX, XLS and VCF
             $allowed = array('504B0304',         // XLSX File signature
                             '504B030414000600',  // XLSX File signature
@@ -176,31 +191,43 @@
                             '424547494E3A5643'   // VCF File signature
                             );
 
-            for($j = 0; $j < count($allowed); $j++){
-                if(strlen($allowed[$j]) == 8){
+            for($j = 0; $j < count($allowed); $j++)
+			{
+                if(strlen($allowed[$j]) == 8)
+				{
                     $this->getHandle($path, 'r', false);
                     $bytes = strtoupper($this->bin2Hex($this->Read($path, 4)));
                     $this->destroyHandle();
-                    if(in_array($bytes, $allowed)){
+                    if(in_array($bytes, $allowed))
+					{
                         return true;
                     }
-                } else if (strlen($allowed[$j]) == 10) {
+                }
+				else if (strlen($allowed[$j]) == 10)
+				{
                     $this->getHandle($path, 'r', false);
                     $bytes = strtoupper($this->bin2Hex($this->Read($path, 5)));
                     $this->destroyHandle();
-                    if(in_array($bytes, $allowed)){
+                    if(in_array($bytes, $allowed))
+					{
                         return true;
                     }
-                } else if (strlen($allowed[$j]) == 16) {
+                }
+				else if (strlen($allowed[$j]) == 16)
+				{
                     $this->getHandle($path, 'r', false);
                     $bytes = strtoupper($this->bin2Hex($this->Read($path, 8)));
                     $this->destroyHandle();
-                    if(in_array($bytes, $allowed)){
+                    if(in_array($bytes, $allowed))
+					{
                         return true;
                     }
                 }
             }
-        }
+
+			$error = 'File signature is not valid.';
+
+		}
 
         return false;
     }
