@@ -48,14 +48,20 @@ class EAVQuery extends AbstractQuery
 			$value = $clause['value'];
 
 			$valueObj = $this->getValue($value, $attributeId);
-			if ($valueObj == null)
+			if (
+				($operator == 'is' || $operator == 'is not' || $operator == '=' || $operator == '!=') && // Take this path only if the query is an exact match.
+				$valueObj == null
+			)
 			{
 				// No value or mapping for the incoming value in the source exists. No need to query ES.
 				return $iscount ? 0 : [];
 			}
 			else
 			{
-				$value = $valueObj['name'];
+				if ($valueObj != null)
+				{
+					$value = $valueObj['name'];
+				}
 
 				//Query ES
 				$arr = [];
