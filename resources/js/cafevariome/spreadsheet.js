@@ -76,6 +76,7 @@ $("#uploadBulk").submit(function(event) {
                     dataType: 'json',
                     success: function(data)  {
                         $('#uploadBulk')[0].reset();
+                        $('#dataFile').parent().find('label').text('Choose file');
                         //data = $.parseJSON(response);
                         //if the data has the wrong headers warn the user
                         if (data.status == 'Header') {
