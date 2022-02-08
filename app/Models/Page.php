@@ -2,16 +2,16 @@
 
 /**
  * Name: Page.php
- * 
+ *
  * Created: 19/02/2020
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
 
 use CodeIgniter\Model;
 
-class Page extends Model 
+class Page extends Model
 {
     protected $db;
     protected $table      = 'pages';
@@ -19,11 +19,14 @@ class Page extends Model
 
     protected $primaryKey = 'id';
 
-	public function __construct(ConnectionInterface &$db = null){
-        if ($db != null) {
+	public function __construct(ConnectionInterface &$db = null)
+	{
+        if ($db != null)
+		{
             $this->db =& $db;
         }
-        else {
+        else
+		{
             $this->db = \Config\Database::connect();
         }
 		$this->builder = $this->db->table($this->table);
@@ -68,8 +71,10 @@ class Page extends Model
         $this->builder->insert($data);
     }
 
-    public function updatePage(array $data, array $conds) {
-        if ($conds) {
+    public function updatePage(array $data, array $conds)
+	{
+        if ($conds)
+		{
             $this->builder->where($conds);
         }
         $this->builder->update($data);

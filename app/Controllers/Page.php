@@ -2,9 +2,9 @@
 
 /**
  * Name: Page.php
- * 
+ *
  * Created: 19/02/2020
- * 
+ *
  * @author Mehdi Mehtarizadeh
  */
 
@@ -83,7 +83,8 @@ class Page extends CVUI_Controller
 
         );
 
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
             $pageTitle = $this->request->getVar('ptitle');
             $pageContent = $this->request->getVar('pcontent');
             $user_id = $this->authAdapter->getUserId();
@@ -91,16 +92,20 @@ class Page extends CVUI_Controller
             $pageData = ['Title' => $pageTitle, 'Content' => $pageContent, 'Author' => $user_id, 'Removable' => 1, 'Active' => 1];
 
             $pageModel = new \App\Models\Page();
-            try {
+            try
+			{
                 $pageModel->createPage($pageData);
                 $this->setStatusMessage("Page '$pageTitle' was created.", STATUS_SUCCESS);
-            } catch (\Exception $ex) {
+            }
+			catch (\Exception $ex)
+			{
                 $this->setStatusMessage("There was a problem creating '$pageTitle'.", STATUS_ERROR);
             }
             return redirect()->to(base_url($this->controllerName.'/List'));
 
         }
-        else {
+        else
+		{
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
             $uidata->data['ptitle'] = array(
@@ -158,22 +163,27 @@ class Page extends CVUI_Controller
         ]);
 
 
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
             $pageTitle = $this->request->getVar('ptitle');
             $pageContent = $this->request->getVar('pcontent');
             $user_id = $this->authAdapter->getUserId();
 
             $updateData = ['Title' => $pageTitle, 'Content' => $pageContent, 'Author' => $user_id];
 
-            try {
+            try
+			{
                 $pageModel->updatePage($updateData, ['id' => $page_id]);
                 $this->setStatusMessage("Page '$pageTitle' was updated.", STATUS_SUCCESS);
-            } catch (\Exception $ex) {
+            }
+			catch (\Exception $ex)
+			{
                 $this->setStatusMessage("There was a problem updating '$pageTitle'.", STATUS_ERROR);
             }
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
-        else {
+        else
+		{
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
             $page = $pageModel->getPage($page_id);
@@ -186,16 +196,17 @@ class Page extends CVUI_Controller
                     'id' => 'ptitle',
                     'type' => 'text',
                     'class' => 'form-control',
-                    'value' => set_value('ptitle', $page[0]['Title']),
-                ); 
+                    'value' => set_value('ptitle', $page['Title']),
+                );
 
                 $uidata->data['pcontent'] = array(
                     'name' => 'pcontent',
                     'id' => 'pcontent',
-                    'value' =>set_value('pcontent', $page[0]['Content'], false),
+                    'value' =>set_value('pcontent', $page['Content'], false),
                 );
             }
-            else {
+            else
+			{
                 $this->setStatusMessage("Page was not found.", STATUS_WARNING);
                 return redirect()->to(base_url($this->controllerName.'/List'));
             }
@@ -207,7 +218,7 @@ class Page extends CVUI_Controller
         return view($this->viewDirectory . '/Update.php', $data);
 
     }
-    
+
     public function Activate(int $page_id)
     {
         $pageModel = new \App\Models\Page();
@@ -217,20 +228,26 @@ class Page extends CVUI_Controller
 		{
             $pageTitle = $page['Title'];
 
-            if (!$page[0]['Active']) {
+            if (!$page['Active'])
+			{
                 $updateData = ['Active' => 1];
-                try {
+                try
+				{
                     $pageModel->updatePage($updateData, ['id' => $page_id]);
                     $this->setStatusMessage("Page '$pageTitle' was activated.", STATUS_SUCCESS);
-                } catch (\Exception $ex) {
+                }
+				catch (\Exception $ex)
+				{
                     $this->setStatusMessage("There was a problem activating '$pageTitle'.", STATUS_ERROR);
                 }
             }
-            else {
+            else
+			{
                 $this->setStatusMessage("Page '$pageTitle' is already active.", STATUS_INFO);
             }
         }
-        else {
+        else
+		{
             $this->setStatusMessage("Page was not found.", STATUS_ERROR);
         }
         return redirect()->to(base_url($this->controllerName.'/List'));
@@ -248,18 +265,23 @@ class Page extends CVUI_Controller
             if ($page['Active'])
 			{
                 $updateData = ['Active' => 0];
-                try {
+                try
+				{
                     $pageModel->updatePage($updateData, ['id' => $page_id]);
                     $this->setStatusMessage("Page '$pageTitle' was deactivated.", STATUS_SUCCESS);
-                } catch (\Exception $ex) {
+                }
+				catch (\Exception $ex)
+				{
                     $this->setStatusMessage("There was a problem deactivating '$pageTitle'.", STATUS_ERROR);
                 }
             }
-            else {
+            else
+			{
                 $this->setStatusMessage("Page '$pageTitle' is already deactive.", STATUS_INFO);
             }
         }
-        else {
+        else
+		{
             $this->setStatusMessage("Page was not found.", STATUS_ERROR);
         }
         return redirect()->to(base_url($this->controllerName.'/List'));
@@ -280,7 +302,7 @@ class Page extends CVUI_Controller
                     'required' => '{field} is required.'
                 ]
             ],
-            
+
             'page_id' => [
                 'label'  => 'Page Id',
                 'rules'  => 'required|alpha_dash',
@@ -288,11 +310,12 @@ class Page extends CVUI_Controller
                     'required' => '{field} is required.',
                     'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
-            ]            
+            ]
         ]);
 
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {      
-            $pageId = $this->request->getVar('page_id'); 
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
+            $pageId = $this->request->getVar('page_id');
             $confirm = $this->request->getVar('confirm');
 
             if ($confirm == 'yes')
@@ -308,14 +331,18 @@ class Page extends CVUI_Controller
                             $pageModel->deletePage($page_id);
                             $this->setStatusMessage("Page '$pageTitle' was deleted.", STATUS_SUCCESS);
                         }
-                        else {
+                        else
+						{
                             $this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
                         }
                     }
-                    else{
+                    else
+					{
                         $this->setStatusMessage("Page does not exist.", STATUS_ERROR);
                     }
-                } catch (\Exception $ex) {
+                }
+				catch (\Exception $ex)
+				{
                     $this->setStatusMessage("There was a problem deleting the page.", STATUS_ERROR);
                 }
             }
@@ -333,12 +360,14 @@ class Page extends CVUI_Controller
                     $this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
                     return redirect()->to(base_url($this->controllerName.'/List'));
                 }
-                else {
+                else
+				{
                     $uidata->data['page_id'] = $page_id;
                     $uidata->data['pageTitle'] = $pageTitle;
                  }
             }
-            else {
+            else
+			{
                 $this->setStatusMessage("Page was not found.", STATUS_ERROR);
                 return redirect()->to(base_url($this->controllerName.'/List'));
             }
@@ -347,4 +376,3 @@ class Page extends CVUI_Controller
         }
     }
 }
- 
