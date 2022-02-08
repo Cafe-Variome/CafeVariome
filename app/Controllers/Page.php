@@ -176,11 +176,11 @@ class Page extends CVUI_Controller
         else {
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
-            $page = $pageModel->getPages(NULL, ['id' => $page_id]);
+            $page = $pageModel->getPage($page_id);
 
-            if (count($page) == 1) {
-                $uidata->data['page_id'] = $page[0]['id'];
-
+            if ($page != null)
+			{
+                $uidata->data['page_id'] = $page['id'];
                 $uidata->data['ptitle'] = array(
                     'name' => 'ptitle',
                     'id' => 'ptitle',
@@ -211,10 +211,11 @@ class Page extends CVUI_Controller
     public function Activate(int $page_id)
     {
         $pageModel = new \App\Models\Page();
-        $page = $pageModel->getPages('Title, Active', ['id' => $page_id]);
+        $page = $pageModel->getPage($page_id);
 
-        if (count($page) == 1) {
-            $pageTitle = $page[0]['Title'];
+        if ($page != null)
+		{
+            $pageTitle = $page['Title'];
 
             if (!$page[0]['Active']) {
                 $updateData = ['Active' => 1];
@@ -238,12 +239,14 @@ class Page extends CVUI_Controller
     public function Deactivate(int $page_id)
     {
         $pageModel = new \App\Models\Page();
-        $page = $pageModel->getPages('Title, Active', ['id' => $page_id]);
+        $page = $pageModel->getPage($page_id);
 
-        if (count($page) == 1) {
-            $pageTitle = $page[0]['Title'];
-            
-            if ($page[0]['Active']) {
+        if ($page != 1)
+		{
+            $pageTitle = $page['Title'];
+
+            if ($page['Active'])
+			{
                 $updateData = ['Active' => 0];
                 try {
                     $pageModel->updatePage($updateData, ['id' => $page_id]);
@@ -292,12 +295,16 @@ class Page extends CVUI_Controller
             $pageId = $this->request->getVar('page_id'); 
             $confirm = $this->request->getVar('confirm');
 
-            if ($confirm == 'yes') {
-                try {
-                    $page = $pageModel->getPages('Title, Removable', ['id' => $page_id]);
-                    if (count($page) == 1) {
-                        $pageTitle = $page[0]['Title'];
-                        if ($page[0]['Removable']) {
+            if ($confirm == 'yes')
+			{
+                try
+				{
+                    $page = $pageModel->getPage($page_id);
+                    if ($page != null)
+					{
+                        $pageTitle = $page['Title'];
+                        if ($page['Removable'])
+						{
                             $pageModel->deletePage($page_id);
                             $this->setStatusMessage("Page '$pageTitle' was deleted.", STATUS_SUCCESS);
                         }
@@ -314,12 +321,15 @@ class Page extends CVUI_Controller
             }
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
-        else {
-            $page = $pageModel->getPages('Title, Removable', ['id' => $page_id]);
-            if (count($page) == 1) {
-                $pageTitle = $page[0]['Title'];
-    
-                if (!$page[0]['Removable']) {
+        else
+		{
+            $page = $pageModel->getPage($page_id);
+            if ($page != null)
+			{
+                $pageTitle = $page['Title'];
+
+                if (!$page['Removable'])
+				{
                     $this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
                     return redirect()->to(base_url($this->controllerName.'/List'));
                 }

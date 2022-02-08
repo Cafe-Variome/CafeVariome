@@ -15,11 +15,16 @@ class Home extends CVUI_Controller
 		$uidata->data['pageContent'] = '';
 		if (is_numeric($page_id)) {
 			($page_id == 0) ? $page_id = 1 : $page_id = $page_id;
-			$page = $pageModel->getPages(Null, ['id' => $page_id]);
+			$page = $pageModel->getActivePage($page_id);
 
-			if (count($page) == 1) {
-				$uidata->title = $page[0]['Title'];
-				$uidata->data['pageContent'] = $page[0]['Content'];
+			if ($page != null)
+			{
+				$uidata->title = $page['Title'];
+				$uidata->data['pageContent'] = $page['Content'];
+			}
+			else
+			{
+				return redirect()->to(base_url());
 			}
 		}
 
