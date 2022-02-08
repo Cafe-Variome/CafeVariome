@@ -20,7 +20,8 @@
 
     public function __construct(string $basePath)
     {
-        if ($basePath != null) {
+        if ($basePath != null)
+		{
             $this->basePath = $basePath;
         }
     }
@@ -271,4 +272,36 @@
 
         return '';
     }
+
+	public static function IsFile(string $path):bool
+	{
+		return is_file($path);
+	}
+
+	public static function GetFileName(string $path): string
+	{
+		return pathinfo($path)['basename'];
+	}
+
+	public static function GetFileExtension(string $path): string
+	{
+	 	return pathinfo($path)['extension'];
+	}
+
+	public static function GetFileSize(string $path): int
+	{
+		 clearstatcache();
+		 return filesize($path);
+	}
+
+	public static function GetFileMimeType(string $path): string
+	{
+		 $mimetype = mime_content_type($path);
+
+		 if ($mimetype != false) {
+			 return $mimetype;
+		 }
+
+		 return '';
+	}
  }
