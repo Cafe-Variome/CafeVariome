@@ -40,8 +40,8 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
      * @param string $source - Name of source update should be performed for
      * @return N/A
      */
-    public function phenoPacketInsertBySourceId(int $source_id, int $overwrite = UPLOADER_DELETE_NONE) {
-
+    public function phenoPacketInsertBySourceId(int $source_id, int $overwrite = UPLOADER_DELETE_NONE)
+	{
         $uploadModel = new Upload();
         $sourceModel = new Source();
         $inputPipeLine = new PhenoPacketDataInput($source_id, $overwrite);
@@ -49,101 +49,114 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
         // get a list of json files just uploaded to this source
         $files = $uploadModel->getPhenoPacketFilesBySourceId($source_id, !$overwrite);
 
-        for ($t=0; $t < count($files); $t++) {
-
+        for ($t=0; $t < count($files); $t++)
+		{
             $file = $files[$t]['FileName'];
             $file_id = $files[$t]['ID'];
-
-            try {
+            try
+			{
                 $inputPipeLine->absorb($file_id);
                 $inputPipeLine->save($file_id);
 				$inputPipeLine->finalize($file_id);
-            } catch (\Exception $ex) {
+            }
+			catch (\Exception $ex)
+			{
                 error_log($ex->getMessage());
             }
         }
     }
 
-        /**
-     * Pheno Packet Insert - manages the loop to insert all recently uploaded json files sequentially
-     * into mysql for the given source.
-     *
-     * @param string $source - Name of source update should be performed for
-     * @return N/A
+	/**
+     * Reads a single phenopacket file and inserts its data into mysql.
+     * @param int $file_id - Id of the file uploaded or inserted.
+     * @param int $overwrite - Whether to overwrite data of the file or not.
+     * @return void
      */
-    public function phenoPacketInsertByFileId(int $file_id, int $overwrite = UPLOADER_DELETE_FILE) {
-
+    public function phenoPacketInsertByFileId(int $file_id, int $overwrite = UPLOADER_DELETE_FILE)
+	{
         $uploadModel = new Upload();
-
         $source_id = $uploadModel->getSourceIdByFileId($file_id);
-
         $inputPipeLine = new PhenoPacketDataInput($source_id, $overwrite);
 
-        try {
+        try
+		{
             $inputPipeLine->absorb($file_id);
             $inputPipeLine->save($file_id);
 			$inputPipeLine->finalize($file_id);
-        } catch (\Exception $ex) {
+        }
+		catch (\Exception $ex)
+		{
             error_log($ex->getMessage());
         }
     }
 
+	 /**
+	  * Reads VCF files uploaded/imported for a specific source and insert their data into mysql.
+	  * @param int $source_id - Id of the source
+	  * @param int $overwrite Whether to overwrite data of the files or not.
+	  * @return void
+	  */
     public function vcfInsertBySourceId(int $source_id, int $overwrite = UPLOADER_DELETE_NONE)
     {
         $uploadModel = new Upload();
         $vcfFiles = $uploadModel->getVCFFilesBySourceId($source_id);
         $inputPipeLine = new VCFDataInput($source_id, $overwrite);
 
-        for ($i=0; $i < count($vcfFiles); $i++) {
+        for ($i=0; $i < count($vcfFiles); $i++)
+		{
             $file_id = $vcfFiles[$i]['ID'];
-
             $inputPipeLine->absorb($file_id);
             $inputPipeLine->save($file_id);
 			$inputPipeLine->finalize($file_id);
         }
     }
 
+	 /**
+	  * Reads a single VCF file and inserts its data into mysql.
+	  * @param int $file_id - Id of the file uploaded or inserted.
+	  * @param int $overwrite - Whether to overwrite data of the file or not.
+	  * @return void
+	  */
     public function vcfInsertByFileId(int $file_id, int $overwrite = UPLOADER_DELETE_FILE)
     {
         $uploadModel = new Upload();
-        $sourceModel = new Source();
-
         $source_id = $uploadModel->getSourceIdByFileId($file_id);
-
         $inputPipeLine = new VCFDataInput($source_id, $overwrite);
 
-        try {
+        try
+		{
             $inputPipeLine->absorb($file_id);
             $inputPipeLine->save($file_id);
 			$inputPipeLine->finalize($file_id);
-        } catch (\Exception $ex) {
+        }
+		catch (\Exception $ex)
+		{
             error_log($ex->getMessage());
         }
     }
 
-    /**
-     * spreadsheetInsert - Loop through CSV/XLSX/ODS files with spout to add to eavs table
-     *
-     * @param string $file        - The File We are uploading
-     * @param int $overwrite         - 0: We do not need to delete data from eavs | 1: We do need to
-     * @param string $source      - The name of the source we are uploading to
-     * @return array $return_data - Basic information on the status of the upload
-     */
-    public function spreadsheetInsert(int $fileId,  int $overwrite = UPLOADER_DELETE_FILE) {
+	 /**
+	  * Reads a single spreadsheet file and inserts its data into mysql.
+	  * @param int $file_id - Id of the file uploaded or inserted.
+	  * @param int $overwrite - Whether to overwrite data of the file or not.
+	  * @return void
+	  */
+    public function spreadsheetInsert(int $fileId,  int $overwrite = UPLOADER_DELETE_FILE)
+	{
         $uploadModel = new Upload();
-        $sourceModel = new Source();
-
         $fileRec = $uploadModel->getFiles('ID, source_id', ['ID' => $fileId]);
 
-        if (count($fileRec) == 1) {
+        if (count($fileRec) == 1)
+		{
             $sourceId = $fileRec[0]['source_id'];
-
             $inputPipeLine = new SpreadsheetDataInput($sourceId, $overwrite);
-            if($inputPipeLine->absorb($fileId)){
+            if($inputPipeLine->absorb($fileId))
+			{
 				$inputPipeLine->save($fileId);
 				$inputPipeLine->finalize($fileId);
 			}
-			else{
+			else
+			{
 				error_log('There was an issue');
 			}
         }
@@ -152,6 +165,12 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
         }
     }
 
+	 /** Reads all the files uploaded/imported to a source and inserts their data into mysql.
+	  * @param int $source_id - Id of the source
+	  * @param bool $pending - Whether to read pending files only or not.
+	  * @param int $overwrite - Whether to overwrite data of the file or not.
+	  * @return void
+	  */
     public function insertFilesBySourceId(int $source_id, bool $pending = true, int $overwrite = UPLOADER_DELETE_FILE)
 	{
 		$uploadModel = new Upload();
@@ -160,7 +179,8 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 
 		for($c = 0; $c < count($files); $c++)
 		{
-			if (strpos($files[$c]['FileName'], '.')) {
+			if (strpos($files[$c]['FileName'], '.'))
+			{
 				$file_id = $files[$c]['ID'];
 				$file_name_array = explode('.', $files[$c]['FileName']);
 				$extension = $file_name_array[count($file_name_array) - 1];
@@ -177,7 +197,8 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 							$inputPipeLine->finalize($file_id, $final_round);
 							unset($inputPipeLine);
 						}
-						catch (\Exception $ex) {
+						catch (\Exception $ex)
+						{
 							error_log($ex->getMessage());
 						}
 						break;
@@ -191,7 +212,8 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 							$inputPipeLine->finalize($file_id, $final_round);
 							unset($inputPipeLine);
 						}
-						catch (\Exception $ex) {
+						catch (\Exception $ex)
+						{
 							error_log($ex->getMessage());
 						}
 						break;
@@ -206,7 +228,8 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 							$inputPipeLine->finalize($file_id, $final_round);
 							unset($inputPipeLine);
 						}
-						catch (\Exception $ex) {
+						catch (\Exception $ex)
+						{
 							error_log($ex->getMessage());
 						}
 						break;
@@ -215,18 +238,35 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 		}
 	}
 
+	 /**
+	  * Indexes data of the specified source to Elasticsearch
+	  * @param int $source_id - Id of the source
+	  * @param bool $append - Whether to append unindexed data or re-index all records.
+	  * @return void
+	  */
 	public function IndexDataToElasticsearch(int $source_id, bool $append)
 	{
 		 $esDataIndex = new ElasticsearchSourceIndex($source_id, $append);
 		 $esDataIndex->IndexSource();
 	}
 
+	 /**
+	  * Indexes data of the specified source to Neo4J
+	  * @param int $source_id - Id of the source
+	  * @param bool $append - Whether to append unindexed data or re-index all records.
+	  * @return void
+	  */
 	public function IndexDataToNeo4J(int $source_id, bool $append)
 	{
 		 $n4jDataIndex = new Neo4JSourceIndex($source_id, $append);
 		 $n4jDataIndex->IndexSource();
 	}
 
+	 /**
+	  * Creates the user interface index for the specified source.
+	  * @param int $source_id - Id of the source
+	  * @return void
+	  */
 	public function CreateUserInterfaceIndex(int $source_id)
 	{
 		 $uiDataIndex = new UserInterfaceSourceIndex($source_id);
