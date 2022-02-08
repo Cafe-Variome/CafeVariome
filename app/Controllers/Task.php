@@ -26,13 +26,22 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\PhenoPacketDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 
 
- class Task extends Controller{
+ class Task extends Controller
+ {
+	 protected $db;
+	 protected $setting;
 
-    function __construct()
-	{
-        $this->db = \Config\Database::connect();
-        $this->setting = Settings::getInstance();
-    }
+	 /**
+	  * Constructor
+	  *
+	  */
+	 public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+	 {
+		 parent::initController($request, $response, $logger);
+
+		 $this->db = \Config\Database::connect();
+		 $this->setting = Settings::getInstance();
+	 }
 
 	 /**
 	  * Reads phenopacket files uploaded/imported for a specific source and insert their data into mysql.
