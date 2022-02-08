@@ -495,7 +495,6 @@ class Source extends CVUI_Controller{
                     'id' => 'name',
                     'type' => 'text',
                     'class' => 'form-control',
-                    'readonly' => 'true', // Don't allow the user to edit the source name
                     'value' => set_value('name', $source_data['name']),
                 );
                 $uidata->data['owner_name'] = array(
