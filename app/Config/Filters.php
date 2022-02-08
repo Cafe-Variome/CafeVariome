@@ -3,6 +3,7 @@
 namespace Config;
 
 use App\Filters\AJAXFilter;
+use App\Filters\TaskFilter;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Filters\CSRF;
 use CodeIgniter\Filters\DebugToolbar;
@@ -20,7 +21,8 @@ class Filters extends BaseConfig
         'csrf'     => CSRF::class,
         'toolbar'  => DebugToolbar::class,
         'honeypot' => Honeypot::class,
-		'ajax'     => AJAXFilter::class
+		'ajax'     => AJAXFilter::class,
+		'task'	   => TaskFilter::class
 	];
 
     /**
@@ -64,6 +66,10 @@ class Filters extends BaseConfig
 		'ajax' => [
 			'before' => ['AjaxApi/*'],
 			'after' => ['AjaxApi/*']
+		],
+		'task' => [
+			'before' => ['Task/*'],
+			'after' => ['Task/*']
 		]
 	];
 }
