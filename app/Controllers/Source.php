@@ -108,9 +108,10 @@ class Source extends CVUI_Controller{
         $this->validation->setRules([
             'name' => [
                 'label'  => 'Source Name',
-                'rules'  => 'required|alpha_numeric_space|is_unique[sources.name]',
+                'rules'  => 'required|alpha_numeric_space|max_length[30]|is_unique[sources.name]',
                 'errors' => [
                     'required' => '{field} is required.',
+					'max_length' => 'Maximum length for {field} is 30 characters.',
                     'uniquename_check' => '{field} already exists.'
                 ]
             ],
@@ -355,9 +356,10 @@ class Source extends CVUI_Controller{
         $this->validation->setRules([
             'name' => [
                 'label'  => 'Source Name',
-                'rules'  => 'required|alpha_dash',
+                'rules'  => 'required|alpha_numeric_space|max_length[30]',
                 'errors' => [
-                    'required' => '{field} is required.'
+					'required' => '{field} is required.',
+					'max_length' => 'Maximum length for {field} is 30 characters.',
                 ]
             ],
 			'owner_name' => [
