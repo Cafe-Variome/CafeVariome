@@ -89,11 +89,11 @@
 </div>
 <div class="form-group row">
 	<div class="col">
-		<button type="submit" onclick="select_groups()" name="submit" class="btn btn-primary">
-			<i class="fa fa-file"></i>  Save Source
+		<button type="submit" onclick="select_groups()" class="btn btn-primary bg-gradient-primary">
+			<i class="fa fa-save" ></i>  Save Changes
 		</button>
-		<a href="<?php echo base_url($controllerName. '/List'); ?>" class="btn btn-secondary" >
-			<i class="fa fa-backward"></i> Go back
+		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
+			<i class="fa fa-database"></i> View Sources
 		</a>
 	</div>
 </div>

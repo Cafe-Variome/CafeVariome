@@ -91,11 +91,11 @@
 
 <div class="form-group row">
 	<div class="col">
-		<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
-			<i class="fa fa-file"></i>  Create Source
+		<button type="submit" name="submit" class="btn btn-success bg-gradient-success">
+			<i class="fa fa-plus"></i>  Create Source
 		</button>
-		<a href="<?php echo base_url('Admin/Index'); ?>" class="btn btn-secondary" >
-			<i class="fa fa-backward"></i> Go back
+		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
+			<i class="fa fa-database"></i> View Sources
 		</a>
 	</div>
 </div>
