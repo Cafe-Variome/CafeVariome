@@ -28,22 +28,21 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 
  class Task extends Controller{
 
-    function __construct(){
+    function __construct()
+	{
         $this->db = \Config\Database::connect();
         $this->setting = Settings::getInstance();
     }
 
-    /**
-     * Pheno Packet Insert - manages the loop to insert all recently uploaded json files sequentially
-     * into mysql for the given source.
-     *
-     * @param string $source - Name of source update should be performed for
-     * @return N/A
-     */
+	 /**
+	  * Reads phenopacket files uploaded/imported for a specific source and insert their data into mysql.
+	  * @param int $source_id - Id of the source
+	  * @param int $overwrite Whether to overwrite data of the files or not.
+	  * @return void
+	  */
     public function phenoPacketInsertBySourceId(int $source_id, int $overwrite = UPLOADER_DELETE_NONE)
 	{
         $uploadModel = new Upload();
-        $sourceModel = new Source();
         $inputPipeLine = new PhenoPacketDataInput($source_id, $overwrite);
 
         // get a list of json files just uploaded to this source
@@ -51,7 +50,6 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 
         for ($t=0; $t < count($files); $t++)
 		{
-            $file = $files[$t]['FileName'];
             $file_id = $files[$t]['ID'];
             try
 			{
