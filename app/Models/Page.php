@@ -28,31 +28,41 @@ class Page extends Model
         }
 		$this->builder = $this->db->table($this->table);
     }
-    
-    function getPages(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
-		if ($cols) {
-            $this->builder->select($cols);
-        }
-        if ($conds) {
-            $this->builder->where($conds);
-        }
-        if ($groupby) {
-            $this->builder->groupBy($groupby);
-        }
-        if ($isDistinct) {
-            $this->builder->distinct();
-        }
-        if ($limit > 0) {
-            if ($offset > 0) {
-                $this->builder->limit($limit, $offset);
-            }
-            $this->builder->limit($limit);
-        }
 
-        $query = $this->builder->get()->getResultArray();
-        return $query; 
+    public function getPages()
+	{
+        return $this->builder->get()->getResultArray();
     }
-    
+
+	public function getPage(int $id)
+	{
+		$this->builder->select();
+		$this->builder->where('id', $id);
+		$query = $this->builder->get()->getResultArray();
+
+		if(count($query) == 1)
+		{
+			return $query[0];
+		}
+
+		return null;
+	}
+
+	public function getActivePage(int $id)
+	{
+		$this->builder->select();
+		$this->builder->where('id', $id);
+		$this->builder->where('Active', true);
+		$query = $this->builder->get()->getResultArray();
+
+		if(count($query) == 1)
+		{
+			return $query[0];
+		}
+
+		return null;
+	}
+
     public function createPage(array $data)
     {
         $this->builder->insert($data);
