@@ -35,7 +35,15 @@ function lookupDir() {
         },
         success: function(response)  {
             count = JSON.parse(response);
-            $('#lookupCount').text(count + ' file(s) were found.');
+            if (count == 0){
+                $('#lookupCount').text('No file was found.');
+            }
+            else if (count > 1){
+                $('#lookupCount').text(count + ' files were found.');
+            }
+            else{
+                $('#lookupCount').text(count + ' file was found.');
+            }
             count > 0 ? showImportBtn() : hideImportBtn();
         },
         error: function(jqXHR, textStatus, errorThrown) {
