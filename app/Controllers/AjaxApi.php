@@ -14,6 +14,7 @@
  */
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceNetworkIndex;
+use App\Libraries\CafeVariome\Core\IO\FileSystem\File;
 use CodeIgniter\Controller;
 use Config\Database;
 use App\Models\Settings;
@@ -725,10 +726,24 @@ class AjaxApi extends Controller{
 
     public function lookupDirectory()
 	{
-		if ($this->request->getMethod() == 'post') {
+		if ($this->request->getMethod() == 'post')
+		{
+			$allowed_formats = ['csv', 'xls', 'xlsx', 'phenopacket', 'json'];
+			$file_count = 0;
 			$path = $this->request->getVar('lookup_dir');
-			$fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket', 'json']);
-			$file_count = count($fileMan->getFiles());
+
+			if (SysFileMan::IsFile($path))
+			{
+				if(in_array(strtolower(SysFileMan::GetFileExtension($path)), $allowed_formats))
+				{
+					$file_count = 1;
+				}
+			}
+			else
+			{
+				$fileMan = new SysFileMan($path, true, $allowed_formats);
+				$file_count = count($fileMan->getFiles());
+			}
 
 			return json_encode($file_count);
 		}
@@ -737,14 +752,27 @@ class AjaxApi extends Controller{
 	public function importFromDirectory()
 	{
 		 if ($this->request->getMethod() == 'post') {
+			 $allowed_formats = ['csv', 'xls', 'xlsx', 'phenopacket', 'json'];
+
 			 $path = $this->request->getVar('lookup_dir');
 			 $source_id = $this->request->getVar('source_id');
 			 $pipeline_id = $this->request->getVar('pipeline_id');
 			 $user_id = $this->request->getVar('user_id');
 
-			 $fileMan = new SysFileMan($path, true, ['csv', 'xls', 'xlsx', 'phenopacket', 'json']);
-			 $unsaved_files = $fileMan->getFiles();
-			 $files_count = count($unsaved_files);
+			 if (SysFileMan::IsFile($path))
+			 {
+				 if (in_array(strtolower(SysFileMan::GetFileExtension($path)), $allowed_formats))
+				 {
+					 $files_count = 1;
+					 $unsaved_files = [new File(SysFileMan::GetFileName($path), SysFileMan::GetFileSize($path), $path, SysFileMan::GetFileMimeType($path) ,0)];
+				 }
+			 }
+			 else
+			 {
+				 $fileMan = new SysFileMan($path, true, $allowed_formats);
+				 $unsaved_files = $fileMan->getFiles();
+				 $files_count = count($unsaved_files);
+			 }
 
 			 $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
 			 $fileMan = new SysFileMan($basePath);
@@ -756,11 +784,13 @@ class AjaxApi extends Controller{
 				 {
 					 $source_path = $source_id . DIRECTORY_SEPARATOR;
 
-					 if (!$fileMan->Exists($source_id)) {
+					 if (!$fileMan->Exists($source_id))
+					 {
 						 $fileMan->CreateDirectory($source_id);
 					 }
 
-					 if ($fileMan->Save($file, $source_path)) {
+					 if ($fileMan->Save($file, $source_path))
+					 {
 						 $file_name = $file->getName();
 						 $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
 						 unset($unsaved_files[$key]);
@@ -768,10 +798,13 @@ class AjaxApi extends Controller{
 				 }
 			 }
 
+
 			 $unsaved_files_count = count($unsaved_files);
 
-			 $result = ["unsaved_count" => $unsaved_files_count,
-				 "saved_count" => $files_count - $unsaved_files_count];
+			 $result = [
+				 "unsaved_count" => $unsaved_files_count,
+				 "saved_count" => $files_count - $unsaved_files_count
+			 ];
 
 			 return json_encode($result);
 		 }
