@@ -38,11 +38,11 @@ function lookupDir() {
             if (count == 0){
                 $('#lookupCount').text('No file was found.');
             }
-            else if (count > 1){
-                $('#lookupCount').text(count + ' files were found.');
+            else if (count == 1){
+                $('#lookupCount').text(count + ' file was found.');
             }
             else{
-                $('#lookupCount').text(count + ' file was found.');
+                $('#lookupCount').text(count + ' files were found.');
             }
             count > 0 ? showImportBtn() : hideImportBtn();
         },
@@ -92,9 +92,21 @@ function importDir() {
             disableImport();
         },
         success: function(response)  {
-            textStatus = response.saved_count + ' file(s) were imported successfully.';
-            if (response.unsaved_count > 0) {
-                textStatus += response.unsaved_count + ' file(s) failed to get imported.'
+            if (response.saved_count == 0){
+                textStatus = 'No file imported.';
+            }
+            else if(response.saved_count == 1){
+                textStatus = response.saved_count + ' file was imported successfully.';
+            }
+            else{
+                textStatus = response.saved_count + ' file(s) were imported successfully.';
+            }
+
+            if (response.unsaved_count == 1) {
+                textStatus += response.unsaved_count + ' file failed to get imported.'
+            }
+            else if (response.unsaved_count > 1) {
+                textStatus += response.unsaved_count + ' files failed to get imported.'
             }
 
             $('#lookupCount').text(textStatus);
