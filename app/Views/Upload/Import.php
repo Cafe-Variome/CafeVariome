@@ -10,7 +10,7 @@
 <div class="row">
     <div class="col">
         <h4>Import spreadsheet files from server for '<?php echo $source_name; ?>'</h3>
-        <p>Accepted file formats are comma delimited, CSV, XLS, and XLSX. </p>
+        <p>Accepted file formats are comma delimited CSV, XLS, XLSX, Phenopacket and JSON. </p>
     </div>
 </div>
 
