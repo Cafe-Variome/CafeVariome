@@ -193,7 +193,7 @@ class Source extends CVUI_Controller{
         $uidata->data['countDSPGroups'] = $countDisplayGroups;
 
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-            $name = strtolower(str_replace(' ', '_', $this->request->getVar('name'))); // Convert the source name to lowercase and replace whitespace with underscore
+            $name = $this->request->getVar('name'); // Convert the source name to lowercase and replace whitespace with underscore
             $uri = $this->request->getVar('uri');
             $owner_name = $this->request->getVar('owner_name');
             $email = $this->request->getVar('email');
