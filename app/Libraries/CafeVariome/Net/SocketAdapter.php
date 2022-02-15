@@ -95,6 +95,11 @@ class SocketAdapter
         return $bytesWritten;
     }
 
+	public function Listen()
+	{
+		socket_listen($this->socket);
+	}
+
     public function setOption(int $level , int $option , $value): bool
     {
         return socket_set_option($this->socket, $level, $option, $value);
