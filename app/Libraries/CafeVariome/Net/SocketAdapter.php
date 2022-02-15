@@ -39,6 +39,11 @@ class SocketAdapter
         return $this;
     }
 
+	public function Bind()
+	{
+		socket_bind($this->socket, $this->address, $this->port);
+	}
+
     public function Connect()
     {
         $this->connected = @socket_connect($this->socket, $this->address, $this->port);
