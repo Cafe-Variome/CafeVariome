@@ -15,8 +15,10 @@ class SocketAdapter
     private $address;
     private $port;
     private $socket;
+	private $reserveSocket;
     private $defaultConfig;
-    private $connected;
+    private bool $connected;
+	private bool $locked; // Boolean flag to show if a request is being served.
 
     public function __construct(string $address, int $port)
 	{
@@ -24,10 +26,11 @@ class SocketAdapter
         $this->port = $port;
         $this->defaultConfig = ['domain' => AF_INET, 'type' => SOCK_STREAM, 'protocol' => SOL_TCP];
         $this->connected = false;
+		$this->locked = false;
     }
 
     /**
-     * @param array $config: domain, type, and protocol configuration 
+     * @param array $config: domain, type, and protocol configuration
      */
     public function Create(array $config = null)
     {
@@ -110,8 +113,15 @@ class SocketAdapter
         if($this->socket){
             socket_close($this->socket);
         }
+
+		if ($this->locked){
+			$this->socket = $this->reserveSocket;
+			$this->reserveSocket = null;
+			$this->locked = false;
+		}
+
         $this->connected = false;
-        
+
         return $this;
     }
 
