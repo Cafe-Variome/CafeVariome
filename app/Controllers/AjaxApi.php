@@ -34,8 +34,6 @@ class AjaxApi extends Controller{
 
     protected $setting;
 
-    private $phpshellHelperInstance;
-
     /**
 	 * Constructor
 	 *
@@ -48,7 +46,6 @@ class AjaxApi extends Controller{
         $this->setting =  Settings::getInstance();
         $this->sourceModel = new Source();
         $this->uploadModel = new Upload();
-        $this->phpshellHelperInstance = new PHPShellHelper();
     }
 
     public function query() {
@@ -130,7 +127,7 @@ class AjaxApi extends Controller{
 		 if ($this->request->getMethod() == 'post'){
 			 $source_id = $this->request->getVar('source_id');
 			 $append = $this->request->getVar('append') === 'true' ? 1 : 0;
-			 $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task IndexDataToElasticsearch $source_id $append");
+			 PHPShellHelper::runAsync(getcwd() . "/index.php Task IndexDataToElasticsearch $source_id $append");
 	 	}
 	 }
 
@@ -146,7 +143,7 @@ class AjaxApi extends Controller{
 		if ($this->request->getMethod() == 'post'){
 			$source_id = $this->request->getVar('source_id');
 			$append = $this->request->getVar('append') === 'true' ? 1 : 0;
-			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task IndexDataToNeo4J $source_id $append");
+			PHPShellHelper::runAsync(getcwd() . "/index.php Task IndexDataToNeo4J $source_id $append");
 		}
 	}
 
@@ -154,7 +151,7 @@ class AjaxApi extends Controller{
 	{
 		if ($this->request->getMethod() == 'post') {
 			$source_id = $this->request->getVar('source_id');
-			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
+			PHPShellHelper::runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
 		}
 	}
 
@@ -300,7 +297,7 @@ class AjaxApi extends Controller{
 			$this->uploadModel->addUploadJobRecord($source_id, $uid, $user_id);
 
 			// Create thread to begin SQL insert in the background
-			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task phenoPacketInsertBySourceId " . $source_id . " 00");
+			PHPShellHelper::runAsync(getcwd() . "/index.php Task phenoPacketInsertBySourceId " . $source_id . " 00");
 
 			// Report to front end that the process has now begun
 			echo json_encode("Green");
@@ -576,9 +573,9 @@ class AjaxApi extends Controller{
 			}
 
 			if ($overwrite == "overwrite") {
-				$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task vcfInsertBySourceId " . $source_id . " " . UPLOADER_DELETE_ALL);
+				PHPShellHelper::runAsync(getcwd() . "/index.php Task vcfInsertBySourceId " . $source_id . " " . UPLOADER_DELETE_ALL);
 			} elseif ($overwrite == "append") {
-				$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task vcfInsertBySourceId " . $source_id . " " . UPLOADER_DELETE_NONE);
+				PHPShellHelper::runAsync(getcwd() . "/index.php Task vcfInsertBySourceId " . $source_id . " " . UPLOADER_DELETE_NONE);
 			}
 
 			return json_encode("Green");
@@ -638,10 +635,10 @@ class AjaxApi extends Controller{
 
 					$fAction = $this->request->getVar('fAction'); // File Action
 					if ($fAction == "overwrite") {
-						$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task spreadsheetInsert $file_id 1 $source_id");
+						PHPShellHelper::runAsync(getcwd() . "/index.php Task spreadsheetInsert $file_id 1 $source_id");
 					}
 					elseif ($fAction == "append") {
-						$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task spreadsheetInsert $file_id 00 $source_id");
+						PHPShellHelper::runAsync(getcwd() . "/index.php Task spreadsheetInsert $file_id 00 $source_id");
 					}
 					$uid = md5(uniqid(rand(),true));
 					$this->uploadModel->addUploadJobRecord($source_id,$uid,$user_id);
@@ -701,10 +698,10 @@ class AjaxApi extends Controller{
 
                 $fAction = $this->request->getVar('fAction'); // File Action
                 if ($fAction == "overwrite") {
-                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 1 $source_id $setting_file");
+                    PHPShellHelper::runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 1 $source_id $setting_file");
                 }
                 elseif ($fAction == "append") {
-                    $this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 00 $source_id $setting_file");
+                    PHPShellHelper::runAsync(getcwd() . "/index.php Task univUploadInsert $file_id 00 $source_id $setting_file");
                 }
                 else {
                     error_log("entered else");
@@ -841,7 +838,7 @@ class AjaxApi extends Controller{
 			$uploadModel = new Upload();
 			$uploadModel->resetFileStatus($fileId);
 
-			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fileId . " " . $overwriteFlag);
+			PHPShellHelper::runAsync(getcwd() . "/index.php Task " . $method . " " . $fileId . " " . $overwriteFlag);
 
 			return json_encode(1);
 		}
@@ -885,7 +882,7 @@ class AjaxApi extends Controller{
 				$uploadModel = new Upload();
 				$uploadModel->resetFileStatus($fid);
 
-				$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task " . $method . " " . $fid . " " . $overwriteFlag);
+				PHPShellHelper::runAsync(getcwd() . "/index.php Task " . $method . " " . $fid . " " . $overwriteFlag);
 			}
 
 			return json_encode(1);
@@ -899,7 +896,7 @@ class AjaxApi extends Controller{
 			$pending = $this->request->getVar('pending');
 			$overwrite_flag = $this->request->getVar('overwrite');
 
-			$this->phpshellHelperInstance->runAsync(getcwd() . "/index.php Task insertFilesBySourceId $source_id $pending $overwrite_flag");
+			PHPShellHelper::runAsync(getcwd() . "/index.php Task insertFilesBySourceId $source_id $pending $overwrite_flag");
 			return json_encode(1);
 		}
 	}

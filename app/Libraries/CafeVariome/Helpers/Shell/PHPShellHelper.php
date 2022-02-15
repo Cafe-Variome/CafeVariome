@@ -16,7 +16,7 @@
 class PHPShellHelper extends ShellHelper
 {
 
-    private function getPHPPath(): string
+    private static function getPHPPath(): string
     {
         if (defined('PHP_BIN_PATH')) {
             return PHP_BIN_PATH;
@@ -24,35 +24,39 @@ class PHPShellHelper extends ShellHelper
         return PHP_BINDIR . '/php';
     }
 
-    // This method is overriden from the parent class to adapt only PHP commands in a synchronous way
-    public function run(string $cmd)
+    // This method is overridden from the parent class to adapt only PHP commands in a synchronous way
+    public static function run(string $cmd)
     {
         $escaped_command = escapeshellcmd($cmd);
 
-        if(!$cmd){
+        if(!$cmd)
+		{
             throw new \Exception("No command to run!");
         }
 
-        $cmdToRun = $this->getPHPPath(). " ".$escaped_command;
+        $cmdToRun = self::getPHPPath(). " ".$escaped_command;
 
         return shell_exec($cmdToRun);
     }
 
-    // This method is overriden from the parent class to adapt only PHP commands in an asynchronous way
-    public function runAsync(string $cmd)
+    // This method is overridden from the parent class to adapt only PHP commands in an asynchronous way
+    public static function runAsync(string $cmd)
     {
         $escaped_command = escapeshellcmd($cmd);
 
-        if(!$cmd){
+        if(!$cmd)
+		{
             throw new \Exception("No command to run!");
         }
 
-        $cmdToRun = $this->getPHPPath(). " ".$escaped_command;
+        $cmdToRun = self::getPHPPath(). " ".$escaped_command;
 
-        if ($this->isWindows()) {
+        if (self::isWindows())
+		{
             shell_exec($cmdToRun . " > NUL");
         }
-        else {
+        else
+		{
             shell_exec($cmdToRun . " >/dev/null 2>&1 &");
         }
     }

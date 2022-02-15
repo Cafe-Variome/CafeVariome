@@ -114,8 +114,7 @@ class Attribute extends CVUI_Controller
 					$attribute['include_in_interface_index'] !== $include_in_interface_index
 				)
 				{
-					$phpshellHelperInstance = new PHPShellHelper();
-					$phpshellHelperInstance->runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
+					PHPShellHelper::runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
 				}
 
 				$this->setStatusMessage("Attribute '$name' was updated.", STATUS_SUCCESS);

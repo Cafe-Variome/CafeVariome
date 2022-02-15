@@ -16,10 +16,10 @@
 abstract class ShellHelper
 {
     // Force extending class to define this method to prevent RCE vulnerabilities
-    abstract public function run(string $cmd);
-    abstract public function runAsync(string $cmd);
+    abstract public static function run(string $cmd);
+    abstract public static function runAsync(string $cmd);
 
-    protected function isWindows() : bool
+    protected static function isWindows() : bool
     {
         return (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
     }
