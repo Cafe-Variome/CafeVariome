@@ -21,7 +21,7 @@ class ServiceInterface
         $this->socket = new SocketAdapter($this->config->address, $this->config->port);
     }
 
-    public function ping()
+    public function ping(): bool
     {
         return $this->socket->Create()->Connect()->isConnected();
     }
