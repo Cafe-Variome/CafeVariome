@@ -16,6 +16,7 @@
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\ElasticsearchSourceIndex;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4JSourceIndex;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceSourceIndex;
+use App\Libraries\CafeVariome\Net\Service\Demon;
 use CodeIgniter\Controller;
 use CodeIgniter\CLI\CLI;
 use App\Models\Upload;
@@ -278,5 +279,11 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 	{
 		 $uiDataIndex = new UserInterfaceSourceIndex($source_id);
 		 $uiDataIndex->IndexSource();
+	}
+
+	public function StartService()
+	{
+		$demon = new Demon();
+		$demon->Run();
 	}
  }
