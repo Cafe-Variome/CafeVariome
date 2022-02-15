@@ -3,14 +3,14 @@
 /**
  * SocketAdapter.php
  * Created: 16/02/2021
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
 
 use App\Models\Settings;
 
-class SocketAdapter extends NetworkAdapter
+class SocketAdapter
 {
     private $address;
     private $port;

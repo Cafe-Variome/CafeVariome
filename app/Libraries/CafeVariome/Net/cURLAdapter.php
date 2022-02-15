@@ -2,15 +2,15 @@
 
 /**
  * cURLRequest.php
- * 
+ *
  * Created: 15/10/2019
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
 
- class cURLAdapter extends NetworkAdapter 
- {  
+ class cURLAdapter
+ {
     protected $adapterInstance;
 
     private $baseUrl;
