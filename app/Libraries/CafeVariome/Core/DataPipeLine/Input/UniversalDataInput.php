@@ -2,7 +2,7 @@
 
 /**
  * Name EAVDataInput.php
- *
+ * @deprecated
  * Created 19/08/2020
  * @author Samuel Balco
  * @author Mehdi Mehtarizadeh

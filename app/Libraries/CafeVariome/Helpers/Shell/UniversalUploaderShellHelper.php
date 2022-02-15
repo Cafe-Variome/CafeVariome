@@ -3,7 +3,7 @@
 /**
  * UnivShellHelper.php
  * Created 26/01/2021
- *
+ * @deprecated
  * @author Mehdi Mehtarizadeh
  * @author Farid Yavari Dizjikan
  *
