@@ -42,5 +42,14 @@ class Beacon
 		return $beaconId;
 	}
 
+	private static function GetEndpointURL(string $endpoint)
+	{
+		return base_url(self::BEACON_CONTROLLER . '/' . $endpoint);
+	}
+
+	public static function GetIndividualsURL()
+	{
+		return self::GetEndpointURL('Individuals');
+	}
 
 }
