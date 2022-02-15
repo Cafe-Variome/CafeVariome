@@ -68,6 +68,18 @@ class SocketAdapter
         return $input;
     }
 
+	public function Send(array $message, int $delay = 0, int $flags = MSG_EOR)
+	{
+		$message = json_encode($message);
+
+		$bytesSent = socket_send($this->socket, $message , strlen($message), MSG_EOR);
+
+		if ($delay > 0) {
+			$this->delay($delay);
+		}
+
+		return $bytesSent;
+	}
 
     public function Write(array $message, int $delay = 0)
     {
