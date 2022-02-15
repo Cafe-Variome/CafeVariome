@@ -18,7 +18,8 @@ class SocketAdapter
     private $defaultConfig;
     private $connected;
 
-    public function __construct(string $address, int $port) {
+    public function __construct(string $address, int $port)
+	{
         $this->address = $address;
         $this->port = $port;
         $this->defaultConfig = ['domain' => AF_INET, 'type' => SOCK_STREAM, 'protocol' => SOL_TCP];
@@ -30,7 +31,8 @@ class SocketAdapter
      */
     public function Create(array $config = null)
     {
-        if (!$config || count($config) == 0) {
+        if (!$config || count($config) == 0)
+		{
             $config = $this->defaultConfig;
         }
         $this->socket = socket_create($config['domain'], $config['type'], $config['protocol']);
@@ -100,7 +102,8 @@ class SocketAdapter
         return $this->connected;
     }
 
-    public function __destruct(){
+    public function __destruct()
+	{
         if($this->socket && $this->connected){
             socket_close($this->socket);
         }
