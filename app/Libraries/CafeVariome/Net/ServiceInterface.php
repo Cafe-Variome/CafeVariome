@@ -11,12 +11,15 @@
  *
  */
 
+use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
+
 class ServiceInterface
 {
     private $socket;
     private $config;
 
-    public function __construct() {
+    public function __construct()
+	{
         $this->config = config('BackgroundService');
         $this->socket = new SocketAdapter($this->config->address, $this->config->port);
     }
@@ -28,8 +31,7 @@ class ServiceInterface
 
     public function Start()
     {
-        $cmd = PHP_BIN_PATH . " " . $this->config->binPath . ' >/dev/null 2>&1 &';
-        $r = shell_exec($cmd);
+		PHPShellHelper::runAsync(getcwd() . "/index.php Task StartService");
     }
 
     public function GetUploadedFilesStatus()
