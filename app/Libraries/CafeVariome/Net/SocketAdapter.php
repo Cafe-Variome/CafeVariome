@@ -50,6 +50,13 @@ class SocketAdapter
         return $this;
     }
 
+	public function Accept()
+	{
+		$this->reserveSocket = $this->socket;
+		$this->socket = socket_accept($this->socket);
+		$this->locked = true;
+	}
+
     public function Read(int $length, int $delay = 0, int $type = PHP_BINARY_READ)
     {
         $input = socket_read($this->socket, $length, $type);
