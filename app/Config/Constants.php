@@ -80,7 +80,7 @@ defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // highest auto
 
 /**
 *--------------------------------------------------------------------------
-* Cafe Variome Path Constants
+* Cafe Variome Constants
 *--------------------------------------------------------------------------
 * @author Mehdi Mehtarizadeh
 * date 11/06/2019
@@ -189,7 +189,5 @@ define('ATTRIBUTE_STORAGE_UNDEFINED', 0);
 define('ATTRIBUTE_STORAGE_ELASTICSEARCH', 1);
 define('ATTRIBUTE_STORAGE_NEO4J', 2);
 define('ATTRIBUTE_STORAGE_EXTERNAL', 3);
-
-
 
 
