@@ -181,7 +181,7 @@ class CVInstaller
 		$envFileHandle = fopen($envFile, 'a+');
 		if ($envFileHandle !== false)
 		{
-			$envData = "ENVIRONMENT = 'development'" . PHP_EOL;
+			$envData = "CI_ENVIRONMENT = development" . PHP_EOL;
 			$envData .= "app.baseURL = '$base_url'" . PHP_EOL;
 			$envData .= "app.baseURL = '$base_url'" . PHP_EOL;
 			$envData .= "database.default.hostname = $dbHost" . PHP_EOL;
@@ -189,6 +189,13 @@ class CVInstaller
 			$envData .= "database.default.username = $dbUsername" . PHP_EOL;
 			$envData .= "database.default.password =  $dbPassword" . PHP_EOL;
 			$envData .= "database.default.DBDriver = MySQLi" . PHP_EOL;
+			$envData .= "#----------------------------------" . PHP_EOL;
+			$envData .= "PHP_BIN_PATH = $php_bin_path" . PHP_EOL;
+			$envData .= "EAV_BATCH_SIZE = 30000" . PHP_EOL;
+			$envData .= "NEO4J_BATCH_SIZE = 30000" . PHP_EOL;
+			$envData .= "SPREADSHEET_BATCH_SIZE = 1000" . PHP_EOL;
+			$envData .= "ELASTICSERACH_AGGREGATE_SIZE = 100000" . PHP_EOL;
+			$envData .= "ELASTICSERACH_EXTRACT_AGGREGATE_SIZE = 10000" . PHP_EOL;
 
 			if (fwrite($envFileHandle, $envData) !== false)
 			{
@@ -230,9 +237,7 @@ class CVInstaller
 		{
 			echo 'Error in creating a handle for Apache config file';
 		}
-
 	}
-
 }
 
 if (isset($argc)) {
