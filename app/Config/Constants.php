@@ -129,17 +129,6 @@ define('SUBJECT_ID_IN_FILE_NAME', 1);
 define('GROUPING_COLUMNS_ALL', 0);
 define('GROUPING_COLUMNS_CUSTOM', 1);
 
-//Data stream batch sizes
-define('EAV_BATCH_SIZE', 30000);
-define('NEO4J_BATCH_SIZE', 30000);
-
-//Data input batch size used in transactions
-define('SPREADSHEET_BATCH_SIZE', 1000);
-
-//Elasticsearch Aggregate Size
-define('ELASTICSERACH_AGGREGATE_SIZE', 50000);
-define('ELASTICSERACH_EXTRACT_AGGREGATE_SIZE', 10000);
-
 //Elasticsearch Index Status
 define('ELASTICSEARCH_INDEX_STATUS_UNKNOWN', 0);
 define('ELASTICSEARCH_INDEX_STATUS_CREATED', 1);
