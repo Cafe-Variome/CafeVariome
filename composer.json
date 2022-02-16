@@ -6,6 +6,11 @@
     "license": "MIT",
     "require": {
 		"php": "^8.0",
+        "ext-sockets": "*",
+        "ext-curl": "*",
+        "ext-mbstring": "*",
+        "ext-intl": "*",
+        "ext-json": "*",
         "codeigniter4/framework": "^4.1",
         "stevenmaguire/oauth2-keycloak": "^2.2.1",
         "components/font-awesome": "^5.9.0",
