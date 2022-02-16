@@ -2,7 +2,7 @@
     "name": "brookeslab/cafevariome",
     "type": "project",
     "description": "Cafe Variome - Health Data Discovery",
-    "homepage": "https://discoverynexus.org/",
+    "homepage": "https://cafevariome.org/",
     "license": "MIT",
     "require": {
 		"php": "^8.0",
