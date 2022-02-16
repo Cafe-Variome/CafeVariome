@@ -48,3 +48,5 @@ Events::on('pre_system', static function () {
         Services::toolbar()->respond();
     }
 });
+
+Events::on('pre_system', '\App\Libraries\CafeVariome\CafeVariome::Boot');
