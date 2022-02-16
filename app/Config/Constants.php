@@ -106,15 +106,8 @@ define('CV_BIN', RESOURCES_DIR . 'bin' . DIRECTORY_SEPARATOR);
 define('STATIC_DIR', 'static' . DIRECTORY_SEPARATOR);
 define('ORPHATERMS_SOURCE', 'orphaterms.txt');
 
-
 define('CV_CONVERT_BIN', CV_BIN . 'cv-convert');
 define('CV_CONVERT_SETTINGS_DIR', UPLOAD . 'settings' . DIRECTORY_SEPARATOR);
-
-
-define('PRECAN', false); // Set/Unset to enable/disable Precanned Queries feature in Query Builder
-define('PHENOTYPE_CATEGORIES', true); // Set/Unset to enable/disable categories wise split in phenotype attributes
-
-define('PHP_BIN_PATH', '/usr/bin/php');
 
 // UI status message types
 define('STATUS_SUCCESS', 1);
