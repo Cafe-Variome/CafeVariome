@@ -20,7 +20,8 @@ class SpreadsheetDataInput extends DataInput
     private $column_count;
     protected $pipeline_id;
 
-    public function __construct(int $source_id, int $delete) {
+    public function __construct(int $source_id, int $delete)
+	{
         parent::__construct($source_id);
         $this->delete = $delete;
         $this->initializeConfiguration();
@@ -28,32 +29,35 @@ class SpreadsheetDataInput extends DataInput
 
     public function absorb(int $file_id): bool
 	{
-
         $this->registerProcess($file_id);
 
         $fileRecord = $this->getSourceFiles($file_id); //Get a list of files for source
 
-        if (count($fileRecord) == 1) {
+        if (count($fileRecord) == 1)
+		{
             $file = $fileRecord[0]['FileName'];
             $this->fileName = $file;
-            if (array_key_exists('pipeline_id', $fileRecord[0])) {
+            if (array_key_exists('pipeline_id', $fileRecord[0]))
+			{
                 $this->pipeline_id = $fileRecord[0]['pipeline_id'];
                 $this->applyPipeline($this->pipeline_id);
             }
 
-            if ($this->fileMan->Exists($file)) {
+            if ($this->fileMan->Exists($file))
+			{
                 $this->uploadModel->clearErrorForFile($file_id);
                 $this->sourceModel->lockSource($this->sourceId);
 
-				if ($this->delete == UPLOADER_DELETE_FILE) {
+				if ($this->delete == UPLOADER_DELETE_FILE)
+				{
                     $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
 					$this->deleteExistingRecords($file_id);
                 }
 
                 $filePath = $this->basePath . $file;
 
-                $return_data = array('result_flag' => 1);
-                if (preg_match("/\.csv$|\.tsv$/", $file)) {
+                if (preg_match("/\.csv$|\.tsv$/", $file))
+				{
                     $line = fgets(fopen($filePath, 'r'));
                     preg_match("/^" . $this->configuration['subject_id_attribute_name'] . "(.)/", $line, $matches);
 					if (
@@ -79,16 +83,16 @@ class SpreadsheetDataInput extends DataInput
 						$this->reader->setFieldDelimiter($delimiter);
 					}
                 }
-                elseif (preg_match("/\.xlsx$/", $file)) {
-
+                elseif (preg_match("/\.xlsx$/", $file))
+				{
 					$this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
                 }
-                elseif (preg_match("/\.ods$/", $file)) {
+                elseif (preg_match("/\.ods$/", $file))
+				{
 					$this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
                 }
-                else {
-                    $return_data['result_flag'] = 0;
-                    $return_data['error'] = "File did not conform to allowed types";
+                else
+				{
                     $message = "File did not conform to allowed types.";
                     $error_code = 2;
                     $this->uploadModel->errorInsert($file_id, $message, $error_code, true);
@@ -105,7 +109,8 @@ class SpreadsheetDataInput extends DataInput
 
     public function save(int $file_id): bool
     {
-		try{
+		try
+		{
 			$this->reportProgress($file_id, 0, 1, 'bulkupload', 'Counting records');
 			$recordCount = $this->countRecords();
 			$this->reportProgress($file_id, 0, $recordCount, 'bulkupload', 'Importing data');
@@ -123,12 +128,14 @@ class SpreadsheetDataInput extends DataInput
 				$subject_id = $this->generateSubjectId();
 			}
 
-			foreach ($this->reader->getSheetIterator() as $sheet) {
+			foreach ($this->reader->getSheetIterator() as $sheet)
+			{
 				$recordsProcessed = -1;  // set counter to -1 initially to avoid counting header of the file
 				$attgroups = [];
 				$temphash = [];
 
-				foreach ($sheet->getRowIterator() as $row) {
+				foreach ($sheet->getRowIterator() as $row)
+				{
 					$row = $row->toArray();
 					if ($recordsProcessed == -1)
 					{
@@ -180,57 +187,69 @@ class SpreadsheetDataInput extends DataInput
 
 			return true;
 		}
-		catch (\Exception $ex) {
+		catch (\Exception $ex)
+		{
 			return false;
 		}
     }
 
 	private function processRow($row, $attgroups, $subject_id, $file_id, & $counter)
 	{
-		foreach ($attgroups as $group){
+		foreach ($attgroups as $group)
+		{
 			$uid = md5(uniqid(rand(),true));
-			foreach ($group as $attribute => $val){
+			foreach ($group as $attribute => $val)
+			{
 				$value = $row[$val];
 				if ($value == "") continue; // Skip empty values
 				$attribute = strtolower(preg_replace('/\s+/', '_', $attribute)); // replace spaces with underline
 				$attribute = $this->sanitiseString($attribute); // sanitise attribute here to remove malicious characters
 
-				if (is_a($value, 'DateTime')) {
+				if (is_a($value, 'DateTime'))
+				{
 					$value = $value->format('Y-m-d H:i:s');
 				}
-				else{
+				else
+				{
 					$value = strtolower($value);
 					$value = $this->sanitiseString($value);
 				}
 
 				$attribute_id = $this->getAttributeIdByName($attribute);
 
-				if ($this->configuration['internal_delimiter'] != '' && $this->configuration['internal_delimiter'] != null) {
+				if ($this->configuration['internal_delimiter'] != '' && $this->configuration['internal_delimiter'] != null)
+				{
 					//if there is an internal delimiter, split the value on it and insert subvalues individually
 					$internal_delimiter = $this->configuration['internal_delimiter'];
 
-					if (strpos($value, $internal_delimiter) !== false) {
+					if (strpos($value, $internal_delimiter) !== false)
+					{
 						$value_array = explode($internal_delimiter, $value); // Split compound value to sub_values
 
-						foreach ($value_array as $sub_value) {
+						foreach ($value_array as $sub_value)
+						{
 							$sub_value_id = $this->getValueIdByNameAndAttributeId($sub_value, $attribute);
 							$this->createEAV($uid, $file_id, $subject_id, $attribute_id, $sub_value_id);
 						}
 					}
-					else {
+					else
+					{
 						$value_id = $this->getValueIdByNameAndAttributeId($value, $attribute);
 						$this->createEAV($uid, $file_id, $subject_id, $attribute_id, $value_id);
 					}
 				}
-				else {
+				else
+				{
 					$value_id = $this->getValueIdByNameAndAttributeId($value, $attribute);
 					$this->createEAV($uid, $file_id, $subject_id, $attribute_id, $value_id);
 				}
 
 				$counter++;
-				if ($counter % SPREADSHEET_BATCH_SIZE == 0) {
+				if ($counter % SPREADSHEET_BATCH_SIZE == 0)
+				{
 					$error = $this->sendBatch();
-					if ($error) {
+					if ($error)
+					{
 						$error_code = 0;
 						$message = "MySQL insert was unsuccessful.";
 						$this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
@@ -336,7 +355,12 @@ class SpreadsheetDataInput extends DataInput
 
             $valid_delimiters = [',', '/', ';', ':', '|', '*', '&', '%', '$', '!', '~', '#', '-', '_', '+', '=', '^'];
 
-            if ($pipeline['internal_delimiter'] != null && $pipeline['internal_delimiter'] != '' && in_array($pipeline['internal_delimiter'], $valid_delimiters)) {
+            if (
+				$pipeline['internal_delimiter'] != null &&
+				$pipeline['internal_delimiter'] != '' &&
+				in_array($pipeline['internal_delimiter'], $valid_delimiters)
+			)
+			{
                 $this->configuration['internal_delimiter'] = $pipeline['internal_delimiter'];
             }
 
