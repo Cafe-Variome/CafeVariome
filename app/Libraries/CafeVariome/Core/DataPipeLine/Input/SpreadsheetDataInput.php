@@ -56,12 +56,24 @@ class SpreadsheetDataInput extends DataInput
                 if (preg_match("/\.csv$|\.tsv$/", $file)) {
                     $line = fgets(fopen($filePath, 'r'));
                     preg_match("/^" . $this->configuration['subject_id_attribute_name'] . "(.)/", $line, $matches);
-					if (count($matches) < 2){
+					if (
+						count($matches) < 2 &&
+						$this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE
+					)
+					{
 						//The subject_id attribute name specified didn't exist.
 						return false;
 					}
-					else{
-						$delimiter = $matches[1];
+					else
+					{
+						if(count($matches) == 2)
+						{
+							$delimiter = $matches[1];
+						}
+						else
+						{
+							$delimiter = $this->detectDelimiter($line);
+						}
 
 						$this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
 						$this->reader->setFieldDelimiter($delimiter);
@@ -99,10 +111,16 @@ class SpreadsheetDataInput extends DataInput
 			$this->reportProgress($file_id, 0, $recordCount, 'bulkupload', 'Importing data');
 			list($linerow, $counter) = array(1, 0);
 
-			if ($this->configuration['subject_id_location'] == SUBJECT_ID_IN_FILE_NAME) {
-				if (strpos($this->fileName, '.')) {
+			if ($this->configuration['subject_id_location'] == SUBJECT_ID_IN_FILE_NAME)
+			{
+				if (strpos($this->fileName, '.'))
+				{
 					$subject_id = explode('.', $this->fileName)[0];
 				}
+			}
+			else if($this->configuration['subject_id_location'] == SUBJECT_ID_PER_FILE)
+			{
+				$subject_id = $this->generateSubjectId();
 			}
 
 			foreach ($this->reader->getSheetIterator() as $sheet) {
@@ -112,17 +130,29 @@ class SpreadsheetDataInput extends DataInput
 
 				foreach ($sheet->getRowIterator() as $row) {
 					$row = $row->toArray();
-					if ($recordsProcessed == -1) {
-						if (!$this->checkHeader($file_id, $row, $attgroups, $temphash)){
+					if ($recordsProcessed == -1)
+					{
+						if (!$this->checkHeader($file_id, $row, $attgroups, $temphash))
+						{
 							break;
 						}
 						$this->db->begin_transaction();
 					}
-					else {
-						if ($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE) {
+					else
+					{
+						if ($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE)
+						{
 							$subject_id = $row[0];
 						}
-						if ($subject_id == ""){
+						else if($this->configuration['subject_id_location'] == SUBJECT_ID_PER_BATCH_OF_RECORDS)
+						{
+							if ($recordsProcessed % $this->configuration['subject_id_assigment_batch_size'] == 0)
+							{
+								$subject_id = $this->generateSubjectId($this->configuration['subject_id_prefix']);
+							}
+						}
+						if ($subject_id == "")
+						{
 							$message = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
 							$error_code = 3;
 							$this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
@@ -337,28 +367,38 @@ class SpreadsheetDataInput extends DataInput
     {
         $group_positions = $this->getGroupPositions();
         $groupnumber = 0;
-        for ($i=0; $i < count($row); $i++) {
+        for ($i=0; $i < count($row); $i++)
+		{
             if ($i === 0) //check for existence subject id as the first column in header, if necessary
             {
-                if ($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE && $row[$i] != $this->configuration['subject_id_attribute_name']){
-                    $message = "No " . $this->configuration['subject_id_attribute_name'] . " column.";
-                    $error_code = 1;
-                    $this->reportError($file_id, $error_code, $message);
-
-                    return false;
+                if ($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE)
+				{
+					if($row[$i] != $this->configuration['subject_id_attribute_name'])
+					{
+						$message = "No " . $this->configuration['subject_id_attribute_name'] . " column.";
+						$error_code = 1;
+						$this->reportError($file_id, $error_code, $message);
+						return false;
+					}
+					else
+					{
+						continue;
+					}
                 }
-                continue;
             }
             $temphash[$row[$i]] = $i;
 
-            if (in_array($i , $group_positions)){
-                if (count($temphash) > 0){
+            if (in_array($i , $group_positions))
+			{
+                if (count($temphash) > 0)
+				{
                     $attgroups[$groupnumber] = $temphash;
                     $groupnumber++;
                     $temphash = [];
                 }
             }
-            if (count($temphash) > 0){
+            if (count($temphash) > 0)
+			{
                 $attgroups[$groupnumber] = $temphash;
             }
         }
