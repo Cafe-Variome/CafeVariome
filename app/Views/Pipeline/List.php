@@ -30,21 +30,9 @@
 		<?php foreach ($pipelinesList as $pipeline): ?>
 		<tr>
 			<td><?= $pipeline['name'] ?></td>
-			<td>
-			<?php if($pipeline['subject_id_location'] == '0'): ?>
-				Attribute in File
-			<?php elseif($pipeline['subject_id_location'] == '1'): ?>
-				File Name
-			<?php endif; ?>
-			</td>
+			<td><?= $pipeline['subject_id_location'] ?></td>
 			<td><?= $pipeline['subject_id_attribute_name'] ?></td>
-			<td>
-			<?php if($pipeline['grouping'] == '0'): ?>
-				Group Individually
-			<?php elseif($pipeline['grouping'] == '1'): ?>
-				Custom
-			<?php endif; ?>
-			</td>
+			<td><?= $pipeline['grouping']?></td>
 			<td>
 				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $pipeline['id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Pipeline">
 					<i class="fa fa-edit text-warning"></i>

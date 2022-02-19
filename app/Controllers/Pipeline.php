@@ -45,6 +45,12 @@ class Pipeline extends CVUI_Controller
         $pipelineModel = new \App\Models\Pipeline();
 
         $pipelines = $pipelineModel->getPipelines();
+
+		foreach ($pipelines as &$pipeline)
+		{
+			$pipeline['subject_id_location'] = PipelineHelper::getSubjectIDLocation($pipeline['subject_id_location']);
+			$pipeline['grouping'] = PipelineHelper::getGrouping($pipeline['grouping']);
+		}
         $uidata->data['pipelinesList'] = $pipelines;
 
         $data = $this->wrapData($uidata);
