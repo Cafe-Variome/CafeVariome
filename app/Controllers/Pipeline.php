@@ -255,7 +255,12 @@ class Pipeline extends CVUI_Controller
                 'type' => 'subject_id_location',
                 'class' => 'form-control',
                 'value' =>set_value('subject_id_location'),
-                'options' => ['0' => 'Attribute in File', '1' => 'File Name']
+                'options' => [
+					SUBJECT_ID_WITHIN_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_WITHIN_FILE),
+					SUBJECT_ID_IN_FILE_NAME => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_IN_FILE_NAME),
+					SUBJECT_ID_PER_BATCH_OF_RECORDS => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_PER_BATCH_OF_RECORDS),
+					SUBJECT_ID_PER_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_PER_FILE)
+				]
             );
 
             $uidata->data['subject_id_attribute_name'] = array(
@@ -288,7 +293,10 @@ class Pipeline extends CVUI_Controller
                 'type' => 'dropdown',
                 'class' => 'form-control',
                 'value' =>set_value('grouping'),
-                'options' => ['0' => 'Group Individually', '1' => 'Custom']
+                'options' => [
+					GROUPING_COLUMNS_ALL => PipelineHelper::getGrouping(GROUPING_COLUMNS_ALL),
+					GROUPING_COLUMNS_CUSTOM => PipelineHelper::getGrouping(GROUPING_COLUMNS_CUSTOM)
+				]
             );
 
             $uidata->data['group_columns'] = array(
@@ -475,7 +483,12 @@ class Pipeline extends CVUI_Controller
                 'id' => 'subject_id_location',
                 'type' => 'subject_id_location',
                 'class' => 'form-control',
-                'options' => ['0' => 'Attribute in File', '1' => 'File Name'],
+				'options' => [
+					SUBJECT_ID_WITHIN_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_WITHIN_FILE),
+					SUBJECT_ID_IN_FILE_NAME => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_IN_FILE_NAME),
+					SUBJECT_ID_PER_BATCH_OF_RECORDS => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_PER_BATCH_OF_RECORDS),
+					SUBJECT_ID_PER_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_PER_FILE)
+				],
                 'value' =>set_value('subject_id_location', $pipeline['subject_id_location']),
                 'selected' => $pipeline['subject_id_location']
             );
@@ -509,7 +522,10 @@ class Pipeline extends CVUI_Controller
                 'id' => 'grouping',
                 'type' => 'dropdown',
                 'class' => 'form-control',
-                'options' => ['0' => 'Group Individually', '1' => 'Custom'],
+				'options' => [
+					GROUPING_COLUMNS_ALL => PipelineHelper::getGrouping(GROUPING_COLUMNS_ALL),
+					GROUPING_COLUMNS_CUSTOM => PipelineHelper::getGrouping(GROUPING_COLUMNS_CUSTOM)
+				],
                 'value' =>set_value('grouping',  $pipeline['grouping']),
                 'selected' => $pipeline['grouping']
             );
