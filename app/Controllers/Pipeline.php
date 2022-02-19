@@ -149,6 +149,23 @@ class Pipeline extends CVUI_Controller
                     'max_length' => 'Maximum length of {field} is 100 characters.'
                 ]
             ],
+			'subject_id_prefix' => [
+				'label' => 'Subject ID Prefix',
+				'rules' => 'permit_empty|alpha_dash|max_length[16]',
+				'errors' => [
+					'alpha_dash' => '{field} can only accept alphanumeric characters, dashes, and underscores.',
+					'max_length' => 'Maximum length of {field} is 16 characters.'
+				]
+			],
+			'subject_id_batch_size' => [
+				'label' => 'Subject ID Batch Size',
+				'rules' => 'required|integer|max_length[4]',
+				'errors' => [
+					'required' => '{field} is required.',
+					'integer' => 'The only valid type for {field} is integer.',
+					'max_length' => 'Maximum length of {field} is 4 digits.'
+				]
+			],
             'grouping' => [
                 'label' => 'Grouping',
                 'rules' => 'required|integer|max_length[3]',
@@ -176,16 +193,16 @@ class Pipeline extends CVUI_Controller
             ]
         ]);
 
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-
-            try {
-
-                $pipeline_name = $this->request->getVar('name');
-                $subject_id_location = $this->request->getVar('subject_id_location');
-                $subject_id_attribute_name = $this->request->getVar('subject_id_attribute_name');
-                $grouping = $this->request->getVar('grouping');
-                $group_columns = $this->request->getVar('group_columns');
-                $internal_delimiter = $this->request->getVar('internal_delimiter');
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
+			$pipeline_name = $this->request->getVar('name');
+			$subject_id_location = $this->request->getVar('subject_id_location');
+			$subject_id_attribute_name = $this->request->getVar('subject_id_attribute_name');
+			$subject_id_prefix = $this->request->getVar('subject_id_prefix');
+			$subject_id_assignment_batch_size = $this->request->getVar('subject_id_batch_size');
+			$grouping = $this->request->getVar('grouping');
+			$group_columns = $this->request->getVar('group_columns');
+			$internal_delimiter = $this->request->getVar('internal_delimiter');
 
                 $pipelineModel = new \App\Models\Pipeline();
 
@@ -193,6 +210,8 @@ class Pipeline extends CVUI_Controller
                     'name' => $pipeline_name,
                     'subject_id_location' => $subject_id_location,
                     'subject_id_attribute_name' => $subject_id_attribute_name,
+					'subject_id_prefix' => $subject_id_prefix,
+					'subject_id_assignment_batch_size' => $subject_id_assignment_batch_size,
                     'grouping' => $grouping,
                     'group_columns' => $group_columns,
                     'internal_delimiter' => $internal_delimiter
@@ -234,6 +253,22 @@ class Pipeline extends CVUI_Controller
                 'class' => 'form-control',
                 'value' =>set_value('subject_id_attribute_name'),
             );
+
+			$uidata->data['subject_id_prefix'] = array(
+				'name' => 'subject_id_prefix',
+				'id' => 'subject_id_prefix',
+				'type' => 'text',
+				'class' => 'form-control',
+				'value' =>set_value('subject_id_prefix'),
+			);
+
+			$uidata->data['subject_id_batch_size'] = array(
+				'name' => 'subject_id_batch_size',
+				'id' => 'subject_id_batch_size',
+				'type' => 'text',
+				'class' => 'form-control',
+				'value' =>set_value('subject_id_batch_size'),
+			);
 
             $uidata->data['grouping'] = array(
                 'name' => 'grouping',
