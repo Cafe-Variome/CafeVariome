@@ -8,6 +8,7 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Helpers\UI\PipelineHelper;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
