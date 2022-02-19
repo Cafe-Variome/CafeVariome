@@ -260,11 +260,14 @@ class SpreadsheetDataInput extends DataInput
 
     protected function initializeConfiguration()
     {
-        $this->configuration = ['subject_id_location' => SUBJECT_ID_WITHIN_FILE,
-                                'subject_id_attribute_name' => 'subject_id',
-                                'grouping_policy' => GROUPING_COLUMNS_ALL, // 0 -> separate all columns with <group_end>, 1 -> custom: define <group_end> positions
-                                'group_end_positions' => [],
-                                'internal_delimiter' => ''
+        $this->configuration = [
+			'subject_id_location' => SUBJECT_ID_WITHIN_FILE,
+			'subject_id_attribute_name' => 'subject_id',
+			'subject_id_assigment_batch_size' => 1,
+			'subject_id_prefix' => '',
+			'grouping_policy' => GROUPING_COLUMNS_ALL, // 0 -> separate all columns with <group_end>, 1 -> custom: define <group_end> positions
+			'group_end_positions' => [],
+			'internal_delimiter' => ''
         ];
     }
 
@@ -272,15 +275,31 @@ class SpreadsheetDataInput extends DataInput
     {
         $pipeline = $this->pipelineModel->getPipeline($pipeline_id);
 
-        if ($pipeline != null) {
+        if ($pipeline != null)
+		{
             $this->configuration['subject_id_location'] = $pipeline['subject_id_location'];
             $this->configuration['grouping_policy'] = $pipeline['grouping'];
 
-            if ($pipeline['subject_id_location'] == SUBJECT_ID_WITHIN_FILE && $pipeline['subject_id_attribute_name'] != null && $pipeline['subject_id_attribute_name'] != '') {
+            if (
+				$pipeline['subject_id_location'] == SUBJECT_ID_WITHIN_FILE &&
+				$pipeline['subject_id_attribute_name'] != null &&
+				$pipeline['subject_id_attribute_name'] != ''
+			)
+			{
                 $this->configuration['subject_id_attribute_name'] = $pipeline['subject_id_attribute_name'];
             }
+			else if($pipeline['subject_id_location'] == SUBJECT_ID_PER_BATCH_OF_RECORDS)
+			{
+				$this->configuration['subject_id_assigment_batch_size'] = $pipeline['subject_id_assignment_batch_size'];
+				$this->configuration['subject_id_prefix'] = $pipeline['subject_id_prefix'];
+			}
 
-            if ($pipeline['grouping'] == GROUPING_COLUMNS_CUSTOM && $pipeline['group_columns'] != null && $pipeline['group_columns'] != '') {
+            if (
+				$pipeline['grouping'] == GROUPING_COLUMNS_CUSTOM &&
+				$pipeline['group_columns'] != null &&
+				$pipeline['group_columns'] != ''
+			)
+			{
                 $this->configuration['grouping_policy'] = $pipeline['grouping'];
                 $this->configuration['group_end_positions'] = $pipeline['group_columns'];
             }
