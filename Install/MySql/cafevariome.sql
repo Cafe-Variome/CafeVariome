@@ -275,8 +275,8 @@ CREATE TABLE `pages` (
 --
 
 INSERT INTO `pages` (`id`, `Title`, `Content`, `Author`, `Active`, `Removable`) VALUES
-(1, 'Home', '<div class=\"&quot;row\">\r\n<h3>What is Cafe Variome?</h3>\r\n<p>Cafe Variome is a flexible web-based, data discovery tool that can be quickly installed by any biomedical data owner to enable the &ldquo;existence&rdquo; rather than the &ldquo;substance&rdquo; of the data to be discovered.</p>\r\n<p>&nbsp;</p>\r\n<h3>What data is Cafe Variome designed for?</h3>\r\n<p>Cafe Variome has been designed for use with all sensitive biomedical data, whether this be genomic variants or cohort data.</p>\r\n<p>For full details please look at the <a href=\"https://www.cafevariome.org/about#Data\"> data section</a>.</p>\r\n<h3>Who is cafe Variome designed for?</h3>\r\n<p>Cafe Variome is designed for owners of sensitive biomedical data who would like to make their data discoverable but don\'t want to risk exposing the content to the outside world. This is not limited to individual institutions, federated Cafe Variome networks can be setup by consortia.</p>\r\n</div>', 1, b'1', b'0'),
-(2, 'Contact', '', 1, b'1', b'0');
+(1, 'Home', '<p><span style=\"font-size: 18pt;\">This is a Cafe Variome installation. Cafe Variome is a health data discovery platform. <br /></span></p>\r\n<p><span style=\"font-size: 18pt;\">To find out more about it, visit <a href=\"https://cafevariome.org\">https://cafevariome.org</a></span></p>\r\n<p>&nbsp;</p>\r\n<p><span style=\"font-size: 18pt;\">You can edit the content of this page through the admin dashboard.</span></p>', 1, b'1', b'0'),
+(2, 'Contact', '<p>...</p>', 1, b'1', b'0');
 
 -- --------------------------------------------------------
 
