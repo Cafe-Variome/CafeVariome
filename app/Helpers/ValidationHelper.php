@@ -32,7 +32,7 @@ class ValidationHelper
      * @author Mehdi Mehtarizadeh
      */
 
-    function unique_network_group_name_check(string $group_name, string $network_key): bool
+    public function unique_network_group_name_check(string $group_name, string $network_key): bool
     {
         $networkGroupModel = new \App\Models\NetworkGroup();
         return ($networkGroupModel->getNetworkGroups('', array('network_key' => $network_key, 'name' => $group_name)) ? false : true);
