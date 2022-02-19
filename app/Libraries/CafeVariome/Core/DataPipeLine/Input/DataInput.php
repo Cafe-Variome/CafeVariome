@@ -379,4 +379,27 @@ abstract class DataInput
 
 		return false;
 	}
+
+	protected function generateSubjectId(string $prefix = ''): string
+	{
+		helper('text');
+		return $prefix . (strlen($prefix) > 0 ? '_' : '') . random_string('alnum', 36 - strlen($prefix));
+	}
+
+	protected function detectDelimiter(string $line): string
+	{
+		$delimiters = [',', ':', " ", "\t"];
+
+		$max_count = 0;
+		$final_delimiter = "";
+		foreach ($delimiters as $delimiter)
+		{
+			if (str_contains($line, $delimiter) && count(explode($delimiter, $line)) > $max_count)
+			{
+				$max_count = count(explode($delimiter, $line));
+				$final_delimiter = $delimiter;
+			}
+		}
+		return $final_delimiter;
+	}
 }
