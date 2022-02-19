@@ -126,6 +126,8 @@ ini_set('memory_limit', "1G");
 //Data Pipeline
 define('SUBJECT_ID_WITHIN_FILE', 0);
 define('SUBJECT_ID_IN_FILE_NAME', 1);
+define('SUBJECT_ID_PER_BATCH_OF_RECORDS', 2);
+define('SUBJECT_ID_PER_FILE', 3);
 define('GROUPING_COLUMNS_ALL', 0);
 define('GROUPING_COLUMNS_CUSTOM', 1);
 
