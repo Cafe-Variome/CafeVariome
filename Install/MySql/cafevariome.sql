@@ -328,7 +328,7 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 (8, 'show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'discovery', 'required'),
 (9, 'auth_server', 'https://network.discoverynexus.org/', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main', 'required'),
 (10, 'installation_key', '', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'main', 'required'),
-(11, 'logo', 'cafevariome_full.png', 'Main Logo', 'Main logo that appears on top left side of the public pages. The file must be located in resources/images/logos/', 'main', 'required|xss_clean'),
+(11, 'logo', '', 'Main Logo', 'Main logo that appears on top left side of the public pages. The file must be located in resources/images/logos/', 'main', 'required|xss_clean'),
 (12, 'oidc_uri', 'https://auth.discoverynexus.org/auth', 'OpenID URL', 'URL (or IP address) of the OpenID provider authentication endpoint.', 'authentication', 'required'),
 (13, 'oidc_realm', 'ERN', 'Realm Name', 'Some OpenID providers, like KeyCloak, have a realm that acts as a subspace separating users.', 'authentication', 'required'),
 (14, 'oidc_client_id', 'my-client', 'Client ID', 'Client ID of the OpenID provider.', 'authentication', 'required'),
