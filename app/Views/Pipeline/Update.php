@@ -38,6 +38,17 @@
     </div>
 </div>
 
+<div class="form-group row" id="subject_id_prefix_batch">
+	<div class="col-6">
+		<?php echo form_label('Subject ID Prefix', 'subject_id_prefix'); ?>
+		<?php echo form_input($subject_id_prefix); ?>
+	</div>
+	<div class="col-6">
+		<?php echo form_label('Batch size of records to assign Subject ID to', 'subject_id_batch_size'); ?>
+		<?php echo form_input($subject_id_batch_size); ?>
+	</div>
+</div>
+
 <div class="form-group row">
     <div class="col-6">
         <?php echo form_label('Grouping', 'grouping'); ?>
