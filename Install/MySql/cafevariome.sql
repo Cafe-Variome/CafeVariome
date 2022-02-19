@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Oct 27, 2021 at 03:10 PM
--- Server version: 5.7.36-0ubuntu0.18.04.1
--- PHP Version: 8.0.11
+-- Generation Time: Feb 19, 2022 at 08:09 PM
+-- Server version: 5.7.37-0ubuntu0.18.04.1
+-- PHP Version: 8.0.15
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -289,6 +289,8 @@ CREATE TABLE `pipelines` (
   `name` varchar(50) NOT NULL,
   `subject_id_location` tinyint(3) NOT NULL DEFAULT '0',
   `subject_id_attribute_name` varchar(100) NOT NULL,
+  `subject_id_assignment_batch_size` int(11) NOT NULL DEFAULT '1',
+  `subject_id_prefix` varchar(16) NOT NULL,
   `grouping` tinyint(4) NOT NULL DEFAULT '0',
   `group_columns` varchar(200) DEFAULT NULL,
   `dateformat` tinyint(4) DEFAULT NULL,
