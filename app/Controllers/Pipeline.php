@@ -335,6 +335,9 @@ class Pipeline extends CVUI_Controller
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
 
+		$pipeline['subject_id_location_text'] = PipelineHelper::getSubjectIDLocation($pipeline['subject_id_location']);
+		$pipeline['grouping'] = PipelineHelper::getGrouping($pipeline['grouping']);
+
         $uidata->data['pipeline'] = $pipeline;
 
         $data = $this->wrapData($uidata);

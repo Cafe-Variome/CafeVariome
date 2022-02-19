@@ -30,11 +30,7 @@
             <tr>
                 <th>Subject ID Location</th>
                 <td>
-                    <?php if($pipeline['subject_id_location'] == 0): ?>
-                        Attribute in File
-                    <?php elseif($pipeline['subject_id_location'] == 1): ?>
-                        File Name
-                    <?php endif; ?>
+                    <?= $pipeline['subject_id_location_text']?>
                 </td>
             </tr>
             </tr>
@@ -43,14 +39,24 @@
                     <?= $pipeline['subject_id_attribute_name'] ?>
                 </td>
             </tr>
+            <?php if($pipeline['subject_id_location'] == SUBJECT_ID_PER_BATCH_OF_RECORDS): ?>
+			</tr>
+			<th>Subject ID Assignment Batch Size</th>
+			<td>
+				<?= $pipeline['subject_id_assignment_batch_size'] ?>
+			</td>
+			</tr>
+			</tr>
+			<th>Subject ID Prefix</th>
+			<td>
+				<?= $pipeline['subject_id_prefix'] ?>
+			</td>
+			</tr>
+			<?php endif; ?>
             <tr>
                 <th>Grouping</th>
                 <td>
-                    <?php if($pipeline['grouping'] == 0): ?>
-                        Group Individually
-                    <?php elseif($pipeline['grouping'] == 1): ?>
-                        Custom
-                    <?php endif; ?>
+                    <?= $pipeline['grouping'] ?>
                 </td>
             </tr>
             <tr>
