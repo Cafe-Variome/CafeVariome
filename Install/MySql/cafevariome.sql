@@ -326,7 +326,7 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 (6, 'allow_registrations', 'off', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'authentication', 'required'),
 (7, 'discovery_requires_login', 'on', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'discovery', 'required'),
 (8, 'show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'discovery', 'required'),
-(9, 'auth_server', '', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main', 'required'),
+(9, 'auth_server', 'https://network.discoverynexus.org/', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main', 'required'),
 (10, 'installation_key', '', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'main', 'required'),
 (11, 'logo', 'cafevariome_full.png', 'Main Logo', 'Main logo that appears on top left side of the public pages. The file must be located in resources/images/logos/', 'main', 'required|xss_clean'),
 (12, 'oidc_uri', 'https://auth.discoverynexus.org/auth', 'OpenID URL', 'URL (or IP address) of the OpenID provider authentication endpoint.', 'authentication', 'required'),
