@@ -15,11 +15,8 @@ use App\Models\ValueMapping;
  * This class contains helper functions for form validation.
  */
 
-class ValidationHelper{
-
-    private $db;
-
-
+class ValidationHelper
+{
     function __construct()
     {
 
