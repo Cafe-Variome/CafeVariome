@@ -229,8 +229,10 @@ class Pipeline extends CVUI_Controller
                 $pipelineModel->createPipeline($data);
 
                 $this->setStatusMessage("Pipeline '$pipeline_name' was created.", STATUS_SUCCESS);
-            } catch (\Exception $ex) {
-                $this->setStatusMessage("There was a problem creating ' '."  . $ex->getMessage(), STATUS_ERROR);
+            }
+			catch (\Exception $ex)
+			{
+                $this->setStatusMessage("There was a problem creating '$pipeline_name'."  . $ex->getMessage(), STATUS_ERROR);
             }
             return redirect()->to(base_url($this->controllerName.'/List'));
 
