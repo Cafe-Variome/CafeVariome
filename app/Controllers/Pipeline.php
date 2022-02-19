@@ -21,7 +21,8 @@ class Pipeline extends CVUI_Controller
 	 * Constructor
 	 *
 	 */
-    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+	{
         parent::setProtected(true);
         parent::setIsAdmin(true);
         parent::initController($request, $response, $logger);
@@ -210,6 +211,8 @@ class Pipeline extends CVUI_Controller
 			$group_columns = $this->request->getVar('group_columns');
 			$internal_delimiter = $this->request->getVar('internal_delimiter');
 
+            try
+			{
                 $pipelineModel = new \App\Models\Pipeline();
 
                 $data = [
@@ -232,7 +235,8 @@ class Pipeline extends CVUI_Controller
             return redirect()->to(base_url($this->controllerName.'/List'));
 
         }
-        else {
+        else
+		{
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
             $uidata->data['name'] = array(
@@ -315,7 +319,8 @@ class Pipeline extends CVUI_Controller
         $pipelineModel = new \App\Models\Pipeline();
         $pipeline = $pipelineModel->getPipeline($id);
 
-        if($pipeline == null){
+        if($pipeline == null)
+		{
             $this->setStatusMessage("Pipeline not found.", STATUS_ERROR);
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
@@ -407,10 +412,10 @@ class Pipeline extends CVUI_Controller
             ]
         ]);
 
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-
-            try {
-
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
+            try
+			{
                 $pipeline_name = $this->request->getVar('name');
                 $subject_id_location = $this->request->getVar('subject_id_location');
                 $subject_id_attribute_name = $this->request->getVar('subject_id_attribute_name');
@@ -434,18 +439,21 @@ class Pipeline extends CVUI_Controller
                 $pipelineModel->updatePipeline($data, ['id' => $id]);
 
                 $this->setStatusMessage("Pipeline '$pipeline_name' was updated.", STATUS_SUCCESS);
-            } catch (\Exception $ex) {
+            }
+			catch (\Exception $ex)
+			{
                 $this->setStatusMessage("There was a problem updating ' '.", STATUS_ERROR);
             }
             return redirect()->to(base_url($this->controllerName.'/List'));
-
         }
-        else {
+        else
+		{
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
             $pipeline = $pipelineModel->getPipeline($id);
 
-            if($pipeline == null){
+            if($pipeline == null)
+			{
                 $this->setStatusMessage("Pipeline not found.", STATUS_ERROR);
                 return redirect()->to(base_url($this->controllerName.'/List'));
             }
