@@ -337,7 +337,7 @@ class Pipeline extends CVUI_Controller
                     'required' => '{field} is required.',
                     'alpha_space' => 'The only valid characters for {field} are alphabetical characters and spaces.',
                     'is_unique' => '{field} already exists.',
-                    'max_length' => 'Maximum length is 50 characters.'
+                    'max_length' => 'Maximum length of {field} is 50 characters.'
                 ]
             ],
             'subject_id_location' => [
@@ -346,7 +346,7 @@ class Pipeline extends CVUI_Controller
                 'errors' => [
                     'required' => '{field} is required.',
                     'integer' => 'The only valid type for {field} is integer.',
-                    'max_length' => 'Maximum length is 3 digits.'
+                    'max_length' => 'Maximum length of {field} is 3 digits.'
                 ]
             ],
             'subject_id_attribute_name' => [
@@ -354,7 +354,7 @@ class Pipeline extends CVUI_Controller
                 'rules' => 'subject_id_required_with[subject_id_location]|max_length[100]',
                 'errors' => [
                     'subject_id_required_with' => '{field} cannot be empty when Subject ID Location is set to Attribute in File.',
-                    'max_length' => 'Maximum length is 100 characters.'
+                    'max_length' => 'Maximum length of {field} is 100 characters.'
                 ]
             ],
             'grouping' => [
@@ -363,7 +363,7 @@ class Pipeline extends CVUI_Controller
                 'errors' => [
                     'required' => '{field} is required.',
                     'integer' => 'The only valid type for {field} is integer.',
-                    'max_length' => 'Maximum length is 3 digits.'
+                    'max_length' => 'Maximum length of {field} is 3 digits.'
                 ]
             ],
             'group_columns' => [
@@ -371,7 +371,7 @@ class Pipeline extends CVUI_Controller
                 'rules' => 'group_columns_required_with[grouping]|max_length[200]',
                 'errors' => [
                     'integer' => 'The only valid type for {field} is integer.',
-                    'max_length' => 'Maximum length is 200 digits.'
+                    'max_length' => 'Maximum length of {field} is 200 digits.'
                 ]
             ],
             'internal_delimiter' => [
@@ -379,7 +379,7 @@ class Pipeline extends CVUI_Controller
                 'rules' => 'permit_empty|valid_delimiter[' . $this->request->getVar('internal_delimiter') . ']|max_length[1]',
                 'errors' => [
                     'valid_delimiter' => 'The only valid inputs for {field} are (,), (/), (;), (:), (|), (*), (&), (%), ($), (!), (~), (#), (-), (_), (+), (=), (^), and (.).',
-                    'max_length' => 'Maximum length is 1 character.'
+                    'max_length' => 'Maximum length of {field} is 1 character.'
                 ]
             ]
         ]);
