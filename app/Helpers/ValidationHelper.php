@@ -49,21 +49,29 @@ class ValidationHelper
     {
         $err = null;
 
-        if ($data[$fields] == SUBJECT_ID_IN_FILE_NAME) {
+        if (
+			$data[$fields] == SUBJECT_ID_IN_FILE_NAME ||
+			$data[$fields] == SUBJECT_ID_PER_BATCH_OF_RECORDS ||
+			$data[$fields] == SUBJECT_ID_PER_FILE
+		)
+		{
             return true;
         }
 
-        if ($data[$fields] == SUBJECT_ID_WITHIN_FILE ) {
-
-            if ($str == '' && $str == null) {
+        if ($data[$fields] == SUBJECT_ID_WITHIN_FILE )
+		{
+            if ($str == '' && $str == null)
+			{
                 $err = "Subject ID Attribute Name cannot be empty.";
                 return false;
 
             }
-            else{
+            else
+			{
                 $regexp = "/^[a-zA-Z0-9-_]+$/";
 
-                if (preg_match($regexp, $str, $matches)) {
+                if (preg_match($regexp, $str, $matches))
+				{
                     return true;
                 }
 
