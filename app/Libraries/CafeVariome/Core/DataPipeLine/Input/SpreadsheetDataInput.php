@@ -137,6 +137,8 @@ class SpreadsheetDataInput extends DataInput
 
 				foreach ($sheet->getRowIterator() as $row)
 				{
+					$attgroups_modified = null; // Only populated if row expansion is supposed to happen
+
 					$row = $row->toArray();
 					if ($recordsProcessed == -1)
 					{
@@ -159,17 +161,87 @@ class SpreadsheetDataInput extends DataInput
 								$subject_id = $this->generateSubjectId($this->configuration['subject_id_prefix']);
 							}
 						}
-						if ($subject_id == "")
+						if ($subject_id == "" && $this->configuration['subject_id_location'] != SUBJECT_ID_BY_EXPANSION_ON_COLUMNS)
 						{
-							$message = "All records require a record ID, a record on line:".$linerow." in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
+							$message = "All records require a record ID, a record on line: " . $linerow . " in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
 							$error_code = 3;
 							$this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
 							$this->sourceModel->unlockSource($this->sourceId);
+
+							return false;
 						}
-						$this->processRow($row, $attgroups, $subject_id, $file_id, $counter);
+
+						if (
+							$subject_id == "" &&
+							$this->configuration['subject_id_location'] == SUBJECT_ID_BY_EXPANSION_ON_COLUMNS
+						)
+						{
+							$expansion_index = -1;
+							$expansion_attribute = '';
+							$rows_to_expand = 0;
+							$expansion_attributes_to_remove = [];
+							$expansion_attributes = $this->getExpansionAttributes();
+
+							$this->getExpansionDetails($row, $expansion_index, $rows_to_expand, $expansion_attributes_to_remove);
+
+							if ($attgroups_modified == null)
+							{
+								$new_group_number = 0;
+								// Remove attributes that are used for expansion
+								foreach ($attgroups as $group_array)
+								{
+									$temp_group = [];
+									foreach ($group_array as $attribute => $val)
+									{
+										if (!in_array($val, $expansion_attributes))
+										{
+											$temp_group[$attribute] = $val;
+										}
+										if($val == $expansion_index)
+										{
+											$expansion_attribute = $attribute;
+										}
+									}
+									if(count($temp_group) > 0)
+									{
+										$attgroups_modified[$new_group_number++] = $temp_group;
+									}
+								}
+								$attgroups_modified[] = [$this->configuration['expansion_attribute_name'] => $expansion_index];
+							}
+
+							// Remove expansion attributes that have not been picked up
+							foreach ($expansion_attributes_to_remove as $expansion_attribute_to_remove)
+							{
+								unset($row[$expansion_attribute_to_remove]);
+							}
+
+							// Create new rows to expand on the expansion attribute
+							for($c = 0; $c < $rows_to_expand; $c++)
+							{
+								$subject_id = $this->generateSubjectId();
+
+								if ($this->configuration['expansion_policy'] == SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL)
+								{
+
+									$row[$expansion_index] = 1;
+								}
+								else
+								{
+									$row[$expansion_index] = $expansion_attribute;
+								}
+
+								$this->processRow($row, $attgroups_modified, $subject_id, $file_id, $counter);
+							}
+							$subject_id = "";
+						}
+						else
+						{
+							$this->processRow($row, $attgroups, $subject_id, $file_id, $counter);
+						}
 					}
 					$recordsProcessed++;
-					$this->reportProgress($file_id, $recordsProcessed, $recordCount, 'bulkupload');
+					$this->reportProgress($file_id, $recordsProcessed, $recordCount);
 				}
 				$linerow++;
 			}
@@ -194,7 +266,7 @@ class SpreadsheetDataInput extends DataInput
 		}
     }
 
-	private function processRow($row, $attgroups, $subject_id, $file_id, & $counter)
+	private function processRow(array $row, array $attgroups, string $subject_id, int $file_id, int & $counter)
 	{
 		foreach ($attgroups as $group)
 		{
@@ -344,6 +416,12 @@ class SpreadsheetDataInput extends DataInput
 				$this->configuration['subject_id_assigment_batch_size'] = $pipeline['subject_id_assignment_batch_size'];
 				$this->configuration['subject_id_prefix'] = $pipeline['subject_id_prefix'];
 			}
+			else if($pipeline['subject_id_location'] == SUBJECT_ID_BY_EXPANSION_ON_COLUMNS)
+			{
+				$this->configuration['expansion_policy'] = $pipeline['expansion_policy'];
+				$this->configuration['expansion_columns'] = $pipeline['expansion_columns'];
+				$this->configuration['expansion_attribute_name'] = $pipeline['expansion_attribute_name'];
+			}
 
             if (
 				$pipeline['grouping'] == GROUPING_COLUMNS_CUSTOM &&
@@ -365,7 +443,6 @@ class SpreadsheetDataInput extends DataInput
 			{
                 $this->configuration['internal_delimiter'] = $pipeline['internal_delimiter'];
             }
-
         }
     }
 
@@ -431,6 +508,61 @@ class SpreadsheetDataInput extends DataInput
 
         return $i > 1;
     }
+
+	private function getExpansionDetails(
+		array $row,
+		int & $expansion_attribute_index,
+		int & $rows_to_expand,
+		array & $expansion_attributes_to_remove
+	)
+	{
+		// determine the attribute to expand on, new attribute name, number of extra rows,
+		$expansion_policy = $this->configuration['expansion_policy'];
+
+		if ($expansion_policy == SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL)
+		{
+			$rows_to_expand = 1;
+			$expansion_attributes_to_remove = [];
+		}
+		else
+		{
+			$expansion_attributes = $this->getExpansionAttributes();
+			$expansion_values = [];
+			foreach ($expansion_attributes as $expansion_column)
+			{
+				if (
+					is_numeric($row[$expansion_column]) &&
+					intval($row[$expansion_column]) == trim($row[$expansion_column]) &&
+					$row[$expansion_column] > 0
+				)
+				{
+					$expansion_values[$expansion_column] = $row[$expansion_column];
+				}
+			}
+
+			if ($expansion_policy == SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM)
+			{
+				$rows_to_expand = max($expansion_values);
+				$expansion_attribute_index = array_search($rows_to_expand, $expansion_values);
+			}
+			else if($expansion_policy == SUBJECT_ID_EXPANDSION_POLICY_MINIMUM)
+			{
+				$rows_to_expand = min($expansion_values);
+			}
+
+			$expansion_attributes_to_remove = array_diff($expansion_attributes, [$expansion_attribute_index]);
+		}
+	}
+
+	private function getExpansionAttributes(): array
+	{
+		$attributes = explode(',', $this->configuration['expansion_columns']);
+		for($i = 0; $i < count($attributes); $i++)
+		{
+			$attributes[$i] -= 1;
+		}
+		return $attributes;
+	}
 
     protected function reportError(int $file_id, int $error_code, string $message)
     {
