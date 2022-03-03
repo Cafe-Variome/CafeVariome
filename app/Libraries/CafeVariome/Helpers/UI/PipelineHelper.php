@@ -22,6 +22,8 @@ class PipelineHelper
 				return 'No Subject ID Given - Assign per Batch of Records in File';
 			case SUBJECT_ID_PER_FILE:
 				return 'No Subject ID Given - Assign per File';
+			case SUBJECT_ID_BY_EXPANSION_ON_COLUMNS:
+				return 'No Subject ID Given - Assign by Expansion of Column(s)';
 		}
 		return 'Undefined';
 	}
