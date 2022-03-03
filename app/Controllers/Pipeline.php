@@ -396,6 +396,7 @@ class Pipeline extends CVUI_Controller
         }
 
 		$pipeline['subject_id_location_text'] = PipelineHelper::getSubjectIDLocation($pipeline['subject_id_location']);
+		$pipeline['expansion_policy'] = $pipeline['expansion_policy'] != null ? PipelineHelper::getExpansionPolicy($pipeline['expansion_policy']) : 'NA';
 		$pipeline['grouping'] = PipelineHelper::getGrouping($pipeline['grouping']);
 
         $uidata->data['pipeline'] = $pipeline;

@@ -53,6 +53,24 @@
 			</td>
 			</tr>
 			<?php endif; ?>
+			<tr>
+				<th>Expansion Columns</th>
+				<td>
+					<?= $pipeline['expansion_columns'] ?>
+				</td>
+			</tr>
+			<tr>
+				<th>Expansion Policy</th>
+				<td>
+					<?= $pipeline['expansion_policy'] ?>
+				</td>
+			</tr>
+			<tr>
+				<th>Expansion Attribute Name</th>
+				<td>
+					<?= $pipeline['expansion_attribute_name'] ?>
+				</td>
+			</tr>
             <tr>
                 <th>Grouping</th>
                 <td>
