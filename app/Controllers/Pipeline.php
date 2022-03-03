@@ -152,7 +152,7 @@ class Pipeline extends CVUI_Controller
                 'label' => 'Subject ID Attribute Name',
                 'rules' => 'subject_id_required_with[subject_id_location]|max_length[100]',
                 'errors' => [
-                    'subject_id_required_with' => '{field} cannot be empty when Subject ID Location is set to Attribute in File.',
+                    'subject_id_required_with' => '{field} cannot be empty when Subject ID Location is set to `Attribute in File`.',
                     'max_length' => 'Maximum length of {field} is 100 characters.'
                 ]
             ],
