@@ -300,8 +300,9 @@ class SpreadsheetDataInput extends DataInput
     private function getDefaultGroupPositions(): array
     {
         $positions = [];
-
-        for ($i=1; $i < $this->column_count; $i++) {
+		$i = $this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE ? 1 : 0;
+        for (; $i < $this->column_count; $i++)
+		{
             $positions[$i] = $i;
         }
 
