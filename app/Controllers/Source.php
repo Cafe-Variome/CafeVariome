@@ -37,7 +37,8 @@ class Source extends CVUI_Controller{
 	 * Constructor
 	 *
 	 */
-    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+	{
         parent::setProtected(true);
         parent::setIsAdmin(true);
         parent::initController($request, $response, $logger);
@@ -45,15 +46,15 @@ class Source extends CVUI_Controller{
 		$this->validation = Services::validation();
         $this->sourceModel = new \App\Models\Source();
         helper('filesystem');
-
     }
 
-    public function Index(){
+    public function Index()
+	{
         return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-    public function List() {
-
+    public function List()
+	{
         $uidata = new UIData();
         $uidata->title = "Sources";
 
@@ -98,8 +99,8 @@ class Source extends CVUI_Controller{
         return view($this->viewDirectory.'/List', $data);
     }
 
-    public function Create() {
-
+    public function Create()
+	{
         $uidata = new UIData();
         $uidata->stickyFooter = false;
 
@@ -325,8 +326,8 @@ class Source extends CVUI_Controller{
         }
     }
 
-    public function Update(int $source_id = null) {
-
+    public function Update(int $source_id = null)
+	{
         $uidata = new UIData();
         $uidata->stickyFooter = false;
 
@@ -572,8 +573,10 @@ class Source extends CVUI_Controller{
         }
     }
 
-    public function Delete(int $source_id = Null) {
-        if ($source_id == Null) {
+    public function Delete(int $source_id = Null)
+	{
+        if ($source_id == Null)
+		{
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
 
@@ -659,7 +662,8 @@ class Source extends CVUI_Controller{
         else
         {
             $source = $this->sourceModel->getSource($source_id);
-            if ($source) {
+            if ($source)
+			{
                 $uidata->data['source_id'] = $source_id;
                 $uidata->data['source_name'] = $source['name'];
                 $uidata->data['confirm'] = array(
