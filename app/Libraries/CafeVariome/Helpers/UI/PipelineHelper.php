@@ -39,4 +39,18 @@ class PipelineHelper
 		}
 		return 'Undefined';
 	}
+
+	public static function getExpansionPolicy(int $policy): string
+	{
+		switch ($policy)
+		{
+			case SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL:
+				return 'Individual';
+			case SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM:
+				return 'Choose Maximum Cell Value';
+			case SUBJECT_ID_EXPANDSION_POLICY_MINIMUM:
+				return 'Choose Minimum Cell Value';
+		}
+		return 'Undefined';
+	}
 }
