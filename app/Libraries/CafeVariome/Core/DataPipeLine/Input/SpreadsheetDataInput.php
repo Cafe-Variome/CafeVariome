@@ -111,6 +111,7 @@ class SpreadsheetDataInput extends DataInput
     {
 		try
 		{
+			$subject_id = "";
 			$this->reportProgress($file_id, 0, 1, 'bulkupload', 'Counting records');
 			$recordCount = $this->countRecords();
 			$this->reportProgress($file_id, 0, $recordCount, 'bulkupload', 'Importing data');
