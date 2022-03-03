@@ -76,7 +76,7 @@
 				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $source['source_id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Source">
 					<i class="fa fa-edit text-warning"></i>
 				</a>
-				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] . "/" . $source['name']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Source">
+				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $source['source_id'] ?>" data-toggle="tooltip" data-placement="top" title="Delete Source">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 			</td>
