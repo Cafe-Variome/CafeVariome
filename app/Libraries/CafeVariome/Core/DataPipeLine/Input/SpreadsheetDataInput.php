@@ -427,7 +427,7 @@ class SpreadsheetDataInput extends DataInput
             }
         }
 
-        return ($i > 1) ? true : false;
+        return $i > 1;
     }
 
     protected function reportError(int $file_id, int $error_code, string $message)
