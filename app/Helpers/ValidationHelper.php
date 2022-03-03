@@ -52,7 +52,8 @@ class ValidationHelper
         if (
 			$data[$fields] == SUBJECT_ID_IN_FILE_NAME ||
 			$data[$fields] == SUBJECT_ID_PER_BATCH_OF_RECORDS ||
-			$data[$fields] == SUBJECT_ID_PER_FILE
+			$data[$fields] == SUBJECT_ID_PER_FILE ||
+			$data[$fields] == SUBJECT_ID_BY_EXPANSION_ON_COLUMNS
 		)
 		{
             return true;
