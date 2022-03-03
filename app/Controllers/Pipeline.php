@@ -173,6 +173,30 @@ class Pipeline extends CVUI_Controller
 					'max_length' => 'Maximum length of {field} is 4 digits.'
 				]
 			],
+			'subject_id_expansion_columns' => [
+				'label' => 'Subject ID Expansion Columns',
+				'rules' => 'expansion_columns_required_with[subject_id_location]|max_length[50]',
+				'errors' => [
+					'expansion_columns_required_with' => '{field} cannot be empty when Subject ID Location is set to `No Subject ID Given - Assign by Expansion of Column(s)`.',
+					'max_length' => 'Maximum length of {field} is 50 characters.'
+				]
+			],
+			'subject_id_expansion_policy' => [
+				'label' => 'Policy of Expansion',
+				'rules' => 'required|integer|max_length[3]',
+				'errors' => [
+					'required' => '{field} is required.',
+					'integer' => 'The only valid type for {field} is integer.',
+					'max_length' => 'Maximum length of {field} is 3 digits.'
+				]
+			],
+			'expansion_attribute_name' => [
+				'label' => 'Expansion Attribute Name',
+				'rules' => 'expansion_attribute_name_required_with[subject_id_location]|max_length[200]',
+				'errors' => [
+					'max_length' => 'Maximum length of {field} is 200 characters.'
+				]
+			],
             'grouping' => [
                 'label' => 'Grouping',
                 'rules' => 'required|integer|max_length[3]',
@@ -207,6 +231,9 @@ class Pipeline extends CVUI_Controller
 			$subject_id_attribute_name = $this->request->getVar('subject_id_attribute_name');
 			$subject_id_prefix = $this->request->getVar('subject_id_prefix');
 			$subject_id_assignment_batch_size = $this->request->getVar('subject_id_batch_size');
+			$subject_id_expansion_policy = $this->request->getVar('subject_id_expansion_policy');
+			$subject_id_expansion_columns = $this->request->getVar('subject_id_expansion_columns');
+			$expansion_attribute_name = $this->request->getVar('expansion_attribute_name');
 			$grouping = $this->request->getVar('grouping');
 			$group_columns = $this->request->getVar('group_columns');
 			$internal_delimiter = $this->request->getVar('internal_delimiter');
@@ -221,6 +248,9 @@ class Pipeline extends CVUI_Controller
                     'subject_id_attribute_name' => $subject_id_attribute_name,
 					'subject_id_prefix' => $subject_id_prefix,
 					'subject_id_assignment_batch_size' => $subject_id_assignment_batch_size,
+					'expansion_policy' => $subject_id_expansion_policy,
+					'expansion_columns' => $subject_id_expansion_columns,
+					'expansion_attribute_name' => $expansion_attribute_name,
                     'grouping' => $grouping,
                     'group_columns' => $group_columns,
                     'internal_delimiter' => $internal_delimiter
@@ -259,7 +289,8 @@ class Pipeline extends CVUI_Controller
 					SUBJECT_ID_WITHIN_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_WITHIN_FILE),
 					SUBJECT_ID_IN_FILE_NAME => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_IN_FILE_NAME),
 					SUBJECT_ID_PER_BATCH_OF_RECORDS => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_PER_BATCH_OF_RECORDS),
-					SUBJECT_ID_PER_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_PER_FILE)
+					SUBJECT_ID_PER_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_PER_FILE),
+					SUBJECT_ID_BY_EXPANSION_ON_COLUMNS => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_BY_EXPANSION_ON_COLUMNS)
 				]
             );
 
@@ -285,6 +316,35 @@ class Pipeline extends CVUI_Controller
 				'type' => 'text',
 				'class' => 'form-control',
 				'value' =>set_value('subject_id_batch_size'),
+			);
+
+			$uidata->data['subject_id_expansion_policy'] = array(
+				'name' => 'subject_id_expansion_policy',
+				'id' => 'subject_id_expansion_policy',
+				'type' => 'subject_id_expansion_policy',
+				'class' => 'form-control',
+				'value' =>set_value('subject_id_expansion_policy'),
+				'options' => [
+					SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL => PipelineHelper::getExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL),
+					SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM => PipelineHelper::getExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM),
+					SUBJECT_ID_EXPANDSION_POLICY_MINIMUM => PipelineHelper::getExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_MINIMUM)
+				]
+			);
+
+			$uidata->data['subject_id_expansion_columns'] = array(
+				'name' => 'subject_id_expansion_columns',
+				'id' => 'subject_id_expansion_columns',
+				'type' => 'text',
+				'class' => 'form-control',
+				'value' =>set_value('subject_id_expansion_columns'),
+			);
+
+			$uidata->data['expansion_attribute_name'] = array(
+				'name' => 'expansion_attribute_name',
+				'id' => 'expansion_attribute_name',
+				'type' => 'text',
+				'class' => 'form-control',
+				'value' =>set_value('expansion_attribute_name'),
 			);
 
             $uidata->data['grouping'] = array(

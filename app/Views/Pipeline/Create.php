@@ -49,6 +49,21 @@
 	</div>
 </div>
 
+<div class="form-group row" id="subject_id_expansion_on_columns">
+	<div class="col-4">
+		<?php echo form_label('Column(s) to Expand on', 'subject_id_expansion_columns'); ?>
+		<?php echo form_input($subject_id_expansion_columns); ?>
+	</div>
+	<div class="col-4">
+		<?php echo form_label('Policy of Expansion', 'subject_id_expansion_policy'); ?>
+		<?php echo form_dropdown($subject_id_expansion_policy); ?>
+	</div>
+	<div class="col-4">
+		<?php echo form_label('New Attribute Name', 'expansion_attribute_name'); ?>
+		<?php echo form_input($expansion_attribute_name); ?>
+	</div>
+</div>
+
 <div class="form-group row">
     <div class="col-6">
         <?php echo form_label('Grouping', 'grouping'); ?>
