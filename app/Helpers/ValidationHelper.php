@@ -141,6 +141,40 @@ class ValidationHelper
         return false;
     }
 
+	public function expansion_attribute_name_required_with(string $str, string $fields, array $data, & $err): bool
+	{
+		$err = null;
+
+		if (
+			$data[$fields] == SUBJECT_ID_WITHIN_FILE ||
+			$data[$fields] == SUBJECT_ID_IN_FILE_NAME ||
+			$data[$fields] == SUBJECT_ID_PER_BATCH_OF_RECORDS ||
+			$data[$fields] == SUBJECT_ID_PER_FILE
+		)
+		{
+			return true;
+		}
+		else
+		{
+			if (strlen(trim($str)) > 0)
+			{
+
+				$regexp = "/^[a-zA-Z0-9-_]+$/";
+
+				if (preg_match($regexp, $str, $matches))
+				{
+					return true;
+				}
+
+				$err = 'The only valid characters for New Attribute Name are alphabetical characters, numbers, dashes, and underscores.';
+			}
+
+			$err = 'New Attribute Name is required.';
+		}
+
+		return false;
+	}
+
     public function group_columns_required_with(string $str, string $fields, array $data, & $err): bool
     {
         $err = null;
