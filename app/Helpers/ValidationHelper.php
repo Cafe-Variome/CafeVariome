@@ -76,9 +76,67 @@ class ValidationHelper
                     return true;
                 }
 
-                $err = "The only valid input for {field} is alphanumeric characters, dashes, and underscores.";
+                $err = "The only valid input for Subject ID Attribute Name is alphanumeric characters, dashes, and underscores.";
             }
         }
+
+        return false;
+    }
+
+	public function expansion_columns_required_with(string $str, string $fields, array $data, & $err): bool
+	{
+		$err = null;
+
+		if (
+			$data[$fields] == SUBJECT_ID_WITHIN_FILE ||
+			$data[$fields] == SUBJECT_ID_IN_FILE_NAME ||
+			$data[$fields] == SUBJECT_ID_PER_BATCH_OF_RECORDS ||
+			$data[$fields] == SUBJECT_ID_PER_FILE
+		)
+		{
+			return true;
+		}
+
+		if ($data[$fields] == SUBJECT_ID_BY_EXPANSION_ON_COLUMNS)
+		{
+			if ($str == null || $str == '')
+			{
+				$err = '`Column(s) to Expand on` cannot be empty when `Subject ID Location` is set to `No Subject ID Given - Assign by Expansion of Column(s)`.';
+				return false;
+			}
+			else
+			{
+				if(strpos($str, ','))
+				{
+					$items = explode(',', $str);
+
+					foreach ($items as $item)
+					{
+						if (intval($item) == 0)
+						{
+							$err = '`Column(s) to Expand on` should be a comma separated list of numbers.';
+							return false;
+						}
+					}
+
+					if ($data['subject_id_expansion_policy'] == SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL)
+					{
+						$err = '`Policy of Expansion` cannot be set to `Individual` when only one column is used for expansion.';
+						return false;
+					}
+					return true;
+				}
+				elseif (is_numeric($str))
+				{
+					if ($data['subject_id_expansion_policy'] != SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL)
+					{
+						$err = '`Policy of Expansion` must be set to `Individual` when only one column is used for expansion.';
+						return false;
+					}
+					return true;
+				}
+			}
+		}
 
         return false;
     }
