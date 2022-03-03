@@ -662,13 +662,6 @@ class Source extends CVUI_Controller{
             if ($source) {
                 $uidata->data['source_id'] = $source_id;
                 $uidata->data['source_name'] = $source['name'];
-                $data = [
-                    'name'    => 'newsletter',
-                    'id'      => 'newsletter',
-                    'value'   => 'accept',
-                    'checked' => TRUE,
-                    'style'   => 'margin:10px'
-                ];
                 $uidata->data['confirm'] = array(
                     'name' => 'confirm',
                     'type' => 'radio',
