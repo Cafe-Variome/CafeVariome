@@ -588,15 +588,14 @@ class Source extends CVUI_Controller{
                     'required' => '{field} is required.'
                 ]
             ],
-
-                'source' => [
-                    'label'  => 'Source Name',
-                    'rules'  => 'required|alpha_dash',
-                    'errors' => [
-                        'required' => '{field} is required.',
-                        'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
-                    ]
-                ]
+			'source_id' => [
+				'label'  => 'Source Id',
+				'rules'  => 'required|integer',
+				'errors' => [
+					'required' => '{field} is required.',
+					'integer' => '{field} must be a positive integer.'
+				]
+			]
             ]);
 
 
