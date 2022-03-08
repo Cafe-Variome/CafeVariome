@@ -28,7 +28,7 @@
 		<?php echo form_label('Source Name', 'name'); ?>
 		<?php echo form_input($name); ?>
 		<small class="form-text text-muted">
-		(no spaces allowed but underscores and dashes are accepted, uppercase characters will be converted to lowercase)
+		(The source name can only contain alphanumeric characters and spaces. Uppercase characters will be converted to lowercase.)
 		</small>
 	</div>
 	<div class=col-6>
