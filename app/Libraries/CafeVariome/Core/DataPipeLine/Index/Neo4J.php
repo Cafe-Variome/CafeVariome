@@ -163,7 +163,11 @@ class Neo4J
 
     public function commitTransaction(bool $destroy = false)
     {
-        $this->transactionStack->commit();
+		if ($this->transactionStack != null)
+		{
+			$this->transactionStack->commit();
+		}
+
         if($destroy)
         {
             $this->destroyTransaction();
