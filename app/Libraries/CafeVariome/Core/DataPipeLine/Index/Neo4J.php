@@ -113,25 +113,16 @@ class Neo4J
         return $parents;
     }
 
-	public function InsertSubject(string $subject_id, int $source_id, int $file_id, string $uid, bool $allow_duplicate = false)
+	public function InsertSubject(string $subject_id, int $source_id, int $file_id, string $uid)
 	{
-		$this->transactionStack = $this->transactionStack ?? $this->neo4jClient->beginTransaction();
-		if (!$allow_duplicate) {
-			$query = 'MATCH (n:Subject{subjectid:"'.$subject_id.'"}) RETURN n.subjectid as id';
-			$result = $this->neo4jClient->run($query);
-			$exists = $result->count() > 0 ? true : false;
-			if ($exists) {
-				return;
-			}
-		}
-		$this->transactionStack->runStatement(Statement::create("CREATE (n:Subject{ subjectid: '" . $subject_id . "', source_id: '" . $source_id . "', file_id: '" . $file_id . "', uid: '" . $uid . "' })"));
+		$this->transactionStack = $this->transactionStack ?? $this->neo4jClient->beginTransaction();       
+		$this->transactionStack->runStatement(Statement::create("MERGE (c:Subject {subjectid: '" . $subject_id . "'}) ON CREATE SET c.source_id = '" . $source_id . "',c.file_id = '" . $file_id . "', c.uid = '" . $uid . "' ON MATCH SET c.source_id = '" . $source_id . "',c.file_id = '" . $file_id . "', c.uid = '" . $uid . "' RETURN count(*)"));
 	}
 
-	public function ConnectSubject(string $subject_id, string $node_type, string $node_key, string $node_id, string $relationship_label, bool $allow_duplicate = false)
+	public function ConnectSubject(string $subject_id, string $node_type, string $node_key, string $node_id, string $relationship_label)
 	{
 		$this->transactionStack = $this->transactionStack ?? $this->neo4jClient->beginTransaction();
-		$avoidDuplicateString = $allow_duplicate ? '' : " AND NOT (a)<-[:" . $relationship_label . "]-(b)";
-		$this->transactionStack->runStatement(Statement::create("MATCH (a:Subject),(b:" . $node_type . ") WHERE a.subjectid = '" . $subject_id . "' AND b." . $node_key . " = '" . $node_id . "' " . $avoidDuplicateString .  " CREATE (a)<-[r:" . $relationship_label . "]-(b)"));
+        $this->transactionStack->runStatement(Statement::create("MATCH (a:Subject) WHERE a.subjectid = '" . $subject_id . "' with a MATCH (b:" . $node_type . ") WHERE  b." . $node_key . " = '" . $node_id . "' MERGE (a)<-[r:" . $relationship_label . "]-(b)"));
 	}
 
 	public function countSubjectsBySourceId(int $source_id, string $uid): int
