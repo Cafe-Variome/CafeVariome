@@ -273,9 +273,9 @@ class SpreadsheetDataInput extends DataInput
 			$uid = md5(uniqid(rand(),true));
 			foreach ($group as $attribute => $val)
 			{
-				$value = $row[$val];
+				$value = trim($row[$val]);
 				if ($value == "") continue; // Skip empty values
-				$attribute = strtolower(preg_replace('/\s+/', '_', $attribute)); // replace spaces with underline
+				$attribute = trim(strtolower(preg_replace('/\s+/', '_', $attribute))); // replace spaces with underline
 				$attribute = $this->sanitiseString($attribute); // sanitise attribute here to remove malicious characters
 
 				if (is_a($value, 'DateTime'))
