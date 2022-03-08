@@ -7,6 +7,8 @@ var attributesValues = {};
 var attributesDisplayNames = {};
 var valuesDisplayNames = {};
 
+var queryXHR = null;
+
 $( function() {
     $( "#age-range" ).slider({
         range: true,
@@ -292,7 +294,9 @@ $(function() {
 
     $('#build_query').click(() => {
         $('#waiting').show();
-        $('#build_query').prop('disabled', 'true');
+        $('#build_query').addClass('disabled');
+        $('#cancel_query').show();
+        $('#reset_query').hide();
         $('#query_result tbody').html('')
         $.ajax({ url: urls['qb_json'], dataType: 'json'})
         .done((jsonAPI) => {
@@ -410,7 +414,7 @@ $(function() {
             var csrfTokenName = Object.keys(csrfTokenObj)[0];
             queryData[csrfTokenName] = csrfTokenObj[csrfTokenName];
 
-            $.ajax({url: baseurl + 'AjaxApi/query',
+            queryXHR = $.ajax({url: baseurl + 'AjaxApi/query',
                 type: 'POST',
                 data: queryData,
                 dataType: 'json',
@@ -472,8 +476,16 @@ $(function() {
                     $('#query_result').show();
                     $('#build_query').removeClass('disabled');
                     $('#waiting').hide();
+                    $('#cancel_query').hide();
+                    $('#reset_query').show();
                 },
             })
+
+            $('#cancel_query').click(()=> {
+                queryXHR.abort();
+                $('#cancel_query').hide();
+            });
+
         }).fail(()=> alert(error['load_json']));
     })
 

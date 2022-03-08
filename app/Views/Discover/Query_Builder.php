@@ -315,7 +315,8 @@
 <div class="row" id="reset_buildQuery">
     <div class="col">
         <a class="btn btn-lg btn-primary<?= ($elasticSearchEnabled ? "" : " disabled"); ?>" id="build_query"><i class="fa fa-search"></i> Build Query</a>
-        <a class="btn btn-secondary  btn-lg" id="reset_query"><i class="fa fa-trash"></i> Reset</a>
+		<button class="btn btn-lg btn-warning" id="cancel_query" style="display: none;"><i class="fa fa-times"></i> Cancel</button>
+		<a class="btn btn-secondary btn-lg" id="reset_query"><i class="fa fa-trash"></i> Reset</a>
     </div>
 </div>
 
