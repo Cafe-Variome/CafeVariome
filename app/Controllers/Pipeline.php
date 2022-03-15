@@ -183,11 +183,8 @@ class Pipeline extends CVUI_Controller
 			],
 			'subject_id_expansion_policy' => [
 				'label' => 'Policy of Expansion',
-				'rules' => 'required|integer|max_length[3]',
+				'rules' => 'expansion_policy_required_with[subject_id_location]',
 				'errors' => [
-					'required' => '{field} is required.',
-					'integer' => 'The only valid type for {field} is integer.',
-					'max_length' => 'Maximum length of {field} is 3 digits.'
 				]
 			],
 			'expansion_attribute_name' => [
@@ -469,10 +466,8 @@ class Pipeline extends CVUI_Controller
 			],
 			'subject_id_expansion_policy' => [
 				'label' => 'Policy of Expansion',
-				'rules' => 'permit_empty|integer|max_length[3]',
+				'rules' => 'expansion_policy_required_with[subject_id_location]',
 				'errors' => [
-					'integer' => 'The only valid type for {field} is integer.',
-					'max_length' => 'Maximum length of {field} is 3 digits.'
 				]
 			],
 			'expansion_attribute_name' => [
