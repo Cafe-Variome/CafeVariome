@@ -21,7 +21,7 @@ class PhenoPacketDataInput extends DataInput
     private $data;
     private $meta;
     private $id;
-    protected $configuration;
+    protected array $configuration;
     private $delete;
 
     public function __construct(int $source_id, int $delete)
@@ -37,7 +37,8 @@ class PhenoPacketDataInput extends DataInput
 
         $fileRecord = $this->getSourceFiles($file_id);
 
-        if (count($fileRecord) == 1) {
+        if (count($fileRecord) == 1)
+		{
             $file = $fileRecord[0]['FileName'];
 			$this->fileName = $file;
 			if (array_key_exists('pipeline_id', $fileRecord[0])) {
@@ -45,7 +46,8 @@ class PhenoPacketDataInput extends DataInput
                 $this->applyPipeline($this->pipeline_id);
             }
 
-            if ($this->fileMan->Exists($file)) {
+            if ($this->fileMan->Exists($file))
+			{
                 $fileContent = $this->fileMan->Read($file);
                 $this->data = json_decode($fileContent, true);
 
@@ -67,94 +69,111 @@ class PhenoPacketDataInput extends DataInput
                     }
                 }
 
-                if($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE){
+                if($this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE)
+				{
                     $this->id = $this->data['subject']['id'];
                 }
-                else if($this->configuration['subject_id_location'] == SUBJECT_ID_IN_FILE_NAME){
+                else if($this->configuration['subject_id_location'] == SUBJECT_ID_IN_FILE_NAME)
+				{
                     preg_match("/(.*)\./", $file, $matches);
                     $this->id = $matches[1];
                 }
+				return true;
             }
+			return false;
         }
+		return false; // If the control reaches this section, the file has not been absorbed successfully.
     }
 
     public function save(int $file_id): bool
     {
-        $steps = 3;
-        $neo4jInterface = new Neo4J();
+		try
+		{
+			$steps = 3;
+			$neo4jInterface = new Neo4J();
 
-        $this->sourceModel->lockSource($this->sourceId);
+			$this->sourceModel->lockSource($this->sourceId);
 
-        $this->db->begin_transaction();
-        $this->reportProgress($file_id, 0, $steps, 'bulkupload', 'Importing data');
+			$this->db->begin_transaction();
+			$this->reportProgress($file_id, 0, $steps, 'bulkupload', 'Importing data');
 
-		$done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
-        // perform recursive insert for given file
-        $done = $this->recursivePacket($this->data, $this->meta, $this->id, $file_id, $this->sourceId, null, null, null, $done);
+			$done = ['meta' => [],'negated' => ['true' => 0],'cell' => [], "type" => []];
+			// perform recursive insert for given file
+			$done = $this->recursivePacket($this->data, $this->meta, $this->id, $file_id, $this->sourceId, null, null, null, $done);
 
-        $this->reportProgress($file_id, 1, $steps, 'bulkupload');
+			$this->reportProgress($file_id, 1, $steps, 'bulkupload');
 
-        $this->reportProgress($file_id, 2, $steps, 'bulkupload');
+			$this->reportProgress($file_id, 2, $steps, 'bulkupload');
 
-        $output = [];
-        $hits = [];
-        $hpo_terms = array_unique($this->arrSearch($this->data, $output));
-		if (count($hpo_terms) > 0) {
-			$hpo_attribute_id = $this->getAttributeIdByName($this->configuration['hpo_attribute_name']);
-			$hpo_value_ids = [];
-			for ($i = 0; $i < count($hpo_terms); $i++) {
-				$hpo_value_id = $this->getValueIdByNameAndAttributeId($hpo_terms[$i], $this->configuration['hpo_attribute_name']);
-				array_push($hpo_value_ids, $hpo_value_id);
-			}
+			$output = [];
+			$hits = [];
+			$hpo_terms = array_unique($this->arrSearch($this->data, $output));
+			if (count($hpo_terms) > 0) {
+				$hpo_attribute_id = $this->getAttributeIdByName($this->configuration['hpo_attribute_name']);
+				$hpo_value_ids = [];
+				for ($i = 0; $i < count($hpo_terms); $i++) {
+					$hpo_value_id = $this->getValueIdByNameAndAttributeId($hpo_terms[$i], $this->configuration['hpo_attribute_name']);
+					array_push($hpo_value_ids, $hpo_value_id);
+				}
 
-			$matches = $this->eavModel->checkNegatedForHPO($hpo_value_ids, $hpo_attribute_id);
-			for ($i = 0; $i < count($matches); $i++) {
-				$hpo_term = $this->getValueByValueIdAndAttributeName($matches[$i], $this->configuration['hpo_attribute_name']);
-				$result = $neo4jInterface->GetAncestors($hpo_term);
-				if (count($result) > 0) {
-					foreach ($result as $key => $value) {
-						if (!array_key_exists($key, $hits)) {
-							$hits[$key] = $value;
+				$matches = $this->eavModel->checkNegatedForHPO($hpo_value_ids, $hpo_attribute_id);
+				for ($i = 0; $i < count($matches); $i++) {
+					$hpo_term = $this->getValueByValueIdAndAttributeName($matches[$i], $this->configuration['hpo_attribute_name']);
+					$result = $neo4jInterface->GetAncestors($hpo_term);
+					if (count($result) > 0) {
+						foreach ($result as $key => $value) {
+							if (!array_key_exists($key, $hits)) {
+								$hits[$key] = $value;
+							}
 						}
 					}
 				}
 			}
+
+			$uid = md5(uniqid(rand(),true));
+
+			$type_attribute_id = $this->getAttributeIdByName('type'); // Add an attribute by the name 'type' and get its id
+			$ancestor_value_id = $this->getValueIdByNameAndAttributeId('ancestor', 'type'); // Add a value for type called ancestor
+			$this->createEAV($uid, $file_id, $this->id, $type_attribute_id, $ancestor_value_id); // Create EAV relationship between 'type' and 'ancestor'
+
+			$ancestor_hpo_attribute_id = $this->getAttributeIdByName('ancestor_hpo_id'); // Add an attribute by the name 'ancestor_hpo_id' and get its id
+			$ancestor_hpo_label_attribute_id = $this->getAttributeIdByName('ancestor_hpo_label'); // Add an attribute by the name 'ancestor_hpo_label'
+
+			foreach ($hits as $key => $value) {
+				$key_value_id = $this->getValueIdByNameAndAttributeId($key, 'ancestor_hpo_id'); // Add a value for 'ancestor_hpo_id'
+				$this->createEAV($uid, $file_id, $this->id, $ancestor_hpo_attribute_id, $key_value_id); // Create EAV relationship between 'ancestor_hpo_id' and $key_value_id
+
+				$value_id = $this->getValueIdByNameAndAttributeId($value, 'ancestor_hpo_label'); // Add a value for 'ancestor_hpo_label'
+				$this->createEAV($uid, $file_id, $this->id, $ancestor_hpo_label_attribute_id, $value_id); // Create EAV relationship between 'ancestor_hpo_label' and $value_id
+			}
+
+			$dbRet = $this->db->commit();
+
+			if ($dbRet === false) {
+				$message = "Data Failed to insert. Please double check file for sanity.";
+				$error_code = 4;
+				$this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
+			}
+			else {
+				$this->reportProgress($file_id, 3, $steps, 'bulkupload');
+				$this->reportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
+			}
+
+			//Update value frequencies
+			$this->updateValueFrequencies();
+
+			//Set attributes types, minimum, and maximum values if applicable
+			$this->determineAttributesType();
+
+			//Determine storage location of each attribute
+			$this->determineAttributesStorageLocation();
+
+			return true;
 		}
-
-        $uid = md5(uniqid(rand(),true));
-
-		$type_attribute_id = $this->getAttributeIdByName('type'); // Add an attribute by the name 'type' and get its id
-		$ancestor_value_id = $this->getValueIdByNameAndAttributeId('ancestor', 'type'); // Add a value for type called ancestor
-        $this->createEAV($uid, $file_id, $this->id, $type_attribute_id, $ancestor_value_id); // Create EAV relationship between 'type' and 'ancestor'
-
-		$ancestor_hpo_attribute_id = $this->getAttributeIdByName('ancestor_hpo_id'); // Add an attribute by the name 'ancestor_hpo_id' and get its id
-		$ancestor_hpo_label_attribute_id = $this->getAttributeIdByName('ancestor_hpo_label'); // Add an attribute by the name 'ancestor_hpo_label'
-
-        foreach ($hits as $key => $value) {
-			$key_value_id = $this->getValueIdByNameAndAttributeId($key, 'ancestor_hpo_id'); // Add a value for 'ancestor_hpo_id'
-			$this->createEAV($uid, $file_id, $this->id, $ancestor_hpo_attribute_id, $key_value_id); // Create EAV relationship between 'ancestor_hpo_id' and $key_value_id
-
-			$value_id = $this->getValueIdByNameAndAttributeId($value, 'ancestor_hpo_label'); // Add a value for 'ancestor_hpo_label'
-            $this->createEAV($uid, $file_id, $this->id, $ancestor_hpo_label_attribute_id, $value_id); // Create EAV relationship between 'ancestor_hpo_label' and $value_id
-        }
-
-        $dbRet = $this->db->commit();
-
-        if ($dbRet === false) {
-            $message = "Data Failed to insert. Please double check file for sanity.";
-            $error_code = 4;
-            $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
-        }
-        else {
-            $this->reportProgress($file_id, 3, $steps, 'bulkupload');
-            $this->reportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
-        }
-
-		//Update value frequencies
-		$this->updateValueFrequencies();
-
-		//Set attributes types, minimum, and maximum values if applicable
-		$this->determineAttributesType();
+		catch (\Exception $ex)
+		{
+			return false;
+		}
     }
 
     /**
