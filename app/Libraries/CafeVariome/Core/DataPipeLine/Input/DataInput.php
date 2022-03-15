@@ -212,6 +212,9 @@ abstract class DataInput
 
 	protected function getValueIdByNameAndAttributeId(string $value, string $attribute): int
 	{
+		$attribute = trim(strtolower(preg_replace('/\s+/', '_', $attribute))); // replace spaces with underline
+		$attribute = $this->sanitiseString($attribute); // sanitise attribute here to remove malicious characters
+
 		$value = strtolower($value);
 		$value = $this->sanitiseString($value);
 
