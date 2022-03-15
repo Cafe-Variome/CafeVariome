@@ -275,17 +275,10 @@ class SpreadsheetDataInput extends DataInput
 			{
 				$value = trim($row[$val]);
 				if ($value == "") continue; // Skip empty values
-				$attribute = trim(strtolower(preg_replace('/\s+/', '_', $attribute))); // replace spaces with underline
-				$attribute = $this->sanitiseString($attribute); // sanitise attribute here to remove malicious characters
 
 				if (is_a($value, 'DateTime'))
 				{
 					$value = $value->format('Y-m-d H:i:s');
-				}
-				else
-				{
-					$value = strtolower($value);
-					$value = $this->sanitiseString($value);
 				}
 
 				$attribute_id = $this->getAttributeIdByName($attribute);
