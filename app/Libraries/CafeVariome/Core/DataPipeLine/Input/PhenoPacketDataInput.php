@@ -105,56 +105,23 @@ class PhenoPacketDataInput extends DataInput
 
 			$this->reportProgress($file_id, 2, $steps, 'bulkupload');
 
-			$output = [];
-			$hits = [];
-			$hpo_terms = array_unique($this->arrSearch($this->data, $output));
-			if (count($hpo_terms) > 0) {
-				$hpo_attribute_id = $this->getAttributeIdByName($this->configuration['hpo_attribute_name']);
-				$hpo_value_ids = [];
-				for ($i = 0; $i < count($hpo_terms); $i++) {
-					$hpo_value_id = $this->getValueIdByNameAndAttributeId($hpo_terms[$i], $this->configuration['hpo_attribute_name']);
-					array_push($hpo_value_ids, $hpo_value_id);
-				}
-
-				$matches = $this->eavModel->checkNegatedForHPO($hpo_value_ids, $hpo_attribute_id);
-				for ($i = 0; $i < count($matches); $i++) {
-					$hpo_term = $this->getValueByValueIdAndAttributeName($matches[$i], $this->configuration['hpo_attribute_name']);
-					$result = $neo4jInterface->GetAncestors($hpo_term);
-					if (count($result) > 0) {
-						foreach ($result as $key => $value) {
-							if (!array_key_exists($key, $hits)) {
-								$hits[$key] = $value;
-							}
-						}
-					}
-				}
-			}
-
 			$uid = md5(uniqid(rand(),true));
 
 			$type_attribute_id = $this->getAttributeIdByName('type'); // Add an attribute by the name 'type' and get its id
 			$ancestor_value_id = $this->getValueIdByNameAndAttributeId('ancestor', 'type'); // Add a value for type called ancestor
 			$this->createEAV($uid, $file_id, $this->id, $type_attribute_id, $ancestor_value_id); // Create EAV relationship between 'type' and 'ancestor'
 
-			$ancestor_hpo_attribute_id = $this->getAttributeIdByName('ancestor_hpo_id'); // Add an attribute by the name 'ancestor_hpo_id' and get its id
-			$ancestor_hpo_label_attribute_id = $this->getAttributeIdByName('ancestor_hpo_label'); // Add an attribute by the name 'ancestor_hpo_label'
-
-			foreach ($hits as $key => $value) {
-				$key_value_id = $this->getValueIdByNameAndAttributeId($key, 'ancestor_hpo_id'); // Add a value for 'ancestor_hpo_id'
-				$this->createEAV($uid, $file_id, $this->id, $ancestor_hpo_attribute_id, $key_value_id); // Create EAV relationship between 'ancestor_hpo_id' and $key_value_id
-
-				$value_id = $this->getValueIdByNameAndAttributeId($value, 'ancestor_hpo_label'); // Add a value for 'ancestor_hpo_label'
-				$this->createEAV($uid, $file_id, $this->id, $ancestor_hpo_label_attribute_id, $value_id); // Create EAV relationship between 'ancestor_hpo_label' and $value_id
-			}
-
 			$dbRet = $this->db->commit();
 
-			if ($dbRet === false) {
+			if ($dbRet === false)
+			{
 				$message = "Data Failed to insert. Please double check file for sanity.";
 				$error_code = 4;
 				$this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
+				return false;
 			}
-			else {
+			else
+			{
 				$this->reportProgress($file_id, 3, $steps, 'bulkupload');
 				$this->reportProgress($file_id, 1, 1, 'bulkupload', 'Finished', true);
 			}
@@ -633,17 +600,10 @@ class PhenoPacketDataInput extends DataInput
         if ($pipeline != null) {
             $this->configuration['subject_id_location'] = $pipeline['subject_id_location'];
 
-            if ($pipeline['subject_id_location'] == SUBJECT_ID_WITHIN_FILE && $pipeline['subject_id_attribute_name'] != null && $pipeline['subject_id_attribute_name'] != '') {
+            if ($pipeline['subject_id_location'] == SUBJECT_ID_WITHIN_FILE && $pipeline['subject_id_attribute_name'] != null && $pipeline['subject_id_attribute_name'] != '')
+			{
                 $this->configuration['subject_id_attribute_name'] = $pipeline['subject_id_attribute_name'];
             }
-
-            if ($pipeline['hpo_attribute_name'] != null && $pipeline['hpo_attribute_name'] != ''){
-				$this->configuration['hpo_attribute_name'] = $pipeline['hpo_attribute_name'];
-			}
-
-			if ($pipeline['negated_hpo_attribute_name'] != null && $pipeline['negated_hpo_attribute_name'] != ''){
-				$this->configuration['negated_hpo_attribute_name'] = $pipeline['negated_hpo_attribute_name'];
-			}
         }
     }
 }
