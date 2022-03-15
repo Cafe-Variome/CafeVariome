@@ -190,6 +190,9 @@ abstract class DataInput
 
 	protected function getAttributeIdByName(string $attribute): int
 	{
+		$attribute = trim(strtolower(preg_replace('/\s+/', '_', $attribute))); // replace spaces with underline
+		$attribute = $this->sanitiseString($attribute); // sanitise attribute here to remove malicious characters
+
 		if (array_key_exists($attribute, $this->attributes))
 		{
 			$attribute_id = $this->attributes[$attribute]['id'];
@@ -209,6 +212,9 @@ abstract class DataInput
 
 	protected function getValueIdByNameAndAttributeId(string $value, string $attribute): int
 	{
+		$value = strtolower($value);
+		$value = $this->sanitiseString($value);
+
 		if (array_key_exists($value, $this->attributes[$attribute]['values']))
 		{
 			$value_id = $this->attributes[$attribute]['values'][$value]['id'];
