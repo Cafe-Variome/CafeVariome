@@ -83,6 +83,44 @@ class ValidationHelper
         return false;
     }
 
+	public function expansion_policy_required_with(?string $str, string $fields, array $data, & $err): bool
+	{
+		$err = null;
+
+		if (
+			$data[$fields] == SUBJECT_ID_WITHIN_FILE ||
+			$data[$fields] == SUBJECT_ID_IN_FILE_NAME ||
+			$data[$fields] == SUBJECT_ID_PER_BATCH_OF_RECORDS ||
+			$data[$fields] == SUBJECT_ID_PER_FILE
+		)
+		{
+			return true;
+		}
+		else
+		{
+			if(is_null($str))
+			{
+				$err = 'Expansion Policy is required.';
+				return false;
+			}
+
+			if (intval($str) > 0)
+			{
+				if (intval($str) > 999)
+				{
+					$err = 'Expansion Policy can only have 3 digits.';
+					return false;
+				}
+				return true;
+			}
+
+			$err = 'Expansion Policy is required.';
+			return false;
+		}
+
+		return false;
+	}
+
 	public function expansion_columns_required_with(string $str, string $fields, array $data, & $err): bool
 	{
 		$err = null;
