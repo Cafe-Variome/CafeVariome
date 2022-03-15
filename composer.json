@@ -11,6 +11,7 @@
         "ext-mbstring": "*",
         "ext-intl": "*",
         "ext-json": "*",
+        "ext-bcmath": "*",
         "codeigniter4/framework": "^4.1",
         "stevenmaguire/oauth2-keycloak": "^2.2",
         "components/font-awesome": "^5.15",
@@ -26,7 +27,7 @@
         "league/oauth2-client": "^2.6",
         "laudis/neo4j-php-client": "^2.4",
         "guzzlehttp/psr7":  "2.0.0"
-        },
+    },
     "require-dev": {
 		"fakerphp/faker": "^1.9",
 		"mikey179/vfsstream": "^1.6",
