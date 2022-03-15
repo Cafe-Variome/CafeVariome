@@ -9,12 +9,8 @@
  *
  */
 
-use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\Net\CellBaseNetworkInterface;
 use App\Libraries\CafeVariome\Net\VariantValidatorNetworkInterface;
-use App\Libraries\CafeVariome\Net\HPONetworkInterface;
-use App\Libraries\CafeVariome\Net\ServiceInterface;
-use App\Libraries\CafeVariome\Core\DataPipeLine\Stream\Neo4J;
 
 class PhenoPacketDataInput extends DataInput
 {
@@ -90,8 +86,6 @@ class PhenoPacketDataInput extends DataInput
 		try
 		{
 			$steps = 3;
-			$neo4jInterface = new Neo4J();
-
 			$this->sourceModel->lockSource($this->sourceId);
 
 			$this->db->begin_transaction();
