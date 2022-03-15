@@ -1,7 +1,6 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
 
-use App\Models\Settings;
 use App\Models\Source;
 
 /**
@@ -24,6 +23,9 @@ class HPOSimilarityQuery extends AbstractQuery
 
 	public function execute(array $clause, int $source_id, bool $iscount)
 	{
+		$sourceModel = new Source();
+		$sourceUID = $sourceModel->getSourceUID($source_id);
+
 		if (array_key_exists('r',$clause))
 		{
 			$r = $clause['r'];
@@ -45,11 +47,11 @@ class HPOSimilarityQuery extends AbstractQuery
 
 			$neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->(:HPOterm)<-[:IS_A*0..20]-(:HPOterm)-[:PHENOTYPE_OF*0..1]->(link)-[:PHENOTYPE_OF]->(s:Subject) ";
 			if ($orpha == 'true'){
-				$neo_query = $neo_query . "where (" . $id_str . ") and s.source_id = \"" . $source_id . "\" and (link:HPOterm or link:ORPHAterm) ";
+				$neo_query = $neo_query . "where (" . $id_str . ") and s.source_id = \"" . $source_id . "\" and s.uid = \"" . $sourceUID . "\" and (link:HPOterm or link:ORPHAterm) ";
 			}
 			else
 			{
-				$neo_query = $neo_query . "where (" . $id_str . ") and s.source_id = \"" . $source_id . "\" and (link:HPOterm) ";
+				$neo_query = $neo_query . "where (" . $id_str . ") and s.source_id = \"" . $source_id . "\" and s.uid = \"" . $sourceUID . "\" and (link:HPOterm) ";
 			}
 			$neo_query = $neo_query . "with s.subjectid as subjectid, n.hpoid as hpoid with subjectid as subjectid, count(distinct(hpoid)) as hpoid where hpoid >=  $s  return subjectid, hpoid";
 			// $neo_query = "MATCH (n:HPOterm)-[:REPLACED_BY*0..1]->()<-[:IS_A*0..20]-()-[r2:PHENOTYPE_OF]->(m) where (" . $id_str . ") and m.source = \"" . $source . "\" with m.subjectid as subjectid, n.hpoid as hpoid with subjectid as subjectid, count(distinct(hpoid)) as hpoid where hpoid >=  $s  return subjectid, hpoid";
