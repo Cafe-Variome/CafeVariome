@@ -342,22 +342,23 @@ class PhenoPacketDataInput extends DataInput
 
                     }
                 }
-				if ($type == $this->configuration['hpo_attribute_name'] && $key == 'type'){
-					if (array_key_exists('negated',$array)){
+				if ($type == 'phenotypicFeatures' && $key == 'type'){
+					if (array_key_exists('negated',$array))
+					{
 						if ($array['negated'] == true){
-							$negated_hpo_attribute_id = $this->getAttributeIdByName($this->configuration['negated_hpo_attribute_name']); // Get attribute id of '$this->configuration['negated_hpo_attribute_name']'
-							$value_id = $this->getValueIdByNameAndAttributeId($value['id'], $this->configuration['negated_hpo_attribute_name']); // Add $value['id'] as a value for '$this->configuration['negated_hpo_attribute_name']' and get its id
+							$negated_hpo_attribute_id = $this->getAttributeIdByName('negated' . $type);
+							$value_id = $this->getValueIdByNameAndAttributeId($value['id'], 'negated' . $type);
 							$this->createEAV($uid, $file, $id, $negated_hpo_attribute_id, $value_id);
 						}
 						else{
-							$hpo_attribute_id = $this->getAttributeIdByName($this->configuration['hpo_attribute_name']); // Get attribute id of '$this->configuration['hpo_attribute_name']
-							$value_id = $this->getValueIdByNameAndAttributeId($value['id'], $this->configuration['hpo_attribute_name']); // Add $value['id'] as a value for '$this->configuration['hpo_attribute_name']' and get its id
+							$hpo_attribute_id = $this->getAttributeIdByName($type);
+							$value_id = $this->getValueIdByNameAndAttributeId($value['id'], $type);
 							$this->createEAV($uid, $file, $id, $hpo_attribute_id, $value_id);
 						}
 					}
 					else{
-						$hpo_attribute_id = $this->getAttributeIdByName($this->configuration['hpo_attribute_name']); // Get attribute id of '$this->configuration['hpo_attribute_name']
-						$value_id = $this->getValueIdByNameAndAttributeId($value['id'], $this->configuration['hpo_attribute_name']); // Add $value['id'] as a value for '$this->configuration['hpo_attribute_name']' and get its id
+						$hpo_attribute_id = $this->getAttributeIdByName($type);
+						$value_id = $this->getValueIdByNameAndAttributeId($value['id'], $type);
 						$this->createEAV($uid, $file, $id, $hpo_attribute_id, $value_id);
 					}
 
@@ -580,11 +581,10 @@ class PhenoPacketDataInput extends DataInput
 
     protected function initializeConfiguration()
     {
-        $this->configuration = ['subject_id_location' => SUBJECT_ID_WITHIN_FILE,
-                                'subject_id_attribute_name' => 'id',
-								'hpo_attribute_name' => 'phenotype',
-								'negated_hpo_attribute_name' => 'negated_hpo'
-        ];
+        $this->configuration = [
+			'subject_id_location' => SUBJECT_ID_WITHIN_FILE,
+			'subject_id_attribute_name' => 'id'
+		];
     }
 
     protected function applyPipeline(int $pipeline_id)
