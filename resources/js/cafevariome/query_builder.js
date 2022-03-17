@@ -48,7 +48,7 @@ $( function() {
 
     $( "#similarity-rel-range" ).slider({
         range: "min",
-        min: 0,
+        min: 0.5,
         max: 1,
         value: 1,
         step: 0.05
@@ -56,7 +56,7 @@ $( function() {
 
     $( "#similarity-rel-range-ordo" ).slider({
         range: "min",
-        min: 0,
+        min: 0.5,
         max: 1,
         value: 1,
         step: 0.05
