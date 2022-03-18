@@ -1,12 +1,14 @@
 <?php namespace App\Models;
 
+use App\Libraries\CafeVariome\CafeVariome;
+
 /**
- * Class UIData 
+ * Class UIData
  * @author: Mehdi Mehtarizadeh
  * Created: 18/06/2019
- * This class contains data passed to views from controllers. 
- * 
- * 
+ * This class contains data passed to views from controllers.
+ *
+ *
  */
 
 class UIData
@@ -16,12 +18,12 @@ class UIData
     //Page info
     public $data = Array();
     public $pageName = FALSE;
-    
+
     //Page contents
     public $javascript = array();
     public $css = array();
     public $fonts = array();
-    
+
     //Page Meta
     public $title = FALSE;
     public $description = FALSE;
@@ -30,9 +32,11 @@ class UIData
 
     public $stickyFooter = true;
 
+	public $cv_version = "";
+
     public function __construct()
     {
-
+		$this->cv_version = CafeVariome::getVersion();
     }
 
 }

@@ -116,6 +116,7 @@ class CVUI_Controller extends Controller{
 		$data['statusMessageType'] = $this->getStatusMessageTypeAlertEquivalent();
 		$data["uriSegments"] = $this->getURISegments();
 		$data['headerImage'] = $headerImage;
+		$data['version'] = $uidata->cv_version;
 
 		//Include additional data attributes specific to each view
 		foreach ($uidata->data as $dataKey => $dataValue) {

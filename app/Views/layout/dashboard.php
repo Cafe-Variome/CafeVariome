@@ -285,7 +285,7 @@
             <footer class="sticky-footer">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a> <br> Copyright &copy; <?= date("Y") . ', University of Leicester' ?> </span>
+                        <span>Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a> (v <?= $version ?>)<br> Copyright &copy; <?= date("Y") . ', University of Leicester' ?> </span>
                     </div>
                 </div>
             </footer>
