@@ -33,21 +33,22 @@ class ORPHASimilarityQuery extends AbstractQuery
 			$hpo = $clause['HPO'];
 			$orpha_id = $clause['id'][0];
 
+			$neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})<-[:IS_A*0..20]-(:ORPHAterm)-[:PHENOTYPE_OF]-(s) where s.source_id = \"" . $source_id . "\" and s.uid = \"" . $sourceUID . "\" return s.subjectid as subjectid";
+			$records = $this->getNeo4JInstance()->runQuery($neo_query);
+			$pat_ids = [];
+			foreach ($records as $record)
+			{
+				$pat_ids[] = $record->get('subjectid');
+			}
+
 			// if just orpha
 			if($r == 1 && $s == 100 && $hpo == 'false')
 			{
-				$neo_query = "Match (o:ORPHAterm{orphaid:\"" . $orpha_id . "\"})<-[:IS_A*0..20]-(:ORPHAterm)-[:PHENOTYPE_OF]-(s) where s.source_id = \"" . $source_id . "\" and s.uid = \"" . $sourceUID . "\" return s.subjectid as subjectid";
-				$records = $this->getNeo4JInstance()->runQuery($neo_query);
-				$pat_ids = [];
-				foreach ($records as $record)
-				{
-					$pat_ids[] = $record->get('subjectid');
-				}
-
 				if($iscount === true)
 				{
 					return count($pat_ids);
-				} else
+				}
+				else
 				{
 					return $pat_ids;
 				}
@@ -299,8 +300,8 @@ class ORPHASimilarityQuery extends AbstractQuery
 				// }
 			}
 
-			$pat_ids = array_keys($subjects);
-			error_log(count(array_keys($subjects)));
+			$pat_ids = array_unique(array_merge($pat_ids, array_keys($subjects)));
+
 			$endtime = microtime(true);
 			$timediff = $endtime - $starttime;
 			error_log($timediff);
