@@ -21,39 +21,45 @@ class User extends Model{
 
     protected $primaryKey = 'id';
 
-   // protected $tempReturnType = 'array';
-
-
-    public function __construct(ConnectionInterface &$db = null){
-        if ($db != null) {
+    public function __construct(ConnectionInterface &$db = null)
+	{
+        if ($db != null)
+		{
             $this->db =& $db;
         }
-        else {
+        else
+		{
             $this->db = \Config\Database::connect();
         }
     }
 
-    function createUser(string $email, string $username, &$authadapter, array $groups = [], array $data = []){
+    public function createUser(string $email, string $username, &$authadapter, array $groups = [], array $data = [])
+	{
         $authadapter->register($email, $username, $data, $groups);
     }
 
-    function updateUser(int $user_id, &$authadapter, array $groups = [], array $data = []){
+    public function updateUser(int $user_id, &$authadapter, array $groups = [], array $data = [])
+	{
         $authadapter->update($user_id, $data, $groups);
     }
 
-    function deleteUser(int $user_id, &$authadapter){
+    public function deleteUser(int $user_id, &$authadapter)
+	{
         $authadapter->delete($user_id);
     }
-function detailsUser(int $user_id, &$authadapter){
-        $authadapter->details($user_id);
-    }
+
+	public function detailsUser(int $user_id, &$authadapter)
+	{
+			$authadapter->details($user_id);
+	}
+
     /**
      * Gets user object by Id.
      * @param int id User ID
      * @return object|null
      */
-    public function getUserById($id){
-
+    public function getUserById($id)
+	{
         $this->builder = $this->db->table($this->table);
         $this->builder->where('id', $id);
         $query = $this->builder->get()->getResult();
@@ -80,8 +86,8 @@ function detailsUser(int $user_id, &$authadapter){
      * @param string uname User Username
      * @return object|null
      */
-    public function getUserByUsername(string $uname){
-
+    public function getUserByUsername(string $uname)
+	{
         $this->builder = $this->db->table($this->table);
         $this->builder->where('username', $uname);
         $query = $this->builder->get()->getResult();
@@ -95,7 +101,8 @@ function detailsUser(int $user_id, &$authadapter){
      *
      * @author Mehdi Mehtarizadeh
 	 */
-	function getUsers(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
+	public function getUsers(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1)
+	{
 		$this->builder = $this->db->table($this->table);
 
 		if ($cols) {
@@ -129,8 +136,10 @@ function detailsUser(int $user_id, &$authadapter){
      * @param string $username
      * @return bool true if user exists false otherwise
      */
-    function userExists(string $username):bool{
-        if ($this->getUserByUsername($username)) {
+    public function userExists(string $username):bool
+	{
+        if ($this->getUserByUsername($username))
+		{
             return true;
         }
         return false;
@@ -168,7 +177,8 @@ function detailsUser(int $user_id, &$authadapter){
      * @param string $email   - The email of the new user
 	 * @return int $insert_id ID of inserted user
      */
-	function createRemoteUser($email) {
+	public function createRemoteUser(string $email): int
+	{
 		$data = array(
             'email'  	=> $email,
             'username'  => $email,
@@ -176,7 +186,7 @@ function detailsUser(int $user_id, &$authadapter){
             'active'    => 0);
         $this->builder = $this->db->table($this->table);
         $this->builder->insert($data);
-		$insert_id = $this->db->insertID();
-		return $insert_id;
+
+		return $this->db->insertID();
 	}
 }
