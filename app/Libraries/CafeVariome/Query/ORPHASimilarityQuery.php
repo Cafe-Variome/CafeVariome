@@ -82,7 +82,9 @@ class ORPHASimilarityQuery extends AbstractQuery
 						$om = $orphatotals[$record->get('ORPHA')]['omimic'];
 						$orpic = $record->get('ORPHA_IC');
 						$omic = $record->get('OMIM_IC');
-						if ($orp != $orpic || $om != $omic){
+
+						if (bccomp($orp, $orpic) != 0 || bccomp($om, $omic) != 0)
+						{
 							$orphatotals[$record->get('ORPHA')]['hpo'] = $record->get('LINK');
 							$orphatotals[$record->get('ORPHA')]['FC'] = $record->get('FrequencyCode');
 							$orphatotals[$record->get('ORPHA')]['omimic'] = $record->get('OMIM_IC');
