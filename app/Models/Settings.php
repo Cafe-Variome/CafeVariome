@@ -164,6 +164,26 @@ class Settings extends Model{
 		return $this->settingData['site_title'];
 	}
 
+	public function getHPOAutoCompleteURL()
+	{
+		return $this->settingData['hpo_autocomplete_url'];
+	}
+
+	public function getORPHAAutoCompleteURL()
+	{
+		return $this->settingData['orpha_autocomplete_url'];
+	}
+
+	public function getSNOMEDAutoCompleteURL()
+	{
+		return $this->settingData['snomed_autocomplete_url'];
+	}
+
+	public function getGeneAutoCompleteURL()
+	{
+		return $this->settingData['gene_autocomplete_url'];
+	}
+
     /**
      * @deprecated
      */
