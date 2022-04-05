@@ -186,13 +186,22 @@ $(function() {
         $('select#values_phen_left').empty()
         var arrayToReduce = $(this).val().trim().split(' ').filter((term) => term.length != 1);
         str = (arrayToReduce.length > 0) ? arrayToReduce.reduce((v1, v2) => v1 + " " + v2) : '';
-        $.getJSON(hpo_autocomplete_url + (str) , (data) => {
-            $('select#values_phen_left').empty()
-            data.forEach((term) => {
-                $('select#values_phen_left').append($('<option></option>').attr('value', term).text(term))
-            })
-        })
-            .fail(function() {  });
+
+        $.ajax({
+            url: hpo_autocomplete_url + str,
+            type: 'GET',
+            dataType:'json',
+            crossDomain: true,
+            success: function  (data, textStatus, jqXHR) {
+                $('select#values_phen_left').empty()
+                data.forEach((term) => {
+                    $('select#values_phen_left').append($('<option></option>').attr('value', term).text(term))
+                })
+            }
+        }).done(function() {
+
+        });
+
         $search_str = $(this).val()
     })
 
