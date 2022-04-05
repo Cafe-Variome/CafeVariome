@@ -94,6 +94,28 @@ $( function() {
         icon: false
     });
 
+    $('#ordoSelect').select2({
+        ajax: {
+            url:  function (params) {
+                return orpha_autocomplete_url + params.term
+            },
+            dataType: 'json',
+            processResults: function (data) {
+                results = [];
+                $.each(data, function (key, value) {
+                    results.push({'id': value, 'text': value})
+                })
+                return {
+                    results: results
+                };
+            }
+        },
+        placeholder: 'Choose Ordo term',
+        allowClear: false,
+        width: '100%',
+        maximumSelectionLength: 1,
+        minimumInputLength: 2
+    });
 });
 
 
@@ -633,27 +655,6 @@ $(function() {
         }
     });
 
-});
-
-$(document).ready(function() {
-    var optionData = [];
-    load_Ordo();
-    function load_Ordo() {
-        $.ajax({ url: baseurl + 'ContentAPI/loadOrpha'  })
-        .done((d)=>{ 
-            d.forEach( (item)=>{
-                optionData.push(item);
-            })
-             $('#ordoSelect').select2({
-                placeholder: 'Choose Ordo term',
-                allowClear: false,
-                width: '100%',
-                maximumSelectionLength: 1,
-                minimumInputLength: 2 ,
-                data:optionData
-            });
-        })
-    }
 });
 
 function getCSRFToken(format = 'string'){
