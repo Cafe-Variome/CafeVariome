@@ -164,7 +164,7 @@ $(function() {
         $('select#values_phen_left').empty()
         var arrayToReduce = $(this).val().trim().split(' ').filter((term) => term.length != 1);
         str = (arrayToReduce.length > 0) ? arrayToReduce.reduce((v1, v2) => v1 + " " + v2) : '';
-        $.getJSON('https://www185.lamp.le.ac.uk/EpadGreg/hpo/query/' + (str) + '/0/1', (data) => {
+        $.getJSON(hpo_autocomplete_url + (str) , (data) => {
             $('select#values_phen_left').empty()
             data.forEach((term) => {
                 $('select#values_phen_left').append($('<option></option>').attr('value', term).text(term))
