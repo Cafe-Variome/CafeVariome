@@ -404,34 +404,6 @@ class Network extends CVUI_Controller{
     /**
      * @deprecated
      */
-    function process_network_join_request() {
-
-        $result['network_key'] = $this->request->getVar('networks');
-        $result['justification'] = $this->request->getVar('justification');
-
-        $result['installation_key'] = $this->setting->settingData['installation_key'];
-
-        $user_id = $this->authAdapter->getUserId();
-        $userModel = new User($this->db);
-        $user = $userModel->getUserById($user_id);
-
-        $result['username'] = $user[0]->username;
-        $result['email'] = $user[0]->email;
-        $result['auth_server'] =  $this->setting->settingData['auth_server'];
-        $networks = AuthHelper::authPostRequest($result,  $this->setting->settingData['auth_server'] . "/network/join_network_request");
-
-        $data = json_decode($networks, 1);
-
-        if (array_key_exists('network_request_id', $data)) {
-            echo json_encode(array('success' => 'Network join request has been sent!'));
-        } else {
-            echo json_encode(array('error' => 'Sorry, unable to process request. Retry!'));
-        }
-    }
-
-    /**
-     * @deprecated
-     */
     function create_remote_user() {
 
         if (isset($_POST['rUser'])) {
