@@ -32,7 +32,7 @@ class Setting extends CVUI_Controller{
         $this->settingModel = Settings::getInstance();
     }
 
-    function Authentication()
+	public function Authentication()
     {
         $uidata = new UIData();
         $uidata->title = "Authentication Settings";
