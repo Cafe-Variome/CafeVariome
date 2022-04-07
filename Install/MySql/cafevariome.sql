@@ -345,6 +345,8 @@ INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `i
 (23, 'hpo_autocomplete_url', 'https://www185.lamp.le.ac.uk/EpadGreg/hpo/query/', 'HPO Auto-complete', 'HPO Auto-complete', 'endpoint', 'required'),
 (24, 'orpha_autocomplete_url', '', 'ORPHA Auto-complete', 'HPO Auto-complete', 'endpoint', 'required'),
 (25, 'snomed_autocomplete_url', '', 'SNOMED Autocomplete ', 'SNOMED Autocomplete ', 'endpoint', 'required');
+(26, 'gene_autocomplete_url', '', 'Gene Autocomplete ', 'Gene Autocomplete ', 'endpoint', 'required');
+
 
 -- --------------------------------------------------------
 
