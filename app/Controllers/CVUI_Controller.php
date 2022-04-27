@@ -237,22 +237,18 @@ class CVUI_Controller extends Controller
 	{
 		$msgtype = $this->getStatusMessageType();
 
-		switch ($msgtype) {
+		switch ($msgtype)
+		{
 			case STATUS_SUCCESS:
 				return 'success';
-				break;
 			case STATUS_ERROR:
 				return 'danger';
-				break;
 			case STATUS_INFO:
 				return 'info';
-				break;
 			case STATUS_WARNING:
 				return 'warning';
-				break;
 			default:
 				return 'info';
-			break;
 		}
 	}
 
