@@ -27,9 +27,9 @@ abstract class OpenIDAuthenticator extends Authenticator
 
     private $proxyDetails;
 
-    public function __construct() {
+    public function __construct()
+	{
         parent::__construct();
-
         $this->initiateOpenIDParams();
     }
 
@@ -47,7 +47,8 @@ abstract class OpenIDAuthenticator extends Authenticator
         $this->loginURI = base_url('auth/login');//$this->setting->getOpenIDRedirectUri();
     }
 
-    protected function configureProxy(){
+    protected function configureProxy()
+	{
         $proxyUserPass = ($this->proxyDetails['username'] != '' && $this->proxyDetails['password'] != '') ? $this->proxyDetails['username'] . ':' . $this->proxyDetails['password'] . '@' : '';
         $this->options['proxy'] = $proxyUserPass . $this->proxyDetails['hostname'] . ':' . $this->proxyDetails['port'];
         $this->options['verify'] = false;
@@ -69,30 +70,38 @@ abstract class OpenIDAuthenticator extends Authenticator
 
     public function login():bool
     {
-        if (!isset($_GET['code'])) {
+        if (!isset($_GET['code']))
+		{
 
             $authUrl = $this->provider->getAuthorizationUrl();
             $this->session->set('oauth2state', $this->provider->getState());
             header('Location: '.$authUrl);
 
             exit;
-        } elseif (empty($_GET['state']) || ($_GET['state'] !== $this->session->get('oauth2state'))) {
+        }
+		elseif (empty($_GET['state']) || ($_GET['state'] !== $this->session->get('oauth2state')))
+		{
 
             $this->session->remove('oauth2state');
             exit('Invalid state, make sure HTTP sessions are enabled.');
 
-        } else {
-            try {
+        }
+		else
+		{
+            try
+			{
                 $token = $this->provider->getAccessToken('authorization_code', [
                     'code' => $_GET['code']
                 ]);
                 $this->session->set('state', $token);
 
-            } catch (\Exception $e) {
+            } catch (\Exception $e)
+			{
                 exit('Failed to get access token: '.$e->getMessage());
             }
 
-            try {
+            try
+			{
                 $user = $this->provider->getResourceOwner($token);
                 $userArray = $user->toArray();
 				$IonAuthModel = new IonAuthModel();
@@ -100,14 +109,16 @@ abstract class OpenIDAuthenticator extends Authenticator
                 $this->recordSession($token, $userArray['email']);
                 return true;
 
-            } catch (\Exception $e) {
+            } catch (\Exception $e)
+			{
                 exit('Failed to get resource owner: '.$e->getMessage());
             }
         }
         return false;
     }
 
-    public function getUser($token){
+    public function getUser($token)
+	{
         return $this->provider->getResourceOwner($token);
     }
 
@@ -116,19 +127,21 @@ abstract class OpenIDAuthenticator extends Authenticator
 	 * @return integer|null The user's ID from the session user data or NULL if not found
 	 *
 	 **/
-    public function getUserId(){
+    public function getUserId()
+	{
         return $this->session->get('user_id');
     }
 
-    protected function recordSession($keys, string $email){
-
+    protected function recordSession($keys, string $email)
+	{
         $userModel = new User();
         $authenticatedUser = $userModel->getUserByUsername($email);
 
         if($authenticatedUser)
         {
 	    // Changed Operator from && to ||
-            if($authenticatedUser->active == 0 || $authenticatedUser->remote == 1){
+            if($authenticatedUser->active == 0 || $authenticatedUser->remote == 1)
+			{
                 $this->logout();
             }
 
@@ -159,26 +172,34 @@ abstract class OpenIDAuthenticator extends Authenticator
             );
             $this->session->set($session_data);
         }
-        else {
+        else
+		{
             $this->logout();
         }
     }
 
-    public function loggedIn(): bool {
-        if ($this->session->has('state')) {
-            try {
+    public function loggedIn(): bool
+	{
+        if ($this->session->has('state'))
+		{
+            try
+			{
                 $token = $this->getToken();
                 $user = $this->getUser($token);
-                if ($user && $user->toArray()['email'] == $this->session->get('email')) {
+                if ($user && $user->toArray()['email'] == $this->session->get('email'))
+				{
                     return true;
                 }
             }
-            catch (\Exception $ex) {
-                try {
+            catch (\Exception $ex)
+			{
+                try
+				{
                     $token = $this->provider->getAccessToken('refresh_token', ['refresh_token' => $this->session->get('state')->getRefreshToken()]);
                     $this->session->set('state', $token);
                 }
-                catch (\Exception $ex) {
+                catch (\Exception $ex)
+				{
                     error_log($ex->getMessage());
                 }
             }
@@ -207,19 +228,22 @@ abstract class OpenIDAuthenticator extends Authenticator
      * @param N/A
      * @return bool
      */
-    public function ping(){
-
-        if (strpos($this->serverURI, '/auth') == false){
+    public function ping()
+	{
+        if (strpos($this->serverURI, '/auth') == false)
+		{
             $this->serverURI .= '/auth/';
         }
-        if (substr($this->serverURI, strlen($this->serverURI) - 1, strlen($this->serverURI)) !== '/') {
+        if (substr($this->serverURI, strlen($this->serverURI) - 1, strlen($this->serverURI)) !== '/')
+		{
             $this->serverURI .= '/';
         }
         $curlOptions = [CURLOPT_NOBODY => true];
         $netAdapterConfig = config('NetworkAdapter');
 
         $cURLAdapter = new cURLAdapter($this->serverURI, $curlOptions);
-        if ($netAdapterConfig->useProxy) {
+        if ($netAdapterConfig->useProxy)
+		{
             $proxyDetails = $netAdapterConfig->proxyDetails;
 
             $cURLAdapter->setOption(CURLOPT_FOLLOWLOCATION, true);
@@ -227,7 +251,8 @@ abstract class OpenIDAuthenticator extends Authenticator
             $cURLAdapter->setOption(CURLOPT_PROXY, $proxyDetails['hostname']);
             $cURLAdapter->setOption(CURLOPT_PROXYPORT, $proxyDetails['port']);
 
-            if ($proxyDetails['username'] != '' && $proxyDetails['password'] != '') {
+            if ($proxyDetails['username'] != '' && $proxyDetails['password'] != '')
+			{
                 $cURLAdapter->setOption(CURLOPT_PROXYUSERPWD, $proxyDetails['username'] . ':' . $proxyDetails['password']);
             }
         }
@@ -244,7 +269,8 @@ abstract class OpenIDAuthenticator extends Authenticator
      * @param N/A
      * @return string
      */
-    private function _get_Unique_Identifier(){
+    private function _get_Unique_Identifier()
+	{
         mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
         $charid = strtoupper(md5(uniqid(rand(), true)));
         $hyphen = chr(45);// "-"
