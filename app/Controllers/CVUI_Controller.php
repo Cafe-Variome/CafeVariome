@@ -20,6 +20,7 @@ class CVUI_Controller extends Controller{
 	private $isProtected = false;
 	private $isAdmin = false;
 	protected $db;
+	protected $dbAdapter;
 
 	protected $session;
 	protected $authAdapter;
