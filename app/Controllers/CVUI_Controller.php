@@ -14,7 +14,6 @@ use App\Models\Settings;
 use App\Models\URISegment;
 use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
-use CodeIgniter\Config\Services;
 
 class CVUI_Controller extends Controller{
 
