@@ -1,9 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Factory;
 
-use App\Libraries\CafeVariome\Entities\IEntity;
-use App\Libraries\CafeVariome\Entities\Entity;
-use App\Libraries\CafeVariome\Entities\NullEntity;
-
 /**
  * EntityFactory.php
  * Created 25/04/2022
@@ -11,6 +7,10 @@ use App\Libraries\CafeVariome\Entities\NullEntity;
  * This is a base factory class for handling object creation of Entity classes. It might become an abstract class in the future.
  * @author Mehdi Mehtarizadeh
  */
+
+use App\Libraries\CafeVariome\Entities\IEntity;
+use App\Libraries\CafeVariome\Entities\Entity;
+use App\Libraries\CafeVariome\Entities\NullEntity;
 
 class EntityFactory
 {
