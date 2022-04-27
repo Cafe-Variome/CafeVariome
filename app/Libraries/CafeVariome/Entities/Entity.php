@@ -4,7 +4,7 @@
  * Entity.php
  * Created 22/04/2022
  *
- * This interface implements IEntity and is a base class of all other Entity classes.
+ * This class implements IEntity and is a base class of all other Entity classes.
  * @author Mehdi Mehtarizadeh
  */
 
