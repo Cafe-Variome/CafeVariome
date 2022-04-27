@@ -15,7 +15,8 @@ use App\Models\URISegment;
 use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 
-class CVUI_Controller extends Controller{
+class CVUI_Controller extends Controller
+{
 
 	private $isProtected = false;
 	private $isAdmin = false;
@@ -174,9 +175,6 @@ class CVUI_Controller extends Controller{
 				exit;
 			}
 		}
-
-
-
 	}
 
 	protected function getURISegments(bool $lowercase = true)
