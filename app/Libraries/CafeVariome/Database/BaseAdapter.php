@@ -112,9 +112,9 @@ abstract class BaseAdapter implements IAdapter
 	}
 
 	/**
-	 * @param object $object
+	 * @param object|null $object
 	 * @return IEntity
 	 */
-	public abstract function toEntity(object $object): IEntity;
+	public abstract function toEntity(?object $object): IEntity;
 
 }

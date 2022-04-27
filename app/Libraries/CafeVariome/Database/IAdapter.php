@@ -58,5 +58,5 @@ interface IAdapter
 	 * @param object $object
 	 * @return IEntity
 	 */
-	public function toEntity(object $object): IEntity;
+	public function toEntity(?object $object): IEntity;
 }
