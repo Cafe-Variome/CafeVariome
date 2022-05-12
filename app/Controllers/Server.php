@@ -43,7 +43,7 @@ class Server extends CVUI_Controller
 
 	public function Index()
 	{
-		return redirect()->to(base_url('Server'));
+		return redirect()->to(base_url($this->controllerName . '/List'));
 	}
 
 	public function List()
