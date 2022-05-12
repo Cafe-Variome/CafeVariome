@@ -198,11 +198,11 @@
             </div>
 
 			<li class="nav-item <?= $controllerName == 'Server' ? 'active' : ''?>">
-				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSet" aria-expanded="true" aria-controls="collapseSet">
+				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseServ" aria-expanded="true" aria-controls="collapseServ">
 					<i class="fas fa-fw fa-server"></i>
 					<span>Servers</span>
 				</a>
-				<div id="collapseSet" class="collapse <?= $controllerName == 'Server' ? 'show' : ''?>" aria-labelledby="headingSet" data-parent="#accordionSidebar">
+				<div id="collapseServ" class="collapse <?= $controllerName == 'Server' ? 'show' : ''?>" aria-labelledby="headingServ" data-parent="#accordionSidebar">
 					<div class="bg-white py-2 collapse-inner rounded">
 						<a class="collapse-item" href="<?= base_url('Server/Create') ?>">Create a Server</a>
 						<a class="collapse-item" href="<?= base_url('Server/List') ?>">View Servers</a>
