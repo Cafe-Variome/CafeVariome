@@ -15,12 +15,12 @@ use App\Libraries\CafeVariome\Factory\ServerFactory;
 class ServerAdapter extends BaseAdapter
 {
 	/**
-	 * @var string name of the corresponding table in the database
+	 * @inheritDoc
 	 */
 	protected string $table = 'servers';
 
 	/**
-	 * @var string primary key of the corresponding table in the database
+	 * @inheritDoc
 	 */
 	protected string $key = 'id';
 
@@ -28,6 +28,7 @@ class ServerAdapter extends BaseAdapter
 	 * Converts general PHP objects to a Server object.
 	 * @param object|null $object
 	 * @return IEntity
+	 * @throws \Exception
 	 */
 	public function toEntity(?object $object): IEntity
 	{
