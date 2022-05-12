@@ -1,12 +1,5 @@
 <?php namespace App\Controllers;
 
-use App\Libraries\CafeVariome\Database\ServerAdapter;
-use App\Libraries\CafeVariome\Factory\EntityFactory;
-use App\Libraries\CafeVariome\Factory\ServerAdapterFactory;
-use App\Libraries\CafeVariome\Factory\ServerFactory;
-use App\Models\UIData;
-use CodeIgniter\Config\Services;
-
 /**
  * Server.php
  * Created 22/04/2022
@@ -15,6 +8,10 @@ use CodeIgniter\Config\Services;
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Factory\ServerAdapterFactory;
+use App\Libraries\CafeVariome\Factory\ServerFactory;
+use App\Models\UIData;
+use CodeIgniter\Config\Services;
 
 class Server extends CVUI_Controller
 {
