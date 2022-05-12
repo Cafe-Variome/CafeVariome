@@ -210,6 +210,19 @@
 				</div>
 			</li>
 
+			<li class="nav-item <?= $controllerName == 'Credential' ? 'active' : ''?>">
+				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCred" aria-expanded="true" aria-controls="collapseCred">
+					<i class="fas fa-fw fa-key"></i>
+					<span>Credentials</span>
+				</a>
+				<div id="collapseCred" class="collapse <?= $controllerName == 'Credential' ? 'show' : ''?>" aria-labelledby="headingCred" data-parent="#accordionSidebar">
+					<div class="bg-white py-2 collapse-inner rounded">
+						<a class="collapse-item" href="<?= base_url('Credential/Create') ?>">Create a Credential</a>
+						<a class="collapse-item" href="<?= base_url('Credential/List') ?>">View Credentials</a>
+					</div>
+				</div>
+			</li>
+
             <li class="nav-item <?= $controllerName == 'Setting' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSet" aria-expanded="true" aria-controls="collapseSet">
                 <i class="fas fa-fw fa-cog"></i>
