@@ -38,7 +38,6 @@ class Server extends CVUI_Controller
 
 		$this->validation = Services::validation();
 		$this->dbAdapter = (new ServerAdapterFactory())->getInstance();
-
 	}
 
 	public function Index()
@@ -51,8 +50,7 @@ class Server extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Servers';
 
-		$serverAdapter = new ServerAdapter();
-		$servers = $serverAdapter->ReadAll();
+		$servers = $this->dbAdapter->ReadAll();
 
 		$uidata->data['servers'] = $servers;
 		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
