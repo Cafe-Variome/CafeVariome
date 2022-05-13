@@ -112,6 +112,22 @@ abstract class BaseAdapter implements IAdapter
 	}
 
 	/**
+	 * @return string name of the database table
+	 */
+	public function GetTable(): string
+	{
+		return $this->table;
+	}
+
+	/**
+	 * @return string name of the primary key column of the database table
+	 */
+	public function GetKey(): string
+	{
+		return $this->key;
+	}
+
+	/**
 	 * @param object|null $object
 	 * @return IEntity
 	 */
