@@ -37,6 +37,9 @@
 					<a href="<?= base_url($controllerName . '/Update/' . $servers[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Server">
 						<i class="fa fa-edit text-warning"></i>
 					</a>
+					<a href="<?php echo base_url($controllerName. '/Details'). "/" . $servers[$c]->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Server">
+						<i class="fa fa-eye text-info"></i>
+					</a>
 					<?php if($servers[$c]->removable): ?>
 						<a href="<?= base_url($controllerName . '/Delete/' . $servers[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Server">
 							<i class="fa fa-trash text-danger"></i>

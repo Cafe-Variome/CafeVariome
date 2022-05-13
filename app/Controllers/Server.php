@@ -215,8 +215,17 @@ class Server extends CVUI_Controller
 
 	public function Details(int $id)
 	{
+		$server = $this->dbAdapter->Read($id);
+
+		if ($server->isNull())
+		{
+			$this->setStatusMessage("Server was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
+
 		$uidata = new UIData();
-		$uidata->title = '';
+		$uidata->title = 'Server Details';
+		$uidata->data['server'] = $server;
 
 		$data = $this->wrapData($uidata);
 
