@@ -357,19 +357,52 @@ class ProxyServer extends CVUI_Controller
 
 	public function Delete(int $id)
 	{
+		$proxyServer = $this->dbAdapter->Read($id);
+
+		if ($proxyServer->isNull())
+		{
+			$this->setStatusMessage("Proxy server was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
+
 		$uidata = new UIData();
-		$uidata->title = '';
+		$uidata->title = 'Delete Proxy Server';
+		$uidata->data['proxyServer'] = $proxyServer;
+
+		$this->validation->setRules([
+			'confirm' => [
+				'label'  => 'confirmation',
+				'rules'  => 'required',
+				'errors' => [
+					'required' => '{field} is required.'
+				]
+			],
+
+			'id' => [
+				'label'  => 'Id',
+				'rules'  => 'required|integer',
+				'errors' => [
+					'required' => '{field} is required.',
+					'integer' => '{field} must be a positive and non-zero integer.'
+				]
+			]
+		]);
 
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 		{
 			try
 			{
-				$this->setStatusMessage("Proxy server '' was deleted.", STATUS_SUCCESS);
+				$confirm = $this->request->getVar('confirm');
+				if ($confirm == 'yes')
+				{
+					$this->dbAdapter->Delete($id);
+					$this->setStatusMessage("Proxy server was deleted.", STATUS_SUCCESS);
+				}
 
 			}
 			catch (\Exception $ex)
 			{
-				$this->setStatusMessage("There was a problem deleting Proxy server" . $ex->getMessage(), STATUS_ERROR);
+				$this->setStatusMessage("There was a problem deleting proxy server: " . $ex->getMessage(), STATUS_ERROR);
 			}
 
 			return redirect()->to(base_url($this->controllerName . '/List'));
@@ -377,7 +410,6 @@ class ProxyServer extends CVUI_Controller
 		else
 		{
 			$uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-
 		}
 
 		$data = $this->wrapData($uidata);
