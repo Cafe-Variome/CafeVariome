@@ -31,6 +31,11 @@ abstract class BaseAdapter implements IAdapter
 	protected string $key;
 
 	/**
+	 * @var array list of properties that are foreign keys of other entities
+	 */
+	protected array $foreign_keys;
+
+	/**
 	 * @var \CodeIgniter\Database\BaseBuilder
 	 */
 	protected $builder;
