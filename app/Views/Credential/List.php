@@ -33,6 +33,9 @@
 			<a href="<?= base_url($controllerName . '/Update/' . $credentials[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Credential">
 				<i class="fa fa-edit text-warning"></i>
 			</a>
+			<a href="<?php echo base_url($controllerName. '/Details'). "/" . $credentials[$c]->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Credential">
+				<i class="fa fa-eye text-info"></i>
+			</a>
 			<?php if ($credentials[$c]->removable): ?>
 				<a href="<?= base_url($controllerName . '/Delete/' . $credentials[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Credential">
 					<i class="fa fa-trash text-danger"></i>

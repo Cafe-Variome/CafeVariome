@@ -289,15 +289,24 @@ class Credential extends CVUI_Controller
 		return view($this->controllerName . '/Update', $data);
 	}
 
-//	public function Details(int $id)
-//	{
-//		$uidata = new UIData();
-//		$uidata->title = '';
-//
-//		$data = $this->wrapData($uidata);
-//
-//		return view($this->controllerName . '/Details', $data);
-//	}
+	public function Details(int $id)
+	{
+		$credential = $this->dbAdapter->Read($id);
+
+		if ($credential->isNull())
+		{
+			$this->setStatusMessage("Credential was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
+
+		$uidata = new UIData();
+		$uidata->title = 'Credential Details';
+		$uidata->data['credential'] = $credential;
+
+		$data = $this->wrapData($uidata);
+
+		return view($this->controllerName . '/Details', $data);
+	}
 
 	public function Delete(int $id)
 	{
