@@ -153,8 +153,9 @@ class Compiler
 			$noids = 0;
 			$andids = []; //array of ids for current or statement
 
-			foreach ($current as $pointer)
+			for ($i = 0; $i < count($current); $i++)
 			{
+				$pointer = $current[$i];
 				if ($noids == 1)
 				{
 					break;
@@ -181,6 +182,11 @@ class Compiler
 					$ids = $this->execute_clause($type, $lookup, $source_id, false);
 					$idsCache[$pointer] = $ids;
 
+				}
+
+				if ($i > 0 && count($andids) == 0) // Shortcut to return empty array iff one round of queries has had no results.
+				{
+					break;
 				}
 
 				if (count($andids) > 0)
