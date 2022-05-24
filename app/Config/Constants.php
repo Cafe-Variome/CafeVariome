@@ -96,7 +96,8 @@ define('UPLOAD','upload' . DIRECTORY_SEPARATOR);
 define('UPLOAD_DATA','UploadData' . DIRECTORY_SEPARATOR);
 define('UPLOAD_JSON','json' . DIRECTORY_SEPARATOR);
 define('UPLOAD_PAIRINGS', 'pairings'. DIRECTORY_SEPARATOR);
-define('VENDOR','vendor/');
+define('UPLOAD_ICONS', 'icons'. DIRECTORY_SEPARATOR);
+define('VENDOR', 'vendor' . DIRECTORY_SEPARATOR);
 
 define('RESOURCES_DIR', "resources". DIRECTORY_SEPARATOR);
 define('HEADER_IMAGE_DIR', RESOURCES_DIR . 'images' . DIRECTORY_SEPARATOR . 'logos' . DIRECTORY_SEPARATOR);
