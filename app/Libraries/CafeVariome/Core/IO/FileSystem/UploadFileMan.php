@@ -28,7 +28,8 @@ class UploadFileMan extends FileMan
 		{
             $this->basePath = UPLOAD; // As set in Constants.php
         }
-        else{
+        else
+		{
             $this->basePath = $basePath;
         }
 		$this->useDiskName = $useDiskName;
@@ -36,6 +37,7 @@ class UploadFileMan extends FileMan
         $this->fileStack = $_FILES;
         $this->files = [];
         $this->loadFiles();
+
     }
 
     public function loadFiles()
