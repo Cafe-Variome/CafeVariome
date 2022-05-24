@@ -54,54 +54,54 @@ class FileMan implements IFileMan
     {
         $readMode = 'r';
 
-        if (!$this->handle || $this->mode != $readMode || $this->filePath != $path) {
+        if (!$this->handle || $this->mode != $readMode || $this->filePath != $path)
+		{
             $this->getHandle($path, $readMode, $isRelative);
         }
-        $buffer = ($length != -1) ? fread($this->handle, $length) : fread($this->handle, $this->getSize($path, $isRelative));
 
-        return $buffer;
+		return ($length != -1) ? fread($this->handle, $length) : fread($this->handle, $this->getSize($path, $isRelative));
     }
 
     public function ReadCSV(string $path, int $length = -1, string $delimiter = ',', string $enclosure = '"', string $escape = '\\')
     {
         $readMode = 'r';
 
-        if (!$this->handle || $this->mode != $readMode || $this->filePath != $path) {
+        if (!$this->handle || $this->mode != $readMode || $this->filePath != $path)
+		{
             $this->getHandle($path);
         }
-        $line = ($length != -1) ? fgetcsv($this->handle, $length, $delimiter, $enclosure, $escape) : fgetcsv($this->handle, $this->getSize($path), $delimiter, $enclosure, $escape);
 
-        return $line;
+		return ($length != -1) ? fgetcsv($this->handle, $length, $delimiter, $enclosure, $escape) : fgetcsv($this->handle, $this->getSize($path), $delimiter, $enclosure, $escape);
     }
 
     public function ReadLine(string $path, int $length = -1, $isRelative = true)
     {
         $readMode = 'r';
 
-        if (!$this->handle || $this->mode != $readMode || $this->filePath != $path) {
+        if (!$this->handle || $this->mode != $readMode || $this->filePath != $path)
+		{
             $this->getHandle($path, $readMode, $isRelative);
         }
-        $line = ($length != -1) ? fgets($this->handle, $length) : fgets($this->handle);
 
-        return $line;
+		return ($length != -1) ? fgets($this->handle, $length) : fgets($this->handle);
     }
 
     public function Write(string $path, string $content, bool $append = false, int $length = -1): int
     {
         $writeOrAppend = $append ? 'a+' : 'w+';
 
-        if (!$this->handle || $this->mode != $writeOrAppend || !$append) {
+        if (!$this->handle || $this->mode != $writeOrAppend || !$append)
+		{
             $this->getHandle($path, $writeOrAppend);
         }
 
-        $bytesWritten = ($length != -1) ? fwrite($this->handle, $content, $length) : fwrite($this->handle, $content);
-
-        return $bytesWritten;
+		return ($length != -1) ? fwrite($this->handle, $content, $length) : fwrite($this->handle, $content);
     }
 
     protected function getHandle(string $path, string $mode = 'r', bool $isRelative = true)
     {
-        if ($this->handle) {
+        if ($this->handle)
+		{
             $this->destroyHandle();
         }
         $absPath = $isRelative ? $this->getFullPath() . $path : $path;
@@ -122,7 +122,8 @@ class FileMan implements IFileMan
 
     public function countFiles(): int
     {
-        if ($this->files != null) {
+        if ($this->files != null)
+		{
             return count($this->files);
         }
         return 0;
@@ -141,7 +142,6 @@ class FileMan implements IFileMan
      * This function validates uploaded files before they are moved to software directories.
      * Currently, XLSX, XLS, VCF, and CSV files are supported.
      */
-
 	 public function isValid(File $file, string & $error): bool
 	 {
 		 $fExt = strtolower($file->getExtension());
@@ -155,7 +155,8 @@ class FileMan implements IFileMan
 			 $i = 1;
 			 while (($line = $this->ReadCSV($path, 0)) !== false )
 			 {
-				 if($columnCount != count($line)){
+				 if($columnCount != count($line))
+				 {
 					 $error = "Number of cells do not match number of columns at line: $i";
 					 return false;
 				 }
@@ -231,7 +232,6 @@ class FileMan implements IFileMan
             }
 
 			$error = 'File signature is not valid.';
-
 		}
 
         return false;
@@ -252,7 +252,8 @@ class FileMan implements IFileMan
     public function getExtension(string $path = '')
     {
         $file_name = $path;
-        if (strpos($path, DIRECTORY_SEPARATOR)) {
+        if (strpos($path, DIRECTORY_SEPARATOR))
+		{
             $path_array = explode(DIRECTORY_SEPARATOR, $path);
             $file_name = $path_array[count($path_array) - 1];
         }
@@ -270,7 +271,8 @@ class FileMan implements IFileMan
     {
         $mimetype = mime_content_type($this->getFullPath() . $path);
 
-        if ($mimetype != false) {
+        if ($mimetype != false)
+		{
             return $mimetype;
         }
 
@@ -302,7 +304,8 @@ class FileMan implements IFileMan
 	{
 		 $mimetype = mime_content_type($path);
 
-		 if ($mimetype != false) {
+		 if ($mimetype != false)
+		 {
 			 return $mimetype;
 		 }
 
