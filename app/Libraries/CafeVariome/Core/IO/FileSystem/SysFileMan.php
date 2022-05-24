@@ -1,21 +1,22 @@
 <?php namespace App\Libraries\CafeVariome\Core\IO\FileSystem;
 
 /**
- * SysFileMan.php 
+ * SysFileMan.php
  * Created: 30/09/2020
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
- * System File Manager Class 
+ *
+ * System File Manager Class
  */
 
  class SysFileMan extends FileMan
  {
-    protected $basePath;
-    protected $files;
-    private $extension_filter;
+    protected string $basePath;
+    protected array $files;
+    private array $extension_filter;
 
-    public function __construct(string $basePath = null, bool $recursive = false, array $extension_filter = []) {
+    public function __construct(string $basePath = null, bool $recursive = false, array $extension_filter = [])
+	{
         parent::__construct($basePath);
 
         $this->files = [];
@@ -87,4 +88,3 @@
         return copy($file->getTempPath(), $this->getFullPath() . $path . basename($file->getName()));
     }
  }
- 

@@ -10,13 +10,17 @@
  * File Manager Class
  */
 
- class FileMan implements IFileMan
- {
-    protected $basePath;
-    protected $files;
+class FileMan implements IFileMan
+{
+    protected string $basePath;
+
+    protected array $files;
+
     protected $handle;
-    protected $filePath;
-    private $mode;
+
+    protected string $filePath;
+
+    private string $mode;
 
     public function __construct(string $basePath)
     {

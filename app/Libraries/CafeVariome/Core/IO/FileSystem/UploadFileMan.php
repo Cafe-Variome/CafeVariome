@@ -14,8 +14,10 @@ class UploadFileMan extends FileMan
 {
     private $fileStack;
     private $removeDuplicateFileOnUpload = true;
-    protected $basePath;
-    protected $files;
+    protected string $basePath;
+    protected array $files;
+
+	private int $diskNameLength;
 
     public function __construct(string $basePath = null) {
         parent::__construct($basePath);
