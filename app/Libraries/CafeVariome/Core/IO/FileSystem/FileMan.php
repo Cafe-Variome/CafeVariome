@@ -249,8 +249,8 @@ class FileMan implements IFileMan
         return bin2hex($bin);
     }
 
-    public function getExtension(string $path = '')
-    {
+    public function getExtension(string $path = ''): string
+	{
         $file_name = $path;
         if (strpos($path, DIRECTORY_SEPARATOR))
 		{
