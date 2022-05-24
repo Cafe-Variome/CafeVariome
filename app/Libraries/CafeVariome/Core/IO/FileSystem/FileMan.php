@@ -311,4 +311,37 @@ class FileMan implements IFileMan
 
 		 return '';
 	}
- }
+
+	public function GetImageSize(string $path)
+	{
+		return getimagesize($this->getFullPath() . $path);
+	}
+
+	public function ResizeImage(string $data, int $width, ?int $height)
+	{
+		$sourceImage = imagecreatefromstring($data);
+		if ($sourceImage != false)
+		{
+			$sourceWidth = imagesx($sourceImage);
+			$sourceHeight = imagesy($sourceImage);
+
+			if (is_null($height))
+			{
+				$height = ($sourceHeight/$sourceWidth) * $width;
+			}
+			$destinationImage = imagecreatetruecolor($width, $height);
+			imagecopyresized($destinationImage, $sourceImage,  0, 0, 0, 0, $width, $height, $sourceWidth, $sourceHeight);
+
+			$background = imagecolorallocate($destinationImage , 0, 0, 0);
+			imagecolortransparent($destinationImage, $background);
+
+			imagealphablending($destinationImage, false);
+
+			//imagesavealpha($destinationImage, true);
+
+			imagepng($destinationImage, null, 0);
+
+			imagedestroy($destinationImage);
+		}
+	}
+}
