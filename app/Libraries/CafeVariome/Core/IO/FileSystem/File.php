@@ -27,8 +27,8 @@ class File
 
     }
 
-    private function findExtension()
-    {
+    private function findExtension(): string
+	{
         $fn = $this->name;
 
         if (strpos($fn, '.') != false) {
@@ -48,18 +48,18 @@ class File
         return $this->extension;
     }
 
-    public function getSize()
-    {
+    public function getSize(): float
+	{
         return $this->size;
     }
 
-    public function getTempPath()
-    {
+    public function getTempPath(): string
+	{
         return $this->tempPath;
     }
 
-    public function getType()
-    {
+    public function getType(): string
+	{
         return $this->type;
     }
 }
