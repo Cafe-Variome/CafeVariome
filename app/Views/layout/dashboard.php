@@ -210,6 +210,32 @@
 				</div>
 			</li>
 
+			<li class="nav-item <?= $controllerName == 'ProxyServer' ? 'active' : ''?>">
+				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProxyServ" aria-expanded="true" aria-controls="collapseProxyServ">
+					<i class="fas fa-fw fa-ethernet"></i>
+					<span>Proxy Servers</span>
+				</a>
+				<div id="collapseProxyServ" class="collapse <?= $controllerName == 'ProxyServer' ? 'show' : ''?>" aria-labelledby="headingProxyServ" data-parent="#accordionSidebar">
+					<div class="bg-white py-2 collapse-inner rounded">
+						<a class="collapse-item" href="<?= base_url('ProxyServer/Create') ?>">Create a Proxy Server</a>
+						<a class="collapse-item" href="<?= base_url('ProxyServer/List') ?>">View Proxy Servers</a>
+					</div>
+				</div>
+			</li>
+
+			<li class="nav-item <?= $controllerName == 'SingleSignOnProvider' ? 'active' : ''?>">
+				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSSO" aria-expanded="true" aria-controls="collapseSSO">
+					<i class="fas fa-sign-in-alt"></i>
+					<span>Single Sign-on Providers</span>
+				</a>
+				<div id="collapseSSO" class="collapse <?= $controllerName == 'SingleSignOnProvider' ? 'show' : ''?>" aria-labelledby="headingSSO" data-parent="#accordionSidebar">
+					<div class="bg-white py-2 collapse-inner rounded">
+						<a class="collapse-item" href="<?= base_url('SingleSignOnProvider/Create') ?>">Create a Provider</a>
+						<a class="collapse-item" href="<?= base_url('SingleSignOnProvider/List') ?>">View Providers</a>
+					</div>
+				</div>
+			</li>
+
 			<li class="nav-item <?= $controllerName == 'Credential' ? 'active' : ''?>">
 				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCred" aria-expanded="true" aria-controls="collapseCred">
 					<i class="fas fa-fw fa-key"></i>
