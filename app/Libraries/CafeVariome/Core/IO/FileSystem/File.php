@@ -17,7 +17,24 @@ class File
 
     private float $size;
 
-    public function __construct(string $name, float $size, string $tempPath, string $type, int $error) {
+    private int $error;
+
+    private string $type;
+
+    private string $tempPath;
+
+	private int $diskNameLength;
+
+    public function __construct(
+		string $name,
+		float $size,
+		string $tempPath,
+		string $type,
+		int $error,
+		bool $useDiskName = false,
+		int $diskNameLength = 32
+	)
+	{
         $this->name = preg_replace('/\s+/', '_', $name);
         $this->extension = $this->findExtension();
         $this->size = $size;
@@ -25,26 +42,37 @@ class File
         $this->type = $type;
         $this->error = $error;
 
+		if ($useDiskName)
+		{
+			$this->diskNameLength = $diskNameLength;
+			$this->diskName = $this->generateDiskName() . '.' . $this->extension;
+		}
     }
 
     private function findExtension(): string
 	{
         $fn = $this->name;
 
-        if (strpos($fn, '.') != false) {
+        if (strpos($fn, '.') != false)
+		{
             $fnArr = explode('.', $fn);
-            return $fnArr[count($fnArr) - 1]; 
+            return $fnArr[count($fnArr) - 1];
         }
         return '';
     }
 
     public function getName()
-    {
+	{
         return $this->name;
     }
 
-    public function getExtension()
-    {
+	public function getDiskName(): string
+	{
+		return $this->diskName;
+	}
+
+    public function getExtension(): string
+	{
         return $this->extension;
     }
 
@@ -62,4 +90,12 @@ class File
 	{
         return $this->type;
     }
+
+	/**
+	 * @throws \Exception
+	 */
+	private function generateDiskName(): string
+	{
+		return bin2hex(random_bytes((int)$this->diskNameLength/2));
+	}
 }
