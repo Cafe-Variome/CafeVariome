@@ -89,17 +89,18 @@ defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // highest auto
 *
 */
 
-define('IMAGES','resources/images/');
-define('JS','resources/js/');
-define('CSS','resources/css/');
-define('UPLOAD','upload' . DIRECTORY_SEPARATOR);
-define('UPLOAD_DATA','UploadData' . DIRECTORY_SEPARATOR);
-define('UPLOAD_JSON','json' . DIRECTORY_SEPARATOR);
+define('WRITABLE', 'writable' . DIRECTORY_SEPARATOR);
+define('RESOURCES_DIR', "resources". DIRECTORY_SEPARATOR);
+
+define('IMAGES', RESOURCES_DIR . 'images' . DIRECTORY_SEPARATOR);
+define('JS', RESOURCES_DIR . 'js' . DIRECTORY_SEPARATOR);
+define('CSS', RESOURCES_DIR . 'css' . DIRECTORY_SEPARATOR);
+define('UPLOAD', WRITABLE . 'uploads' . DIRECTORY_SEPARATOR);
+define('UPLOAD_DATA', 'data' . DIRECTORY_SEPARATOR);
 define('UPLOAD_PAIRINGS', 'pairings'. DIRECTORY_SEPARATOR);
 define('UPLOAD_ICONS', 'icons'. DIRECTORY_SEPARATOR);
 define('VENDOR', 'vendor' . DIRECTORY_SEPARATOR);
 
-define('RESOURCES_DIR', "resources". DIRECTORY_SEPARATOR);
 define('HEADER_IMAGE_DIR', RESOURCES_DIR . 'images' . DIRECTORY_SEPARATOR . 'logos' . DIRECTORY_SEPARATOR);
 define('JSON_DATA_DIR', RESOURCES_DIR . "phenotype_lookup_data" . DIRECTORY_SEPARATOR);
 define('USER_INTERFACE_INDEX_DIR', RESOURCES_DIR . "user_interface_index" . DIRECTORY_SEPARATOR);
