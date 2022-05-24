@@ -4,17 +4,18 @@
  * File.php
  * Created: 29/01/2020
  * @author Mehdi Mehtarizadeh
- * 
+ *
  */
 
 class File
 {
-    private $name;
-    private $extension;
-    private $size;
-    private $error;
-    private $type;
-    private $tempPath;
+    private string $name;
+
+	private string $diskName;
+
+    private string $extension;
+
+    private float $size;
 
     public function __construct(string $name, float $size, string $tempPath, string $type, int $error) {
         $this->name = preg_replace('/\s+/', '_', $name);
