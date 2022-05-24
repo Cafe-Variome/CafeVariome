@@ -27,7 +27,9 @@
         "league/oauth2-client": "^2.6",
         "laudis/neo4j-php-client": "^2.4",
         "guzzlehttp/psr7":  "2.0.0",
-        "ext-sodium": "*"
+        "ext-sodium": "*",
+        "ext-fileinfo": "*",
+        "ext-gd": "*"
     },
     "require-dev": {
 		"fakerphp/faker": "^1.9",
