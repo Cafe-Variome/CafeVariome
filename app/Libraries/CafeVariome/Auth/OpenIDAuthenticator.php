@@ -151,7 +151,6 @@ abstract class OpenIDAuthenticator extends Authenticator
                 'user_id'                   => $authenticatedUser->id,
                 'ip_address'                => $authenticatedUser->ip_address,
                 'username'                  => $authenticatedUser->username,
-                // 'password'                  => $authenticatedUser->password,
                 'email'                     => $authenticatedUser->email,
                 'activation_code'           => $authenticatedUser->activation_code,
                 'forgotten_password_code'   => $authenticatedUser->forgotten_password_code,
@@ -163,10 +162,8 @@ abstract class OpenIDAuthenticator extends Authenticator
                 'first_name'                => $authenticatedUser->first_name,
                 'last_name'                 => $authenticatedUser->last_name,
                 'company'                   => $authenticatedUser->company,
-                // 'controller'                => "auth_federated",
                 'is_admin'                  => $authenticatedUser->is_admin,
                 'Token'                     => $sess,
-                'query_builder_basic'		=> 'yes',
                 'state_bool'                => 1,
                 'state'						=> $keys
             );
