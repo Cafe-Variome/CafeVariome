@@ -1,8 +1,5 @@
 <?php namespace App\Controllers;
 
-use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
-use App\Libraries\CafeVariome\Net\HPONetworkInterface;
-
 /**
  * ContentAPI.php
  *
@@ -14,6 +11,10 @@ use App\Libraries\CafeVariome\Net\HPONetworkInterface;
  * This controller contains endpoints that serve (static) content.
  */
 
+use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
+use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
+use App\Libraries\CafeVariome\Net\HPONetworkInterface;
+
 class ContentAPI extends BaseController
 {
 	public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
@@ -21,14 +22,15 @@ class ContentAPI extends BaseController
 		parent::initController($request, $response, $logger);
 	}
 
-	public function hpoQuery(string $hpo_term = ''){
-
+	public function hpoQuery(string $hpo_term = '')
+	{
 		$hpoNetworkInterface = new HPONetworkInterface();
 		$results = $hpoNetworkInterface->getHPO($hpo_term);
 		return json_encode($results);
 	}
 
-	public function buildHPOTree() {
+	public function buildHPOTree()
+	{
 		if ($this->request->isAJAX())
 		{
 			$hpoNetworkInterface = new HPONetworkInterface();
@@ -83,7 +85,8 @@ class ContentAPI extends BaseController
 		}
 	}
 
-	public function loadOrpha(){
+	public function loadOrpha()
+	{
 		$this->response->setHeader("Content-Type", "application/json");
 
 		$path = FCPATH . RESOURCES_DIR . STATIC_DIR;
@@ -101,5 +104,37 @@ class ContentAPI extends BaseController
 		}
 
 		return json_encode($terms);
+	}
+
+	public function SingleSignOnIcon(int $id)
+	{
+		$singleSignOnProviderAdapterFactory = new SingleSignOnProviderAdapterFactory();
+		$singleSignOnProvider = $singleSignOnProviderAdapterFactory->getInstance()->Read($id);
+
+		if ($singleSignOnProvider->isNull())
+		{
+			//Return 404
+			return $this->response->setStatusCode(404, 'Not found.');
+		}
+
+		if ($singleSignOnProvider->icon != null)
+		{
+			$basePath = FCPATH . UPLOAD . UPLOAD_ICONS;
+			$fileMan = new SysFileMan($basePath);
+			if($fileMan->Exists($singleSignOnProvider->icon))
+			{
+				$this->response->setHeader('Content-type', $fileMan->getMimeType($singleSignOnProvider->icon));
+				$s = $fileMan->GetImageSize($singleSignOnProvider->icon);
+				return $this->response->setStatusCode(200)->setBody($fileMan->ResizeImage($fileMan->Read($singleSignOnProvider->icon), 64, null));
+			}
+		}
+
+		$fileMan = new SysFileMan(IMAGES . DIRECTORY_SEPARATOR . 'cafevariome' . DIRECTORY_SEPARATOR);
+
+		if($fileMan->Exists('sso-icon.png'))
+		{
+			$this->response->setHeader('Content-type', $fileMan->getMimeType('sso-icon.png'));
+			return $this->response->setStatusCode(200)->setBody($fileMan->ResizeImage($fileMan->Read('sso-icon.png'), 64, null));
+		}
 	}
 }
