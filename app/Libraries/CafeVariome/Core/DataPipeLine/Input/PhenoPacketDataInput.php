@@ -61,7 +61,10 @@ class PhenoPacketDataInput extends DataInput
                     for ($i=0; $i < count($target); $i++) {
                         $this->meta[$target[$i]['namespacePrefix']] = [];
                         $this->meta[$target[$i]['namespacePrefix']]['meta_name'] = $target[$i]['name'];
-                        $this->meta[$target[$i]['namespacePrefix']]['meta_version'] = $target[$i]['version'];
+                        // Some Ontologies (like OMIM) dont have versions
+                        if (isset($target[$i]['version'])) {
+                            $this->meta[$target[$i]['namespacePrefix']]['meta_version'] = $target[$i]['version'];
+                        }
                     }
                 }
 
@@ -241,10 +244,12 @@ class PhenoPacketDataInput extends DataInput
 								$meta_name_attribute_id = $this->getAttributeIdByName('meta_name'); // Get attribute id of 'meta_name'
 								$meta_name_value_id = $this->getValueIdByNameAndAttributeId($meta[$prefix]['meta_name'], 'meta_name'); // Add '$meta[$prefix]['meta_name']' as a value for 'meta_name' and get its id
                                 $this->createEAV($uid, $file, $id,$meta_name_attribute_id, $meta_name_value_id);
-
-								$meta_version_attribute_id = $this->getAttributeIdByName('meta_version'); // Get attribute id of 'meta_version'
-								$meta_version_value_id = $this->getValueIdByNameAndAttributeId($meta[$prefix]['meta_version'], 'meta_version'); // Add '$meta[$prefix]['meta_version']' as a value for 'meta_version' and get its id
-								$this->createEAV($uid, $file, $id,$meta_version_attribute_id, $meta_version_value_id);
+                                // Make sure we do have a version for this meta
+                                if (isset($meta[$prefix]['meta_version'])) {
+    								$meta_version_attribute_id = $this->getAttributeIdByName('meta_version'); // Get attribute id of 'meta_version'
+    								$meta_version_value_id = $this->getValueIdByNameAndAttributeId($meta[$prefix]['meta_version'], 'meta_version'); // Add '$meta[$prefix]['meta_version']' as a value for 'meta_version' and get its id
+    								$this->createEAV($uid, $file, $id,$meta_version_attribute_id, $meta_version_value_id);
+                                }
 
                                 array_push($done['meta'], $prefix);
                             }
@@ -425,10 +430,11 @@ class PhenoPacketDataInput extends DataInput
 								$meta_name_attribute_id = $this->getAttributeIdByName('meta_name'); // Get attribute id of 'meta_name'
 								$meta_name_value_id = $this->getValueIdByNameAndAttributeId($meta[$prefix]['meta_name'], 'meta_name'); // Add '$meta[$prefix]['meta_name']' as a value for 'meta_name' and get its id
 								$this->createEAV($uid, $file, $id, $meta_name_attribute_id, $meta_name_value_id);
-
-								$meta_version_attribute_id = $this->getAttributeIdByName('meta_version'); // Get attribute id of 'meta_version'
-								$meta_version_value_id = $this->getValueIdByNameAndAttributeId($meta[$prefix]['meta_version'], 'meta_version'); // Add '$meta[$prefix]['meta_version']' as a value for 'meta_version' and get its id
-								$this->createEAV($uid, $file, $id, $meta_version_attribute_id, $meta_version_value_id);
+                                if (isset($meta[$prefix]['meta_version'])) {
+    								$meta_version_attribute_id = $this->getAttributeIdByName('meta_version'); // Get attribute id of 'meta_version'
+    								$meta_version_value_id = $this->getValueIdByNameAndAttributeId($meta[$prefix]['meta_version'], 'meta_version'); // Add '$meta[$prefix]['meta_version']' as a value for 'meta_version' and get its id
+    								$this->createEAV($uid, $file, $id, $meta_version_attribute_id, $meta_version_value_id);
+                                }
 
                                 array_push($done['meta'], $prefix);
                             }
