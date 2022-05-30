@@ -12,80 +12,51 @@
         <table class="table table-bordered table-striped table-hover" id="userdetailstable" style="width:40%;">
             <tr>
                 <th>ID</th>
-                <td><?php echo $id; ?></td>
+                <td><?php echo $user->getID(); ?></td>
             </tr>
 			<tr>
 				<th>Full Name</th>
-				<td><?php echo $first_name . " " . $last_name; ?></td>
+				<td><?php echo $user->first_name . " " . $user->last_name; ?></td>
             </tr>
 			<tr>
 				<th>Email</th>
-				<td><?php echo $uemail; ?></td>
+				<td><?php echo $user->email; ?></td>
             </tr>
 			<tr>
 				<th>Company</th>
-				<td><?php echo $company; ?></td>
+				<td><?php echo $user->company; ?></td>
             </tr>
-			<tr>
-				<th>Phone</th>
-				<td><?php echo $phone; ?></td>
-            </tr>
+<!--			<tr>-->
+<!--				<th>Phone</th>-->
+<!--				<td>--><?php //echo $user->phone; ?><!--</td>-->
+<!--            </tr>-->
 			<tr>
             <th>Remote</th>
-				<td><?php if ($remote) {
-						echo 'Remote User';
-					} else {
-						echo 'Local User';
-					} ?>
-				</td>
-            </tr>
-			<tr>
-            <th>Network Groups</th>
-				<td>
-					<?php if (isset($users_groups)) : ?>
-						<?php if (array_key_exists($id, $users_groups)) : ?>
-							<?php foreach ($users_groups[$id] as $group) : ?>
-								<?php echo "<i>'" . $group['group_description'] . "' Network Group</i> (Network: " . $group['network_name'] . ");<br/>" ?>
-							<?php endforeach ?>
-						<?php else : echo "None"; ?>
-						<?php endif; ?>
-					<?php endif; ?>
-				</td>
+				<td><?= $user->remote ? 'Remote User' : 'Local User' ?></td>
             </tr>
 			<tr>
 				<th>Last Login</th>
-				<td><?= $last_login; ?></td>
+				<td><?= $user->last_login ? date("H:i:s d-m-Y T", $user->last_login) : 'This user has not logged in yet.' ; ?></td>
             </tr>
 			<tr>
 				<th>Created On</th>
-				<td><?= $created_on; ?></td>
+				<td><?= date("H:i:s d-m-Y T", $user->last_login); ?></td>
             </tr>
 			<tr>
 				<th>Role</th>
-				<td>
-					<?php if ($is_admin) {
-						echo 'Admin';
-					} else {
-						echo 'User';
-					} ?>
-				</td>
+				<td><?= $user->is_admin ? 'Admin' : 'User' ?></td>
             </tr>
 			<tr>
 				<th>IP Address</th>
-				<td><?php echo $ip_address; ?></td>
+				<td><?php echo $user->ip_address; ?></td>
             </tr>
 			<tr>
             	<th>Status</th>
-				<td><?php if ($active) {
-						echo 'Active';
-					} else {
-						echo 'Inactive';
-					} ?>
-				</td>
+				<td><?= $user->active ? 'Active' : 'Inactive' ?></td>
             </tr>
         </table>
         <hr />
-        <a href="<?= base_url($controllerName . '/Update') . "/" . $id; ?>" class="btn btn-warning bg-gradient-warning">
+        <a href="<?= base_url($controllerName . '/Update') . "/" . $user->getID(); ?>" class="btn btn-warning bg-gradient-warning">
             <i class="fa fa-edit"></i>&nbsp;Edit
 		</a>
 		<a href="<?php echo base_url($controllerName); ?>" class="btn btn-secondary bg-gradient-secondary">

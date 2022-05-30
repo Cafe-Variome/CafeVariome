@@ -16,7 +16,7 @@
 		</div>
 	</div>
 <?php endif; ?>
-<?php echo form_open($controllerName."/Update/". $user_id); ?>
+<?php echo form_open($controllerName."/Update/". $id); ?>
 <?php echo form_hidden('uemail', $uemail); ?>
     <div class="form-group">
         <?php echo form_label('Email as Username: (*)', 'email'); ?>
@@ -42,14 +42,14 @@
     </div>
     <div class="form-group">
         <div class="custom-control custom-checkbox">
-            <?php echo form_checkbox($isadmin); ?>
-            <?php echo form_label('Assign admin rights to user for this installation.', 'isadmin', array("class"=>"custom-control-label")); ?>
+            <?php echo form_checkbox($is_admin); ?>
+            <?php echo form_label('Assign admin rights to user for this installation.', 'is_admin', array("class"=>"custom-control-label")); ?>
         </div>
     </div>
     <div class="form-group">
         <div class="custom-control custom-checkbox">
-            <?php echo form_checkbox($isremote); ?>
-            <?php echo form_label('This user is a remote user from a different installation.', 'isremote', array("class"=>"custom-control-label")); ?>
+            <?php echo form_checkbox($remote); ?>
+            <?php echo form_label('This user is a remote user from a different installation.', 'remote', array("class"=>"custom-control-label")); ?>
         </div>
     </div>
     <div class="form-group row">

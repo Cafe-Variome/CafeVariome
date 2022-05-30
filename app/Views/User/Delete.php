@@ -7,10 +7,10 @@
 	</div>
 </div>
 <hr>
-<?php echo form_open($controllerName.'/Delete/'.$id); ?>
+<?php echo form_open($controllerName.'/Delete/'.$user->getID()); ?>
 <div class="form-group">
     <span class="text-danger">
-        Warning: Are you sure you want to delete user <?= $first_name . ' ' . $last_name ?>?
+        Warning: Are you sure you want to delete user <?= $user->first_name . ' ' . $user->last_name ?>?
     </span>
 </div>
 <div class="form-group">
