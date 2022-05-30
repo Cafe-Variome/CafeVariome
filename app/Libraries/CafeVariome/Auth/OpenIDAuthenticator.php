@@ -1,5 +1,4 @@
-<?php
-namespace App\Libraries\CafeVariome\Auth;
+<?php namespace App\Libraries\CafeVariome\Auth;
 
 /**
  * Name: OpenIDAuthenticator.php
@@ -8,277 +7,399 @@ namespace App\Libraries\CafeVariome\Auth;
  *
  */
 
-use App\Models\IonAuthModel;
-use App\Models\User;
+use App\Libraries\CafeVariome\Database\UserAdapter;
+use App\Libraries\CafeVariome\Entities\IEntity;
+use App\Libraries\CafeVariome\Factory\CredentialAdapterFactory;
+use App\Libraries\CafeVariome\Factory\ProxyServerAdapterFactory;
+use App\Libraries\CafeVariome\Factory\ServerAdapterFactory;
+use App\Libraries\CafeVariome\Factory\UserAdapterFactory;
+use App\Libraries\CafeVariome\Factory\UserFactory;
+use App\Libraries\CafeVariome\Helpers\Core\URLHelper;
+use App\Libraries\CafeVariome\Net\OpenIDNetworkInterface;
+use App\Libraries\CafeVariome\Security\Cryptography;
 use App\Libraries\CafeVariome\Net\cURLAdapter;
+use App\Libraries\CafeVariome\Entities\SingleSignOnProvider;
 
-
-abstract class OpenIDAuthenticator extends Authenticator
+class OpenIDAuthenticator
 {
-    protected $provider;
-    protected $options;
-    protected $serverURI;
-    protected $serverPort;
-    protected $realm;
-    protected $clientId;
-    protected $clientSecret;
-    protected $loginURI;
-    protected $networkAdapterConfig;
+    protected SingleSignOnProvider $provider;
 
-    private $proxyDetails;
+    protected array $options;
 
-    public function __construct()
+	protected string $state;
+
+	protected array $scopes;
+
+	protected array $proxyOptions;
+
+	private UserAdapter $userAdapter;
+
+	protected ?string $lastError;
+
+	protected string $baseURL;
+
+	protected $session;
+
+    public function __construct(SingleSignOnProvider $provider)
 	{
-        parent::__construct();
-        $this->initiateOpenIDParams();
-    }
+		$this->provider = $provider;
+		$this->userAdapter = (new UserAdapterFactory())->getInstance();
+		$options = [];
+		$this->state = '';
+		$this->proxyOptions = [];
+		$this->lastError = null;
+		$this->session =  \Config\Services::session();
 
-    private function initiateOpenIDParams()
-    {
-        $this->serverURI = $this->setting->getOpenIDEndpoint();
-        $this->serverPort = $this->setting->getOpenIDPort();
-        $this->realm = $this->setting->getOpenIDRealm();
-        $this->clientId = $this->setting->getOpenIDClientId();
-        $this->clientSecret = $this->setting->getOpenIDClientSecret();
+		$server = (new ServerAdapterFactory())->getInstance()->Read($provider->server_id);
+		$this->baseURL = URLHelper::InsertPort($server->address, $provider->port);
 
-        $this->networkAdapterConfig = config('NetworkAdapter');
-        $this->proxyDetails = $this->networkAdapterConfig->proxyDetails;
+		if ($provider->credential_id != null)
+		{
+			$credential = (new CredentialAdapterFactory())->getInstance()->Read($provider->credential_id);
 
-        $this->loginURI = base_url('auth/login');//$this->setting->getOpenIDRedirectUri();
-    }
+			if (!$credential->isNull())
+			{
+				$options['client_id'] = $credential->username;
+				$options['client_secret'] = Cryptography::Decrypt($credential->password, $credential->hash);
+			}
+		}
 
-    protected function configureProxy()
+		if ($provider->proxy_server_id != null)
+		{
+			$proxyServer = (new ProxyServerAdapterFactory())->getInstance()->Read($provider->proxy_server_id);
+			if (!$proxyServer->isNull())
+			{
+				$this->proxyOptions['hostname'] = (new ServerAdapterFactory())->getInstance()->Read($proxyServer->server_id)->address;
+				$this->proxyOptions['port'] = $proxyServer->port;
+
+				$proxyServerCredential = (new CredentialAdapterFactory())->getInstance()->Read($provider->credential_id);
+				if (!$proxyServerCredential->isNull())
+				{
+					$this->proxyOptions['username'] = $proxyServerCredential->username;
+					$this->proxyOptions['password']  = Cryptography::Decrypt($proxyServerCredential->password, $proxyServerCredential->hash);
+				}
+			}
+		}
+
+		$openIDNetworkInterface = new OpenIDNetworkInterface($this->baseURL, $this->proxyOptions);
+		$metaData = $openIDNetworkInterface->GetMetaData(null);
+
+		$options['authorization_endpoint'] = $metaData['authorization_endpoint'];
+		$options['redirect_uri'] = base_url('Auth/Login');
+		$options['token_endpoint'] = $metaData['token_endpoint'];
+		$options['userinfo_endpoint'] = $metaData['userinfo_endpoint'];
+		$options['end_session_endpoint'] = $metaData['end_session_endpoint'];
+
+		$this->options = $options;
+
+		$this->scopes = ['email'];
+	}
+
+	public function GetAuthenticationURL(): string
 	{
-        $proxyUserPass = ($this->proxyDetails['username'] != '' && $this->proxyDetails['password'] != '') ? $this->proxyDetails['username'] . ':' . $this->proxyDetails['password'] . '@' : '';
-        $this->options['proxy'] = $proxyUserPass . $this->proxyDetails['hostname'] . ':' . $this->proxyDetails['port'];
-        $this->options['verify'] = false;
-    }
+		$authParams = $this->GenerateAuthenticationParameters();
+		return $this->AttachQuery($this->options['authorization_endpoint'], $this->GenerateQueryString($authParams));
+	}
 
-    public function getToken()
-    {
-        $token = new \League\OAuth2\Client\Token\AccessToken(['access_token' => $this->session->get('state')->getToken()]);
-        return $token;
-    }
-
-    /**
-     * Login - Begin Keycloak login process when called first time. If redirected from
-     *         keycloak upon successful login pull out tokens for success process
-     *
-     * @param N/A
-     * @return N/A
-     */
-
-    public function login():bool
-    {
-        if (!isset($_GET['code']))
-		{
-
-            $authUrl = $this->provider->getAuthorizationUrl();
-            $this->session->set('oauth2state', $this->provider->getState());
-            header('Location: '.$authUrl);
-
-            exit;
-        }
-		elseif (empty($_GET['state']) || ($_GET['state'] !== $this->session->get('oauth2state')))
-		{
-
-            $this->session->remove('oauth2state');
-            exit('Invalid state, make sure HTTP sessions are enabled.');
-
-        }
-		else
-		{
-            try
-			{
-                $token = $this->provider->getAccessToken('authorization_code', [
-                    'code' => $_GET['code']
-                ]);
-                $this->session->set('state', $token);
-
-            } catch (\Exception $e)
-			{
-                exit('Failed to get access token: '.$e->getMessage());
-            }
-
-            try
-			{
-                $user = $this->provider->getResourceOwner($token);
-                $userArray = $user->toArray();
-				$IonAuthModel = new IonAuthModel();
-				$IonAuthModel->updateLastLogin($this->getUserIdByEmail($userArray['email'])); // Update last login
-                $this->recordSession($token, $userArray['email']);
-                return true;
-
-            } catch (\Exception $e)
-			{
-                exit('Failed to get resource owner: '.$e->getMessage());
-            }
-        }
-        return false;
-    }
-
-    public function getUser($token)
+	public function GetLogoutURL(): string
 	{
-        return $this->provider->getResourceOwner($token);
-    }
+		$authParams = $this->GenerateAuthenticationParameters();
+		return $this->AttachQuery($this->options['end_session_endpoint'], $this->GenerateQueryString($authParams));
+	}
+
+	public function GetState(): ?string
+	{
+		return $this->state;
+	}
+
+	public function GetAccessToken(array $input): ?string
+	{
+		$accessTokenURL = $this->options['token_endpoint'];
+
+		$openIDNetworkInterface = new OpenIDNetworkInterface($accessTokenURL, $this->proxyOptions);
+
+		$params = [
+			'grant_type' => 'authorization_code',
+			'client_id'     => $this->options['client_id'],
+            'client_secret' => $this->options['client_secret'],
+            'redirect_uri'  => $this->options['redirect_uri'],
+		];
+
+		$params = array_merge($params, $input);
+
+		$encodedCredentials = base64_encode(sprintf('%s:%s', $params['client_id'], $params['client_secret']));
+		$params['credential'] = $encodedCredentials;
+		unset($params['client_id'], $params['client_secret']);
+
+		$response = $openIDNetworkInterface->GetToken($this->GenerateQueryString($params), $params['credential']);
+
+		if (is_array($response))
+		{
+			if (array_key_exists('error', $response))
+			{
+				$this->lastError = 'There was an error while trying to get an access token: ' . $response['error_description'];
+			}
+			else if (array_key_exists('access_token', $response))
+			{
+				if (array_key_exists('refresh_token', $response))
+				{
+					$this->session->set('oidc_refresh_token', $response['refresh_token']);
+				}
+				return $response['access_token'];
+			}
+		}
+		return null;
+	}
+
+	public function GetRefreshToken(array $input): ?string
+	{
+		$accessTokenURL = $this->options['token_endpoint'];
+
+		$openIDNetworkInterface = new OpenIDNetworkInterface($accessTokenURL, $this->proxyOptions);
+
+		$params = [
+			'grant_type' => 'refresh_token',
+			'client_id'     => $this->options['client_id'],
+			'client_secret' => $this->options['client_secret'],
+			'redirect_uri'  => $this->options['redirect_uri'],
+		];
+
+		$params = array_merge($params, $input);
+
+		$encodedCredentials = base64_encode(sprintf('%s:%s', $params['client_id'], $params['client_secret']));
+		$params['credential'] = $encodedCredentials;
+		unset($params['client_id'], $params['client_secret']);
+
+		$response = $openIDNetworkInterface->GetToken($this->GenerateQueryString($params), $params['credential']);
+
+		if (is_array($response))
+		{
+			if (array_key_exists('error', $response))
+			{
+				$this->lastError = 'There was an error while trying to get a refresh token: ' . $response['error_description'];
+			}
+			else if (array_key_exists('access_token', $response))
+			{
+				return $response['access_token'];
+			}
+		}
+		return null;
+	}
+
+	public function GetResourceOwner(string $token)
+	{
+		$resourceOwnerURL = $this->options['userinfo_endpoint'];
+
+		$openIDNetworkInterface = new OpenIDNetworkInterface($resourceOwnerURL, $this->proxyOptions);
+
+		return $openIDNetworkInterface->GetResourceOwner($token);
+	}
+
+	public function LinkUserToAccount(string $email, int $policy, string $ip_address, ?string $first_name = null, ?string $last_name = null): int
+	{
+		$id = $this->userAdapter->ReadIdByEmail($email);
+
+		if (is_null($id))
+		{
+			if ($policy == SINGLE_SIGNON_POST_AUTH_CREATE_ACCOUNT)
+			{
+				// Create account
+				return	$this->userAdapter->Create(
+						(new UserFactory())->getInstanceFromParameters(
+							$email, $email, $first_name, $last_name, $ip_address, null
+					));
+			}
+			else if ($policy == SINGLE_SIGNON_POST_AUTH_LINK_ACCOUNT)
+			{
+				return -1;
+			}
+		}
+
+		return $id;
+	}
+
+	protected function GenerateAuthenticationParameters(): array
+	{
+		$params = [
+			'response_type'   => 'code',
+			'approval_prompt' => 'auto'
+		];
+
+		if ($this->state == '')
+		{
+			$this->state = $this->GetRandomString();
+		}
+
+		$params['state'] = $this->state;
+
+		if (count($this->scopes) == 0)
+		{
+			$this->scopes = $this->GetDefaultScopes();
+		}
+		$params['scopes'] = implode(' ', $this->scopes);
+
+		$params['redirect_uri'] = $this->GetRedirectURI();
+		$params['client_id'] = $this->options['client_id'];
+
+		return $params;
+	}
+
+	protected function GetRandomString(int $length = 32): string
+	{
+		return bin2hex(random_bytes($length / 2));
+	}
+
+	protected function GetDefaultScopes(): array
+	{
+		return ['profile', 'email'];
+	}
+
+	protected function GetRedirectURI(): string
+	{
+		return base_url('Auth/Login');
+	}
+
+	protected function AttachQuery(string $url, string $query): string
+	{
+		$query = trim($query, '?&');
+
+		if ($query)
+		{
+			$glue = strstr($url, '?') === false ? '?' : '&';
+			return $url . $glue . $query;
+		}
+
+		return $url;
+	}
+
+	protected function GenerateQueryString(array $options): string
+	{
+		return http_build_query($options, '', '&', \PHP_QUERY_RFC3986);
+	}
+
+	public function GetPostAuthenticationPolicy(): int
+	{
+		return $this->provider->authentication_policy;
+	}
+
+	public function UpdateLastLogin(int $user_id): bool
+	{
+		return $this->userAdapter->UpdateLastLogin($user_id);
+	}
+
+	public function GetUserById(int $user_id): IEntity
+	{
+		return $this->userAdapter->Read($user_id);
+	}
+
+	public function GetLastError(): ?string
+	{
+		return $this->lastError;
+	}
+
+	public function GetProfileEndpoint()
+	{
+		return rtrim($this->baseURL, '/') . '/account/';
+	}
 
     /**
 	 * Get user id
 	 * @return integer|null The user's ID from the session user data or NULL if not found
 	 *
 	 **/
-    public function getUserId()
+    public function GetUserId(): int
 	{
-        return $this->session->get('user_id');
-    }
-
-    protected function recordSession($keys, string $email)
-	{
-        $userModel = new User();
-        $authenticatedUser = $userModel->getUserByUsername($email);
-
-        if($authenticatedUser)
-        {
-	    // Changed Operator from && to ||
-            if($authenticatedUser->active == 0 || $authenticatedUser->remote == 1)
-			{
-                $this->logout();
-            }
-
-            $sess = $this->_get_Unique_Identifier();
-            $session_data = array(
-                'identity'                  => $authenticatedUser->username,
-                'user_id'                   => $authenticatedUser->id,
-                'ip_address'                => $authenticatedUser->ip_address,
-                'username'                  => $authenticatedUser->username,
-                'email'                     => $authenticatedUser->email,
-                'activation_code'           => $authenticatedUser->activation_code,
-                'forgotten_password_code'   => $authenticatedUser->forgotten_password_code,
-                'forgotten_password_time'   => $authenticatedUser->forgotten_password_time,
-                'remember_code'             => $authenticatedUser->remember_code,
-                'created_on'                => $authenticatedUser->created_on,
-                'old_last_login'            => $authenticatedUser->last_login,
-                'active'                    => $authenticatedUser->active,
-                'first_name'                => $authenticatedUser->first_name,
-                'last_name'                 => $authenticatedUser->last_name,
-                'company'                   => $authenticatedUser->company,
-                'is_admin'                  => $authenticatedUser->is_admin,
-                'Token'                     => $sess,
-                'state_bool'                => 1,
-                'state'						=> $keys
-            );
-            $this->session->set($session_data);
-        }
-        else
+		if($this->session->has('user_id'))
 		{
-            $this->logout();
-        }
+			return intval($this->session->get('user_id'));
+		}
+
+		return -1;
     }
 
-    public function loggedIn(): bool
+	public function GetUserIdByToken(string $token): int
+	{
+		$resourceOwner = $this->GetResourceOwner($token);
+		if (is_array($resourceOwner))
+		{
+			if (array_key_exists('email', $resourceOwner))
+			{
+				return $this->userAdapter->ReadIdByEmail($resourceOwner['email']);
+			}
+		}
+
+		return -1;
+	}
+
+    public function RecordSession(\App\Libraries\CafeVariome\Entities\User $user)
+	{
+		$session_data = array(
+			'user_id'                   => $user->getID(),
+			'username'                  => $user->username,
+			'email'                     => $user->email,
+			'first_name'                => $user->first_name,
+			'is_admin'                  => $user->is_admin,
+		);
+		$this->session->set($session_data);
+    }
+
+    public function LoggedIn(): bool
 	{
         if ($this->session->has('state'))
 		{
-            try
-			{
-                $token = $this->getToken();
-                $user = $this->getUser($token);
-                if ($user && $user->toArray()['email'] == $this->session->get('email'))
+				$token = $this->GetRefreshToken(['refresh_token' => $this->session->get('oidc_refresh_token')]);
+				if (!is_null($token))
 				{
-                    return true;
-                }
-            }
-            catch (\Exception $ex)
-			{
-                try
-				{
-                    $token = $this->provider->getAccessToken('refresh_token', ['refresh_token' => $this->session->get('state')->getRefreshToken()]);
-                    $this->session->set('state', $token);
-                }
-                catch (\Exception $ex)
-				{
-                    error_log($ex->getMessage());
-                }
-            }
-        }
+					$this->session->set('state', $token);
+					return true;
+				}
+		}
 
         return false;
     }
 
+	public function RemoveSession()
+	{
+		$this->session->remove('state');
+		$this->session->remove('oidc_refresh_token');
+		$this->session->remove('oauth2state');
+	}
+
     /**
-	 * Check to see if the currently logged in user is an admin.
-     *
-	 * @author Mehdi Mehtarizadeh
-	 * @param integer $id User id
-	 *
+	 * Check to see if the currently logged-in user is an admin.
 	 * @return boolean Whether the user is an administrator
 	 *
 	 */
-	public function isAdmin(): bool
+	public function IsAdmin(): bool
 	{
         return $this->session->get('is_admin');
     }
 
     /**
-     * ping
+     * Ping
      * Checks the availability of auth server.
      * @param N/A
      * @return bool
      */
-    public function ping()
+    public function Ping(): bool
 	{
-        if (strpos($this->serverURI, '/auth') == false)
-		{
-            $this->serverURI .= '/auth/';
-        }
-        if (substr($this->serverURI, strlen($this->serverURI) - 1, strlen($this->serverURI)) !== '/')
-		{
-            $this->serverURI .= '/';
-        }
         $curlOptions = [CURLOPT_NOBODY => true];
-        $netAdapterConfig = config('NetworkAdapter');
+        $cURLAdapter = new cURLAdapter($this->baseURL, $curlOptions);
 
-        $cURLAdapter = new cURLAdapter($this->serverURI, $curlOptions);
-        if ($netAdapterConfig->useProxy)
+		$cURLAdapter->setOption(CURLOPT_FOLLOWLOCATION, true);
+		$cURLAdapter->setOption(CURLOPT_HTTPPROXYTUNNEL, 1);
+		$cURLAdapter->setOption(CURLOPT_PROXY, $this->proxyOptions['hostname']);
+		$cURLAdapter->setOption(CURLOPT_PROXYPORT, $this->proxyOptions['port']);
+
+		if ($this->proxyOptions['username'] != '' && $this->proxyOptions['password'] != '')
 		{
-            $proxyDetails = $netAdapterConfig->proxyDetails;
+			$cURLAdapter->setOption(CURLOPT_PROXYUSERPWD, $this->proxyOptions['username'] . ':' . $this->proxyOptions['password']);
+		}
 
-            $cURLAdapter->setOption(CURLOPT_FOLLOWLOCATION, true);
-            $cURLAdapter->setOption(CURLOPT_HTTPPROXYTUNNEL, 1);
-            $cURLAdapter->setOption(CURLOPT_PROXY, $proxyDetails['hostname']);
-            $cURLAdapter->setOption(CURLOPT_PROXYPORT, $proxyDetails['port']);
-
-            if ($proxyDetails['username'] != '' && $proxyDetails['password'] != '')
-			{
-                $cURLAdapter->setOption(CURLOPT_PROXYUSERPWD, $proxyDetails['username'] . ':' . $proxyDetails['password']);
-            }
-        }
 
         $cURLAdapter->Send();
         $httpStatus = $cURLAdapter->getInfo(CURLINFO_HTTP_CODE);
 
         return $httpStatus == 200;
     }
-
-    /**
-     * _get_Unique_Identifier
-     * Generates a uuid for Token attribute in session data.
-     * @param N/A
-     * @return string
-     */
-    private function _get_Unique_Identifier()
-	{
-        mt_srand((double)microtime()*10000);//optional for php 4.2.0 and up.
-        $charid = strtoupper(md5(uniqid(rand(), true)));
-        $hyphen = chr(45);// "-"
-        $uuid = chr(123)// "{"
-            .substr($charid, 0, 8).$hyphen
-            .substr($charid, 8, 4).$hyphen
-            .substr($charid,12, 4).$hyphen
-            .substr($charid,16, 4).$hyphen
-            .substr($charid,20,12)
-            .chr(125);// "}"
-        return $uuid;
-    }
-
 }
