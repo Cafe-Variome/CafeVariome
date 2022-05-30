@@ -47,8 +47,6 @@ class SingleSignOnProviderFactory extends EntityFactory
 	 * @param int|null $credential_id credential to be used for the provider if the client is confidential
 	 * @param int|null $proxy_server_id proxy server to be used to access the provider server
 	 * @param string|null $icon icon file to be shown in the login page
-	 * @param string|null $logout_url logout URL if it cannot be retrieved automatically
-	 * @param string|null $realm realm of the client, if provided
 	 * @param bool $removable if the provider is removable by the admin
 	 * @return SingleSignOnProvider
 	 * @throws \Exception
@@ -65,8 +63,6 @@ class SingleSignOnProviderFactory extends EntityFactory
 		?int $credential_id,
 		?int $proxy_server_id,
 		?string $icon,
-		?string $logout_url,
-		?string $realm,
 		bool $removable = true
 	): SingleSignOnProvider
 	{
@@ -82,8 +78,6 @@ class SingleSignOnProviderFactory extends EntityFactory
 			'credential_id' => $credential_id,
 			'proxy_server_id' => $proxy_server_id,
 			'icon' => $icon,
-			'logout_url' => $logout_url,
-			'realm' => $realm,
 			'removable' => $removable
 		]);
 	}

@@ -79,17 +79,6 @@
 
 <div class="form-group row">
 	<div class="col-6">
-		<?php echo form_label('Realm', 'realm'); ?>
-		<?php echo form_input($realm); ?>
-	</div>
-	<div class="col-6">
-		<?php echo form_label('Logout URL', 'logout_url'); ?>
-		<?php echo form_input($logout_url); ?>
-	</div>
-</div>
-
-<div class="form-group row">
-	<div class="col-6">
 		<?php echo form_label('Type', 'type'); ?>
 		<?php echo form_dropdown($type); ?>
 	</div>

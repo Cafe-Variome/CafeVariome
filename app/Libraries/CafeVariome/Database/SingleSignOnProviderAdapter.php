@@ -9,6 +9,7 @@
  */
 
 use App\Libraries\CafeVariome\Entities\IEntity;
+use App\Libraries\CafeVariome\Factory\ServerAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SingleSignOnProviderFactory;
 
 class SingleSignOnProviderAdapter extends BaseAdapter
@@ -22,6 +23,47 @@ class SingleSignOnProviderAdapter extends BaseAdapter
 	 * @inheritDoc
 	 */
 	protected string $key = 'id';
+
+	public function ReadUserLoginSingleSignOnProviders(): array
+	{
+		$this->builder->select();
+		$this->builder->where('user_login', true);
+		$results = $this->builder->get()->getResult();
+
+		$entities = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			array_push($entities, $this->toEntity($results[$c]));
+		}
+
+		return $entities;
+	}
+
+	/**
+	 * @param string $url
+	 * @param bool $query
+	 * @return IEntity
+	 * @throws \Exception
+	 */
+	public function ReadByURL(string $url, bool $query = true): IEntity
+	{
+		$serverAdapter = (new ServerAdapterFactory())->getInstance();
+		$serverTable = $serverAdapter->GetTable();
+		$serverKey = $serverAdapter->GetKey();
+		$this->builder->select( $this->table . '.*');
+		$this->builder->join($serverTable, $serverTable . '.' . $serverKey . '=' . $this->table . '.server_id');
+		$this->builder->where($serverTable . '.address', $url);
+		$this->builder->where($this->table . '.query', $query);
+		$results = $this->builder->get()->getResult();
+
+		$record = null;
+		if (count($results) == 1)
+		{
+			$record = $results[0];
+		}
+
+		return $this->toEntity($record);
+	}
 
 	/**
 	 * Converts general PHP objects to a SingleSignOnProvider object.
