@@ -166,22 +166,6 @@ class SingleSignOnProvider extends CVUI_Controller
 					'max_length' => 'Maximum length of {field} is 11 digits.'
 				]
 			],
-			'realm' => [
-				'label'  => 'Realm',
-				'rules'  => 'permit_empty|alpha_numeric|max_length[512]',
-				'errors' => [
-					'alpha_numeric' => '{field} can only have alphanumeric characters.',
-					'max_length' => 'Maximum length of {field} is 512 characters.'
-				]
-			],
-			'logout_url' => [
-				'label'  => 'Logout URL',
-				'rules'  => 'permit_empty|string|max_length[512]',
-				'errors' => [
-					'string' => '{field} must be a valid string.',
-					'max_length' => 'Maximum length of {field} is 512 characters.'
-				]
-			],
 			'type' => [
 				'label'  => 'Type',
 				'rules'  => 'integer|greater_than_equal_to[0]|max_length[3]',
@@ -225,16 +209,14 @@ class SingleSignOnProvider extends CVUI_Controller
 				$server_id = $this->request->getVar('server_id');
 				$port = $this->request->getVar('port');
 				$credential_id = $this->request->getVar('credential_id') > 0 ? $this->request->getVar('credential_id') : null;
-				$realm = $this->request->getVar('realm');
-				$logout_url = $this->request->getVar('logout_url');
 				$proxy_server_id = $this->request->getVar('proxy_server_id') > 0 ? $this->request->getVar('proxy_server_id') : null;
 				$type = $this->request->getVar('type');
 				$query = $this->request->getVar('query') ? true : false;
-				$user_login = $this->request->getVar('login') ? true : false;
+				$user_login = $this->request->getVar('user_login') ? true : false;
 				$authentication_policy = $this->request->getVar('authentication_policy');
 
 				$this->dbAdapter->Create((new SingleSignOnProviderFactory())->getInstanceFromParameters(
-					$name, $display_name, $type, $port, $authentication_policy, $query, $user_login, $server_id, $credential_id, $proxy_server_id, $icon, $logout_url, $realm
+					$name, $display_name, $type, $port, $authentication_policy, $query, $user_login, $server_id, $credential_id, $proxy_server_id, $icon
 				));
 
 				$this->setStatusMessage("Single SignOn Provider $name was created.", STATUS_SUCCESS);
@@ -311,22 +293,6 @@ class SingleSignOnProvider extends CVUI_Controller
 				'class' => 'form-control',
 				'value' => set_value('credential_id'),
 				'options' => $credentialsList
-			);
-
-			$uidata->data['logout_url'] = array(
-				'name' => 'logout_url',
-				'id' => 'logout_url',
-				'type' => 'text',
-				'class' => 'form-control',
-				'value' =>set_value('logout_url'),
-			);
-
-			$uidata->data['realm'] = array(
-				'name' => 'realm',
-				'id' => 'realm',
-				'type' => 'text',
-				'class' => 'form-control',
-				'value' =>set_value('realm'),
 			);
 
 			$uidata->data['proxy_server_id'] = array(
@@ -481,22 +447,6 @@ class SingleSignOnProvider extends CVUI_Controller
 					'max_length' => 'Maximum length of {field} is 11 digits.'
 				]
 			],
-			'realm' => [
-				'label'  => 'Realm',
-				'rules'  => 'permit_empty|alpha_numeric|max_length[512]',
-				'errors' => [
-					'alpha_numeric' => '{field} can only have alphanumeric characters.',
-					'max_length' => 'Maximum length of {field} is 512 characters.'
-				]
-			],
-			'logout_url' => [
-				'label'  => 'Logout URL',
-				'rules'  => 'permit_empty|string|max_length[512]',
-				'errors' => [
-					'string' => '{field} must be a valid string.',
-					'max_length' => 'Maximum length of {field} is 512 characters.'
-				]
-			],
 			'type' => [
 				'label'  => 'Type',
 				'rules'  => 'integer|greater_than_equal_to[0]|max_length[3]',
@@ -549,16 +499,14 @@ class SingleSignOnProvider extends CVUI_Controller
 				$server_id = $this->request->getVar('server_id');
 				$port = $this->request->getVar('port');
 				$credential_id = $this->request->getVar('credential_id') > 0 ? $this->request->getVar('credential_id') : null;
-				$realm = $this->request->getVar('realm');
-				$logout_url = $this->request->getVar('logout_url');
 				$proxy_server_id = $this->request->getVar('proxy_server_id') > 0 ? $this->request->getVar('proxy_server_id') : null;
 				$type = $this->request->getVar('type');
 				$query = $this->request->getVar('query') ? true : false;
-				$user_login = $this->request->getVar('login') ? true : false;
+				$user_login = $this->request->getVar('user_login') ? true : false;
 				$authentication_policy = $this->request->getVar('authentication_policy');
 
 				$this->dbAdapter->Update($id, (new SingleSignOnProviderFactory())->getInstanceFromParameters(
-					$name, $display_name, $type, $port, $authentication_policy, $query, $user_login, $server_id, $credential_id, $proxy_server_id, $icon, $logout_url, $realm
+					$name, $display_name, $type, $port, $authentication_policy, $query, $user_login, $server_id, $credential_id, $proxy_server_id, $icon
 				));
 
 				$this->setStatusMessage("Single Sign-on Provider '$name' was updated.", STATUS_SUCCESS);
@@ -639,22 +587,6 @@ class SingleSignOnProvider extends CVUI_Controller
 				'value' => set_value('credential_id'),
 				'options' => $credentialsList,
 				'selected' => $singleSignOnProvider->credential_id
-			);
-
-			$uidata->data['logout_url'] = array(
-				'name' => 'logout_url',
-				'id' => 'logout_url',
-				'type' => 'text',
-				'class' => 'form-control',
-				'value' =>set_value('logout_url', $singleSignOnProvider->logout_url),
-			);
-
-			$uidata->data['realm'] = array(
-				'name' => 'realm',
-				'id' => 'realm',
-				'type' => 'text',
-				'class' => 'form-control',
-				'value' =>set_value('realm', $singleSignOnProvider->realm),
 			);
 
 			$uidata->data['proxy_server_id'] = array(

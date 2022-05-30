@@ -41,16 +41,6 @@ class SingleSignOnProvider extends Entity
 	public int $port;
 
 	/**
-	 * @var string
-	 */
-	public ?string $logout_url;
-
-	/**
-	 * @var string|null
-	 */
-	public ?string $realm;
-
-	/**
 	 * @var bool
 	 */
 	public bool $user_login;
