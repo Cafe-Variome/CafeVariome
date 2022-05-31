@@ -13,17 +13,15 @@
  */
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceNetworkIndex;
+use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
+use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
+use App\Libraries\CafeVariome\Helpers\Core\URLHelper;
 use CodeIgniter\RESTful\ResourceController;
-use CodeIgniter\API\ResponseTrait;
-use CodeIgniter\Controller;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
-
 use App\Libraries\CafeVariome\Core\APIResponseBundle;
-use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
-use CodeIgniter\Config\Services;
 
 
 class QueryApi extends ResourceController
@@ -42,38 +40,47 @@ class QueryApi extends ResourceController
 
     public function Query()
     {
-        $network_key = $this->request->getVar('network_key');
+        $networkKey = $this->request->getVar('network_key');
         $queryString = $this->request->getVar('query');
-        //$user_id = $this->request->getVar('user_id');
         $token = json_decode($this->request->getVar('token'), true);
+		$providerURL = $this->request->getVar('authentication_url');
+		$providerURL = str_replace(URLHelper::ExtractPort($providerURL), '', $providerURL); // Extract and remove port, if it exists
+		$singleSignOnProvider = (new SingleSignOnProviderAdapterFactory())->getInstance()->ReadByURL($providerURL);
+
 		$apiResponseBundle = new APIResponseBundle();
 
-        if ($token != null) {
-
-            $token = new \League\OAuth2\Client\Token\AccessToken($token);
-            $authAdapterConfig = config('AuthAdapter');
-            $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
-            $user_id = $authAdapter->getUserIdByToken($token);
-
-            $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler();
-
-            $networkRequestModel = new NetworkRequest();
-            $resp = [];
-            try {
-                $resp = $cafeVariomeQuery->CompileAndRunQuery($queryString, $network_key, $user_id);
-                $apiResponseBundle->initiateResponse(1, json_decode($resp, true));
-
-            } catch (\Exception $ex) {
-                error_log($ex->getMessage());
-                $apiResponseBundle->initiateResponse(0);
-                $apiResponseBundle->setResponseMessage($ex->getMessage());
-            }
-        }
-        else{
-            //No token present with query, unauthorised
-            $apiResponseBundle->initiateResponse(0);
-            $apiResponseBundle->setResponseMessage('Token not found. Unauthorised query.');
-        }
+		if (!$singleSignOnProvider->isNull())
+		{
+			if ($token != null)
+			{
+				$authenticator = (new AuthenticatorFactory())->GetInstance($singleSignOnProvider);
+				$user_id = $authenticator->GetUserIdByToken($token);
+				$cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler();
+				try
+				{
+					$resp = $cafeVariomeQuery->CompileAndRunQuery($queryString, $networkKey, $user_id);
+					$apiResponseBundle->initiateResponse(1, json_decode($resp, true));
+				}
+				catch (\Exception $ex)
+				{
+					error_log($ex->getMessage());
+					$apiResponseBundle->initiateResponse(0);
+					$apiResponseBundle->setResponseMessage($ex->getMessage());
+				}
+			}
+			else
+			{
+				//No token present with query, unauthorised
+				$apiResponseBundle->initiateResponse(0);
+				$apiResponseBundle->setResponseMessage('Token not found. Unauthorised query.');
+			}
+		}
+		else
+		{
+			// Authentication provider not found
+			$apiResponseBundle->initiateResponse(0);
+			$apiResponseBundle->setResponseMessage('Authentication provider not found. Unauthorised query.');
+		}
         return $this->respond($apiResponseBundle->getResponseJSON());
     }
 

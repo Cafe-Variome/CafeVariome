@@ -10,21 +10,17 @@
  * @author Vatsalya Maddi
 */
 
-use App\Libraries\CafeVariome\Auth\AuthAdapter;
+use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
+use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
+use App\Libraries\CafeVariome\Helpers\Core\URLHelper;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 use App\Libraries\CafeVariome\Query\Compiler;
 use App\Models\Settings;
-use CodeIgniter\HTTP\Message;
 use CodeIgniter\RESTful\ResourceController;
-use CodeIgniter\API\ResponseTrait;
-use CodeIgniter\Controller;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
-use App\Libraries\CafeVariome\Net\ServiceInterface;
-use App\Libraries\CafeVariome\Core\APIResponseBundle;
-use CodeIgniter\Config\Services;
 use App\Libraries\CafeVariome\Beacon\Beacon;
 
 class BeaconAPI extends ResourceController
@@ -152,8 +148,8 @@ class BeaconAPI extends ResourceController
 		)
 		{
 			// If no token is specified then drop the request with a 400.
-			$result = "This is a secure Beacon API. Please include a valid authentication token.";
-			return $this->response->setStatusCode(400)->setBody($result);
+			$result = "This is a secure Beacon API. Please include a valid authentication token along with an authentication URL.";
+			return $this->response->setStatusCode(403)->setBody($result);
 		}
 
 		if (
@@ -163,15 +159,23 @@ class BeaconAPI extends ResourceController
 		{
 			// If no network key is specified then drop the request with a 403.
 			$result = "Please specify the network key you want to discover on.";
+			return $this->response->setStatusCode(400)->setBody($result);
+		}
+
+		$providerURL = $this->request->getVar('authentication-url');
+		$providerURL = str_replace(URLHelper::ExtractPort($providerURL), '', $providerURL); // Extract and remove port, if it exists
+		$singleSignOnProvider = (new SingleSignOnProviderAdapterFactory())->getInstance()->ReadByURL($providerURL);
+
+		if (!$singleSignOnProvider->isNull())
+		{
+			$result = "The authentication URL provided has not been authorized on for use on this Beacon server.";
 			return $this->response->setStatusCode(403)->setBody($result);
 		}
 
-		$tokenObj = new \League\OAuth2\Client\Token\AccessToken(['access_token' =>  $token]);
-		$authAdapterConfig = config('AuthAdapter');
-		$authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
-		$user_id = $authAdapter->getUserIdByToken($tokenObj);
+		$authenticator = (new AuthenticatorFactory())->GetInstance($singleSignOnProvider);
+		$user_id = $authenticator->GetUserIdByToken($token);
 
-		$queryCompiler = new  \App\Libraries\CafeVariome\Query\Compiler();
+		$queryCompiler = new Compiler();
 
         $eavQueries = [];
         $diseaseCodes = [];
