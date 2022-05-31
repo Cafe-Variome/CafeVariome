@@ -49,7 +49,7 @@ class QueryApi extends ResourceController
 
 		if ($providerURL != null)
 		{
-			$providerURL = str_replace(URLHelper::ExtractPort($providerURL), '', $providerURL); // Extract and remove port, if it exists
+			$providerURL = str_replace(':' . URLHelper::ExtractPort($providerURL), '', $providerURL); // Extract and remove port, if it exists
 			$singleSignOnProvider = (new SingleSignOnProviderAdapterFactory())->getInstance()->ReadByURL($providerURL);
 
 
