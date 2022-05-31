@@ -15,6 +15,8 @@
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceNetworkIndex;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\File;
+use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
+use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use CodeIgniter\Controller;
 use Config\Database;
 use App\Models\Settings;
@@ -26,10 +28,9 @@ use App\Models\Upload;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
-use App\Libraries\CafeVariome\Auth\AuthAdapter;
 
-class AjaxApi extends Controller{
-
+class AjaxApi extends Controller
+{
 	protected $db;
 
     protected $setting;
@@ -48,21 +49,33 @@ class AjaxApi extends Controller{
         $this->uploadModel = new Upload();
     }
 
-    public function query() {
+    public function query()
+	{
         $networkInterface = new NetworkInterface();
-		$authAdapterConfig = config('AuthAdapter');
-        $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
+
+		$session = \Config\Services::session();
 
         //Check to see if user is logged in
-        if (!$authAdapter->loggedIn()) {
-            return json_encode(['timeout' => 'Your session has timed out. You need to login again.']);
-        }
+        if (!$session->has(AUTHENTICATOR_SESSION_NAME))
+		{
+			return json_encode(['timeout' => 'Your session has timed out. You need to login again.']);
+		}
+		$authenticatorFactory = new AuthenticatorFactory();
+		$authenticator = $authenticatorFactory->GetInstance(
+			(new SingleSignOnProviderAdapterFactory())->getInstance()->Read(
+				$session->get(AUTHENTICATOR_SESSION_NAME)
+			));
+
+		if (!$authenticator->LoggedIn())
+		{
+			return json_encode(['timeout' => 'Your session has timed out. You need to login again.']);
+		}
 
         $network_key = $this->request->getVar('network_key');
         $queryString = json_encode($this->request->getVar('jsonAPI'));
-        $token = $authAdapter->getToken();
+        $token = $authenticator->GetRefreshToken(['refresh_token' => $session->get(SSO_REFRESH_TOKEN_SESSION_NAME)]);
 
-        $user_id = $authAdapter->getUserIdByToken($token);
+        $user_id = $authenticator->GetUserIdByToken($token);
 
         try {
             $results = [];
