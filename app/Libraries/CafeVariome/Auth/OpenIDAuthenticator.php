@@ -32,7 +32,7 @@ class OpenIDAuthenticator
 
 	protected array $proxyOptions;
 
-	private UserAdapter $userAdapter;
+	protected UserAdapter $userAdapter;
 
 	protected ?string $lastError;
 
