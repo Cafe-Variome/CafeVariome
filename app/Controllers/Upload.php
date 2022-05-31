@@ -43,7 +43,7 @@ use CodeIgniter\Config\Services;
      * @return N/A
      */
     public function Phenopacket($source_id) {
-        $user_id = $this->authAdapter->getUserId();
+        $user_id = $this->authenticator->getUserId();
 
         // data for hidden input for source
         $uidata = new UIData();
@@ -75,7 +75,7 @@ use CodeIgniter\Config\Services;
 
         $uidata = new UIData();
         $uidata->title = "Upload VCF Files";
-        $user_id = $this->authAdapter->getUserId();
+        $user_id = $this->authenticator->getUserId();
 
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
         $uidata->data['source_id'] = $source_id;
@@ -100,7 +100,7 @@ use CodeIgniter\Config\Services;
 
         $uidata = new UIData();
         $uidata->title = "Upload Spreadsheet File";
-		$user_id = $this->authAdapter->getUserID();
+		$user_id = $this->authenticator->getUserID();
 
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
         $uidata->data['user_id'] = $user_id;
@@ -125,7 +125,7 @@ use CodeIgniter\Config\Services;
     {
         $uidata = new UIData();
         $uidata->title = "Import Files";
-        $user_id = $this->authAdapter->getUserId();
+        $user_id = $this->authenticator->getUserId();
 
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
         $uidata->data['user_id'] = $user_id;
@@ -148,7 +148,7 @@ use CodeIgniter\Config\Services;
         $uidata = new UIData();
         $uidata->title = "Universal Upload";
         // Since this is a shared function for curators and admin check that the curator is a curator for this source
-        $user_id = $this->authAdapter->getUserId();
+        $user_id = $this->authenticator->getUserId();
 
         $uidata->data['source_name'] = $this->sourceModel->getSourceNameByID($source_id);
         $uidata->data['user_id'] = $user_id;
