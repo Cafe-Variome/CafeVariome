@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 31, 2022 at 03:01 PM
+-- Generation Time: May 31, 2022 at 03:11 PM
 -- Server version: 5.7.38-0ubuntu0.18.04.1
 -- PHP Version: 8.0.19
 
@@ -81,6 +81,13 @@ CREATE TABLE `credentials` (
   `hide_username` bit(1) NOT NULL,
   `removable` bit(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `credentials`
+--
+
+INSERT INTO `credentials` (`id`, `name`, `username`, `password`, `hash`, `hide_username`, `removable`) VALUES
+(1, 'Leicester KeyCloak Client', 'test_client', 'jZveJcMZsyfvX63Gyx+ArisbxCvh+1MA30PRvW1ih8GapHiMWMKQvi0FAS5pLZCx7BsDaLggopo1abiOaDj7zegu2Z7UpiJFIo3MIEc=', '7fab8bd26ba101c1dbdae766674197e2a424512d8eebcdf12e645dc1f73d6a5c', b'1', b'0');
 
 -- --------------------------------------------------------
 
@@ -321,7 +328,7 @@ CREATE TABLE `pipelines` (
 --
 
 INSERT INTO `pipelines` (`id`, `name`, `subject_id_location`, `subject_id_attribute_name`, `subject_id_assignment_batch_size`, `subject_id_prefix`, `expansion_columns`, `expansion_policy`, `expansion_attribute_name`, `grouping`, `group_columns`, `dateformat`, `internal_delimiter`) VALUES
-(1, 'default', 0, 'subject_id', 1, '', '', NULL, NULL, 0, '', NULL, ',');
+(1, 'csvpipeline', 0, 'subject_id', 1, '', '', NULL, NULL, 0, '', NULL, ',');
 
 -- --------------------------------------------------------
 
@@ -355,7 +362,7 @@ CREATE TABLE `servers` (
 --
 
 INSERT INTO `servers` (`id`, `name`, `address`, `removable`) VALUES
-(4, 'ULEICS-Keycloak', 'https://auth.discoverynexus.org/auth/realms/ERN/', b'0');
+(1, 'ULEICS-Keycloak', 'https://auth.discoverynexus.org/auth/realms/ERN/', b'0');
 
 -- --------------------------------------------------------
 
@@ -426,7 +433,7 @@ CREATE TABLE `single_sign_on_providers` (
 --
 
 INSERT INTO `single_sign_on_providers` (`id`, `server_id`, `name`, `display_name`, `icon`, `type`, `port`, `user_login`, `query`, `authentication_policy`, `credential_id`, `proxy_server_id`, `removable`) VALUES
-(11, 4, 'ULEICS-Keycloak', 'ULEICS Key Cloak', 'a6c7c364b3a2d47cca77a6983c.png', 1, 443, b'1', b'1', 0, 5, NULL, b'0');
+(1, 1, 'ULEICS-Keycloak', 'ULEICS Key Cloak', 'a6c7c364b3a2d47cca77a6983c.png', 1, 443, b'1', b'1', 0, 1, NULL, b'0');
 
 -- --------------------------------------------------------
 
@@ -841,7 +848,7 @@ ALTER TABLE `attribute_mappings`
 -- AUTO_INCREMENT for table `credentials`
 --
 ALTER TABLE `credentials`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `eavs`
@@ -913,7 +920,7 @@ ALTER TABLE `pages`
 -- AUTO_INCREMENT for table `pipelines`
 --
 ALTER TABLE `pipelines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `proxy_servers`
@@ -925,19 +932,19 @@ ALTER TABLE `proxy_servers`
 -- AUTO_INCREMENT for table `servers`
 --
 ALTER TABLE `servers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `settings`
 --
 ALTER TABLE `settings`
-  MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `single_sign_on_providers`
 --
 ALTER TABLE `single_sign_on_providers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `sources`
@@ -967,13 +974,13 @@ ALTER TABLE `upload_jobs`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users_groups`
 --
 ALTER TABLE `users_groups`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users_groups_networks`
