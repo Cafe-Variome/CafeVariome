@@ -106,6 +106,11 @@ class OpenIDAuthenticator
 		$this->scopes = ['email'];
 	}
 
+	public function GetBaseURL(): string
+	{
+		return $this->baseURL;
+	}
+
 	public function GetAuthenticationURL(): string
 	{
 		$authParams = $this->GenerateAuthenticationParameters();
