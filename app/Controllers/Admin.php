@@ -9,20 +9,19 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Factory\UserAdapterFactory;
 use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use App\Models\UIData;
 use App\Models\Settings;
-use App\Models\Network;
 use App\Models\Source;
-use App\Models\User;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
-use App\Libraries\CafeVariome\Auth\KeyCloak;
 use App\Models\NetworkRequest;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Config\Services;
 
-class Admin extends CVUI_Controller{
+class Admin extends CVUI_Controller
+{
 
     /**
 	 * Validation list template.
@@ -36,7 +35,8 @@ class Admin extends CVUI_Controller{
 	 * Constructor
 	 *
 	 */
-    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+	{
         parent::setProtected(true);
         parent::setIsAdmin(true);
         parent::initController($request, $response, $logger);
@@ -49,7 +49,8 @@ class Admin extends CVUI_Controller{
 
     }
 
-    public function Index(){
+    public function Index()
+	{
         $uidata = new UIData();
         $uidata->title = "Administrator Dashboard";
         $uidata->stickyFooter = false;
@@ -58,11 +59,9 @@ class Admin extends CVUI_Controller{
 
         $sourceModel = new Source();
         $networkInterface = new NetworkInterface();
-        $userModel = new User();
         $networkRequestModel = new NetworkRequest();
 
         $neo4j = new Neo4J();
-        $keyCloak = new KeyCloak();
         $service = new ServiceInterface();
 
         $sourceList = $sourceModel->getSources('source_id, name', ['status'=>'online']);
@@ -71,14 +70,18 @@ class Admin extends CVUI_Controller{
         $maxSourcesToDisplay = 12;
         $sourceCountList = [];
         $sourceNameLabels = '';
-        foreach ($sourceList as $source) {
-            if ($sc > $maxSourcesToDisplay) {
+        foreach ($sourceList as $source)
+		{
+            if ($sc > $maxSourcesToDisplay)
+			{
                 break;
             }
-            if ($sc == count($sourceList) - 1 || $sc == $maxSourcesToDisplay) {
+            if ($sc == count($sourceList) - 1 || $sc == $maxSourcesToDisplay)
+			{
                 $sourceNameLabels .= "'" . $source['name']. "'";
             }
-            else{
+            else
+			{
                 $sourceNameLabels .= "'" . $source['name']. "',";
             }
 
@@ -90,34 +93,38 @@ class Admin extends CVUI_Controller{
         $uidata->data['sourceNames'] = $sourceNameLabels;
 
         $networks = $networkInterface->GetNetworksByInstallationKey($this->setting->getInstallationKey());
-        if ($networks->status) {
+        if ($networks->status)
+		{
             $uidata->data['networksCount'] = count($networks->data);
             $uidata->data['networkMsg'] = null;
         }
-        else{
+        else
+		{
             //Problem contacting network server
             $uidata->data['networksCount'] = "-";
             $uidata->data['networkMsg'] = "There was a problem in communicating with network software. Please fix it as the system is unable to function correctly.";
         }
 
-        $uidata->data['usersCount'] = count($userModel->getUsers('id'));
+        $uidata->data['usersCount'] = count((new UserAdapterFactory())->getInstance()->ReadAll());
         $uidata->data['networkRequestCount'] = count($networkRequestModel->getNetworkRequests('id', ['status' => -1]));
 
         $elasticStatus = ElasticsearchHelper::ping();
         $uidata->data['elasticStatus'] = $elasticStatus;
         $uidata->data['elasticMsg'] = null;
-        if (!$elasticStatus) {
+        if (!$elasticStatus)
+		{
             $uidata->data['elasticMsg'] = "Elasticsearch is not running. The query interface is not accessible. Please ask the server administrator to start it.";
         }
 
         $neo4jStatus = $neo4j->ping();
         $uidata->data['neo4jStatus'] = $neo4jStatus;
         $uidata->data['neo4jMsg'] = null;
-        if (!$neo4jStatus) {
+        if (!$neo4jStatus)
+		{
             $uidata->data['neo4jMsg'] = "Neo4J is not running. Some capabilities of the system are disabled because of this. Please ask the server administrator to start it.";
         }
 
-        $uidata->data['keycloakStatus'] = $keyCloak->ping();
+        $uidata->data['keycloakStatus'] = false;
         $uidata->data['serviceStatus'] = $service->ping();
 
         $data = $this->wrapData($uidata);
