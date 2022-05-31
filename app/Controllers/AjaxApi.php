@@ -93,7 +93,7 @@ class AjaxApi extends Controller
                     if ($installation->installation_key != $this->setting->getInstallationKey()) {
                         // Send the query
                         $queryNetInterface = new QueryNetworkInterface($installation->base_url);
-                        $queryResponse = $queryNetInterface->query($queryString, (int) $network_key, $token);
+                        $queryResponse = $queryNetInterface->query($queryString, (int) $network_key, $authenticator->GetBaseURL(), $token);
                         if ($queryResponse->status) {
                             array_push($results, json_encode($queryResponse->data));
                         }
