@@ -59,6 +59,8 @@ writable/session/*
 
 writable/uploads/*
 !writable/uploads/index.html
+!writable/uploads/data/index.html
+!writable/uploads/icons/index.html
 
 writable/debugbar/*
 
@@ -124,10 +126,6 @@ nb-configuration.xml
 
 /results/
 /phpunit*.xml
-
-resources/phenotype_lookup_data/*
-!resources/phenotype_lookup_data/.htaccess
-!resources/phenotype_lookup_data/index.html
 
 resources/user_interface_index/*
 !resources/user_interface_index/.htaccess
