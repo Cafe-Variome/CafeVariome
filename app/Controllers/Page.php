@@ -87,7 +87,7 @@ class Page extends CVUI_Controller
 		{
             $pageTitle = $this->request->getVar('ptitle');
             $pageContent = $this->request->getVar('pcontent');
-            $user_id = $this->authAdapter->getUserId();
+            $user_id = $this->authenticator->getUserId();
 
             $pageData = ['Title' => $pageTitle, 'Content' => $pageContent, 'Author' => $user_id, 'Removable' => 1, 'Active' => 1];
 
@@ -167,7 +167,7 @@ class Page extends CVUI_Controller
 		{
             $pageTitle = $this->request->getVar('ptitle');
             $pageContent = $this->request->getVar('pcontent');
-            $user_id = $this->authAdapter->getUserId();
+            $user_id = $this->authenticator->getUserId();
 
             $updateData = ['Title' => $pageTitle, 'Content' => $pageContent, 'Author' => $user_id];
 
