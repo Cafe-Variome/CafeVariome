@@ -40,6 +40,12 @@ class OpenIDAuthenticator
 
 	protected $session;
 
+	protected const AUTHENTICATOR_SESSION = AUTHENTICATOR_SESSION_NAME;
+	protected const SSO_RANDOM_STATE_SESSION = SSO_RANDOM_STATE_SESSION_NAME;
+	protected const SSO_TOKEN_SESSION = SSO_TOKEN_SESSION_NAME;
+	protected const SSO_REFRESH_TOKEN_SESSION = SSO_REFRESH_TOKEN_SESSION_NAME;
+	protected const POST_AUTHENTICATION_REDIRECT_URL_SESSION = POST_AUTHENTICATION_REDIRECT_URL_SESSION_NAME;
+
     public function __construct(SingleSignOnProvider $provider)
 	{
 		$this->provider = $provider;
@@ -143,7 +149,7 @@ class OpenIDAuthenticator
 			{
 				if (array_key_exists('refresh_token', $response))
 				{
-					$this->session->set('oidc_refresh_token', $response['refresh_token']);
+					$this->session->set(self::SSO_REFRESH_TOKEN_SESSION, $response['refresh_token']);
 				}
 				return $response['access_token'];
 			}
@@ -345,12 +351,12 @@ class OpenIDAuthenticator
 
     public function LoggedIn(): bool
 	{
-        if ($this->session->has('state'))
+        if ($this->session->has(self::SSO_RANDOM_STATE_SESSION))
 		{
-				$token = $this->GetRefreshToken(['refresh_token' => $this->session->get('oidc_refresh_token')]);
+				$token = $this->GetRefreshToken(['refresh_token' => $this->session->get(self::SSO_REFRESH_TOKEN_SESSION)]);
 				if (!is_null($token))
 				{
-					$this->session->set('state', $token);
+					$this->session->set(self::SSO_RANDOM_STATE_SESSION, $token);
 					return true;
 				}
 		}
@@ -360,9 +366,9 @@ class OpenIDAuthenticator
 
 	public function RemoveSession()
 	{
-		$this->session->remove('state');
-		$this->session->remove('oidc_refresh_token');
-		$this->session->remove('oauth2state');
+		$this->session->remove(self::SSO_RANDOM_STATE_SESSION);
+		$this->session->remove(self::SSO_REFRESH_TOKEN_SESSION);
+		$this->session->remove(self::SSO_RANDOM_STATE_SESSION);
 	}
 
     /**
