@@ -27,7 +27,8 @@ class Discover extends CVUI_Controller{
 	 * Constructor
 	 *
 	 */
-    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+	{
         parent::setProtected(true);
         parent::setIsAdmin(false);
         parent::initController($request, $response, $logger);
@@ -35,17 +36,18 @@ class Discover extends CVUI_Controller{
 		$this->validation = Services::validation();
     }
 
-    public function index(){
+    public function index()
+	{
         return redirect()->to(base_url($this->controllerName. '/Select_Network'));
     }
 
-    public function select_network(){
+    public function select_network()
+	{
         $uidata = new UIData();
         $uidata->title = "Select Network";
 
         $networkInterface = new NetworkInterface();
         $networkModel = new Network();
-        $sourceModel = new Source();
 
         $user_id = $this->session->get('user_id');
 
@@ -79,8 +81,8 @@ class Discover extends CVUI_Controller{
         return view($this->viewDirectory.'/Select_Network', $data);
     }
 
-    public function query_builder($network_key = null){
-
+    public function query_builder($network_key = null)
+	{
         $uidata = new UIData();
         $networkInterface = new NetworkInterface();
 
@@ -93,7 +95,7 @@ class Discover extends CVUI_Controller{
 
         // Check if the user is in the master network group for this network
 
-        $user_id = $this->authAdapter->getUserId();
+        $user_id = $this->authenticator->getUserId();
 
         $uidata->data['user_id'] = $user_id;
         $uidata->data['network_key'] = $network_key;
