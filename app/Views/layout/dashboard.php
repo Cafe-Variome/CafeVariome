@@ -257,7 +257,6 @@
                 <div id="collapseSet" class="collapse <?= $controllerName == 'Setting' ? 'show' : ''?>" aria-labelledby="headingSet" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
                     <a class="collapse-item" href="<?= base_url('Setting/Main') ?>">System Settings</a>
-                    <a class="collapse-item" href="<?= base_url('Setting/Authentication') ?>">Authentication Settings</a>
                     <a class="collapse-item" href="<?= base_url('Setting/Elasticsearch') ?>">Elastic Search Settings</a>
                     <a class="collapse-item" href="<?= base_url('Setting/Neo4J') ?>">Neo4J Settings</a>
                     <a class="collapse-item" href="<?= base_url('Setting/Discovery') ?>">Discovery Settings</a>

@@ -134,31 +134,6 @@ class Settings extends Model{
         return $this->settingData['neo4j_port'];
     }
 
-    public function getOpenIDEndpoint()
-    {
-        return $this->settingData["oidc_uri"];
-    }
-
-    public function getOpenIDPort()
-    {
-        return $this->settingData["oidc_port"];
-    }
-
-    public function getOpenIDRealm()
-    {
-        return $this->settingData["oidc_realm"];
-    }
-
-    public function getOpenIDClientId()
-    {
-        return $this->settingData["oidc_client_id"];
-    }
-
-    public function getOpenIDClientSecret()
-    {
-        return $this->settingData["oidc_client_secret"];
-    }
-
 	public function getSiteTitle()
 	{
 		return $this->settingData['site_title'];
