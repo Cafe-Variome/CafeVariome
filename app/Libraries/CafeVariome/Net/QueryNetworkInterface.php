@@ -44,9 +44,14 @@ class QueryNetworkInterface extends AbstractNetworkInterface
         }
     }
 
-    public function query(string $query, int $network_key, string $token = null)
+    public function query(string $query, int $network_key, string $authentication_url, string $token = null)
     {
-        $this->adapterw('QueryApi/Query', ['query' => $query, 'network_key' => $network_key, 'token' => json_encode($token)]);
+        $this->adapterw('QueryApi/Query', [
+			'query' => $query,
+			'network_key' => $network_key,
+			'token' => json_encode($token),
+			'authentication_url' => $authentication_url
+		]);
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
