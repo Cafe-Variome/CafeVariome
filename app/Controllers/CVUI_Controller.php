@@ -7,6 +7,10 @@
  * This class extends CodeIgniter4 Controller class.
  *
  */
+
+use App\Libraries\CafeVariome\Auth\LocalAuthenticator;
+use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
+use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use CodeIgniter\Controller;
 use App\Models\UIData;
 use App\Models\Settings;
@@ -53,11 +57,32 @@ class CVUI_Controller extends Controller
 		$this->db = \Config\Database::connect();
         $this->setting =  Settings::getInstance();
 
-		$this->authAdapterConfig = config('AuthAdapter');
-		$this->authAdapter = new AuthAdapter($this->authAdapterConfig->authRoutine);
 
-        // If the controller needs authorisation, initiate AuthAdapater object accordingly.
-		if ($this->isProtected) {
+		if ($this->session->has(self::AUTHENTICATOR_SESSION))
+		{
+			if (intval($this->session->get(self::AUTHENTICATOR_SESSION)) > 0)
+			{
+				$authenticatorFactory = new AuthenticatorFactory();
+				$this->authenticator = $authenticatorFactory->GetInstance(
+					(new SingleSignOnProviderAdapterFactory())->getInstance()->Read(
+						$this->session->get(self::AUTHENTICATOR_SESSION)
+					));
+			}
+			else
+			{
+				if (self::LOCAL_AUTHENTICATION)
+				{
+					// Local authenticator being used
+					$this->authenticator = new LocalAuthenticator();
+				}
+			}
+
+		}
+
+
+        // If the controller needs authorisation, initiate AuthAdapter object accordingly.
+		if ($this->isProtected)
+		{
 			$this->checkAuthentication($this->isAdmin);
 		}
 
@@ -87,8 +112,6 @@ class CVUI_Controller extends Controller
 		$session = \Config\Services::session($config);
 		$setting =  Settings::getInstance();
 
-        $authAdapterConfig = config('AuthAdapter');
-        $authAdapter = new AuthAdapter($authAdapterConfig->authRoutine);
 
 		$headerImage = "";
 		$headerImageFile = $setting->settingData['logo'];
@@ -123,57 +146,78 @@ class CVUI_Controller extends Controller
 		$data['version'] = $uidata->cv_version;
 
 		//Include additional data attributes specific to each view
-		foreach ($uidata->data as $dataKey => $dataValue) {
+		foreach ($uidata->data as $dataKey => $dataValue)
+		{
 			$data[$dataKey] = $dataValue;
 		}
 
 		$data["session"] = &$session;
 		$data["setting"] = &$setting;
-		$data["auth"] = &$authAdapter;
-
 		$data['controllerName'] = $this->getClassName();
 
-		return $data;
+		$loggedIn = $this->authenticator != null && $this->authenticator->loggedIn();
+		$data['loggedIn'] = $loggedIn;
+		if($loggedIn)
+		{
+			$user = $this->authenticator->GetUserById($this->authenticator->GetUserId());
+			$data['userName'] = $user->first_name;
+			$data['isAdmin'] = $user->is_admin;
+			$data['profileURL'] = $this->authenticator->GetProfileEndpoint();
+		}
 
+		return $data;
 	}
 
-	protected function setAuthLevel(bool $protected, bool $isAdmin){
+	protected function setAuthLevel(bool $protected, bool $isAdmin)
+	{
 		$this->isProtected = $protected;
 		$this->isAdmin = $isAdmin;
 	}
 
-	protected function setProtected(bool $protected){
+	protected function setProtected(bool $protected)
+	{
 		$this->isProtected = $protected;
 	}
 
-	public function getProtected(){
+	public function getProtected()
+	{
 		return $this->isProtected;
 	}
 
-	protected function setIsAdmin(bool $isAdmin){
+	protected function setIsAdmin(bool $isAdmin)
+	{
 		$this->isAdmin = $isAdmin;
 	}
 
-	public function getAdmin(){
+	public function getAdmin()
+	{
 		return $this->isAdmin;
 	}
 
-	private function checkAuthentication(bool $checkIsAdmin) {
+	private function checkAuthentication(bool $checkIsAdmin)
+	{
 		$this->session->set('_cvReturnUrl', uri_string());
 
-		if ($checkIsAdmin) {
-			if ($this->authAdapter->loggedIn()) {
-				if (!$this->authAdapter->isAdmin()) {
+		if ($checkIsAdmin)
+		{
+			if ($this->authenticator != null && $this->authenticator->loggedIn())
+			{
+				if (!$this->authenticator->IsAdmin())
+				{
 					header('Location: '.base_url("home/index"));
 					exit;
 				}
 			}
-			else {
+			else
+			{
 				header('Location: '.base_url("auth/login"));
 				exit;
 			}
-		} else {
-			if (!$this->authAdapter->loggedIn()) {
+		}
+		else
+		{
+			if ($this->authenticator == null || !$this->authenticator->LoggedIn())
+			{
 				header('Location: '.base_url("auth/login"));
 				exit;
 			}
@@ -206,19 +250,24 @@ class CVUI_Controller extends Controller
 	{
 		$className = get_class($this);
 
-		try {
+		try
+		{
 			$classNameArray = explode('\\', $className);
 			return $classNameArray[count($classNameArray) - 1];
-		} catch (\Throwable $th) {
+		}
+		catch (\Throwable $th)
+		{
 			return $className;
 		}
 	}
 
 	protected function setStatusMessage(string $message, int $msgtype, bool $appendmsg = false)
 	{
-		if ($appendmsg) {
+		if ($appendmsg)
+		{
 			$msg = $this->session->getFlashData('StatusMessage');
-			if ($msg) {
+			if ($msg)
+			{
 				$message = $msg . '<br/>' . $message;
 			}
 		}
