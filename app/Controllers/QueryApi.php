@@ -44,43 +44,55 @@ class QueryApi extends ResourceController
         $queryString = $this->request->getVar('query');
         $token = json_decode($this->request->getVar('token'), true);
 		$providerURL = $this->request->getVar('authentication_url');
-		$providerURL = str_replace(URLHelper::ExtractPort($providerURL), '', $providerURL); // Extract and remove port, if it exists
-		$singleSignOnProvider = (new SingleSignOnProviderAdapterFactory())->getInstance()->ReadByURL($providerURL);
 
 		$apiResponseBundle = new APIResponseBundle();
 
-		if (!$singleSignOnProvider->isNull())
+		if ($providerURL != null)
 		{
-			if ($token != null)
+			$providerURL = str_replace(URLHelper::ExtractPort($providerURL), '', $providerURL); // Extract and remove port, if it exists
+			$singleSignOnProvider = (new SingleSignOnProviderAdapterFactory())->getInstance()->ReadByURL($providerURL);
+
+
+			if (!$singleSignOnProvider->isNull())
 			{
-				$authenticator = (new AuthenticatorFactory())->GetInstance($singleSignOnProvider);
-				$user_id = $authenticator->GetUserIdByToken($token);
-				$cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler();
-				try
+				if ($token != null)
 				{
-					$resp = $cafeVariomeQuery->CompileAndRunQuery($queryString, $networkKey, $user_id);
-					$apiResponseBundle->initiateResponse(1, json_decode($resp, true));
+					$authenticator = (new AuthenticatorFactory())->GetInstance($singleSignOnProvider);
+					$user_id = $authenticator->GetUserIdByToken($token);
+					$cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler();
+					try
+					{
+						$resp = $cafeVariomeQuery->CompileAndRunQuery($queryString, $networkKey, $user_id);
+						$apiResponseBundle->initiateResponse(1, json_decode($resp, true));
+					}
+					catch (\Exception $ex)
+					{
+						error_log($ex->getMessage());
+						$apiResponseBundle->initiateResponse(0);
+						$apiResponseBundle->setResponseMessage($ex->getMessage());
+					}
 				}
-				catch (\Exception $ex)
+				else
 				{
-					error_log($ex->getMessage());
+					//No token present with query, unauthorised
 					$apiResponseBundle->initiateResponse(0);
-					$apiResponseBundle->setResponseMessage($ex->getMessage());
+					$apiResponseBundle->setResponseMessage('Token not found. Unauthorised query.');
 				}
 			}
 			else
 			{
-				//No token present with query, unauthorised
+				// Authentication provider not found
 				$apiResponseBundle->initiateResponse(0);
-				$apiResponseBundle->setResponseMessage('Token not found. Unauthorised query.');
+				$apiResponseBundle->setResponseMessage('Authentication provider not found. Unauthorised query.');
 			}
 		}
 		else
 		{
-			// Authentication provider not found
+			// Authentication provider URL not present
 			$apiResponseBundle->initiateResponse(0);
-			$apiResponseBundle->setResponseMessage('Authentication provider not found. Unauthorised query.');
+			$apiResponseBundle->setResponseMessage('Authentication provider URL not present. Unauthorised query.');
 		}
+
         return $this->respond($apiResponseBundle->getResponseJSON());
     }
 
