@@ -66,7 +66,7 @@ class CVUI_Controller extends Controller
 				$provider = (new SingleSignOnProviderAdapterFactory())->getInstance()->Read($this->session->get(self::AUTHENTICATOR_SESSION));
 				if (!$provider->isNull())
 				{
-					$this->authenticator = $authenticatorFactory->GetInstance();
+					$this->authenticator = $authenticatorFactory->GetInstance($provider);
 				}
 				else
 				{
