@@ -4,7 +4,7 @@ namespace App\Libraries\CafeVariome\Auth;
 /**
  * Name: AuthAdapter.php
  * Created: 17/07/2019
- *
+ * @deprecated
  * @author: Mehdi Mehtarizadeh
  *
  * This adapter class provides a simple and unified interface for auhentication.
@@ -13,7 +13,8 @@ namespace App\Libraries\CafeVariome\Auth;
 
  use App\Models\User;
 
-class AuthAdapter{
+class AuthAdapter
+{
 
     /**
      * This attribute takes 3 inputs:
@@ -28,40 +29,39 @@ class AuthAdapter{
      */
     public $authEngine;
 
-    public function __construct($authRoutine){
-        switch($authRoutine){
-            case 'KeyCloakFirst':
-                $this->authEngine = new KeyCloak();
-                if(!$this->authEngine->ping()){
-                    //Keycloak Server not available
-                    //Switch to Ion Auth
-                    $this->authEngine = new IonAuth();
-                }
-            break;
-            case 'KeyCloakOnly':
-                $this->authEngine = new KeyCloak();
-                if(!$this->authEngine->ping()){
-                    //Keycloak Server not available
-                    //Switch to Ion Auth
-                    throw new Exception('KeyCloak Server is not available.');
-                }
-            break;
-            case 'OAuth':
-                $this->authEngine = new OAuth();
-                break;
-            case 'IonAuthOnly':
-                $this->authEngine = new IonAuth();
-            break;
-        }
+    public function __construct($authRoutine)
+	{
+		$this->authEngine = new OpenIDAuthenticator($authRoutine);
+//        switch($authRoutine)
+//		{
+//            case 'KeyCloakFirst':
+//                $this->authEngine = new KeyCloak();
+//                if(!$this->authEngine->ping()){
+//                    //Keycloak Server not available
+//                    //Switch to Ion Auth
+//                    $this->authEngine = new IonAuth();
+//                }
+//            break;
+//            case 'KeyCloakOnly':
+//                $this->authEngine = new KeyCloak();
+//                if(!$this->authEngine->ping()){
+//                    //Keycloak Server not available
+//                    //Switch to Ion Auth
+//                    throw new Exception('KeyCloak Server is not available.');
+//                }
+//            break;
+//            case 'OAuth':
+//                $this->authEngine = new OAuth();
+//                break;
+//            case 'IonAuthOnly':
+//                $this->authEngine = new IonAuth();
+//            break;
+//        }
     }
 
-    public function login($username = '', $password = '', $remember = ''){
-        if(get_class($this->authEngine) == 'App\Libraries\CafeVariome\Auth\IonAuth'){
-            return $this->authEngine->login($username, $password, $remember);
-        }
-        else{
-            return $this->authEngine->login();
-        }
+    public function login()
+	{
+		return $this->authEngine->login();
     }
 
     public function register(string $email, string $username,  array $additionaldata, array $groups = []){
@@ -94,7 +94,7 @@ class AuthAdapter{
     }
 
     public function loggedIn():bool{
-        return $this->authEngine->loggedIn();
+        return $this->authEngine->LoggedIn();
     }
 
     public function isAdmin(int $id=0):bool{
