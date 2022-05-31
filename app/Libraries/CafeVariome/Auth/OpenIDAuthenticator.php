@@ -399,14 +399,16 @@ class OpenIDAuthenticator
 
 		$cURLAdapter->setOption(CURLOPT_FOLLOWLOCATION, true);
 		$cURLAdapter->setOption(CURLOPT_HTTPPROXYTUNNEL, 1);
-		$cURLAdapter->setOption(CURLOPT_PROXY, $this->proxyOptions['hostname']);
-		$cURLAdapter->setOption(CURLOPT_PROXYPORT, $this->proxyOptions['port']);
-
-		if ($this->proxyOptions['username'] != '' && $this->proxyOptions['password'] != '')
+		if (count($this->proxyOptions) > 0)
 		{
-			$cURLAdapter->setOption(CURLOPT_PROXYUSERPWD, $this->proxyOptions['username'] . ':' . $this->proxyOptions['password']);
-		}
+			$cURLAdapter->setOption(CURLOPT_PROXY, $this->proxyOptions['hostname']);
+			$cURLAdapter->setOption(CURLOPT_PROXYPORT, $this->proxyOptions['port']);
 
+			if ($this->proxyOptions['username'] != '' && $this->proxyOptions['password'] != '')
+			{
+				$cURLAdapter->setOption(CURLOPT_PROXYUSERPWD, $this->proxyOptions['username'] . ':' . $this->proxyOptions['password']);
+			}
+		}
 
         $cURLAdapter->Send();
         $httpStatus = $cURLAdapter->getInfo(CURLINFO_HTTP_CODE);

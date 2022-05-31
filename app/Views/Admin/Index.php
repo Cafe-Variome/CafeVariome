@@ -217,9 +217,9 @@
 									</span>
 								<?php endif ?>
 							</div>
-							<div class="col-4">OpenID Provider</div>
+							<div class="col-4">Authenticator</div>
 							<div class="col-2">
-								<?php if($keycloakStatus): ?>
+								<?php if($openIDStatus): ?>
 									<span class="icon text-50">
 									<i class="fas fa-check text-success"></i>
 									</span>

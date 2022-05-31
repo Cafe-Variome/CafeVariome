@@ -70,4 +70,9 @@ class LocalAuthenticator
 	{
 		return base_url('Auth/Profile');
 	}
+
+	public function Ping(): bool
+	{
+		return true;
+	}
 }

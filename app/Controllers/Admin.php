@@ -124,7 +124,7 @@ class Admin extends CVUI_Controller
             $uidata->data['neo4jMsg'] = "Neo4J is not running. Some capabilities of the system are disabled because of this. Please ask the server administrator to start it.";
         }
 
-        $uidata->data['keycloakStatus'] = false;
+        $uidata->data['openIDStatus'] = $this->authenticator->Ping();
         $uidata->data['serviceStatus'] = $service->ping();
 
         $data = $this->wrapData($uidata);
