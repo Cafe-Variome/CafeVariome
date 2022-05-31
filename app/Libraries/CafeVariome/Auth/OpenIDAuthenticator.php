@@ -85,7 +85,7 @@ class OpenIDAuthenticator
 		$metaData = $openIDNetworkInterface->GetMetaData(null);
 
 		$options['authorization_endpoint'] = $metaData['authorization_endpoint'];
-		$options['redirect_uri'] = base_url('Auth/Login');
+		$options['redirect_uri'] = $this->GetRedirectURI();
 		$options['token_endpoint'] = $metaData['token_endpoint'];
 		$options['userinfo_endpoint'] = $metaData['userinfo_endpoint'];
 		$options['end_session_endpoint'] = $metaData['end_session_endpoint'];
