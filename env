@@ -96,9 +96,19 @@ database.default.DBDriver = MySQLi
 # Cafe Variome Constants
 #--------------------------------------------------------------------
 
-#  PHP_BIN_PATH = /usr/bin/php
-#  EAV_BATCH_SIZE = 30000
-#  NEO4J_BATCH_SIZE = 30000
-#  SPREADSHEET_BATCH_SIZE = 1000
-#  ELASTICSERACH_AGGREGATE_SIZE = 100000
-#  ELASTICSERACH_EXTRACT_AGGREGATE_SIZE = 10000
+PHP_BIN_PATH = /usr/bin/php
+EAV_BATCH_SIZE = 30000
+NEO4J_BATCH_SIZE = 30000
+SPREADSHEET_BATCH_SIZE = 1000
+ELASTICSERACH_AGGREGATE_SIZE = 100000
+ELASTICSERACH_EXTRACT_AGGREGATE_SIZE = 10000
+
+#--------------------------------------------------------------------
+# Authentication and Session Names
+#--------------------------------------------------------------------
+ALLOW_LOCAL_AUTHENTICATION = false # To determine if local authentication can happen or not.
+AUTHENTICATOR_SESSION_NAME = '_CV_AUTHENTICATOR_ID'
+SSO_RANDOM_STATE = '_CV_OAUTH2_STATE'
+SSO_TOKEN = '_CV_OAUTH2_TOKEN'
+SSO_REFRESH_TOKEN = '_CV_OAUTH2_REFRESH_TOKEN'
+POST_AUTHENTICATION_REDIRECT_URL = '_CV_REDIRECT_URL'
