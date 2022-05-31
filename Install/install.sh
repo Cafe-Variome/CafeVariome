@@ -12,11 +12,12 @@ setfacl -m u:$apacheUser:rwx $cwd/../writable/
 setfacl -m u:$apacheUser:rwx $cwd/../writable/logs/
 setfacl -m u:$apacheUser:rwx $cwd/../writable/cache/
 setfacl -m u:$apacheUser:rwx $cwd/../writable/uploads/
+setfacl -m u:$apacheUser:rwx $cwd/../writable/uploads/data/
+setfacl -m u:$apacheUser:rwx $cwd/../writable/uploads/icons/
 setfacl -m u:$apacheUser:rwx $cwd/../writable/session/
-setfacl -m u:$apacheUser:rwx $cwd/../resources/phenotype_lookup_data/
 setfacl -m u:$apacheUser:rwx $cwd/../resources/user_interface_index/
 setfacl -m u:$apacheUser:rwx $cwd/../upload/
 setfacl -m u:$apacheUser:rwx $cwd/../upload/pairings/
 setfacl -m u:$apacheUser:rwx $cwd/../upload/UploadData/
-echo "Directory permissions set."                                                                   
+echo "Directory permissions set."
 
