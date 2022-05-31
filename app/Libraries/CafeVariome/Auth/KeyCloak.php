@@ -7,7 +7,7 @@ namespace App\Libraries\CafeVariome\Auth;
  * @author Gregory Warren
  * @author Owen Lancaster
  * @author Mehdi Mehtarizadeh
- *
+ * @deprecated
  */
 
 use App\Models\User;
