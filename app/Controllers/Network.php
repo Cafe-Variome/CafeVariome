@@ -13,8 +13,6 @@ use App\Models\User;
 use App\Models\NetworkGroup;
 use App\Models\UIData;
 use App\Models\Source;
-use App\Helpers\AuthHelper;
-use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use CodeIgniter\Config\Services;
 
@@ -358,7 +356,7 @@ class Network extends CVUI_Controller{
 
             $userModel = new User();
 
-            $user_id = $this->authAdapter->getUserId();
+            $user_id = $this->authenticator->getUserId();
             $user = $userModel->getUserById($user_id);
             $email = $user[0]->email;
 
