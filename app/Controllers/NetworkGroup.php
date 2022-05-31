@@ -14,7 +14,6 @@ use App\Models\UIData;
 use App\Models\User;
 use App\Models\Source;
 use App\Helpers\AuthHelper;
-use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use CodeIgniter\Config\Services;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 
