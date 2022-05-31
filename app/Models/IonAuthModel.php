@@ -919,7 +919,7 @@ class IonAuthModel
 				$this->updateLastLogin($user->id);
 
 				$this->clearLoginAttempts($identity);
-				$this->clearForgottenPasswordCode($identity);
+//				$this->clearForgottenPasswordCode($identity);
 
 				if ($this->config->rememberUsers)
 				{
@@ -929,7 +929,7 @@ class IonAuthModel
 					}
 					else
 					{
-						$this->clearRememberCode($identity);
+//						$this->clearRememberCode($identity);
 					}
 				}
 
