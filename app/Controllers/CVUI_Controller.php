@@ -9,10 +9,8 @@
  */
 use CodeIgniter\Controller;
 use App\Models\UIData;
-use App\Models\cms_model;
 use App\Models\Settings;
 use App\Models\URISegment;
-use App\Libraries\CafeVariome\Auth\AuthAdapter;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 
 class CVUI_Controller extends Controller
