@@ -69,6 +69,11 @@ class OpenIDAuthenticator
 				$options['client_secret'] = $credential->password != null ? Cryptography::Decrypt($credential->password, $credential->hash) : null;
 			}
 		}
+		else
+		{
+			$options['client_id'] = null;
+			$options['client_secret'] = null;
+		}
 
 		if ($provider->proxy_server_id != null)
 		{
