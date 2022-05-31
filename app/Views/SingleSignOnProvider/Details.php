@@ -68,14 +68,6 @@
 				</td>
 			</tr>
 			<tr>
-				<th>Realm</th>
-				<td><?= $singleSignOnProvider->realm ?></td>
-			</tr>
-			<tr>
-				<th>Logout URL</th>
-				<td><?= $singleSignOnProvider->logout_url ?></td>
-			</tr>
-			<tr>
 				<th>User Login</th>
 				<td><?= $singleSignOnProvider->user_login ? "<i class='fa fa-check text-success'></i>" : "<i class='fa fa-times text-danger'></i>" ?></td>
 			</tr>
