@@ -66,7 +66,7 @@ class OpenIDAuthenticator
 			if (!$credential->isNull())
 			{
 				$options['client_id'] = $credential->username;
-				$options['client_secret'] = Cryptography::Decrypt($credential->password, $credential->hash);
+				$options['client_secret'] = $credential->password != null ? Cryptography::Decrypt($credential->password, $credential->hash) : null;
 			}
 		}
 
