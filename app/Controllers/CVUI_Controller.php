@@ -201,7 +201,7 @@ class CVUI_Controller extends Controller
 
 	private function checkAuthentication(bool $checkIsAdmin)
 	{
-		$this->session->set('_cvReturnUrl', uri_string());
+		$this->session->set(self::POST_AUTHENTICATION_REDIRECT_URL_SESSION, uri_string());
 
 		if ($checkIsAdmin)
 		{
