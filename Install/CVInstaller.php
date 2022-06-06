@@ -7,7 +7,7 @@ class CVInstaller
 	public static function InstallDB()
 	{
 	   // Valid PHP Version?
-	   $minPHPVersion = '7.4';
+	   $minPHPVersion = '8.0';
 	   if (phpversion() < $minPHPVersion) {
 		   die("Your PHP version must be {$minPHPVersion} or higher to run CodeIgniter. Current version: " . phpversion());
 	   }
@@ -107,7 +107,7 @@ class CVInstaller
 	public static function Deploy(string $base_url, string $installation_key, string $php_bin_path, string $apache_config_file, string $deployment_directory, array $database_info)
 	{
 		// Valid PHP Version?
-		$minPHPVersion = '7.4';
+		$minPHPVersion = '8.0';
 		if (phpversion() < $minPHPVersion) {
 			die("Your PHP version must be {$minPHPVersion} or higher to run CodeIgniter. Current version: " . phpversion());
 		}
