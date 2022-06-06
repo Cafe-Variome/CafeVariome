@@ -315,54 +315,6 @@ class Auth extends CVUI_Controller
 
 		$data = $this->wrapData($uidata);
 		return view($this->controllerName . '/Login', $data);
-
-
-//		if ($this->authenticator->loggedIn()) {
-//			if ($this->session->has('_cvReturnUrl')) {
-//				$redirect = $this->session->get('_cvReturnUrl');
-//				$this->session->remove('_cvReturnUrl');
-//				return redirect()->to(base_url($redirect));
-//			}
-//			return redirect()->to(base_url('Home/index'));
-//		} else {
-//			if ($this->authenticator->login('', '', false)) {
-//				if ($this->session->has('_cvReturnUrl')) {
-//					$redirect = $this->session->get('_cvReturnUrl');
-//					$this->session->remove('_cvReturnUrl');
-//					return redirect()->to(base_url($redirect));
-//				}
-//				return redirect()->to(base_url('Home/index'));
-//			}
-//
-//			// validate form input
-//			$this->validation->setRule('identity', str_replace(':', '', lang('Auth.login_identity_label')), 'required');
-//			$this->validation->setRule('password', str_replace(':', '', lang('Auth.login_password_label')), 'required');
-//
-//			if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-//				// check to see if the user is logging in
-//				// check for "remember me"
-//				$remember = (bool)$this->request->getVar('remember');
-//
-//				if ($this->ionAuth->login($this->request->getVar('identity'), $this->request->getVar('password'), $remember)) {
-//					return redirect()->to(base_url('Home/Index'));
-//				} else {
-//					$this->setStatusMessage("Email or password was incorrect.", STATUS_ERROR);
-//					return redirect()->to(base_url('auth/login'));
-//				}
-//
-//			}
-//			else
-//			{
-//				// the user is not logging in so display the login page
-//				// set the flash data error message if there is one
-//				$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
-//
-
-//
-//				$data = $this->wrapData($uidata);
-//				return view($this->viewsFolder . DIRECTORY_SEPARATOR . 'login', $data);
-//			}
-//		}
 	}
 
 	/**
