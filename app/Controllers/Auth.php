@@ -323,9 +323,16 @@ class Auth extends CVUI_Controller
 	 */
 	public function Logout()
 	{
-		$logoutURL = $this->authenticator->GetLogoutURL();
+		$logoutURL = '';
+		if ($this->authenticator != null)
+		{
+			$logoutURL = $this->authenticator->GetLogoutURL();
+		}
+
 		$this->session->destroy();
-		return redirect()->to($logoutURL);
+
+
+		return $logoutURL != '' ? redirect()->to($logoutURL) : redirect()->to(base_url());
 	}
 
 }
