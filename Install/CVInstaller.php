@@ -42,7 +42,35 @@ class CVInstaller
 
 	   echo "Creating database tables ... \n";
 
-	   $db = config('Database')->default;
+		$lines = file('../.env');
+
+		$db = [];
+
+
+		foreach ($lines as $line)
+		{
+			if (str_starts_with($line, 'database.default.hostname'))
+			{
+				$db['hostname'] = trim(explode('=', $line)[1]);
+			}
+			else if(str_starts_with($line, 'database.default.database'))
+			{
+				$db['database'] = trim(explode('=', $line)[1]);
+			}
+			else if(str_starts_with($line, 'database.default.username'))
+			{
+				$db['username'] = trim(explode('=', $line)[1]);
+			}
+			else if(str_starts_with($line, 'database.default.password'))
+			{
+				$db['password'] = trim(explode('=', $line)[1]);
+			}
+			else if(str_starts_with($line, 'database.default.DBDriver'))
+			{
+				$db['DBDriver'] = trim(explode('=', $line)[1]);
+			}
+
+		}
 
 	   // Name of the file
 	   $filename = 'MySql/cafevariome.sql';
