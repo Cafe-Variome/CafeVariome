@@ -26,7 +26,8 @@
         "components/jqueryui": "^1.12.1",
         "vakata/jstree": "^3.3.8",
         "tinymce/tinymce": "^5.2.0",
-        "laudis/neo4j-php-client": "^2.4",
+        "laudis/neo4j-php-client": "^2.6",
+        "psr18-adapter/guzzle": "^0.1",
         "guzzlehttp/psr7":  "2.0.0"
     },
     "require-dev": {
