@@ -14,9 +14,9 @@ class TaskFilter implements \CodeIgniter\Filters\FilterInterface
      */
     public function before(RequestInterface $request, $arguments = null)
     {
-        if(!$request->isCLI())
+        if(!is_cli())
 		{
-			return Services::response()->setStatusCode(400);
+			return Services::response()->setStatusCode(403);
 		}
     }
 
