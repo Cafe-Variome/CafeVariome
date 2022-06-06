@@ -175,6 +175,8 @@ class Auth extends CVUI_Controller
 									$this->authenticator->RecordSession($user);
 									return redirect()->to('Home/Index');
 								}
+
+								$this->authenticator->RemoveSession();
 							}
 							else
 							{
