@@ -257,6 +257,12 @@ class Auth extends CVUI_Controller
 							if (!$user->isNull())
 							{
 								$authenticator->RecordSession($user);
+								if ($this->session->has(self::POST_AUTHENTICATION_REDIRECT_URL_SESSION))
+								{
+									$redirect = $this->session->get();
+									$this->session->remove(self::POST_AUTHENTICATION_REDIRECT_URL_SESSION);
+									return redirect()->to(base_url($redirect));
+								}
 								return redirect()->to(base_url('Home/Index'));
 							}
 						}
