@@ -38,9 +38,9 @@ defined('MINUTE') || define('MINUTE', 60);
 defined('HOUR')   || define('HOUR', 3600);
 defined('DAY')    || define('DAY', 86400);
 defined('WEEK')   || define('WEEK', 604800);
-defined('MONTH')  || define('MONTH', 2592000);
-defined('YEAR')   || define('YEAR', 31536000);
-defined('DECADE') || define('DECADE', 315360000);
+defined('MONTH')  || define('MONTH', 2_592_000);
+defined('YEAR')   || define('YEAR', 31_536_000);
+defined('DECADE') || define('DECADE', 315_360_000);
 
 /*
  | --------------------------------------------------------------------------
@@ -79,15 +79,30 @@ defined('EXIT__AUTO_MIN')      || define('EXIT__AUTO_MIN', 9); // lowest automat
 defined('EXIT__AUTO_MAX')      || define('EXIT__AUTO_MAX', 125); // highest automatically-assigned error code
 
 /**
-*--------------------------------------------------------------------------
-* Cafe Variome Constants
-*--------------------------------------------------------------------------
-* @author Mehdi Mehtarizadeh
-* date 11/06/2019
-* This section contains base folder paths for running Cafe Variome user interface.
-* The code is extracted from the Cafe Variome 2.
-*
-*/
+ * @deprecated Use \CodeIgniter\Events\Events::PRIORITY_LOW instead.
+ */
+define('EVENT_PRIORITY_LOW', 200);
+
+/**
+ * @deprecated Use \CodeIgniter\Events\Events::PRIORITY_NORMAL instead.
+ */
+define('EVENT_PRIORITY_NORMAL', 100);
+
+/**
+ * @deprecated Use \CodeIgniter\Events\Events::PRIORITY_HIGH instead.
+ */
+define('EVENT_PRIORITY_HIGH', 10);
+
+/**
+ *--------------------------------------------------------------------------
+ * Cafe Variome Constants
+ *--------------------------------------------------------------------------
+ * @author Mehdi Mehtarizadeh
+ * date 11/06/2019
+ * This section contains base folder paths for running Cafe Variome user interface.
+ * The code is extracted from the Cafe Variome 2.
+ *
+ */
 
 define('WRITABLE', 'writable' . DIRECTORY_SEPARATOR);
 define('RESOURCES_DIR', "resources". DIRECTORY_SEPARATOR);
@@ -186,5 +201,3 @@ define('SINGLE_SIGNON_OIDC2', 1);
 
 define('SINGLE_SIGNON_POST_AUTH_CREATE_ACCOUNT', 0);
 define('SINGLE_SIGNON_POST_AUTH_LINK_ACCOUNT', 1);
-
-

@@ -64,9 +64,7 @@ class Autoload extends AutoloadConfig
      *
      * @var array<string, string>
      */
-    public $classmap = [
-		'Keycloak' => 'vendor/stevenmaguire/oauth2-keycloak/src/Provider/Keycloak.php'
-	];
+    public $classmap = [];
 
     /**
      * -------------------------------------------------------------------

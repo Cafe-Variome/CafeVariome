@@ -12,7 +12,7 @@
         "ext-intl": "*",
         "ext-json": "*",
         "ext-bcmath": "*",
-        "codeigniter4/framework": "^4.1",
+        "codeigniter4/framework": "^4.2",
         "stevenmaguire/oauth2-keycloak": "^2.2",
         "components/font-awesome": "^5.15",
         "twbs/bootstrap": "^4.6",

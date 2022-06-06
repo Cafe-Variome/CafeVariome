@@ -19,6 +19,17 @@ class Security extends BaseConfig
 
     /**
      * --------------------------------------------------------------------------
+     * CSRF Token Randomization
+     * --------------------------------------------------------------------------
+     *
+     * Randomize the CSRF Token for added security.
+     *
+     * @var bool
+     */
+    public $tokenRandomize = false;
+
+    /**
+     * --------------------------------------------------------------------------
      * CSRF Token Name
      * --------------------------------------------------------------------------
      *
@@ -72,7 +83,7 @@ class Security extends BaseConfig
      *
      * @var bool
      */
-    public $regenerate = false;
+    public $regenerate = true;
 
     /**
      * --------------------------------------------------------------------------
@@ -100,7 +111,7 @@ class Security extends BaseConfig
      *
      * @var string
      *
-     * @deprecated
+     * @deprecated `Config\Cookie` $samesite property is used.
      */
     public $samesite = 'Lax';
 }
