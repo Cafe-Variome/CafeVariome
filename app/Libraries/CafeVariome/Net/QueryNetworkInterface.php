@@ -12,9 +12,6 @@
  * It is mainly for sending queries to other installations and handling the response.
  */
 
-use App\Models\Settings;
-use League\OAuth2\Client\Token\AccessToken;
-
 class QueryNetworkInterface extends AbstractNetworkInterface
 {
     public function __construct(string $targetUri) {
