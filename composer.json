@@ -12,6 +12,9 @@
         "ext-intl": "*",
         "ext-json": "*",
         "ext-bcmath": "*",
+        "ext-sodium": "*",
+        "ext-fileinfo": "*",
+        "ext-gd": "*",
         "codeigniter4/framework": "^4.2",
         "components/font-awesome": "^5.15",
         "twbs/bootstrap": "^4.6",
@@ -24,10 +27,7 @@
         "vakata/jstree": "^3.3.8",
         "tinymce/tinymce": "^5.2.0",
         "laudis/neo4j-php-client": "^2.4",
-        "guzzlehttp/psr7":  "2.0.0",
-        "ext-sodium": "*",
-        "ext-fileinfo": "*",
-        "ext-gd": "*"
+        "guzzlehttp/psr7":  "2.0.0"
     },
     "require-dev": {
 		"fakerphp/faker": "^1.9",
