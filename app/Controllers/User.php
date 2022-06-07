@@ -96,8 +96,8 @@ class User extends CVUI_Controller
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 		{
             $email    = $this->request->getVar('email');
-            $is_admin = ($this->request->getVar('isadmin') != null) ? 1 : 0;
-            $remote = ($this->request->getVar('isremote') != null) ? 1 : 0;
+            $is_admin = ($this->request->getVar('is_admin') != null) ? 1 : 0;
+            $remote = ($this->request->getVar('remote') != null) ? 1 : 0;
             $first_name = $this->request->getVar('first_name');
             $last_name = $this->request->getVar('last_name');
             $company = $this->request->getVar('company');
