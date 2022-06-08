@@ -141,10 +141,13 @@ class BeaconAPI extends ResourceController
     {
 		$token = $this->request->header('auth-token')?->getValue();
 		$network_key = $this->request->header('network-key')?->getValue();
+		$providerURL = $this->request->header('authentication-url')?->getValue();
 
 		if (
 			$token == null ||
-			$token == ''
+			$token == '' ||
+			$providerURL == null ||
+			$providerURL = ''
 		)
 		{
 			// If no token is specified then drop the request with a 400.
@@ -162,7 +165,6 @@ class BeaconAPI extends ResourceController
 			return $this->response->setStatusCode(400)->setBody($result);
 		}
 
-		$providerURL = $this->request->getVar('authentication-url');
 		$providerURL = str_replace(URLHelper::ExtractPort($providerURL), '', $providerURL); // Extract and remove port, if it exists
 		$singleSignOnProvider = (new SingleSignOnProviderAdapterFactory())->getInstance()->ReadByURL($providerURL);
 
@@ -221,7 +223,7 @@ class BeaconAPI extends ResourceController
 					{
 						// Send the query
 						$queryNetInterface = new QueryNetworkInterface($installation->base_url);
-						$queryResponse = $queryNetInterface->query($query_json, (int) $network_key, $tokenObj);
+						$queryResponse = $queryNetInterface->query($query_json, (int) $network_key, $token);
 						if ($queryResponse->status)
 						{
 							array_push($results, json_encode($queryResponse->data));
@@ -414,7 +416,7 @@ class BeaconAPI extends ResourceController
 				{
 					// Send the query
 					$queryNetInterface = new QueryNetworkInterface($installation->base_url);
-					$queryResponse = $queryNetInterface->query($query_json, (int) $network_key, $tokenObj);
+					$queryResponse = $queryNetInterface->query($query_json, (int) $network_key, $token);
 					if ($queryResponse->status)
 					{
 						array_push($results, json_encode($queryResponse->data));
