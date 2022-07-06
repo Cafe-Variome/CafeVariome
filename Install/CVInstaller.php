@@ -115,16 +115,21 @@ class CVInstaller
 
 	   echo "Tables imported successfully \n";
 
-	   print("Please enter your installation key:");
+	   // print("Please enter your installation key:");
 	   $installation_key = readline("Please enter your installation key:");
 	   $installation_key = trim($installation_key);
 
-	   print("Please enter the URL to authentication server:");
+	   // print("Please enter the URL to authentication server:");
 	   $auth_server = readline("Please enter the URL to authentication server:");
 	   $auth_server = trim($auth_server);
 
+	   // print("Please enter the password for Admin user:");
+	   $admin_password = readline("Please enter the password for Admin user:");
+       $admin_password = trim(password_hash("$admin_password", PASSWORD_DEFAULT));
+
 	   $con->query("Update settings set value = '$installation_key' where setting_key = 'installation_key';");
 	   $con->query("Update settings set value = '$auth_server' where setting_key = 'auth_server';");
+	   $con->query("Update users set password = '$admin_password' where username='admin@cafevariome.org';");
 
 	   print("Settings were updated successfully. \n");
 
