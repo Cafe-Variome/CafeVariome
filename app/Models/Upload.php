@@ -265,6 +265,16 @@ use CodeIgniter\Database\ConnectionInterface;
         }
         $this->builder->like('FileName', '.phenopacket');
         $this->builder->orLike('FileName', '.json');
+        // The above orLike will create an OR clause to the above where statements
+        // This means that it will return either .phenopacket files which are part of the source
+        // provided to function. Or any .json files with no care with which source it is in.
+        // This meant for Phenopacket uploader it would redo every single .json file on every upload.
+        // A quick fix added below adds the other where statements to make sure that .json files must also
+        // be part of the same source and pending if $pending == true
+        if ($pending) {
+            $this->builder->where('Status', 'Pending');
+        }
+        $this->builder->where('source_id', $source_id);
 
         $query = $this->builder->get()->getResultArray();
 
