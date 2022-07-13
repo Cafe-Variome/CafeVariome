@@ -4,13 +4,18 @@ Options FollowSymLinks
 # ----------------------------------------------------------------------
 # Protecting files that give away sensitive information
 # ----------------------------------------------------------------------
-<Files "composer*">
-    Require all denied
-</Files>
 
-<Files ~ "\.(env|nojekyll|spark|txt|dist|md|xml|gitignore|gitattributes|lock|editorconfig|yml)$">
-    Require all denied
-</Files>
+# Deny access to filenames starting with dot(.)
+<FilesMatch "^\.">
+	Order allow,deny
+	Deny from all
+</FilesMatch>
+
+# Deny access to sensitive paths
+<FilesMatch "^composer*|^build*|^vendor*|^.git*|^Install*|^test*">
+	Order allow,deny
+	Deny from all
+</FilesMatch>
 
 # ----------------------------------------------------------------------
 # Rewrite engine
@@ -21,8 +26,11 @@ Options FollowSymLinks
 <IfModule mod_rewrite.c>
 
 	RewriteEngine On
-	Options All -Indexes
-	Options +FollowSymlinks
+
+	# Disable directory listing
+	<IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
 
 	# If you installed CodeIgniter in a subfolder, you will need to
 	# change the following line to match the subfolder you need.
@@ -42,11 +50,6 @@ Options FollowSymLinks
 	RewriteCond %{REQUEST_URI} ^/([^/]+)/([^/]+)/? [NC]
 	RewriteRule .*  %1/index.php?page=%2           [L]
 
-    # Preventing Mixed content from loading insecure stylesheet over HTTPS
-    Header always set Content-Security-Policy "upgrade-insecure-requests;"
-	RewriteCond %{SERVER_PORT} !^443$
-    RewriteRule ^/(.*) https://%{SERVER_NAME}/$1 [NC,R,L]
-
 	# Checks to see if the user is attempting to access a valid file,
     # such as an image or css document, if this isn't true it sends the
     # request to the front controller, index.php
@@ -63,18 +66,38 @@ Options FollowSymLinks
 	RewriteCond %{SCRIPT_FILENAME} -f
 	RewriteRule "(^|/)\." - [F]
 
+	# Deny access to sensitive directories
+	RewriteRule (^|/)Install(/|$) - [F]
+	RewriteRule (^|/).git(/|$) - [F]
+	RewriteRule (^|/)tests(/|$) - [F]
+	RewriteRule (^|/)vendor(/|$) - [F]
+
+	# Deny access to sensitive URL paths
+	RewriteRule ^.git$ - [F]
+	RewriteRule ^tests$ - [F]
+	RewriteRule ^Install$ - [F]
+	RewriteRule ^vendor$ - [F]
+
 </IfModule>
 
 # Extra Security Headers
 <IfModule mod_headers.c>
     # Protect against page-framing and click-jacking
-	Header always append X-Frame-Options SAMEORIGIN
+	Header always set X-Frame-Options "SAMEORIGIN"
 	# Protect against XSS attacks
 	Header set X-XSS-Protection "1; mode=block"
 	# Protect against content-sniffing
-	Header set X-Content-Type-Options nosniff
+	Header set X-Content-Type-Options "nosniff"
 	# Session Hijacking Prevention
 	Header always edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure
+	# Strict-Transport-Security for MITM prevention
+	Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"
+	# Referrer Policy
+	Header set Referrer-Policy "same-origin"
+	# Preventing Mixed content from loading insecure stylesheet over HTTPS and Implementing other Content Security Policy features
+    Header add Content-Security-Policy "default-src 'self'; script-src 'self'; frame-ancestors 'self'; upgrade-insecure-requests;"
+	RewriteCond %{SERVER_PORT} !^443$
+    RewriteRule ^/(.*) https://%{SERVER_NAME}/$1 [NC,R,L]
 </IfModule>
 
 <IfModule !mod_rewrite.c>
