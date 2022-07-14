@@ -1,6 +1,9 @@
 # Disable directory browsing
 Options FollowSymLinks
 
+# Prevent directory listing
+IndexIgnore *
+
 # ----------------------------------------------------------------------
 # Protecting files that give away sensitive information
 # ----------------------------------------------------------------------
@@ -12,7 +15,7 @@ Options FollowSymLinks
 </FilesMatch>
 
 # Deny access to sensitive paths
-<FilesMatch "^composer*|^build*|^vendor*|^.git*|^Install*|^test*">
+<FilesMatch "^composer*|^build*|^README.md|^license.txt|^php*">
 	Order allow,deny
 	Deny from all
 </FilesMatch>
@@ -26,11 +29,8 @@ Options FollowSymLinks
 <IfModule mod_rewrite.c>
 
 	RewriteEngine On
-
-	# Disable directory listing
-	<IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
-    </IfModule>
+	Options All -Indexes
+	Options +FollowSymlinks
 
 	# If you installed CodeIgniter in a subfolder, you will need to
 	# change the following line to match the subfolder you need.
@@ -77,6 +77,10 @@ Options FollowSymLinks
 	RewriteRule ^tests$ - [F]
 	RewriteRule ^Install$ - [F]
 	RewriteRule ^vendor$ - [F]
+
+	# Disallow access to vendor directory
+	RewriteRule ^vendor/(.*)?$ / [F,L]
+	RewriteRule ^composer\.(lock|json)$ / [F,L]
 
 </IfModule>
 
