@@ -14,8 +14,8 @@ IndexIgnore *
 	Deny from all
 </FilesMatch>
 
-# Deny access to sensitive paths
-<FilesMatch "^composer*|^build*|^README.md|^license.txt|^php*">
+# Deny access to sensitive files
+<FilesMatch "^composer*|^build*|^README.md|^php*">
 	Order allow,deny
 	Deny from all
 </FilesMatch>
