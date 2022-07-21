@@ -23,17 +23,30 @@ function select_groups() {
 }
 
 // Set proper hyperlinks to uploaders in the modal
-$('#addVariantsModal').on('show.bs.modal', function (event) {
+$('#uploadModal').on('show.bs.modal',function(event){
     var button = $(event.relatedTarget); 
     var sourceId = button.data('id'); 
-    var srcname = button.data('srcname'); 
-    // If necessary, you could initiate an AJAX request here (and then do the updating in a callback).
-    // Update the modal's content. We'll use jQuery here, but you could use a data binding library or other methods instead.
     var modal = $(this);
-    modal.find('.modal-title').text('Add Records To ' + srcname);
     modal.find('#bulkImport').attr('href', baseurl + "Upload/Spreadsheet/" + sourceId);
     modal.find('#phenoPacketsImport').attr('href', baseurl + "Upload/Phenopacket/" + sourceId);
     modal.find('#VCFImport').attr('href', baseurl + "Upload/VCF/" + sourceId);
-    modal.find('#UniversalImport').attr('href', baseurl + "Upload/Universal/" + sourceId);
-  })
+    modal.find('#importModal').attr('href', baseurl + "Upload/Import/" + sourceId);
+})
 
+$('#indicesModal').on('show.bs.modal',function(event){
+    var button = $(event.relatedTarget); 
+    var sourceId = button.data('id'); 
+    var modal = $(this);
+    modal.find('#ESIndex').attr('href', baseurl + "Source/Elasticsearch/" + sourceId);
+    modal.find('#NeoIndex').attr('href', baseurl + "Source/Neo4J/" + sourceId);
+    modal.find('#UIIndex').attr('href', baseurl + "Source/UserInterface/" + sourceId);
+})
+
+$('#sourcesModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget); 
+    var sourceId = button.data('id');   
+    var modal = $(this);
+    modal.find('#srcValues').attr('href', baseurl + "Attribute/List/" + sourceId);
+    modal.find('#srcEdit').attr('href', baseurl + "Source/Update/" + sourceId);
+    modal.find('#srcDelete').attr('href', baseurl + "Source/Delete/" + sourceId);
+})
