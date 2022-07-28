@@ -1,7 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Entities;
 
-use App\Libraries\CafeVariome\Security\Cryptography;
-
 /**
  * Credential.php
  * Created 22/04/2022
@@ -9,6 +7,8 @@ use App\Libraries\CafeVariome\Security\Cryptography;
  * This class extends Entity.
  * @author Mehdi Mehtarizadeh
  */
+
+use App\Libraries\CafeVariome\Security\Cryptography;
 
 class Credential extends Entity
 {
