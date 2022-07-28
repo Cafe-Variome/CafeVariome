@@ -42,7 +42,7 @@ class User extends CVUI_Controller
 		$this->session = Services::session();
 		$this->db = \Config\Database::connect();
         $this->setting =  Settings::getInstance($this->db);
-		$this->dbAdapter = (new UserAdapterFactory())->getInstance();
+		$this->dbAdapter = (new UserAdapterFactory())->GetInstance();
 
         $this->validation = Services::validation();
 
