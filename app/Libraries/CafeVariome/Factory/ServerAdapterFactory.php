@@ -17,7 +17,7 @@ class ServerAdapterFactory extends AdapterFactory
 	 * Creates and returns an object of the ServerAdapter type.
 	 * @return IAdapter
 	 */
-    public function getInstance(): IAdapter
+    public function GetInstance(): IAdapter
     {
         return new ServerAdapter();
     }

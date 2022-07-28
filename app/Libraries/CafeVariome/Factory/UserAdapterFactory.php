@@ -16,7 +16,7 @@ class UserAdapterFactory extends AdapterFactory
     /**
      * @inheritDoc
      */
-    public function getInstance(): IAdapter
+    public function GetInstance(): IAdapter
     {
         return new UserAdapter();
     }

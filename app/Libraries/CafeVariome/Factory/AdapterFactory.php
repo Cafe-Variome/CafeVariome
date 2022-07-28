@@ -17,5 +17,5 @@ abstract class AdapterFactory
 	 *
 	 * @return IAdapter
 	 */
-	public abstract function getInstance(): IAdapter;
+	public abstract function GetInstance(): IAdapter;
 }

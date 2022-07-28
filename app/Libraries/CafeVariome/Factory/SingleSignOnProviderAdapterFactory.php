@@ -17,7 +17,7 @@ class SingleSignOnProviderAdapterFactory extends AdapterFactory
 	 * Creates and returns an object of the SingleSignOnProviderAdapter type.
 	 * @return IAdapter
 	 */
-	public function getInstance(): IAdapter
+	public function GetInstance(): IAdapter
 	{
 		return new SingleSignOnProviderAdapter();
 	}
