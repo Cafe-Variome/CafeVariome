@@ -10,7 +10,19 @@
 
 class SourceHelper
 {
-	public static function getElasticsearchIndexStatus(int $status)
+	public static function getSourceStatus(int $status)
+	{
+		switch ($status)
+		{
+			case SOURCE_STATUS_OFFLINE:
+				return 'Offline';
+			case SOURCE_STATUS_ONLINE:
+				return 'Online';
+		}
+		return 'Undefined';
+	}
+
+	public static function getElasticsearchIndexStatus(int $status): string
 	{
 		switch ($status){
 			case ELASTICSEARCH_INDEX_STATUS_UNKNOWN:
