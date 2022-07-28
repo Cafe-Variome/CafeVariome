@@ -1,5 +1,14 @@
 <?php namespace App\Libraries\CafeVariome\Database;
 
+/**
+ * ProxyServerAdapter.php
+ * Created 12/05/2022
+ *
+ * This class offers CRUD operation for ProxyServer.
+ * @author Mehdi Mehtarizadeh
+ */
+
+
 use App\Libraries\CafeVariome\Entities\IEntity;
 use App\Libraries\CafeVariome\Factory\ProxyServerFactory;
 
@@ -27,6 +36,6 @@ class ProxyServerAdapter extends BaseAdapter
     public function toEntity(?object $object): IEntity
     {
         $proxyServerFactory = new ProxyServerFactory();
-		return $proxyServerFactory->getInstance($object);
+		return $proxyServerFactory->GetInstance($object);
     }
 }
