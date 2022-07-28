@@ -9,6 +9,7 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Factory\UserAdapterFactory;
 use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use App\Models\UIData;
@@ -64,7 +65,8 @@ class Admin extends CVUI_Controller
         $neo4j = new Neo4J();
         $service = new ServiceInterface();
 
-        $sourceList = $sourceModel->getSources('source_id, name', ['status'=>'online']);
+		$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+        $sourceList = $sourceAdapter->ReadAllOnline();
 
         $sc = 0;
         $maxSourcesToDisplay = 12;
@@ -78,14 +80,14 @@ class Admin extends CVUI_Controller
             }
             if ($sc == count($sourceList) - 1 || $sc == $maxSourcesToDisplay)
 			{
-                $sourceNameLabels .= "'" . $source['name']. "'";
+                $sourceNameLabels .= "'" . $source->display_name. "'";
             }
             else
 			{
-                $sourceNameLabels .= "'" . $source['name']. "',";
+                $sourceNameLabels .= "'" . $source->display_name. "',";
             }
 
-            $sourceCountList[$source['name']] = 0;
+            $sourceCountList[$source->name] = 0;
             $sc++;
         }
 
@@ -105,7 +107,7 @@ class Admin extends CVUI_Controller
             $uidata->data['networkMsg'] = "There was a problem in communicating with network software. Please fix it as the system is unable to function correctly.";
         }
 
-        $uidata->data['usersCount'] = count((new UserAdapterFactory())->getInstance()->ReadAll());
+        $uidata->data['usersCount'] = count((new UserAdapterFactory())->GetInstance()->ReadAll());
         $uidata->data['networkRequestCount'] = count($networkRequestModel->getNetworkRequests('id', ['status' => -1]));
 
         $elasticStatus = ElasticsearchHelper::ping();
