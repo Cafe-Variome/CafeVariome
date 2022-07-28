@@ -43,7 +43,7 @@ class SingleSignOnProvider extends CVUI_Controller
 		parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-		$this->dbAdapter = (new SingleSignOnProviderAdapterFactory())->getInstance();
+		$this->dbAdapter = (new SingleSignOnProviderAdapterFactory())->GetInstance();
 	}
 
 	public function Index()
@@ -78,7 +78,7 @@ class SingleSignOnProvider extends CVUI_Controller
 		$uidata->javascript = [JS. 'cafevariome/singlesignonprovider.js'];
 
 		$serverAdapterFactory = new ServerAdapterFactory();
-		$servers = $serverAdapterFactory->getInstance()->ReadAll();
+		$servers = $serverAdapterFactory->GetInstance()->ReadAll();
 		$serversList = [-1 => 'Please select a server...'];
 
 		foreach ($servers as $server)
@@ -87,7 +87,7 @@ class SingleSignOnProvider extends CVUI_Controller
 		}
 
 		$credentialAdapterFactory = new CredentialAdapterFactory();
-		$credentials = $credentialAdapterFactory->getInstance()->ReadAll();
+		$credentials = $credentialAdapterFactory->GetInstance()->ReadAll();
 		$credentialsList = [-1 => 'Please select a credential if necessary...'];
 
 		foreach ($credentials as $credential)
@@ -96,7 +96,7 @@ class SingleSignOnProvider extends CVUI_Controller
 		}
 
 		$proxyServerAdapterFactory = new ProxyServerAdapterFactory();
-		$proxyServers = $proxyServerAdapterFactory->getInstance()->ReadAll();
+		$proxyServers = $proxyServerAdapterFactory->GetInstance()->ReadAll();
 		$proxyServerList = [-1 => 'Please select a proxy server if necessary...'];
 
 		foreach ($proxyServers as $proxyServer)
@@ -359,7 +359,7 @@ class SingleSignOnProvider extends CVUI_Controller
 		$uidata->javascript = [JS. 'cafevariome/singlesignonprovider.js'];
 
 		$serverAdapterFactory = new ServerAdapterFactory();
-		$servers = $serverAdapterFactory->getInstance()->ReadAll();
+		$servers = $serverAdapterFactory->GetInstance()->ReadAll();
 		$serversList = [-1 => 'Please select a server...'];
 
 		foreach ($servers as $server)
@@ -368,7 +368,7 @@ class SingleSignOnProvider extends CVUI_Controller
 		}
 
 		$credentialAdapterFactory = new CredentialAdapterFactory();
-		$credentials = $credentialAdapterFactory->getInstance()->ReadAll();
+		$credentials = $credentialAdapterFactory->GetInstance()->ReadAll();
 		$credentialsList = [-1 => 'Please select a credential if necessary...'];
 
 		foreach ($credentials as $credential)
@@ -377,7 +377,7 @@ class SingleSignOnProvider extends CVUI_Controller
 		}
 
 		$proxyServerAdapterFactory = new ProxyServerAdapterFactory();
-		$proxyServers = $proxyServerAdapterFactory->getInstance()->ReadAll();
+		$proxyServers = $proxyServerAdapterFactory->GetInstance()->ReadAll();
 		$proxyServerList = [-1 => 'Please select a proxy server if necessary...'];
 
 		foreach ($proxyServers as $proxyServer)
@@ -648,18 +648,18 @@ class SingleSignOnProvider extends CVUI_Controller
 		$uidata->title = 'Single Sign-on Provider Details';
 		$uidata->data['singleSignOnProvider'] = $singleSignOnProvider;
 
-		$server = (new ServerAdapterFactory())->getInstance()->Read($singleSignOnProvider->server_id);
+		$server = (new ServerAdapterFactory())->GetInstance()->Read($singleSignOnProvider->server_id);
 		$uidata->data['server'] = $server;
 
 		$credential =
 			$singleSignOnProvider->credential_id ?
-				(new CredentialAdapterFactory())->getInstance()->Read($singleSignOnProvider->credential_id) :
-				(new EntityFactory())->getInstance(null);
+				(new CredentialAdapterFactory())->GetInstance()->Read($singleSignOnProvider->credential_id) :
+				(new EntityFactory())->GetInstance(null);
 		$uidata->data['credential'] = $credential;
 
 		$proxyServer = $singleSignOnProvider->proxy_server_id ?
-			(new ProxyServerAdapterFactory())->getInstance()->Read($singleSignOnProvider->proxy_server_id) :
-			(new EntityFactory())->getInstance(null);
+			(new ProxyServerAdapterFactory())->GetInstance()->Read($singleSignOnProvider->proxy_server_id) :
+			(new EntityFactory())->GetInstance(null);
 		$uidata->data['proxyServer'] = $proxyServer;
 
 		$data = $this->wrapData($uidata);
