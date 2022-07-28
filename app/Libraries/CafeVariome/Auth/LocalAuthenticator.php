@@ -21,7 +21,7 @@ class LocalAuthenticator
 	public function __construct()
 	{
 		$this->session =  \Config\Services::session();
-		$this->userAdapter = (new UserAdapterFactory())->getInstance();
+		$this->userAdapter = (new UserAdapterFactory())->GetInstance();
 	}
 
 	public function GetUserIdByEmail(string $email): ?int
