@@ -47,7 +47,7 @@ class SingleSignOnProviderAdapter extends BaseAdapter
 	 */
 	public function ReadByURL(string $url, bool $query = true): IEntity
 	{
-		$serverAdapter = (new ServerAdapterFactory())->getInstance();
+		$serverAdapter = (new ServerAdapterFactory())->GetInstance();
 		$serverTable = $serverAdapter->GetTable();
 		$serverKey = $serverAdapter->GetKey();
 		$this->builder->select( $this->table . '.*');
@@ -74,6 +74,6 @@ class SingleSignOnProviderAdapter extends BaseAdapter
     public function toEntity(?object $object): IEntity
     {
 		$singleSignOnProviderFactory = new SingleSignOnProviderFactory();
-		return $singleSignOnProviderFactory->getInstance($object);
+		return $singleSignOnProviderFactory->GetInstance($object);
     }
 }
