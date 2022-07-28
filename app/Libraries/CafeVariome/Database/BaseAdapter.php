@@ -1,6 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Database;
 
-use App\Libraries\CafeVariome\Entities\Entity;
 use App\Libraries\CafeVariome\Entities\IEntity;
 use \Config\Database;
 
@@ -89,7 +88,8 @@ abstract class BaseAdapter implements IAdapter
 		$entities = [];
 		for($c = 0; $c < count($results); $c++)
 		{
-		    array_push($entities, $this->toEntity($results[$c]));
+			$entities[$results[$c]->{$this->key}] = $this->toEntity($results[$c]);
+		    //array_push($entities, $this->toEntity($results[$c]));
 		}
 
 		return $entities;
