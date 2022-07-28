@@ -33,6 +33,6 @@ class ServerAdapter extends BaseAdapter
 	public function toEntity(?object $object): IEntity
 	{
 		$serverFactory = new ServerFactory();
-		return $serverFactory->getInstance($object);
+		return $serverFactory->GetInstance($object);
 	}
 }
