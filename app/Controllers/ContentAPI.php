@@ -109,7 +109,7 @@ class ContentAPI extends BaseController
 	public function SingleSignOnIcon(int $id)
 	{
 		$singleSignOnProviderAdapterFactory = new SingleSignOnProviderAdapterFactory();
-		$singleSignOnProvider = $singleSignOnProviderAdapterFactory->getInstance()->Read($id);
+		$singleSignOnProvider = $singleSignOnProviderAdapterFactory->GetInstance()->Read($id);
 
 		if ($singleSignOnProvider->isNull())
 		{
