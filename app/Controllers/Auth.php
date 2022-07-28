@@ -87,7 +87,7 @@ class Auth extends CVUI_Controller
 
 		$this->ionAuth = new \App\Libraries\CafeVariome\Auth\IonAuth();
 		$this->validation = \Config\Services::validation();
-		$this->dbAdapter = (new SingleSignOnProviderAdapterFactory())->getInstance();
+		$this->dbAdapter = (new SingleSignOnProviderAdapterFactory())->GetInstance();
 		helper(['form', 'url']);
 		$this->configIonAuth = config('IonAuth');
 
