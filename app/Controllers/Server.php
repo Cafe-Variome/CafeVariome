@@ -37,7 +37,7 @@ class Server extends CVUI_Controller
 		parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-		$this->dbAdapter = (new ServerAdapterFactory())->getInstance();
+		$this->dbAdapter = (new ServerAdapterFactory())->GetInstance();
 	}
 
 	public function Index()
