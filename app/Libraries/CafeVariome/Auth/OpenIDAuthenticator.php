@@ -49,19 +49,19 @@ class OpenIDAuthenticator
     public function __construct(SingleSignOnProvider $provider)
 	{
 		$this->provider = $provider;
-		$this->userAdapter = (new UserAdapterFactory())->getInstance();
+		$this->userAdapter = (new UserAdapterFactory())->GetInstance();
 		$options = [];
 		$this->state = '';
 		$this->proxyOptions = [];
 		$this->lastError = null;
 		$this->session =  \Config\Services::session();
 
-		$server = (new ServerAdapterFactory())->getInstance()->Read($provider->server_id);
+		$server = (new ServerAdapterFactory())->GetInstance()->Read($provider->server_id);
 		$this->baseURL = URLHelper::InsertPort($server->address, $provider->port);
 
 		if ($provider->credential_id != null)
 		{
-			$credential = (new CredentialAdapterFactory())->getInstance()->Read($provider->credential_id);
+			$credential = (new CredentialAdapterFactory())->GetInstance()->Read($provider->credential_id);
 
 			if (!$credential->isNull())
 			{
@@ -77,13 +77,13 @@ class OpenIDAuthenticator
 
 		if ($provider->proxy_server_id != null)
 		{
-			$proxyServer = (new ProxyServerAdapterFactory())->getInstance()->Read($provider->proxy_server_id);
+			$proxyServer = (new ProxyServerAdapterFactory())->GetInstance()->Read($provider->proxy_server_id);
 			if (!$proxyServer->isNull())
 			{
-				$this->proxyOptions['hostname'] = (new ServerAdapterFactory())->getInstance()->Read($proxyServer->server_id)->address;
+				$this->proxyOptions['hostname'] = (new ServerAdapterFactory())->GetInstance()->Read($proxyServer->server_id)->address;
 				$this->proxyOptions['port'] = $proxyServer->port;
 
-				$proxyServerCredential = (new CredentialAdapterFactory())->getInstance()->Read($provider->credential_id);
+				$proxyServerCredential = (new CredentialAdapterFactory())->GetInstance()->Read($provider->credential_id);
 				if (!$proxyServerCredential->isNull())
 				{
 					$this->proxyOptions['username'] = $proxyServerCredential->username;
