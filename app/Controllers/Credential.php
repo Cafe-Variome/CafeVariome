@@ -36,7 +36,7 @@ class Credential extends CVUI_Controller
 		parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-		$this->dbAdapter = (new CredentialAdapterFactory())->getInstance();
+		$this->dbAdapter = (new CredentialAdapterFactory())->GetInstance();
 
 	}
 
