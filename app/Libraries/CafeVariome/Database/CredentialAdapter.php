@@ -32,6 +32,6 @@ class CredentialAdapter extends BaseAdapter
     public function toEntity(?object $object): IEntity
     {
         $credentialFactory = new CredentialFactory();
-		return $credentialFactory->getInstance($object);
+		return $credentialFactory->GetInstance($object);
     }
 }
