@@ -38,7 +38,7 @@ class ProxyServer extends CVUI_Controller
 		parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-		$this->dbAdapter = (new ProxyServerAdapterFactory())->getInstance();
+		$this->dbAdapter = (new ProxyServerAdapterFactory())->GetInstance();
 
 	}
 
@@ -71,7 +71,7 @@ class ProxyServer extends CVUI_Controller
 		$uidata->title = 'Create Proxy Server';
 
 		$serverAdapterFactory = new ServerAdapterFactory();
-		$servers = $serverAdapterFactory->getInstance()->ReadAll();
+		$servers = $serverAdapterFactory->GetInstance()->ReadAll();
 		$serversList = [-1 => 'Please select a server...'];
 
 		foreach ($servers as $server)
@@ -80,7 +80,7 @@ class ProxyServer extends CVUI_Controller
 		}
 
 		$credentialAdapterFactory = new CredentialAdapterFactory();
-		$credentials = $credentialAdapterFactory->getInstance()->ReadAll();
+		$credentials = $credentialAdapterFactory->GetInstance()->ReadAll();
 		$credentialsList = [-1 => 'Please select a credential...'];
 
 		foreach ($credentials as $credential)
@@ -209,7 +209,7 @@ class ProxyServer extends CVUI_Controller
 		$uidata->data['id'] = $proxyServer->getID();
 
 		$serverAdapterFactory = new ServerAdapterFactory();
-		$servers = $serverAdapterFactory->getInstance()->ReadAll();
+		$servers = $serverAdapterFactory->GetInstance()->ReadAll();
 		$serversList = [-1 => 'Please select a server...'];
 
 		foreach ($servers as $server)
@@ -218,7 +218,7 @@ class ProxyServer extends CVUI_Controller
 		}
 
 		$credentialAdapterFactory = new CredentialAdapterFactory();
-		$credentials = $credentialAdapterFactory->getInstance()->ReadAll();
+		$credentials = $credentialAdapterFactory->GetInstance()->ReadAll();
 		$credentialsList = [-1 => 'Please select a credential...'];
 
 		foreach ($credentials as $credential)
@@ -347,8 +347,8 @@ class ProxyServer extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Proxy Server Details';
 		$uidata->data['proxyServer'] = $proxyServer;
-		$uidata->data['server'] = (new ServerAdapterFactory())->getInstance()->Read($proxyServer->server_id);
-		$uidata->data['credential'] = $proxyServer->credential_id != null ? (new CredentialAdapterFactory())->getInstance()->Read($proxyServer->credential_id) : null;
+		$uidata->data['server'] = (new ServerAdapterFactory())->GetInstance()->Read($proxyServer->server_id);
+		$uidata->data['credential'] = $proxyServer->credential_id != null ? (new CredentialAdapterFactory())->GetInstance()->Read($proxyServer->credential_id) : null;
 
 		$data = $this->wrapData($uidata);
 
