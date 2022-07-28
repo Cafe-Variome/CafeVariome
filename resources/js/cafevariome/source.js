@@ -41,12 +41,3 @@ $('#indicesModal').on('show.bs.modal',function(event){
     modal.find('#NeoIndex').attr('href', baseurl + "Source/Neo4J/" + sourceId);
     modal.find('#UIIndex').attr('href', baseurl + "Source/UserInterface/" + sourceId);
 })
-
-$('#sourcesModal').on('show.bs.modal', function (event) {
-    var button = $(event.relatedTarget); 
-    var sourceId = button.data('id');   
-    var modal = $(this);
-    modal.find('#srcValues').attr('href', baseurl + "Attribute/List/" + sourceId);
-    modal.find('#srcEdit').attr('href', baseurl + "Source/Update/" + sourceId);
-    modal.find('#srcDelete').attr('href', baseurl + "Source/Delete/" + sourceId);
-})

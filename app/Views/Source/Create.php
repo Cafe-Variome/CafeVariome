@@ -32,51 +32,30 @@
 		</small>
 	</div>
 	<div class=col-6>
-		<?php echo form_label('Owner Name', 'owner_name'); ?>
-		<?php echo form_input($owner_name); ?>
+		<?php echo form_label('Display Name', 'display_name'); ?>
+		<?php echo form_input($display_name); ?>
 	</div>
 </div>
 <div class="form-group row">
 	<div class=col-6>
-		<?php echo form_label('Owner Email', 'email'); ?>
-		<?php echo form_input($email); ?>
+		<?php echo form_label('Owner Name', 'owner_name'); ?>
+		<?php echo form_input($owner_name); ?>
 	</div>
+	<div class=col-6>
+		<?php echo form_label('Owner Email', 'owner_email'); ?>
+		<?php echo form_input($owner_email); ?>
+	</div>
+
+</div>
+<div class="form-group row">
 	<div class="col-6">
 		<?php echo form_label('Source URI', 'uri'); ?>
 		<?php echo form_input($uri); ?>
 	</div>
-</div>
-<div class="form-group row">
-	<div class=col-6>
-		<?php echo form_label('Username', 'username'); ?>
-		<?php echo form_input($username); ?>
-	</div>
-	<div class="col-6">
-		<?php echo form_label('Password', 'password'); ?>
-		<?php echo form_input($password); ?>
-	</div>
-</div>
-<div class="form-group row">
-	<div class=col-6>
-		<?php echo form_label('Source Description', 'desc'); ?>
-		<?php echo form_input($desc); ?>
-	</div>
 	<div class=col-6>
 		<?php echo form_label('Status', 'status'); ?>
-		<?php
-		$options = array(
-			'online' => 'Online',
-			'offline' => 'Offline',
-		);
-		echo form_dropdown('status', $options, 'mysql', ['class' => 'form-control']);
-		?>
+		<?php echo form_dropdown($status); ?>
 	</div>
-</div>
-<div class="form-group row">
-	<div class=col-12>
-		<?php echo form_label('Long Source Description', 'long_description'); ?>
-			<?php echo form_textarea($long_description); ?>
-		</div>
 </div>
 <div class="form-group row">
 	<div class=col-6>
@@ -85,10 +64,16 @@
 	</div>
 	<div class=col-6>
 		<?php echo form_label('Count Display Access Group', 'count_display'); ?>
-		<?php echo form_multiselect('count_display[]', $countDSPGroups , $selected_count_display, ['id'=> 'count_display','class' => 'form-control']); ?>
+		<?php echo form_multiselect('count_display[]', $countDSPGroups , $selected_count_display, ['id'=> 'count_display', 'class' => 'form-control']); ?>
 	</div>
 </div>
 
+<div class="form-group row">
+	<div class=col-12>
+		<?php echo form_label('Source Description', 'description'); ?>
+		<?php echo form_textarea($description); ?>
+	</div>
+</div>
 <div class="form-group row">
 	<div class="col">
 		<button type="submit" name="submit" class="btn btn-success bg-gradient-success">

@@ -8,9 +8,8 @@
 </div>
 <hr>
 
-<?php echo form_open($controllerName."/Delete/" . $source_id . "/" . $source_name); ?>
-<?php echo form_hidden(array('source' => $source_name)); ?>
-<?php echo form_hidden(array('source_id' => $source_id)); ?>
+<?php echo form_open($controllerName."/Delete/" . $id); ?>
+
 <div class="form-group">
 <span class="text-danger">Warning: Are you sure you want to delete the source '<?php echo $source_name; ?>' ?</span>
 </div>
