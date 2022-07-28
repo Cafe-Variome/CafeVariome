@@ -119,7 +119,7 @@
 			<i class="fa fa-plus"></i> Create Single Sign-on Provider
 		</button>
 		<a href="<?= base_url($controllerName) . '/List';?>" class="btn btn-secondary bg-gradient-secondary" >
-			<i class="fa fa-sign-in"></i> View Single Sign-on Providers
+			<i class="fa fa-sign-in-alt"></i> View Single Sign-on Providers
 		</a>
 	</div>
 </div>
