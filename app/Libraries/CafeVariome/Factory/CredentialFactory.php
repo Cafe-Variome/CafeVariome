@@ -19,7 +19,7 @@ class CredentialFactory extends EntityFactory
 	 * @return IEntity
 	 * @throws \Exception
 	 */
-	public function getInstance(?object $input): IEntity
+	public function GetInstance(?object $input): IEntity
 	{
 		if (is_null($input) || count($objectVars = get_object_vars($input)) == 0 )
 		{

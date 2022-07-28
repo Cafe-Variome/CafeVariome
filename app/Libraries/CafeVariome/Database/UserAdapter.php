@@ -79,6 +79,6 @@ class UserAdapter extends BaseAdapter
     public function toEntity(?object $object): IEntity
     {
 		$userFactory = new UserFactory();
-		return $userFactory->getInstance($object);
+		return $userFactory->GetInstance($object);
     }
 }
