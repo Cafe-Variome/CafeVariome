@@ -58,7 +58,6 @@ class Admin extends CVUI_Controller
         $uidata->css = [CSS.'dashboard/chartjs/Chart.min.css'];
         $uidata->javascript = [JS.'dashboard/chartjs/Chart.min.js', JS . 'cafevariome/admin.js'];
 
-        $sourceModel = new Source();
         $networkInterface = new NetworkInterface();
         $networkRequestModel = new NetworkRequest();
 
