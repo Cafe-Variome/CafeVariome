@@ -99,7 +99,7 @@ IndexIgnore *
 	# Referrer Policy
 	Header set Referrer-Policy "same-origin"
 	# Preventing Mixed content from loading insecure stylesheet over HTTPS and Implementing other Content Security Policy features
-    Header add Content-Security-Policy "default-src 'self'; script-src 'self'; frame-ancestors 'self'; upgrade-insecure-requests;"
+    #Header add Content-Security-Policy "script-src 'self' https://googleapis.com/; frame-ancestors 'self'; upgrade-insecure-requests;"
 	RewriteCond %{SERVER_PORT} !^443$
     RewriteRule ^/(.*) https://%{SERVER_NAME}/$1 [NC,R,L]
 </IfModule>
