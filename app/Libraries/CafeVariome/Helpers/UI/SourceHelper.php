@@ -35,7 +35,7 @@ class SourceHelper
 		return 'Undefined';
 	}
 
-	public static function getElasticsearchDataStatus(int $status)
+	public static function getElasticsearchDataStatus(int $status): string
 	{
 		switch ($status){
 			case ELASTICSEARCH_DATA_STATUS_UNKNOWN:
@@ -52,7 +52,7 @@ class SourceHelper
 		return 'Undefined';
 	}
 
-	public static function getNeo4JIndexStatus(int $status)
+	public static function getNeo4JIndexStatus(int $status): string
 	{
 		switch ($status){
 			case NEO4J_INDEX_STATUS_UNKNOWN:
@@ -65,7 +65,7 @@ class SourceHelper
 		return 'Undefined';
 	}
 
-	public static function getNeo4JDataStatus(int $status)
+	public static function getNeo4JDataStatus(int $status): string
 	{
 		switch ($status){
 			case NEO4J_DATA_STATUS_UNKNOWN:
@@ -82,7 +82,7 @@ class SourceHelper
 		return 'Undefined';
 	}
 
-	public static function getUserInterfaceIndexStatus(int $status)
+	public static function getUserInterfaceIndexStatus(int $status): string
 	{
 		switch ($status){
 			case USER_INTERFACE_INDEX_STATUS_UNKNOWN:
