@@ -82,6 +82,12 @@ class DataFileAdapter extends BaseAdapter
 		return $this->builder->update(['status' => $status]);
 	}
 
+	public function UpdateRecordCount(int $id, int $record_count): bool
+	{
+		$this->builder->where($this->GetKey(), $id);
+		return $this->builder->update(['record_count' => $record_count]);
+	}
+
 	public function ReadSourceId(int $id): ?int
 	{
 		$this->builder->select('source_id');
