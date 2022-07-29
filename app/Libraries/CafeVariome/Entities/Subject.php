@@ -14,6 +14,8 @@ class Subject extends Entity
 
 	public int $source_id;
 
+	public string $display_name;
+
 	public function __construct(array $properties)
     {
         parent::__construct($properties);
