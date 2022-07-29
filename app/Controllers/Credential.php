@@ -345,9 +345,12 @@ class Credential extends CVUI_Controller
 		{
 			try
 			{
-				$this->dbAdapter->Delete($id);
-				$this->setStatusMessage("Credential was deleted.", STATUS_SUCCESS);
-
+				$confirm = $this->request->getVar('confirm');
+				if ($confirm == 'yes')
+				{
+					$this->dbAdapter->Delete($id);
+					$this->setStatusMessage("Credential was deleted.", STATUS_SUCCESS);
+				}
 			}
 			catch (\Exception $ex)
 			{
