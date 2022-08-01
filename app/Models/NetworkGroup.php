@@ -2,12 +2,12 @@
 
 /**
  * NetworkGroup.php
- * 
+ *
  * Created: 20/08/2019
- * 
+ *
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
- * 
+ *
  * This class handles operations on NetworkGroup entities and network_groups table.
  */
 
@@ -16,7 +16,7 @@ use CodeIgniter\Database\ConnectionInterface;
 
 
 class NetworkGroup extends Model{
-    
+
 	protected $db;
     protected $table      = 'network_groups';
     protected $builder;
@@ -31,19 +31,18 @@ class NetworkGroup extends Model{
         else {
             $this->db = \Config\Database::connect();
         }
-        $this->setting =  Settings::getInstance();
         $this->builder = $this->db->table($this->table);
     }
 
     /**
 	 * getNetworkGroups
-     * 
+     *
 	 * General function to get fetch data from network_groups table.
-     * 
+     *
      * @author Mehdi Mehtarizadeh
 	 */
 	function getNetworkGroups(string $cols = null, array $conds = null, array $groupby = null, bool $includeNetworks = false, bool $isDistinct = false, int $limit = -1, int $offset = -1){
-		
+
 		if ($cols) {
             $this->builder->select($cols);
         }
@@ -67,9 +66,9 @@ class NetworkGroup extends Model{
         }
 
         $query = $this->builder->get()->getResultArray();
-        return $query; 
+        return $query;
     }
-    
+
     /**
 	 * createNetworkGroup
 	 */
@@ -78,7 +77,7 @@ class NetworkGroup extends Model{
 		$insert_id = $this->db->insertID();
 		return $insert_id;
     }
-    
+
     function deleteNetworkGroup(int $id){
         $this->builder = $this->db->table($this->table); // Do not remove this line! @see hasSource(int $group_id)
         $this->builder->where('id', $id);
@@ -87,8 +86,8 @@ class NetworkGroup extends Model{
 
     /**
      * hasSource
-     * 
-     * @param int $group_id 
+     *
+     * @param int $group_id
      * @return bool true if networkgroup has any sources assigned, false otherwise
      */
     function hasSource(int $group_id): bool{
@@ -128,7 +127,7 @@ class NetworkGroup extends Model{
         foreach ($query as $row) {
             array_push($ids, $row['id']);
         }
-        
+
         return $ids;
     }
  }
