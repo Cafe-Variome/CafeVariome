@@ -44,10 +44,7 @@ class Admin extends CVUI_Controller
 
 		$this->session = Services::session();
 		$this->db = \Config\Database::connect();
-        $this->setting =  Settings::getInstance($this->db);
-
         $this->validation = Services::validation();
-
     }
 
     public function Index()
