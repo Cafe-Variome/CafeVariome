@@ -116,7 +116,6 @@ class CVUI_Controller extends Controller
 		$config = new \Config\App();
 
 		$session = \Config\Services::session($config);
-		$setting =  Settings::getInstance();
 
 
 		$headerImage = "";
