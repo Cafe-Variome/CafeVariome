@@ -1,5 +1,8 @@
 <?php namespace App\Libraries\CafeVariome;
 
+use App\Libraries\CafeVariome\Database\SettingAdapter;
+use App\Libraries\CafeVariome\Factory\SettingAdapterFactory;
+
 /**
  * CafeVariome.php
  *
@@ -48,5 +51,10 @@ class CafeVariome
 	public static function GetVersion(): string
 	{
 		return self::$version;
+	}
+
+	public static function Settings(): Database\IAdapter
+	{
+		return (new SettingAdapterFactory())->GetInstance();
 	}
 }
