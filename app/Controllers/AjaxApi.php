@@ -35,6 +35,15 @@ class AjaxApi extends Controller
 
     protected $setting;
 
+	protected $authenticator;
+
+	protected const LOCAL_AUTHENTICATION = ALLOW_LOCAL_AUTHENTICATION;
+	protected const AUTHENTICATOR_SESSION = AUTHENTICATOR_SESSION_NAME;
+	protected const SSO_RANDOM_STATE_SESSION = SSO_RANDOM_STATE_SESSION_NAME;
+	protected const SSO_TOKEN_SESSION = SSO_TOKEN_SESSION_NAME;
+	protected const SSO_REFRESH_TOKEN_SESSION = SSO_REFRESH_TOKEN_SESSION_NAME;
+	protected const POST_AUTHENTICATION_REDIRECT_URL_SESSION = POST_AUTHENTICATION_REDIRECT_URL_SESSION_NAME;
+
     /**
 	 * Constructor
 	 *
