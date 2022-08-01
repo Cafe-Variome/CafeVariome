@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: May 31, 2022 at 03:11 PM
+-- Generation Time: Aug 01, 2022 at 02:42 PM
 -- Server version: 5.7.38-0ubuntu0.18.04.1
 -- PHP Version: 8.0.19
 
@@ -39,6 +39,17 @@ CREATE TABLE `attributes` (
   `include_in_interface_index` bit(1) NOT NULL,
   `storage_location` tinyint(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `attributes_groups`
+--
+
+CREATE TABLE `attributes_groups` (
+  `attribute_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -92,17 +103,35 @@ INSERT INTO `credentials` (`id`, `name`, `username`, `password`, `hash`, `hide_u
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `data_files`
+--
+
+CREATE TABLE `data_files` (
+  `id` int(11) NOT NULL,
+  `name` varchar(1024) NOT NULL,
+  `disk_name` varchar(32) NOT NULL,
+  `size` int(11) UNSIGNED NOT NULL,
+  `upload_date` int(11) NOT NULL,
+  `record_count` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `source_id` int(11) NOT NULL,
+  `status` tinyint(3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `eavs`
 --
 
 CREATE TABLE `eavs` (
   `id` int(15) NOT NULL,
-  `uid` char(36) NOT NULL,
   `source_id` int(11) NOT NULL,
   `file_id` int(11) NOT NULL,
-  `subject_id` varchar(36) NOT NULL,
+  `subject_id` int(11) NOT NULL,
   `attribute_id` int(11) NOT NULL,
   `value_id` int(11) DEFAULT NULL,
+  `group_id` int(11) NOT NULL,
   `indexed` bit(1) NOT NULL DEFAULT b'0'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -113,30 +142,10 @@ CREATE TABLE `eavs` (
 --
 
 CREATE TABLE `groups` (
-  `id` mediumint(8) UNSIGNED NOT NULL,
-  `name` varchar(20) NOT NULL,
-  `description` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `groups`
---
-
-INSERT INTO `groups` (`id`, `name`, `description`) VALUES
-(1, 'admin', 'Administrator'),
-(2, 'members', 'General User');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `login_attempts`
---
-
-CREATE TABLE `login_attempts` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `ip_address` varchar(45) NOT NULL,
-  `login` varchar(100) NOT NULL,
-  `time` int(11) UNSIGNED DEFAULT NULL
+  `id` int(11) NOT NULL,
+  `name` varchar(1024) NOT NULL,
+  `source_id` int(11) NOT NULL,
+  `display_name` varchar(1024) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -371,40 +380,38 @@ INSERT INTO `servers` (`id`, `name`, `address`, `removable`) VALUES
 --
 
 CREATE TABLE `settings` (
-  `setting_id` int(11) NOT NULL,
-  `setting_key` varchar(50) NOT NULL,
+  `key` varchar(50) NOT NULL,
   `value` varchar(100) NOT NULL,
-  `setting_name` varchar(50) DEFAULT NULL,
-  `info` mediumtext NOT NULL,
-  `setting_group` varchar(50) DEFAULT NULL,
-  `validation_rules` varchar(100) NOT NULL DEFAULT 'required|xss_clean'
+  `name` varchar(50) DEFAULT NULL,
+  `info` varchar(1024) NOT NULL,
+  `group` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `settings`
 --
 
-INSERT INTO `settings` (`setting_id`, `setting_key`, `value`, `setting_name`, `info`, `setting_group`, `validation_rules`) VALUES
-(1, 'site_title', 'Cafe Variome', 'Site Title', 'Title as it appears in the web browser and on top left side of all pages.', 'main', 'required'),
-(2, 'site_description', 'Cafe Variome - Description', 'Site Description', 'Description of the website that appears as metadata in the structure of public pages.', 'main', 'required'),
-(3, 'site_author', 'Bioinformatics Research Group - University of Leicester', 'Site Author', 'Name of the owner of the website, whether a person or an organisation, that appears as metadata on public pages.', 'main', 'required'),
-(4, 'site_keywords', 'healthcare data discovery, bioinformatics', 'Keywords', 'Keywords explaining activity of the website that appear as metadata on public pages. They help search engines find this website.', 'main', 'required'),
-(5, 'email', 'admin@cafevariome.org', 'Administrator Email', 'Email of the person or group of people responsible for the website.', 'main', 'required'),
-(6, 'allow_registrations', 'off', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'authentication', 'required'),
-(7, 'discovery_requires_login', 'on', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'discovery', 'required'),
-(8, 'show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'discovery', 'required'),
-(9, 'auth_server', '', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main', 'required'),
-(10, 'installation_key', '', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'main', 'required'),
-(11, 'logo', '', 'Main Logo', 'Main logo that appears on top left side of the public pages. The file must be located in resources/images/logos/', 'main', 'required|xss_clean'),
-(12, 'elastic_url', 'http://localhost:9200', 'Elasticsearch Address', 'Elastic search address', 'elasticsearch', 'required'),
-(13, 'neo4j_username', 'neo4j', 'Neo4J Username', 'Username that is used to communicate with Neo4J REST API.', 'neo4j', 'required'),
-(14, 'neo4j_port', '7474', 'Neo4J Port', 'The port that the Neo4J REST API is running on. BY default it is 7474.', 'neo4j', 'required'),
-(15, 'neo4j_server', 'http://localhost', 'Neo4J Server', 'The URL of the Neo4J REST API.', 'neo4j', 'required'),
-(16, 'neo4j_password', 'neo4j123', 'Neo4J Password', 'Password that is used to communicate with Neo4J REST API.', 'neo4j', 'required'),
-(17, 'hpo_autocomplete_url', 'https://autocomplete.cafevariome.org/Hpo/query/', 'HPO Auto-complete Endpoint', 'Endpoint that provides auto-complete service for HPO terms lookup ', 'endpoint', 'required'),
-(18, 'orpha_autocomplete_url', 'https://autocomplete.cafevariome.org/Orpha/query/', 'ORPHA Auto-complete Endpoint', 'Endpoint that provides auto-complete service for ORPHA terms lookup ', 'endpoint', 'required'),
-(19, 'snomed_autocomplete_url', 'https://autocomplete.cafevariome.org/Snomed/query/', 'SNOMED Auto-complete Endpoint', 'Endpoint that provides auto-complete service for SNOMED terms lookup ', 'endpoint', 'required'),
-(20, 'gene_autocomplete_url', 'https://autocomplete.cafevariome.org/Gene/query/', 'Gene Auto-complete Endpoint', 'Endpoint that provides auto-complete service for gene lookup ', 'endpoint', 'required');
+INSERT INTO `settings` (`key`, `value`, `name`, `info`, `group`) VALUES
+('allow_registrations', 'off', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'authentication'),
+('auth_server', '', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main'),
+('discovery_requires_login', 'on', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'discovery'),
+('elastic_url', 'http://localhost:9200', 'Elasticsearch Address', 'Elastic search address', 'elasticsearch'),
+('email', 'admin@cafevariome.org', 'Administrator Email', 'Email of the person or group of people responsible for the website.', 'main'),
+('gene_autocomplete_url', 'https://autocomplete.cafevariome.org/Gene/query/', 'Gene Auto-complete Endpoint', 'Endpoint that provides auto-complete service for gene lookup ', 'endpoint'),
+('hpo_autocomplete_url', 'https://autocomplete.cafevariome.org/Hpo/query/', 'HPO Auto-complete Endpoint', 'Endpoint that provides auto-complete service for HPO terms lookup ', 'endpoint'),
+('installation_key', '', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'main'),
+('logo', '', 'Main Logo', 'Main logo that appears on top left side of the public pages. The file must be located in resources/images/logos/', 'main'),
+('neo4j_password', 'neo4j123', 'Neo4J Password', 'Password that is used to communicate with Neo4J REST API.', 'neo4j'),
+('neo4j_port', '7474', 'Neo4J Port', 'The port that the Neo4J REST API is running on. BY default it is 7474.', 'neo4j'),
+('neo4j_server', 'http://localhost', 'Neo4J Server', 'The URL of the Neo4J REST API.', 'neo4j'),
+('neo4j_username', 'neo4j', 'Neo4J Username', 'Username that is used to communicate with Neo4J REST API.', 'neo4j'),
+('orpha_autocomplete_url', 'https://autocomplete.cafevariome.org/Orpha/query/', 'ORPHA Auto-complete Endpoint', 'Endpoint that provides auto-complete service for ORPHA terms lookup ', 'endpoint'),
+('show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'discovery'),
+('site_author', 'Bioinformatics Research Group - University of Leicester', 'Site Author', 'Name of the owner of the website, whether a person or an organisation, that appears as metadata on public pages.', 'main'),
+('site_description', 'Cafe Variome - Description', 'Site Description', 'Description of the website that appears as metadata in the structure of public pages.', 'main'),
+('site_keywords', 'healthcare data discovery, bioinformatics', 'Keywords', 'Keywords explaining activity of the website that appear as metadata on public pages. They help search engines find this website.', 'main'),
+('site_title', 'Cafe Variome', 'Site Title', 'Title as it appears in the web browser and on top left side of all pages.', 'main'),
+('snomed_autocomplete_url', 'https://autocomplete.cafevariome.org/Snomed/query/', 'SNOMED Auto-complete Endpoint', 'Endpoint that provides auto-complete service for SNOMED terms lookup ', 'endpoint');
 
 -- --------------------------------------------------------
 
@@ -442,69 +449,52 @@ INSERT INTO `single_sign_on_providers` (`id`, `server_id`, `name`, `display_name
 --
 
 CREATE TABLE `sources` (
-  `source_id` int(11) NOT NULL,
+  `id` int(11) NOT NULL,
   `uid` varchar(11) NOT NULL,
-  `owner_name` mediumtext NOT NULL,
-  `email` mediumtext NOT NULL,
-  `name` varchar(30) NOT NULL,
-  `uri` mediumtext NOT NULL,
-  `description` mediumtext NOT NULL,
-  `long_description` mediumtext NOT NULL,
-  `status` varchar(15) NOT NULL,
-  `date_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `username` varchar(100) DEFAULT NULL,
-  `password` varchar(100) DEFAULT NULL,
-  `record_count` bigint(255) NOT NULL DEFAULT '0',
-  `elastic_status` tinyint(1) DEFAULT '0',
-  `elastic_lock` tinyint(1) DEFAULT '0'
+  `name` varchar(128) NOT NULL,
+  `display_name` varchar(128) NOT NULL,
+  `description` text NOT NULL,
+  `owner_name` varchar(256) NOT NULL,
+  `owner_email` varchar(128) NOT NULL,
+  `uri` varchar(128) DEFAULT NULL,
+  `date_created` int(11) UNSIGNED NOT NULL,
+  `record_count` int(255) UNSIGNED NOT NULL DEFAULT '0',
+  `locked` bit(1) NOT NULL,
+  `status` tinyint(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `uploaddatastatus`
+-- Table structure for table `subjects`
 --
 
-CREATE TABLE `uploaddatastatus` (
-  `FileName` varchar(100) NOT NULL,
-  `uploadStart` datetime NOT NULL,
-  `uploadEnd` datetime DEFAULT NULL,
-  `Status` varchar(20) NOT NULL,
-  `elasticStatus` varchar(20) NOT NULL,
+CREATE TABLE `subjects` (
+  `id` int(11) NOT NULL,
+  `name` varchar(1024) NOT NULL,
   `source_id` int(11) NOT NULL,
-  `user_id` int(11) UNSIGNED NOT NULL,
-  `ID` int(11) UNSIGNED NOT NULL,
-  `patient` varchar(50) DEFAULT NULL,
-  `tissue` varchar(50) DEFAULT NULL,
+  `display_name` varchar(1024) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `tasks`
+--
+
+CREATE TABLE `tasks` (
+  `id` int(11) NOT NULL,
+  `data_file_id` int(11) DEFAULT NULL,
+  `type` tinyint(3) UNSIGNED NOT NULL,
+  `overwrite` bit(1) NOT NULL,
+  `started` int(11) UNSIGNED DEFAULT NULL,
+  `ended` int(11) UNSIGNED DEFAULT NULL,
+  `progress` tinyint(3) UNSIGNED NOT NULL,
+  `error_code` tinyint(3) UNSIGNED NOT NULL,
+  `error_message` varchar(4096) DEFAULT NULL,
   `pipeline_id` int(11) DEFAULT NULL,
-  `setting_file` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `upload_error`
---
-
-CREATE TABLE `upload_error` (
-  `ID` mediumint(8) UNSIGNED NOT NULL,
-  `error_id` mediumint(8) UNSIGNED NOT NULL,
-  `message` varchar(500) NOT NULL,
-  `error_code` int(5) NOT NULL,
-  `source_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `upload_jobs`
---
-
-CREATE TABLE `upload_jobs` (
-  `ID` int(8) NOT NULL,
-  `source_id` int(11) NOT NULL,
-  `user_id` mediumint(8) UNSIGNED NOT NULL,
-  `linking_id` varchar(50) NOT NULL
+  `user_id` int(11) NOT NULL,
+  `status` tinyint(3) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -536,25 +526,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `email`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`, `is_admin`, `token`, `remote`) VALUES
-(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', 1268889823, 1654005190, 1, 'Admin', 'Admin', 'Brookes Lab', '', 1, NULL, 0);
--- --------------------------------------------------------
-
---
--- Table structure for table `users_groups`
---
-
-CREATE TABLE `users_groups` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `user_id` int(11) UNSIGNED NOT NULL,
-  `group_id` mediumint(8) UNSIGNED NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
---
--- Dumping data for table `users_groups`
---
-
-INSERT INTO `users_groups` (`id`, `user_id`, `group_id`) VALUES
-(1, 1, 1);
+(1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', 1268889823, 1659359084, 1, 'Admin', 'Admin', 'Brookes Lab', '', 1, NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -610,6 +582,13 @@ ALTER TABLE `attributes`
   ADD KEY `SourceIDAttribute_FK` (`source_id`);
 
 --
+-- Indexes for table `attributes_groups`
+--
+ALTER TABLE `attributes_groups`
+  ADD PRIMARY KEY (`attribute_id`,`group_id`),
+  ADD KEY `Group_ID_FK` (`group_id`);
+
+--
 -- Indexes for table `attributes_ontology_prefixes_relationships`
 --
 ALTER TABLE `attributes_ontology_prefixes_relationships`
@@ -633,17 +612,22 @@ ALTER TABLE `credentials`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `data_files`
+--
+ALTER TABLE `data_files`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `eavs`
 --
 ALTER TABLE `eavs`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `uid` (`uid`),
   ADD KEY `source_id` (`source_id`),
   ADD KEY `subject_id` (`subject_id`),
   ADD KEY `attribute_id` (`attribute_id`),
   ADD KEY `value_id` (`value_id`),
   ADD KEY `indexed` (`indexed`),
-  ADD KEY `uid_2` (`uid`,`attribute_id`,`value_id`),
+  ADD KEY `uid_2` (`attribute_id`,`value_id`),
   ADD KEY `subj_src` (`subject_id`,`source_id`),
   ADD KEY `comi` (`id`,`source_id`);
 
@@ -651,12 +635,6 @@ ALTER TABLE `eavs`
 -- Indexes for table `groups`
 --
 ALTER TABLE `groups`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `login_attempts`
---
-ALTER TABLE `login_attempts`
   ADD PRIMARY KEY (`id`);
 
 --
@@ -747,7 +725,7 @@ ALTER TABLE `servers`
 -- Indexes for table `settings`
 --
 ALTER TABLE `settings`
-  ADD PRIMARY KEY (`setting_id`);
+  ADD PRIMARY KEY (`key`);
 
 --
 -- Indexes for table `single_sign_on_providers`
@@ -762,27 +740,20 @@ ALTER TABLE `single_sign_on_providers`
 -- Indexes for table `sources`
 --
 ALTER TABLE `sources`
-  ADD PRIMARY KEY (`source_id`),
+  ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `name` (`name`);
 
 --
--- Indexes for table `uploaddatastatus`
+-- Indexes for table `subjects`
 --
-ALTER TABLE `uploaddatastatus`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `Pipeline_Id_FK` (`pipeline_id`);
+ALTER TABLE `subjects`
+  ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `upload_error`
+-- Indexes for table `tasks`
 --
-ALTER TABLE `upload_error`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `upload_jobs`
---
-ALTER TABLE `upload_jobs`
-  ADD PRIMARY KEY (`ID`);
+ALTER TABLE `tasks`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `users`
@@ -790,15 +761,6 @@ ALTER TABLE `upload_jobs`
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`),
   ADD UNIQUE KEY `uc_email` (`email`);
-
---
--- Indexes for table `users_groups`
---
-ALTER TABLE `users_groups`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `uc_users_groups` (`user_id`,`group_id`),
-  ADD KEY `fk_users_groups_users1_idx` (`user_id`),
-  ADD KEY `fk_users_groups_groups1_idx` (`group_id`);
 
 --
 -- Indexes for table `users_groups_networks`
@@ -848,7 +810,13 @@ ALTER TABLE `attribute_mappings`
 -- AUTO_INCREMENT for table `credentials`
 --
 ALTER TABLE `credentials`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT for table `data_files`
+--
+ALTER TABLE `data_files`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `eavs`
@@ -860,13 +828,7 @@ ALTER TABLE `eavs`
 -- AUTO_INCREMENT for table `groups`
 --
 ALTER TABLE `groups`
-  MODIFY `id` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT for table `login_attempts`
---
-ALTER TABLE `login_attempts`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `menu_items`
@@ -920,7 +882,7 @@ ALTER TABLE `pages`
 -- AUTO_INCREMENT for table `pipelines`
 --
 ALTER TABLE `pipelines`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `proxy_servers`
@@ -932,55 +894,37 @@ ALTER TABLE `proxy_servers`
 -- AUTO_INCREMENT for table `servers`
 --
 ALTER TABLE `servers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `settings`
---
-ALTER TABLE `settings`
-  MODIFY `setting_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `single_sign_on_providers`
 --
 ALTER TABLE `single_sign_on_providers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `sources`
 --
 ALTER TABLE `sources`
-  MODIFY `source_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `uploaddatastatus`
+-- AUTO_INCREMENT for table `subjects`
 --
-ALTER TABLE `uploaddatastatus`
-  MODIFY `ID` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+ALTER TABLE `subjects`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `upload_error`
+-- AUTO_INCREMENT for table `tasks`
 --
-ALTER TABLE `upload_error`
-  MODIFY `ID` mediumint(8) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `upload_jobs`
---
-ALTER TABLE `upload_jobs`
-  MODIFY `ID` int(8) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `tasks`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT for table `users_groups`
---
-ALTER TABLE `users_groups`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users_groups_networks`
@@ -1008,7 +952,14 @@ ALTER TABLE `value_mappings`
 -- Constraints for table `attributes`
 --
 ALTER TABLE `attributes`
-  ADD CONSTRAINT `SourceIDAttribute_FK` FOREIGN KEY (`source_id`) REFERENCES `sources` (`source_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `SourceIDAttribute_FK` FOREIGN KEY (`source_id`) REFERENCES `sources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `attributes_groups`
+--
+ALTER TABLE `attributes_groups`
+  ADD CONSTRAINT `Attribute_ID_FK` FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`),
+  ADD CONSTRAINT `Group_ID_FK` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`);
 
 --
 -- Constraints for table `attributes_ontology_prefixes_relationships`
@@ -1036,7 +987,7 @@ ALTER TABLE `menu_items`
 --
 ALTER TABLE `network_groups_sources`
   ADD CONSTRAINT `NetworkGroupIDFK` FOREIGN KEY (`group_id`) REFERENCES `network_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `SourceIDFK` FOREIGN KEY (`source_id`) REFERENCES `sources` (`source_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `SourceIDFK` FOREIGN KEY (`source_id`) REFERENCES `sources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `network_requests`
@@ -1076,19 +1027,6 @@ ALTER TABLE `single_sign_on_providers`
   ADD CONSTRAINT `CredentialsIdFK` FOREIGN KEY (`credential_id`) REFERENCES `credentials` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `ProxyServerFK` FOREIGN KEY (`proxy_server_id`) REFERENCES `proxy_servers` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `ServerIdFK` FOREIGN KEY (`server_id`) REFERENCES `servers` (`id`) ON UPDATE CASCADE;
-
---
--- Constraints for table `uploaddatastatus`
---
-ALTER TABLE `uploaddatastatus`
-  ADD CONSTRAINT `Pipeline_Id_FK` FOREIGN KEY (`pipeline_id`) REFERENCES `pipelines` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
---
--- Constraints for table `users_groups`
---
-ALTER TABLE `users_groups`
-  ADD CONSTRAINT `fk_users_groups_groups1` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  ADD CONSTRAINT `fk_users_groups_users1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION;
 
 --
 -- Constraints for table `users_groups_networks`
