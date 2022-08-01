@@ -36,7 +36,7 @@ class UIData
 
     public function __construct()
     {
-		$this->cv_version = CafeVariome::getVersion();
+		$this->cv_version = CafeVariome::GetVersion();
     }
 
 }
