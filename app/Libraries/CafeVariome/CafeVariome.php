@@ -45,7 +45,7 @@ class CafeVariome
 		define('POST_AUTHENTICATION_REDIRECT_URL_SESSION_NAME', getenv('POST_AUTHENTICATION_REDIRECT_URL_SESSION_NAME'));
 	}
 
-	public static function getVersion(): string
+	public static function GetVersion(): string
 	{
 		return self::$version;
 	}
