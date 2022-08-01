@@ -13,6 +13,8 @@
  * Code must be more secure. Some of the methods here must be moved to back-end layers for security reasons.
  */
 
+use App\Libraries\CafeVariome\Auth\LocalAuthenticator;
+use App\Libraries\CafeVariome\CafeVariome;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceNetworkIndex;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\File;
 use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
@@ -53,7 +55,7 @@ class AjaxApi extends Controller
 		parent::initController($request, $response, $logger);
 
 		$this->db = Database::connect();
-        $this->setting =  Settings::getInstance();
+        $this->setting =  CafeVariome::Settings();
         $this->sourceModel = new Source();
         $this->uploadModel = new Upload();
     }
