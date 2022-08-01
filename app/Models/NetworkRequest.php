@@ -3,24 +3,24 @@
 /**
  * Name: NetworkRequest.php
  * Created: 2/12/2019
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
- * 
- * 
+ *
+ *
+ *
  */
 
 use CodeIgniter\Model;
 use CodeIgniter\Database\ConnectionInterface;
 
-class NetworkRequest extends Model 
+class NetworkRequest extends Model
 {
     protected $db;
     protected $table      = 'network_requests';
     protected $builder;
 
     protected $primaryKey = 'id';
-    
+
     private $response;
 
 	public function __construct(ConnectionInterface &$db = null){
@@ -31,14 +31,12 @@ class NetworkRequest extends Model
         else {
             $this->db = \Config\Database::connect();
         }
-        $this->setting = Settings::getInstance($this->db);
-        
         $this->builder = $this->db->table($this->table);
 
     }
 
     function getNetworkRequests(string $cols = null, array $conds = null, array $groupby = null, bool $isDistinct = false, int $limit = -1, int $offset = -1){
-	
+
 		if ($cols) {
             $this->builder->select($cols);
         }
@@ -59,7 +57,7 @@ class NetworkRequest extends Model
         }
 
         $query = $this->builder->get()->getResultArray();
-        return $query; 
+        return $query;
     }
 
     public function createNetworkRequest(array $data): bool
