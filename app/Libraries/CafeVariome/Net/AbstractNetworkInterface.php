@@ -2,27 +2,28 @@
 
 /**
  * AbstractNetworkInterface.php
- * 
+ *
  * Created: 28/10/2020
- * 
+ *
  * @author Mehdi Mehtarizadeh
- * 
+ *
  * This is an abstract class for communicating with RESTful endpoints of other Cafe Variome instances.
- * 
+ *
  */
 
-use App\Models\Settings;
+use App\Libraries\CafeVariome\CafeVariome;
 
 
 abstract class AbstractNetworkInterface
 {
     protected $serverURI;
     protected $networkAdapter;
-    protected $setting; 
+    protected $setting;
     protected $networkAdapterConfig;
 
-    public function __construct(string $targetUri) {
-        $this->setting = Settings::getInstance();
+    public function __construct(string $targetUri)
+	{
+        $this->setting = CafeVariome::Settings();
         $this->serverURI = $targetUri;
         $this->networkAdapterConfig = config('NetworkAdapter');
     }
