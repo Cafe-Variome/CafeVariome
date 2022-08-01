@@ -1,5 +1,6 @@
 <?php namespace App\Libraries\CafeVariome\Helpers\Core;
 
+use App\Libraries\CafeVariome\CafeVariome;
 use App\Models\Settings;
 use App\Models\Source;
 
@@ -24,9 +25,9 @@ class ElasticsearchHelper
 	 */
 	public static function getIndexPrefix(): string
 	{
-		$setting = Settings::getInstance();
+		$setting = CafeVariome::Settings();
 
-		$title = $setting->getSiteTitle();
+		$title = $setting->GetSiteTitle();
 		$title = preg_replace("/\s.+/", '', $title);
 
 		$baseUrl = base_url();
@@ -60,13 +61,16 @@ class ElasticsearchHelper
 	 */
 	public static function ping():bool
 	{
-		$setting = Settings::getInstance();
+		$setting = CafeVariome::Settings();
 
-		try {
-			$client = \Elasticsearch\ClientBuilder::create()->setHosts([$setting->getElasticSearchUri()])->build();
+		try
+		{
+			$client = \Elasticsearch\ClientBuilder::create()->setHosts([$setting->GetElasticSearchUri()])->build();
 			$status = $client->ping();
 			return $status;
-		} catch (\Exception $ex) {
+		}
+		catch (\Exception $ex)
+		{
 			return false;
 		}
 	}
