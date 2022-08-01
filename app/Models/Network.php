@@ -33,8 +33,6 @@ class Network extends Model{
         else {
             $this->db = \Config\Database::connect();
 		}
-
-		$this->setting =  Settings::getInstance();
 		$this->networkGroupModel = new NetworkGroup();
 	}
 
