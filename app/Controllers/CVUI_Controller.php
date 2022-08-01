@@ -9,6 +9,7 @@
  */
 
 use App\Libraries\CafeVariome\Auth\LocalAuthenticator;
+use App\Libraries\CafeVariome\CafeVariome;
 use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
 use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use CodeIgniter\Controller;
@@ -55,7 +56,7 @@ class CVUI_Controller extends Controller
 		// $this->session = \Config\Services::session();
 		$this->session = \Config\Services::session();
 		$this->db = \Config\Database::connect();
-        $this->setting =  Settings::getInstance();
+        $this->setting =  CafeVariome::Settings();
 
 
 		if ($this->session->has(self::AUTHENTICATOR_SESSION))
@@ -119,7 +120,7 @@ class CVUI_Controller extends Controller
 
 
 		$headerImage = "";
-		$headerImageFile = $setting->settingData['logo'];
+		$headerImageFile = $this->setting->GetHeaderImage();
 		if (is_file(FCPATH . HEADER_IMAGE_DIR . $headerImageFile))
 		{
 			if (strpos($headerImageFile, '.') !== false)
@@ -136,11 +137,11 @@ class CVUI_Controller extends Controller
 
 		$data = [];
 
-		$data["heading"] = $setting->settingData['site_title'];
+		$data["site_title"] = $this->setting->GetSiteTitle();
 		$data["title"] = $uidata->title;
-		$data["description"] = $uidata->description;
-		$data["keywords"] = $uidata->keywords;
-		$data["author"] = $uidata->author;
+		$data["meta_description"] = $uidata->description;
+		$data["meta_keywords"] = $uidata->keywords;
+		$data["meta_author"] = $uidata->author;
 		$data["javascript"] = $uidata->javascript;
 		$data["css"] = $uidata->css;
 		$data["stickyFooter"] = $uidata->stickyFooter;
