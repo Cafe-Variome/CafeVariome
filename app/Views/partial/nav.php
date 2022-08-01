@@ -26,7 +26,7 @@
 		</div>
 	<?php endif; ?>
 	<a class="navbar-brand text-dark ml-3" href="<?php echo base_url("home"); ?>">
-		<?= $heading ?>
+		<?= $site_title ?>
 	</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
     	<span class="navbar-toggler-icon"></span>
