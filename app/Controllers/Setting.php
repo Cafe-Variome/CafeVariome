@@ -12,7 +12,8 @@ use App\Models\UIData;
 use App\Models\Settings;
 use CodeIgniter\Config\Services;
 
-class Setting extends CVUI_Controller{
+class Setting extends CVUI_Controller
+{
 
     private $settingModel;
 
@@ -27,10 +28,7 @@ class Setting extends CVUI_Controller{
 
 		$this->session = Services::session();
 		$this->db = \Config\Database::connect();
-        $this->setting =  Settings::getInstance();
-
-        $this->settingModel = Settings::getInstance();
-    }
+	}
 
     public function Discovery()
     {
