@@ -10,14 +10,14 @@
 <!doctype html>
 <html class="h-100">
 <head>
-    <title><?php echo $setting->settingData['site_title'] ?> | <?php echo $title ?></title>
+    <title><?php echo $site_title ?> | <?php echo $title ?></title>
 
     <meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<meta name="keywords" content="<?php echo $keywords ?>" />
-	<meta name="author" content="<?php echo $author ?>" />
-	<meta name="description" content="<?php echo $description ?>" />
+	<meta name="keywords" content="<?php echo $meta_keywords ?>" />
+	<meta name="author" content="<?php echo $meta_author ?>" />
+	<meta name="description" content="<?php echo $meta_description ?>" />
 
     <link rel="stylesheet" href="<?php echo base_url(VENDOR . "twbs/bootstrap/dist/css/bootstrap.css");?>" />
     <link rel="stylesheet" href="<?php echo base_url(CSS . "site.css");?>" />
@@ -35,7 +35,7 @@
     <!-- favicon and touch icons -->
     <link rel="shortcut icon" href="<?php echo base_url(IMAGES.'logos/favicon.ico');?>" />
 
-	<script type="text/javascript" src="<?= base_url('UserInterfaceAPI/getUIConstants') ?>"></script>
+	<script type="text/javascript" src="<?= base_url('UserInterfaceAPI/Gmeta_etUIConstants') ?>"></script>
 
     <script src="<?php echo base_url(JS."jquery-3.6.0.min.js");?>"></script>
 
