@@ -1,5 +1,6 @@
 <?php namespace App\Libraries\CafeVariome\Helpers\Core;
 
+use App\Libraries\CafeVariome\CafeVariome;
 use App\Models\Settings;
 use Laudis\Neo4j\Authentication\Authenticate;
 use Laudis\Neo4j\ClientBuilder;
@@ -25,12 +26,12 @@ class Neo4JHelper
 	 */
 	public static function ping():bool
 	{
-		$setting = Settings::getInstance();
+		$setting = CafeVariome::Settings();
 
-		$neo4jUsername = $setting->getNeo4JUserName();
-		$neo4jPassword = $setting->getNeo4JPassword();
-		$neo4jAddress = $setting->getNeo4JUri();
-		$neo4jPort = $setting->getNeo4JPort();
+		$neo4jUsername = $setting->GetNeo4JUserName();
+		$neo4jPassword = $setting->GetNeo4JPassword();
+		$neo4jAddress = $setting->GetNeo4JUri();
+		$neo4jPort = $setting->GetNeo4JPort();
 
 		$protocol = 'http';
 		if (strpos($neo4jAddress, 'https://') !== false) {
