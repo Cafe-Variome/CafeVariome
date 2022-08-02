@@ -40,10 +40,7 @@ class User extends CVUI_Controller
         parent::initController($request, $response, $logger);
 
 		$this->session = Services::session();
-		$this->db = \Config\Database::connect();
-        $this->setting =  Settings::getInstance($this->db);
 		$this->dbAdapter = (new UserAdapterFactory())->GetInstance();
-
         $this->validation = Services::validation();
 
     }
