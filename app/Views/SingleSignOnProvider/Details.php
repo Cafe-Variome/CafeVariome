@@ -91,9 +91,11 @@
 		<a href="<?= base_url($controllerName . '/Update') . "/" . $singleSignOnProvider->getID(); ?>" class="btn btn-warning bg-gradient-warning">
 			<i class="fa fa-edit"></i>&nbsp;Edit Single Sign-on Provider
 		</a>
+		<?php if ($singleSignOnProvider->removable): ?>
 		<a href="<?= base_url($controllerName . '/Delete') . "/" . $singleSignOnProvider->getID(); ?>" class="btn btn-danger bg-gradient-danger">
 			<i class="fa fa-trash"></i>&nbsp;Delete Single Sign-on Provider
 		</a>
+		<?php endif; ?>
 	</div>
 </div>
 

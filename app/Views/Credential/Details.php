@@ -48,9 +48,11 @@
 		<a href="<?= base_url($controllerName . '/Update') . "/" . $credential->getID(); ?>" class="btn btn-warning bg-gradient-warning">
 			<i class="fa fa-edit"></i>&nbsp;Edit Credential
 		</a>
+		<?php if ($credential->removable): ?>
 		<a href="<?= base_url($controllerName . '/Delete') . "/" . $credential->getID(); ?>" class="btn btn-danger bg-gradient-danger">
 			<i class="fa fa-trash"></i>&nbsp;Delete Credential
 		</a>
+		<?php endif; ?>
 	</div>
 </div>
 

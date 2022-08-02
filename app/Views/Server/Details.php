@@ -43,9 +43,11 @@
 		<a href="<?= base_url($controllerName . '/Update') . "/" . $server->getID(); ?>" class="btn btn-warning bg-gradient-warning">
 			<i class="fa fa-edit"></i>&nbsp;Edit Server
 		</a>
+		<?php if ($server->removable): ?>
 		<a href="<?= base_url($controllerName . '/Delete') . "/" . $server->getID(); ?>" class="btn btn-danger bg-gradient-danger">
 			<i class="fa fa-trash"></i>&nbsp;Delete Server
 		</a>
+		<?php endif; ?>
 	</div>
 </div>
 
