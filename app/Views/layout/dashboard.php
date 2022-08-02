@@ -12,11 +12,11 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <meta name="keywords" content="<?php echo $keywords ?>" />
-        <meta name="author" content="<?php echo $author ?>" />
-        <meta name="description" content="<?php echo $description ?>" />
+        <meta name="keywords" content="<?php echo $meta_keywords ?>" />
+        <meta name="author" content="<?php echo $meta_author ?>" />
+        <meta name="description" content="<?php echo $meta_description ?>" />
 
-        <title><?= $heading ?> - <?= $title ?></title>
+        <title><?= $site_title ?> - <?= $title ?></title>
 
         <!-- Custom fonts for this template-->
         <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
@@ -33,7 +33,7 @@
 
         <!-- favicon -->
         <link rel="shortcut icon" href="<?php echo base_url(IMAGES.'logos/favicon.ico');?>" />
-		<script type="text/javascript" src="<?= base_url('UserInterfaceAPI/getUIConstants') ?>"></script>
+		<script type="text/javascript" src="<?= base_url('UserInterfaceAPI/GetUIConstants') ?>"></script>
 
         <script src="<?php echo base_url(JS."jquery-3.6.0.min.js");?>"></script>
     </head>
@@ -50,7 +50,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <img src="<?= base_url(IMAGES . "cafevariome/cafevariome_icon.png") ?>" />
                 </div>
-                <div class="sidebar-brand-text mx-2 text-gray-900"><?= $heading ?></div>
+                <div class="sidebar-brand-text mx-2 text-gray-900"><?= $site_title ?></div>
             </a>
 
             <!-- Divider -->
