@@ -29,37 +29,37 @@
 	</tr>
 	</thead>
 	<tbody>
-	<?php for($c = 0; $c < count($dataFiles); $c++): ?>
+	<?php foreach($dataFiles as $dataFile): ?>
 	<tr>
-		<td><?= $dataFiles[$c]->name ?></td>
-		<td><?= \App\Libraries\CafeVariome\Helpers\UI\SourceHelper::formatSize($dataFiles[$c]->size) ?></td>
-		<td><?= date("H:i:s d-m-Y T", $dataFiles[$c]->upload_date) ?></td>
-		<td><?= $dataFiles[$c]->record_count ?></td>
+		<td><?= $dataFile->name ?></td>
+		<td><?= \App\Libraries\CafeVariome\Helpers\UI\SourceHelper::formatSize($dataFile->size) ?></td>
+		<td><?= date("H:i:s d-m-Y T", $dataFile->upload_date) ?></td>
+		<td><?= $dataFile->record_count ?></td>
 		<td>
-			<?= $dataFiles[$c]->user->username ?>
+			<?= $dataFile->user->username ?>
 			<br>
-			(<?= $dataFiles[$c]->user->first_name ?> <?= $dataFiles[$c]->user->last_name ?>)
+			(<?= $dataFile->user->first_name ?> <?= $dataFile->user->last_name ?>)
 		</td>
-		<td><?= \App\Libraries\CafeVariome\Helpers\UI\DataFileHelper::GetDataFileStatus($dataFiles[$c]->status) ?></td>
-		<td id="action-<?= $dataFiles[$c]->getID() ?>">
-			<?php if($dataFiles[$c]->status != DATA_FILE_STATUS_PROCESSING): ?>
-				<div id="actionBtns-<?= $dataFiles[$c]->getID() ?>">
-					<a data-placement="top" title="Process Data File" data-toggle="modal" data-target="#taskModal" data-fileid="<?= $dataFiles[$c]->getID() ?>" data-filename="<?= $dataFiles[$c]->name ?>">
+		<td><?= \App\Libraries\CafeVariome\Helpers\UI\DataFileHelper::GetDataFileStatus($dataFile->status) ?></td>
+		<td id="action-<?= $dataFile->getID() ?>">
+			<?php if($dataFile->status != DATA_FILE_STATUS_PROCESSING): ?>
+				<div id="actionBtns-<?= $dataFile->getID() ?>">
+					<a data-placement="top" title="Process Data File" data-toggle="modal" data-target="#taskModal" data-fileid="<?= $dataFile->getID() ?>" data-filename="<?= $dataFile->name ?>">
 						<i class="fa fa-play text-success"></i>
 					</a>
-					<?php if($dataFiles[$c]->status == DATA_FILE_STATUS_PROCESSED): ?>
-					<a href="<?php echo base_url($controllerName.'/DeleteRecords'). "/" . $dataFiles[$c]->getID() ?>" data-toggle="tooltip" data-placement="top" title="Delete Records">
+					<?php if($dataFile->status == DATA_FILE_STATUS_PROCESSED): ?>
+					<a href="<?php echo base_url($controllerName.'/DeleteRecords'). "/" . $dataFile->getID() ?>" data-toggle="tooltip" data-placement="top" title="Delete Records">
 						<i class="fa fa-trash-alt text-warning"></i>
 					</a>
 					<?php endif; ?>
-					<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $dataFiles[$c]->getID() ?>" data-toggle="tooltip" data-placement="top" title="Delete Data File">
+					<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $dataFile->getID() ?>" data-toggle="tooltip" data-placement="top" title="Delete Data File">
 						<i class="fa fa-trash text-danger"></i>
 					</a>
 				</div>
 			<?php endif; ?>
 		</td>
 	</tr>
-	<?php endfor; ?>
+	<?php endforeach; ?>
 	</tbody>
 </table>
 

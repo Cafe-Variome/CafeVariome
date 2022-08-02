@@ -25,23 +25,23 @@
 	</tr>
 	</thead>
 	<tbody>
-	<?php for($c = 0; $c < count($proxyServers); $c++): ?>
+	<?php foreach($proxyServers as $proxyServer): ?>
 		<tr>
-			<td><?= $proxyServers[$c]->name ?></td>
-			<td><?= $proxyServers[$c]->port ?></td>
+			<td><?= $proxyServer->name ?></td>
+			<td><?= $proxyServer->port ?></td>
 			<td>
-				<a href="<?= base_url($controllerName . '/Update/' . $proxyServers[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Proxy Server">
+				<a href="<?= base_url($controllerName . '/Update/' . $proxyServer->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Proxy Server">
 					<i class="fa fa-edit text-warning"></i>
 				</a>
-				<a href="<?php echo base_url($controllerName. '/Details'). "/" . $proxyServers[$c]->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Proxy Server">
+				<a href="<?php echo base_url($controllerName. '/Details'). "/" . $proxyServer->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Proxy Server">
 					<i class="fa fa-eye text-info"></i>
 				</a>
-				<a href="<?= base_url($controllerName . '/Delete/' . $proxyServers[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Proxy Server">
+				<a href="<?= base_url($controllerName . '/Delete/' . $proxyServer->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Proxy Server">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 			</td>
 		</tr>
-	<?php endfor; ?>
+	<?php endforeach; ?>
 	</tbody>
 </table>
 

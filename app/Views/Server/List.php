@@ -25,29 +25,29 @@
 	</tr>
 	</thead>
 	<tbody>
-		<?php for($c = 0; $c < count($servers); $c++): ?>
+		<?php foreach ($servers as $server):?>
 			<tr>
-				<td><?= $servers[$c]->name ?></td>
+				<td><?= $server->name ?></td>
 				<td>
-					<a target="_blank" href="<?= $servers[$c]->address ?>">
-						<?= $servers[$c]->address ?>
+					<a target="_blank" href="<?= $server->address ?>">
+						<?= $server->address ?>
 					</a>
 				</td>
 				<td>
-					<a href="<?= base_url($controllerName . '/Update/' . $servers[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Server">
+					<a href="<?= base_url($controllerName . '/Update/' . $server->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Server">
 						<i class="fa fa-edit text-warning"></i>
 					</a>
-					<a href="<?php echo base_url($controllerName. '/Details'). "/" . $servers[$c]->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Server">
+					<a href="<?php echo base_url($controllerName. '/Details'). "/" . $server->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Server">
 						<i class="fa fa-eye text-info"></i>
 					</a>
-					<?php if($servers[$c]->removable): ?>
-						<a href="<?= base_url($controllerName . '/Delete/' . $servers[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Server">
+					<?php if($server->removable): ?>
+						<a href="<?= base_url($controllerName . '/Delete/' . $server->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Server">
 							<i class="fa fa-trash text-danger"></i>
 						</a>
 					<?php endif; ?>
 				</td>
 			</tr>
-		<?php endfor; ?>
+		<?php endforeach; ?>
 	</tbody>
 </table>
 

@@ -25,25 +25,25 @@
 	</tr>
 	</thead>
 	<tbody>
-	<?php for($c = 0; $c < count($credentials); $c++): ?>
+	<?php foreach($credentials as $credential): ?>
 	<tr>
-		<td><?= $credentials[$c]->name ?></td>
-		<td><?= $credentials[$c]->hide_username ? "[Username is hidden]" : $credentials[$c]->username ?></td>
+		<td><?= $credential->name ?></td>
+		<td><?= $credential->hide_username ? "[Username is hidden]" : $credential->username ?></td>
 		<td>
-			<a href="<?= base_url($controllerName . '/Update/' . $credentials[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Credential">
+			<a href="<?= base_url($controllerName . '/Update/' . $credential->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Credential">
 				<i class="fa fa-edit text-warning"></i>
 			</a>
-			<a href="<?php echo base_url($controllerName. '/Details'). "/" . $credentials[$c]->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Credential">
+			<a href="<?php echo base_url($controllerName. '/Details'). "/" . $credential->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Credential">
 				<i class="fa fa-eye text-info"></i>
 			</a>
-			<?php if ($credentials[$c]->removable): ?>
-				<a href="<?= base_url($controllerName . '/Delete/' . $credentials[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Credential">
+			<?php if ($credential->removable): ?>
+				<a href="<?= base_url($controllerName . '/Delete/' . $credential->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Credential">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 			<?php endif; ?>
 		</td>
 	</tr>
-	<?php endfor; ?>
+	<?php endforeach; ?>
 	</tbody>
 </table>
 

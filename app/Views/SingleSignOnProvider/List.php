@@ -28,30 +28,30 @@
 	</tr>
 	</thead>
 	<tbody>
-	<?php for($c = 0; $c < count($singleSignOnProviders); $c++): ?>
+	<?php foreach($singleSignOnProviders as $singleSignOnProvider): ?>
 		<tr>
-			<td><?= $singleSignOnProviders[$c]->name ?></td>
-			<td><?= $singleSignOnProviders[$c]->display_name ?></td>
-			<td><?= $singleSignOnProviders[$c]->port ?></td>
-			<td><img src="<?= base_url('ContentAPI/SingleSignOnIcon/' . $singleSignOnProviders[$c]->getID()) ?>"></td>
+			<td><?= $singleSignOnProvider->name ?></td>
+			<td><?= $singleSignOnProvider->display_name ?></td>
+			<td><?= $singleSignOnProvider->port ?></td>
+			<td><img src="<?= base_url('ContentAPI/SingleSignOnIcon/' . $singleSignOnProvider->getID()) ?>"></td>
 			<td>
-				<?= \App\Libraries\CafeVariome\Helpers\UI\SingleSignOnProviderHelper::getType($singleSignOnProviders[$c]->type) ?>
+				<?= \App\Libraries\CafeVariome\Helpers\UI\SingleSignOnProviderHelper::getType($singleSignOnProvider->type) ?>
 			</td>
 			<td>
-				<a href="<?= base_url($controllerName . '/Update/' . $singleSignOnProviders[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Server">
+				<a href="<?= base_url($controllerName . '/Update/' . $singleSignOnProvider->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Server">
 					<i class="fa fa-edit text-warning"></i>
 				</a>
-				<a href="<?php echo base_url($controllerName. '/Details'). "/" . $singleSignOnProviders[$c]->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Server">
+				<a href="<?php echo base_url($controllerName. '/Details'). "/" . $singleSignOnProvider->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Server">
 					<i class="fa fa-eye text-info"></i>
 				</a>
-				<?php if($singleSignOnProviders[$c]->removable): ?>
-					<a href="<?= base_url($controllerName . '/Delete/' . $singleSignOnProviders[$c]->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Server">
+				<?php if($singleSignOnProvider->removable): ?>
+					<a href="<?= base_url($controllerName . '/Delete/' . $singleSignOnProvider->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Server">
 						<i class="fa fa-trash text-danger"></i>
 					</a>
 				<?php endif; ?>
 			</td>
 		</tr>
-	<?php endfor; ?>
+	<?php endforeach; ?>
 	</tbody>
 </table>
 

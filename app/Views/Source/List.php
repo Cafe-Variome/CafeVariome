@@ -95,17 +95,17 @@
             <div class="modal-body">
 				<div class="row">
 					<div class="col">
-						<a id="ESIndex" class="btn btn-info bg-gradient-info font-weight-bold" href="<?php echo base_url($controllerName . '/Elasticsearch') . "/" . $source->getID(); ?>">
+						<a id="ESIndex" class="btn btn-info bg-gradient-info font-weight-bold" href="">
 							<i class="fa fa-search"></i> Elasticsearch Index
 						</a>
 					</div>
 					<div class="col">
-						<a id="NeoIndex" class="btn btn-warning bg-gradient-warning font-weight-bold" href="<?php echo base_url($controllerName . '/Neo4J') . "/" . $source->getID(); ?>">
+						<a id="NeoIndex" class="btn btn-warning bg-gradient-warning font-weight-bold" href="">
 							<i class="fa fa-project-diagram"></i> Neo4J Index
 						</a>
 					</div>
 					<div class="col">
-						<a id="UIIndex" class="btn btn-secondary bg-gradient-secondary font-weight-bold" href="<?php echo base_url($controllerName . '/UserInterface') . "/" . $source->getID(); ?>">
+						<a id="UIIndex" class="btn btn-secondary bg-gradient-secondary font-weight-bold" href="">
 							<i class="fa fa-desktop"></i> User Interface Index
 						</a>
 					</div>
