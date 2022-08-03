@@ -167,7 +167,7 @@ class BeaconAPI extends ResourceController
 		}
 
 		$providerURL = str_replace(URLHelper::ExtractPort($providerURL), '', $providerURL); // Extract and remove port, if it exists
-		$singleSignOnProvider = (new SingleSignOnProviderAdapterFactory())->getInstance()->ReadByURL($providerURL);
+		$singleSignOnProvider = (new SingleSignOnProviderAdapterFactory())->GetInstance()->ReadByURL($providerURL);
 
 		if (!$singleSignOnProvider->isNull())
 		{
