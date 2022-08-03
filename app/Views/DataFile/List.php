@@ -66,7 +66,7 @@
 <div class="row">
 	<div class="col">
 		<a href="<?= base_url($controllerName.'/Upload/' . $source->getID()) ?>" class="btn btn-success bg-gradient-success">
-			<i class="fa fa-upload"></i>  Upload Data File(s)
+			<i class="fa fa-upload"></i>  Upload Data File
 		</a>
 		<a href="<?= base_url($controllerName.'/Import/' . $source->getID()) ?>" class="btn btn-primary bg-gradient-primary">
 			<i class="fas fa-file-import"></i> Import Data File(s)
