@@ -54,6 +54,21 @@ class AttributeAdapter extends BaseAdapter
 		return null;
 	}
 
+	public function ReadMinimumAndMaximum(int $id): array
+	{
+		$this->builder->select('min, max');
+		$this->builder->where($this->GetKey(), $id);
+
+		$result = $this->builder->get()->getResult();
+
+		if (count($result) == 1)
+		{
+			return [$result[0]->min, $result[0]->max];
+		}
+
+		return [];
+	}
+
 	/**
     /**
      * @inheritDoc
