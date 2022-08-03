@@ -50,6 +50,12 @@ class SourceAdapter extends BaseAdapter
 		return $this->builder->update(['locked' => 0]);
 	}
 
+	public function UpdateRecordCount(int $id, int $record_count): bool
+	{
+		$this->builder->where($this->GetKey(), $id);
+		return $this->builder->update(['record_count' => $record_count]);
+	}
+
 	/**
 	 * @inheritDoc
 	 */
