@@ -161,7 +161,7 @@ class DataFile extends CVUI_Controller
 							$size = $files[0]->getSize();
 							$dataFileFactory = new DataFileFactory();
 
-							$this->dbAdapter->Create($dataFileFactory->getInstanceFromParameters(
+							$this->dbAdapter->Create($dataFileFactory->GetInstanceFromParameters(
 								$name,
 								$disk_name,
 								$size,
