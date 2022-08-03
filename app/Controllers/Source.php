@@ -122,14 +122,16 @@ class Source extends CVUI_Controller
                 'errors' => [
                     'required' => '{field} is required.',
 					'max_length' => 'Maximum length for {field} is 30 characters.',
-                    'uniquename_check' => '{field} already exists.'
+                    'uniquename_check' => '{field} already exists.',
+					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
                 ]
             ],
             'owner_name' => [
                     'label'  => 'Owner Name',
                     'rules'  => 'required|alpha_numeric_space',
                     'errors' => [
-                        'required' => '{field} is required.'
+                        'required' => '{field} is required.',
+						'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
                     ]
             ],
             'owner_email' => [
@@ -144,14 +146,16 @@ class Source extends CVUI_Controller
                 'label'  => 'Source URI',
                 'rules'  => 'required|valid_url',
                 'errors' => [
-                    'required' => '{field} is required.'
+                    'required' => '{field} is required.',
+					'valid_url' => 'Please check the URL field. It does not appear to be valid.'
                 ]
             ],
             'description' => [
                 'label'  => 'Source Description',
                 'rules'  => 'required|alpha_numeric_space',
                 'errors' => [
-                    'required' => '{field} is required.'
+                    'required' => '{field} is required.',
+					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
                 ]
             ],
             'status' => [
@@ -349,13 +353,15 @@ class Source extends CVUI_Controller
                 'errors' => [
 					'required' => '{field} is required.',
 					'max_length' => 'Maximum length for {field} is 30 characters.',
+					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
                 ]
             ],
 			'owner_name' => [
 				'label'  => 'Owner Name',
 				'rules'  => 'required|alpha_numeric_space',
 				'errors' => [
-					'required' => '{field} is required.'
+					'required' => '{field} is required.',
+					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
 				]
 			],
             'owner_email' => [
@@ -370,14 +376,16 @@ class Source extends CVUI_Controller
                 'label'  => 'Source URI',
                 'rules'  => 'required|valid_url',
                 'errors' => [
-                    'required' => '{field} is required.'
+                    'required' => '{field} is required.',
+					'valid_url' => 'Please check the URL field. It does not appear to be valid.'
                 ]
             ],
             'description' => [
                 'label'  => 'Source Description',
                 'rules'  => 'required|alpha_numeric_space',
                 'errors' => [
-                    'required' => '{field} is required.'
+                    'required' => '{field} is required.',
+					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
                 ]
             ],
             'status' => [
