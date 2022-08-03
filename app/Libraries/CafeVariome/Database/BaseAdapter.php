@@ -132,6 +132,16 @@ abstract class BaseAdapter implements IAdapter
 		return $this->key;
 	}
 
+	protected function changeTable(string $table)
+	{
+		$this->builder = $this->db->table($table);
+	}
+
+	protected function resetTable()
+	{
+		$this->builder = $this->db->table($this->table);
+	}
+
 	/**
 	 * @param object|null $object
 	 * @return IEntity
