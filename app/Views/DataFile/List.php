@@ -76,7 +76,7 @@
 		</a>
 	</div>
 </div>
-
+<br>
 <div class="modal fade" id="taskModal" tabindex="-1" aria-labelledby="taskModalLabel" aria-hidden="true">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
