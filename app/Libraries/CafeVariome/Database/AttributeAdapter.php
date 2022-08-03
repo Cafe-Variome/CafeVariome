@@ -14,6 +14,18 @@ use App\Libraries\CafeVariome\Factory\AttributeFactory;
 class AttributeAdapter extends BaseAdapter
 {
 
+	/**
+	 * @inheritDoc
+	 */
+	protected string $table = 'attributes';
+
+	/**
+	 * @inheritDoc
+	 */
+	protected string $key = 'id';
+
+
+	/**
     /**
      * @inheritDoc
      */
