@@ -254,6 +254,7 @@ class AjaxApi extends Controller
     }
 
     /**
+	 * @deprecated
      * Check Json Presence - Check if the server has any of the targeted json files
      * Already present for this source
      *
