@@ -69,6 +69,13 @@ class AttributeAdapter extends BaseAdapter
 		return [];
 	}
 
+
+	public function UpdateType(int $id, int $type): bool
+	{
+		$this->builder->where($this->GetKey(), $id);
+		return $this->builder->update(['type' => $type]);
+	}
+	
 	/**
     /**
      * @inheritDoc
