@@ -130,12 +130,6 @@ class SocketAdapter
         usleep($length);
     }
 
-    private function attachInstallationKey(array & $message)
-    {
-        $settings = Settings::getInstance();
-        $message['installation_key'] = $settings->getInstallationKey();
-    }
-
     public function isConnected(): bool
     {
         return $this->connected;
