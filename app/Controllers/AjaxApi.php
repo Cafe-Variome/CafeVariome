@@ -365,30 +365,6 @@ class AjaxApi extends Controller
 		}
     }
 
-	/**
-	 * @depreacted
-	 */
-    private function checkUploadJobs() {
-
-        $user_id = $this->request->getVar('user_id');
-        $return = ['Status' => '', 'Message' => []];
-        if ($this->uploadModel->countUploadJobRecord($user_id)) {
-            $return['Status'] = true;
-            $values = $this->uploadModel->checkUploadJobRecord($user_id);
-            for ($i=0; $i < count($values); $i++) {
-                if ($values[$i]['elastic_lock'] == 0) {
-                    $source_name = $this->uploadModel->getSourceNameByID($values[$i]['source_id']);
-                    array_push($return['Message'], $source_name);
-                    $this->uploadModel->removeUploadJobRecord($user_id,$values[$i]['source_id']);
-                }
-            }
-        }
-        else {
-            $return['Status'] = false;
-        }
-        echo json_encode($return);
-    }
-
     public function vcfUpload() {
 		if ($this->request->getMethod() == 'post') {
 			$basePath = FCPATH . UPLOAD . UPLOAD_DATA;
