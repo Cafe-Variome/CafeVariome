@@ -1,6 +1,6 @@
 <?php namespace App\Controllers;
 
-use App\Models\Settings;
+use App\Libraries\CafeVariome\CafeVariome;
 
 /**
  * UserInterfaceAPI.php
@@ -14,13 +14,12 @@ use App\Models\Settings;
 
 class UserInterfaceAPI extends BaseController
 {
-
 	private $setting;
 
 	public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
 	{
 		parent::initController($request, $response, $logger);
-		$this->setting =  Settings::getInstance();
+		$this->setting = CafeVariome::Settings();
 	}
 
 	public function getUIConstants()
