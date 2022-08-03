@@ -978,7 +978,11 @@ class AjaxApi extends Controller
 		}
     }
 
-    public function getSourceStatus(){
+	/**
+	 * @return false|string|void
+	 * @deprecated
+	 */
+    private function getSourceStatus(){
 
 		if ($this->request->getMethod() == 'post') {
 			$source_id = $this->request->getVar('source_id');
