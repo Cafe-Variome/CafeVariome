@@ -285,6 +285,7 @@ class AjaxApi extends Controller
     }
 
     /**
+	 * @deprecated
      * Json Batch - At this point all checks have been performed. Upload the json files in
      * Batches of 20 (as limited by php.ini)
      *
