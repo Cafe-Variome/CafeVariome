@@ -16,7 +16,11 @@
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\ElasticsearchSourceIndex;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4JSourceIndex;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceSourceIndex;
+use App\Libraries\CafeVariome\Factory\DataFileAdapterFactory;
+use App\Libraries\CafeVariome\Factory\PipelineAdapterFactory;
+use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
 use App\Libraries\CafeVariome\Net\Service\Demon;
+use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Controller;
 use CodeIgniter\CLI\CLI;
 use App\Models\Upload;
@@ -29,8 +33,8 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 
  class Task extends Controller
  {
-	 protected $db;
-	 protected $setting;
+	 protected $dbAdapter;
+
 
 	 /**
 	  * Constructor
