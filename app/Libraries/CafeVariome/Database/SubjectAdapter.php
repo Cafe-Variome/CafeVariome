@@ -24,6 +24,14 @@ class SubjectAdapter extends BaseAdapter
 	 */
 	protected string $key = 'id';
 
+	public function CountBySourceId(int $source_id): int
+	{
+		$this->builder->select($this->GetKey());
+		$this->builder->where('source_id', $source_id);
+
+		return $this->builder->countAll();
+	}
+
 	/**
 	 * Converts general PHP objects to a Subject object.
 	 * @param object|null $object
