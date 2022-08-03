@@ -640,6 +640,7 @@ class AjaxApi extends Controller
     }
 
     /**
+	 * deprecated
      * spreadsheetUpload - Perform Upload for CSV/XLS/XLSX files
      *
      * @param string $source_id - The source name we will be uploading to
