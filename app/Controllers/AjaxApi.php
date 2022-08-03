@@ -361,7 +361,12 @@ class AjaxApi extends Controller
 		}
     }
 
-    public function vcfUpload() {
+	/**
+	 * @return false|string|void
+	 * @throws \PhpOffice\PhpSpreadsheet\Exception
+	 * @deprecated
+	 */
+    private function vcfUpload() {
 		if ($this->request->getMethod() == 'post') {
 			$basePath = FCPATH . UPLOAD . UPLOAD_DATA;
 			$pairingsPath = FCPATH . UPLOAD . UPLOAD_PAIRINGS;
