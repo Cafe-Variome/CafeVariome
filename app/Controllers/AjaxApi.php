@@ -29,7 +29,6 @@ use CodeIgniter\Controller;
 use Config\Database;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
-use App\Models\Source;
 use App\Models\Upload;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
@@ -60,11 +59,8 @@ class AjaxApi extends Controller
 
 		$this->db = Database::connect();
         $this->setting =  CafeVariome::Settings();
-        $this->sourceModel = new Source();
-        $this->uploadModel = new Upload();
 
 		$this->session = \Config\Services::session();
-
 
 		if ($this->session->has(self::AUTHENTICATOR_SESSION))
 		{
