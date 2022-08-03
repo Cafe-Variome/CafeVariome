@@ -153,6 +153,26 @@ abstract class DataInput
 		return htmlentities(str_replace($malicious_chars, $soap, $dirty_string));
 	}
 
+	protected function getSubjectIdByName(string $subject): int
+	{
+		$subject = trim(strtolower(preg_replace('/\s+/', '_', $subject))); // replace spaces with underline
+		$subject = $this->sanitiseString($subject);
+
+		if (array_key_exists($subject, $this->subjects))
+		{
+			$subject_id = $this->subjects[$subject]['id'];
+		}
+		else
+		{
+			$subject_id = $this->createSubject($subject); // Insert subject to database
+			// Add attribute to the list
+			$this->subjects[$subject] = [
+				'id' => $subject_id
+			];
+		}
+		return $subject_id;
+	}
+
 	protected function getAttributeIdByName(string $attribute): int
 	{
 		$attribute = trim(strtolower(preg_replace('/\s+/', '_', $attribute))); // replace spaces with underline
