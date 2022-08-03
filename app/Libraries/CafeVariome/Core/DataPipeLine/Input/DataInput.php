@@ -81,29 +81,6 @@ abstract class DataInput
         }
     }
 
-	/**
-	 * @deprecated
-	 */
-    public function removeAttribuesAndValuesFiles(string $file_name = null)
-    {
-        $path = FCPATH . UPLOAD . UPLOAD_DATA . $this->sourceId . DIRECTORY_SEPARATOR;
-        $fileMan = new SysFileMan($path);
-
-        if ($file_name != null) {
-            $fname = strpos($file_name, '.') ? explode('.', $file_name)[0] : $file_name;
-            if ($fileMan->Exists($fname)) {
-                $fileMan->Delete($fname);
-            }
-        }
-        else{
-            foreach ($fileMan->getFiles() as $file) {
-                if (strpos($file, '_uniq.json')) {
-                    $fileMan->Delete($file);
-                }
-            }
-        }
-    }
-
 	protected function updateSubjectCount()
 	{
 		$totalRecordCount = $this->sourceModel->countSourceEntries($this->sourceId);
