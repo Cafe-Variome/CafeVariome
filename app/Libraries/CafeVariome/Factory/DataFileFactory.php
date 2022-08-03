@@ -35,7 +35,7 @@ class DataFileFactory extends EntityFactory
 		return new DataFile($properties);
 	}
 
-	public function getInstanceFromParameters(
+	public function GetInstanceFromParameters(
 		string $name,
 		string $disk_name,
 		float $size,
