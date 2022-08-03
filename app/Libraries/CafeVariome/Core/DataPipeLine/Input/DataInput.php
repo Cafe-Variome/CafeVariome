@@ -173,6 +173,28 @@ abstract class DataInput
 		return $subject_id;
 	}
 
+	protected function getGroupIdByName(string $group): int
+	{
+		$group = trim(strtolower(preg_replace('/\s+/', '_', $group))); // replace spaces with underline
+		$group = $this->sanitiseString($group);
+
+		if (array_key_exists($group, $this->groups))
+		{
+			$group_id = $this->groups[$group]['id'];
+		}
+		else
+		{
+			$group_id = $this->createGroup($group); // Insert subject to database
+			$attribute_ids = $this->groupAdapter->ReadAttributeIds($group_id);
+			// Add attribute to the list
+			$this->groups[$group] = [
+				'id' => $group_id,
+				'attribute_ids' => $attribute_ids
+			];
+		}
+		return $group_id;
+	}
+
 	protected function getAttributeIdByName(string $attribute): int
 	{
 		$attribute = trim(strtolower(preg_replace('/\s+/', '_', $attribute))); // replace spaces with underline
