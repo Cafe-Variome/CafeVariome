@@ -84,18 +84,6 @@ abstract class DataInput
 	/**
 	 * @deprecated
 	 */
-    public function dumpAttributesAndValues(int $file_id)
-    {
-        $attributeValueList = $this->eavModel->getUniqueAttributesAndValuesByFileIdAndSourceId($file_id, $this->sourceId);
-        $fileName = $this->uploadModel->getFileName($file_id);
-        $fileNameWithoutExtension = preg_replace("/\.json|\.phenopacket|\.csv|\.xlsx|\.xls/", '', $fileName);
-
-        $this->fileMan->Write($fileNameWithoutExtension . "_uniq.json", json_encode($attributeValueList));
-    }
-
-	/**
-	 * @deprecated
-	 */
     public function removeAttribuesAndValuesFiles(string $file_name = null)
     {
         $path = FCPATH . UPLOAD . UPLOAD_DATA . $this->sourceId . DIRECTORY_SEPARATOR;
