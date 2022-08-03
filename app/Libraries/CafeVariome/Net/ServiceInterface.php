@@ -126,31 +126,41 @@ class ServiceInterface
         return false;
     }
 
-    public function ReportProgress(int $entity_id, int $records_processed, int $total_records, string $name, string $status = "", bool $finished = false, string $message = "records_processed"): bool
+    public function ReportProgress(int $task_id, int $progress, string $status = '', bool $finished = false): array
     {
-        $message = [
-            'type' => 'reportprogress',
-            'process' => [
-                'pid' => getmypid(),
-                'name' => $name, //'bulkupload'
-                'entityId' => $entity_id,
-                'message' => $message,
-                'count' => $records_processed,
-                'total'  => $total_records,
-                'status' => $status,
-                'finished' => $finished
-            ]
-        ];
+        $message = (new ReportProgressMessageFactory())->GetInstance($task_id, $progress, $finished, $status);
 
-        try {
+        try
+		{
             $this->socket->Create()->Connect()->Write($message, 10);
+			$results = '';
+			while ($out = $this->socket->Read(2048))
+			{
+				$results .= $out;
+			}
             $this->socket->Close();
 
-            return true;
-        } catch (\Exception $ex) {
-            error_log($ex->getMessage());
+			$responseArray = json_decode($results, true);
+
+			return 	[
+				'response_received' => true,
+				'error' => null,
+				'payload' => $responseArray
+			];
+        }
+		catch (\Exception $ex)
+		{
+			return [
+				'response_received' => false,
+				'error' => $ex->getMessage(),
+				'payload' => null
+			];
         }
 
-        return false;
+		return [
+			'response_received' => false,
+			'error' => null,
+			'payload' => null
+		];
     }
 }
