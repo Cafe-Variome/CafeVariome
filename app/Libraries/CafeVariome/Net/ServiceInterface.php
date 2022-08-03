@@ -7,10 +7,13 @@
  *
  * @author Mehdi Mehtarizadeh
  *
- * This is class that interfaces with Cafe Variome Service process.
+ * This class interfaces with Cafe Variome Service process.
  *
  */
 
+use App\Libraries\CafeVariome\Factory\PollProgressMessageFactory;
+use App\Libraries\CafeVariome\Factory\RegisterTaskMessageFactory;
+use App\Libraries\CafeVariome\Factory\ReportProgressMessageFactory;
 use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 
 class ServiceInterface
