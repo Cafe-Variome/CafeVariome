@@ -89,7 +89,7 @@ class AjaxApi extends Controller
 		}
     }
 
-    public function query()
+    public function Query()
 	{
         $networkInterface = new NetworkInterface();
 
