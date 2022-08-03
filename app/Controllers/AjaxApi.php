@@ -547,7 +547,11 @@ class AjaxApi extends Controller
 		}
     }
 
-    public function vcfBatch() {
+	/**
+	 * @return false|string|void
+	 * @deprecated
+	 */
+    private function vcfBatch() {
 		if ($this->request->getMethod() == 'post') {
 			$basePath = FCPATH . UPLOAD;
 			$fileMan = new UploadFileMan($basePath);
