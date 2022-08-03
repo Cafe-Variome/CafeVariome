@@ -24,6 +24,21 @@ class AttributeAdapter extends BaseAdapter
 	 */
 	protected string $key = 'id';
 
+	public function ReadIdByNameAndSourceId(string $name, int $source_id): ?int
+	{
+		$this->builder->select($this->GetKey());
+		$this->builder->where('name', $name);
+		$this->builder->where('source_id', $source_id);
+		$results = $this->builder->get()->getResult();
+
+		if (count($results) == 1)
+		{
+			return $results[0]->{$this->GetKey()};
+		}
+
+		return null;
+	}
+
 
 	/**
     /**
