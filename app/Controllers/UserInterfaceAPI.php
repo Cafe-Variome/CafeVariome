@@ -22,7 +22,7 @@ class UserInterfaceAPI extends BaseController
 		$this->setting = CafeVariome::Settings();
 	}
 
-	public function getUIConstants()
+	public function GetUIConstants()
 	{
 		$this->response->setHeader("Content-Type", "text/javascript");
 
