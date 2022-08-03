@@ -594,7 +594,12 @@ class AjaxApi extends Controller
 		}
     }
 
-    public function vcfStart() {
+	/**
+	 * @return false|string|void
+	 * @throws \Exception
+	 * @deprecated
+	 */
+    private function vcfStart() {
 		if ($this->request->getMethod() == 'post') {
 			$pairingsPath = FCPATH . UPLOAD . UPLOAD_PAIRINGS;
 			$fileMan = new UploadFileMan($pairingsPath);
