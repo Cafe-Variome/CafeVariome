@@ -35,7 +35,7 @@
     <!-- favicon and touch icons -->
     <link rel="shortcut icon" href="<?php echo base_url(IMAGES.'logos/favicon.ico');?>" />
 
-	<script type="text/javascript" src="<?= base_url('UserInterfaceAPI/Gmeta_etUIConstants') ?>"></script>
+	<script type="text/javascript" src="<?= base_url('UserInterfaceAPI/GetUIConstants') ?>"></script>
 
     <script src="<?php echo base_url(JS."jquery-3.6.0.min.js");?>"></script>
 
