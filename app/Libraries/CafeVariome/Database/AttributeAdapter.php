@@ -81,6 +81,15 @@ class AttributeAdapter extends BaseAdapter
 		return $this->builder->update(['storage_location' => $storage_location]);
 	}
 
+	public function UpdateMinimumAndMaximum(int $id, float $minimum, float $maximum): bool
+	{
+		$this->builder->where($this->GetKey(), $id);
+		return $this->builder->update([
+			'min' => $minimum,
+			'max' => $maximum
+		]);
+	}
+
 	/**
     /**
      * @inheritDoc
