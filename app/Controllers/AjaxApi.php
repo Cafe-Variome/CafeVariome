@@ -102,7 +102,7 @@ class AjaxApi extends Controller
 		}
 		$authenticatorFactory = new AuthenticatorFactory();
 		$authenticator = $authenticatorFactory->GetInstance(
-			(new SingleSignOnProviderAdapterFactory())->getInstance()->Read(
+			(new SingleSignOnProviderAdapterFactory())->GetInstance()->Read(
 				$session->get(AUTHENTICATOR_SESSION_NAME)
 			));
 
