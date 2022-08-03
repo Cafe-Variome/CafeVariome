@@ -1,13 +1,15 @@
 <?php namespace App\Libraries\CafeVariome\Net\Service;
 
-use App\Libraries\CafeVariome\Net\SocketAdapter;
-
 /**
  * Demon.php
  * Created: 15/02/2022
  * @author Mehdi Mehtarizadeh
  *
  */
+
+use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
+use App\Libraries\CafeVariome\Net\SocketAdapter;
+
 
 class Demon
 {
@@ -22,6 +24,8 @@ class Demon
 
 	public function Run()
 	{
+		$taskAdapter = (new TaskAdapterFactory())->GetInstance();
+
 		$this->socket->Create(); // Create a socket
 		$this->socket->setOption(SOL_SOCKET, SO_REUSEADDR, 1); // Set relevant options
 		$this->socket->Bind(); // Bind it to the address and port specified in BackgroundService config file
@@ -38,68 +42,74 @@ class Demon
 			$request = $this->socket->Read(5000);
 			try
 			{
-				$requestArr = json_decode($request, true);
+				$incomingMessage = json_decode($request);
 				if (json_last_error() == JSON_ERROR_NONE)
 				{
 					$process = [];
-					$type = $requestArr['type'];
-					$installation_key = $requestArr['installation_key'];
+					$type = $incomingMessage->type;
+					$installation_key = $incomingMessage->installation_key;
 
 					switch (strtolower($type))
 					{
-						case 'registerprocess':
-							$process = $requestArr['process'];
-							$pid = $process['pid'];
-							$name = $process['name'];
-							$entityId = $process['entityId'];
-							$message = $process['message'];
-							$status = $process['status'];
-							$finished = $process['finished'];
-							if(
-								!array_key_exists($entityId, $tasks) &&
-								strtolower($message) === 'records_count'
-							)
+						case 'registertaskmessage':
+							$task_id = $incomingMessage->task_id;
+							$task = $taskAdapter->Read($task_id);
+
+							if (!$task->isNull())
 							{
-								$records_count = $process['count'];
-								$tasks[$installation_key][$entityId] = [
-									'pid' => $pid,
-									'installation_key' => $installation_key,
-									'message' => $message,
-									'name' => $name,
-									'entityId' => $entityId,
-									'records_count' => $records_count,
-									'finished' => $finished,
-									'status' => $status
+								$tasks[$installation_key][$task_id] = [
+									'error' => 0,
+									'continue' => true,
+									'progress' => 0,
+									'finished' => $incomingMessage->finished,
+									'status' => $incomingMessage->status,
+									'process_id' => $incomingMessage->process_id,
+									'data_file_id' => $task->data_file_id
 								];
 							}
+
 							break;
-						case 'reportprogress':
-							$process = $requestArr['process'];
-							$pid = $process['pid'];
-							$name = $process['name'];
-							$entityId = $process['entityId'];
-							$message = $process['message'];
-							$status = $process['status'];
-							$finished = $process['finished'];
+						case 'reportprogressmessage':
 							if(
 								array_key_exists($installation_key, $tasks) &&
-								array_key_exists($entityId, $tasks[$installation_key]) &&
-								strtolower($message) === 'records_processed')
+								array_key_exists($task_id, $tasks[$installation_key])
+							)
 							{
-								$records_processed = $process['count'];
-								$total_records = $process['total'];
+								$task = $tasks[$installation_key][$task_id];
+								$task['progress'] = $incomingMessage->progress;
+								$task['finished'] = $incomingMessage->finished;
+								$task['status'] = $incomingMessage->status;
 
-								$task = $tasks[$installation_key][$entityId];
-								$task['records_processed'] = $records_processed;
-								$task['records_count'] = $total_records;
-								$task['finished'] = $finished;
+								$tasks[$installation_key][$task_id] = $task;
 
-								if ($status != "") {
-									$task['status'] = $status;
-								}
+//								$resp[$task_id]['progress'] = $tasks[$installation_key][$task_id]['progress'];
+//								$resp[$task_id]['status'] = $tasks[$installation_key][$task_id]['status'];
+//								$resp[$task_id]['finished'] = $tasks[$installation_key][$task_id]['finished'];
+								$resp[$task_id]['continue'] = $tasks[$installation_key][$task_id]['continue'];
 
-								$tasks[$installation_key][$entityId] = $task;
+								$this->socket->Send($resp);
 							}
+							break;
+						case 'pollprogressmessage':
+							$resp = [];
+
+							if (array_key_exists($installation_key, $tasks))
+							{
+								foreach ($tasks[$installation_key] as $taskId => $taskInfo)
+								{
+									$resp[$taskId]['progress'] = $taskInfo['progress'];
+									$resp[$taskId]['finished'] = $taskInfo['finished'];
+									$resp[$taskId]['status'] = $taskInfo['status'];
+									$resp[$taskId]['data_file_id'] = $taskInfo['data_file_id'];
+
+									if($taskInfo['finished'])
+									{
+										unset($tasks[$installation_key][$taskId]);
+									}
+								}
+							}
+
+							$this->socket->Send($resp);
 							break;
 						case 'uploadedfilesstatus':
 							$resp = [];
