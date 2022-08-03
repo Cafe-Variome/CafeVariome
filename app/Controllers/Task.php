@@ -44,8 +44,123 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 	 {
 		 parent::initController($request, $response, $logger);
 
-		 $this->db = \Config\Database::connect();
-		 $this->setting = Settings::getInstance();
+		 $this->dbAdapter = (new TaskAdapterFactory())->GetInstance();
+	 }
+
+	 public function Start(int $task_id)
+	 {
+		 $task = $this->dbAdapter->Read($task_id);
+
+		 if ($task->isNull())
+		 {
+
+		 }
+		 else
+		 {
+			 $task->started = time();
+			 $this->dbAdapter->Update($task_id, $task);
+
+			 switch ($task->type)
+			 {
+				 case TASK_TYPE_FILE_PROCESS:
+					 if(is_null($task->data_file_id))
+					 {
+						 $task->SetError(TASK_ERROR_DATA_FILE_ID_NULL);
+						 $task->status = TASK_STATUS_FAILED;
+					 }
+
+					 if(is_null($task->pipeline_id))
+					 {
+						 $task->SetError(TASK_ERROR_PIPELINE_ID_NULL);
+						 $task->status = TASK_STATUS_FAILED;
+					 }
+
+					 $dataFileAdapter = (new DataFileAdapterFactory())->GetInstance();
+					 $pipelineAdapter = (new PipelineAdapterFactory())->GetInstance();
+
+					 $dataFile = $dataFileAdapter->Read($task->data_file_id);
+					 if ($dataFile->isNull())
+					 {
+						 $task->SetError(TASK_ERROR_DATA_FILE_NULL);
+						 $task->status = TASK_STATUS_FAILED;
+					 }
+
+//					 if ($dataFile->status == DATA_FILE_STATUS_PROCESSING)
+//					 {
+//						 $task->SetError(TASK_ERROR_DUPLICATE);
+//						 $task->status = TASK_STATUS_CENCELLED;
+//					 }
+
+					 $extension = $dataFileAdapter->ReadExtensionById($task->data_file_id);
+					 $pipeline = $pipelineAdapter->Read($task->pipeline_id);
+
+					 if ($pipeline->isNull())
+					 {
+						 $task->SetError(TASK_ERROR_PIPELINE_NULL);
+						 $task->status = TASK_STATUS_FAILED;
+					 }
+
+					 $this->dbAdapter->Update($task_id, $task);
+
+					 if ($task->error_code == TASK_ERROR_NO_ERROR)
+					 {
+						 // Mark task as started
+						 $task->status = TASK_STATUS_STARTED;
+						 $this->dbAdapter->Update($task_id, $task);
+
+						 $serviceInterface = new ServiceInterface();
+						 $serviceInterface->RegisterTask($task_id); // Register task in Demon
+
+						 $overwrite = UPLOADER_DELETE_FILE;
+						 $inputPipeLine = null;
+						 //Start task
+						 switch (strtolower($extension))
+						 {
+							 case 'csv':
+							 case 'xls':
+							 case 'xlsx':
+							 	$inputPipeLine = new SpreadsheetDataInput($task, $dataFile->source_id);
+							 	break;
+							 case 'phenopacket':
+							 case 'json':
+								 $inputPipeLine = new PhenoPacketDataInput($task, $dataFile->source_id);
+							 	break;
+							 case 'vcf':
+								 $inputPipeLine = new VCFDataInput($task, $dataFile->source_id);
+								 break;
+						 }
+
+						 if (!is_null($inputPipeLine))
+						 {
+							 try
+							 {
+								 // Mark task as processing
+								 $task->status = TASK_STATUS_PROCESSING;
+								 $this->dbAdapter->Update($task_id, $task);
+
+								 $inputPipeLine->Absorb($task->data_file_id);
+								 $inputPipeLine->Save($task->data_file_id);
+								 $inputPipeLine->Finalize($task->data_file_id);
+
+								 // Mark task as finished
+								 $task->status = TASK_STATUS_FINISHED;
+								 $task->ended = time();
+							 }
+							 catch(\Exception $ex)
+							 {
+								 $exceptionMessage = $ex->getMessage();
+								 $task->SetError(TASK_ERROR_RUNTIME_ERROR, $exceptionMessage);
+							 }
+						 }
+					 }
+
+					 $this->dbAdapter->Update($task_id, $task);
+
+					 break;
+				 case TASK_TYPE_SOURCE_INDEX:
+					 break;
+			 }
+		 }
 	 }
 
 	 /**
