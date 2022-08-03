@@ -68,23 +68,26 @@ class User extends CVUI_Controller
             ],
             'first_name' => [
                     'label'  => 'First Name',
-                    'rules'  => 'required',
+                    'rules'  => 'required|alpha_space',
                     'errors' => [
-                        'required' => '{field} is required.'
+                        'required' => '{field} is required.',
+						'alpha_space' => 'The only valid characters in the {field} are alphabets or space characters.'
                     ]
             ],
             'last_name' => [
                 'label'  => 'Last Name',
-                'rules'  => 'required',
+                'rules'  => 'required|alpha_space',
                 'errors' => [
                     'required' => '{field} is required.',
+					'alpha_space' => 'The only valid characters in the {field} are alphabets or space characters.'
                 ]
             ],
             'company' => [
                 'label'  => 'Institute/Laboratory/Company Name',
-                'rules'  => 'required',
+                'rules'  => 'required|alpha_numeric_space',
                 'errors' => [
-                    'required' => '{field} is required.'
+                    'required' => '{field} is required.',
+					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
                 ]
             ]
         ]
@@ -230,23 +233,26 @@ class User extends CVUI_Controller
 		$this->validation->setRules([
 			'first_name' => [
 					'label'  => 'First Name',
-					'rules'  => 'required',
+					'rules'  => 'required|alpha_space',
 					'errors' => [
-						'required' => '{field} is required.'
+						'required' => '{field} is required.',
+						'alpha_space' => 'The only valid characters in the {field} are alphabets or space characters.'
 					]
 			],
 			'last_name' => [
 				'label'  => 'Last Name',
-				'rules'  => 'required',
+				'rules'  => 'required|alpha_space',
 				'errors' => [
 					'required' => '{field} is required.',
+					'alpha_space' => 'The only valid characters in the {field} are alphabets or space characters.'
 				]
 			],
 			'company' => [
 				'label'  => 'Institute/Laboratory/Company Name',
-				'rules'  => 'required',
+				'rules'  => 'required|alpha_numeric_space',
 				'errors' => [
-					'required' => '{field} is required.'
+					'required' => '{field} is required.',
+					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
 				]
 			]
 		]
