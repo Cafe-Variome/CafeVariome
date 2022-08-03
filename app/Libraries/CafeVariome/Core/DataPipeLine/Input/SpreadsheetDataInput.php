@@ -9,57 +9,50 @@
  *
  */
 
-use App\Models\EAV;
+use App\Libraries\CafeVariome\Entities\Task;
 use \Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
 class SpreadsheetDataInput extends DataInput
 {
-    private $delete;
     protected $serviceInterface;
     protected array $configuration;
     private $column_count;
     protected $pipeline_id;
 
-    public function __construct(int $source_id, int $delete)
+    public function __construct(Task $task, int $source_id)
 	{
-        parent::__construct($source_id);
-        $this->delete = $delete;
-        $this->initializeConfiguration();
+        parent::__construct($task, $source_id);
+        $this->InitializePipeline();
     }
 
-    public function absorb(int $file_id): bool
+    public function Absorb(int $file_id): bool
 	{
-        $this->registerProcess($file_id);
-
-        $fileRecord = $this->getSourceFiles($file_id); //Get a list of files for source
-
-        if (count($fileRecord) == 1)
+		$dataFile = $this->dataFileAdapter->Read($file_id);
+		if ($dataFile->isNull())
 		{
-            $file = $fileRecord[0]['FileName'];
-            $this->fileName = $file;
-            if (array_key_exists('pipeline_id', $fileRecord[0]))
+			return false;
+		}
+		else
+		{
+			$this->fileName = $dataFile->disk_name;
+			$this->applyPipeline($this->pipelineId);
+
+			if ($this->fileMan->Exists($this->fileName))
 			{
-                $this->pipeline_id = $fileRecord[0]['pipeline_id'];
-                $this->applyPipeline($this->pipeline_id);
-            }
+				$this->sourceAdapter->Lock($this->sourceId);
 
-            if ($this->fileMan->Exists($file))
-			{
-                $this->uploadModel->clearErrorForFile($file_id);
-                $this->sourceModel->lockSource($this->sourceId);
-
-				if ($this->delete == UPLOADER_DELETE_FILE)
+				if ($this->overwrite == UPLOADER_DELETE_FILE)
 				{
-                    $this->reportProgress($file_id, 0, 1, 'bulkupload', 'Deleting existing data for the file');
-					$this->deleteExistingRecords($file_id);
-                }
+					$this->ReportProgress(0, false, 'Deleting existing data for the file');
+					$this->DeleteExistingRecords($file_id);
+				}
 
-                $filePath = $this->basePath . $file;
+				$filePath = $this->basePath . $this->fileName;
 
-                if (preg_match("/\.csv$|\.tsv$/", $file))
+				if (preg_match("/\.csv$|\.tsv$/", $this->fileName))
 				{
-                    $line = fgets(fopen($filePath, 'r'));
-                    preg_match("/^" . $this->configuration['subject_id_attribute_name'] . "(.)/", $line, $matches);
+					$line = fgets(fopen($filePath, 'r'));
+					preg_match("/^" . $this->configuration['subject_id_attribute_name'] . "(.)/", $line, $matches);
 					if (
 						count($matches) < 2 &&
 						$this->configuration['subject_id_location'] == SUBJECT_ID_WITHIN_FILE
@@ -70,7 +63,7 @@ class SpreadsheetDataInput extends DataInput
 					}
 					else
 					{
-						if(count($matches) == 2)
+						if (count($matches) == 2)
 						{
 							$delimiter = $matches[1];
 						}
@@ -82,39 +75,38 @@ class SpreadsheetDataInput extends DataInput
 						$this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
 						$this->reader->setFieldDelimiter($delimiter);
 					}
-                }
-                elseif (preg_match("/\.xlsx$/", $file))
+				}
+				elseif (preg_match("/\.xlsx$/", $this->fileName))
 				{
 					$this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
-                }
-                elseif (preg_match("/\.ods$/", $file))
+				}
+				elseif (preg_match("/\.ods$/", $this->fileName))
 				{
 					$this->reader = ReaderEntityFactory::createReaderFromFile($filePath);
-                }
-                else
+				}
+				else
 				{
-                    $message = "File did not conform to allowed types.";
-                    $error_code = 2;
-                    $this->uploadModel->errorInsert($file_id, $message, $error_code, true);
+					$message = "File did not conform to allowed types.";
+					$error_code = 2;
 
 					return false;
-                }
+				}
 
-                $this->reader->open($filePath);
+				$this->reader->open($filePath);
 				return true;
-            }
-        }
+			}
+		}
 		return false; // If the control reaches this section, the file has not been absorbed successfully.
     }
 
-    public function save(int $file_id): bool
+    public function Save(int $file_id): bool
     {
 		try
 		{
 			$subject_id = "";
-			$this->reportProgress($file_id, 0, 1, 'bulkupload', 'Counting records');
+			$this->ReportProgress(0, 'Counting records');
 			$recordCount = $this->countRecords();
-			$this->reportProgress($file_id, 0, $recordCount, 'bulkupload', 'Importing data');
+			$this->ReportProgress(0, 'Importing data');
 			list($linerow, $counter) = array(1, 0);
 
 			if ($this->configuration['subject_id_location'] == SUBJECT_ID_IN_FILE_NAME)
@@ -165,8 +157,8 @@ class SpreadsheetDataInput extends DataInput
 						{
 							$message = "All records require a record ID, a record on line: " . $linerow . " in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
 							$error_code = 3;
-							$this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
-							$this->sourceModel->unlockSource($this->sourceId);
+
+							$this->sourceAdapter->Unlock($this->sourceId);
 
 							return false;
 						}
@@ -241,7 +233,9 @@ class SpreadsheetDataInput extends DataInput
 						}
 					}
 					$recordsProcessed++;
-					$this->reportProgress($file_id, $recordsProcessed, $recordCount);
+
+					$progress =  intval(ceil((($recordsProcessed / $recordCount)) * 100.0));
+					$this->ReportProgress($progress);
 				}
 				$linerow++;
 			}
@@ -266,12 +260,15 @@ class SpreadsheetDataInput extends DataInput
 		}
     }
 
-	private function processRow(array $row, array $attgroups, string $subject_id, int $file_id, int & $counter)
+	private function processRow(array $row, array $attgroups, string $subject_id_string, int $file_id, int & $counter)
 	{
-		foreach ($attgroups as $group)
+		foreach ($attgroups as $groupArray)
 		{
-			$uid = md5(uniqid(rand(),true));
-			foreach ($group as $attribute => $val)
+			$group = implode('_', array_keys($groupArray));
+			$group_id = $this->getGroupIdByName($group);
+			$groupAttributeIds = [];
+
+			foreach ($groupArray as $attribute => $val)
 			{
 				$value = trim($row[$val]);
 				if ($value == "") continue; // Skip empty values
@@ -281,7 +278,9 @@ class SpreadsheetDataInput extends DataInput
 					$value = $value->format('Y-m-d H:i:s');
 				}
 
+				$subject_id = $this->getSubjectIdByName($subject_id_string);
 				$attribute_id = $this->getAttributeIdByName($attribute);
+				array_push($groupAttributeIds, $attribute_id);
 
 				if ($this->configuration['internal_delimiter'] != '' && $this->configuration['internal_delimiter'] != null)
 				{
@@ -295,19 +294,19 @@ class SpreadsheetDataInput extends DataInput
 						foreach ($value_array as $sub_value)
 						{
 							$sub_value_id = $this->getValueIdByNameAndAttributeId($sub_value, $attribute);
-							$this->createEAV($uid, $file_id, $subject_id, $attribute_id, $sub_value_id);
+							$this->createEAV($group_id, $file_id, $subject_id, $attribute_id, $sub_value_id);
 						}
 					}
 					else
 					{
 						$value_id = $this->getValueIdByNameAndAttributeId($value, $attribute);
-						$this->createEAV($uid, $file_id, $subject_id, $attribute_id, $value_id);
+						$this->createEAV($group_id, $file_id, $subject_id, $attribute_id, $value_id);
 					}
 				}
 				else
 				{
 					$value_id = $this->getValueIdByNameAndAttributeId($value, $attribute);
-					$this->createEAV($uid, $file_id, $subject_id, $attribute_id, $value_id);
+					$this->createEAV($group_id, $file_id, $subject_id, $attribute_id, $value_id);
 				}
 
 				$counter++;
@@ -318,11 +317,13 @@ class SpreadsheetDataInput extends DataInput
 					{
 						$error_code = 0;
 						$message = "MySQL insert was unsuccessful.";
-						$this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
-						$this->sourceModel->unlockSource($this->sourceId);
+
+						$this->sourceAdapter->Unlock($this->sourceId);
 					}
 				}
 			}
+
+			$this->associateGroupWithAttributes($group, $groupAttributeIds);
 		}
 	}
 
@@ -336,8 +337,9 @@ class SpreadsheetDataInput extends DataInput
 	{
        $status = $this->db->commit();
 
-       if (!$status){
-       	return !$status;
+       if (!$status)
+	   {
+		   return !$status;
 	   }
 
        $this->db->begin_transaction();
@@ -346,8 +348,10 @@ class SpreadsheetDataInput extends DataInput
     private function countRecords(): int
     {
         $rc = -1; // set counter to -1 initially to avoid counting header of the file
-        foreach ($this->reader->getSheetIterator() as $sheet) {
-            foreach ($sheet->getRowIterator() as $row) {
+        foreach ($this->reader->getSheetIterator() as $sheet)
+		{
+            foreach ($sheet->getRowIterator() as $row)
+			{
 				$row = $row->toArray();
                 $this->column_count = count($row);
                 $rc++;
@@ -374,7 +378,7 @@ class SpreadsheetDataInput extends DataInput
         return $positions;
     }
 
-    protected function initializeConfiguration()
+    protected function InitializePipeline()
     {
         $this->configuration = [
 			'subject_id_location' => SUBJECT_ID_WITHIN_FILE,
@@ -559,9 +563,6 @@ class SpreadsheetDataInput extends DataInput
 
     protected function reportError(int $file_id, int $error_code, string $message)
     {
-        $this->uploadModel->errorInsert($file_id, $this->sourceId, $message, $error_code, true);
-        $this->sourceModel->unlockSource($this->sourceId);
-
         //report to service
         //$this->serviceInterface->ReportError();
     }
