@@ -209,6 +209,7 @@ class AjaxApi extends Controller
 	}
 
     /**
+	 * @deprecated
      * validateUpload - Ensure the source we are wanting to upload to is an actual source
      * Users can change the parameter on url to what they wish
      * Check if the source is locked by another update/upload operation
