@@ -88,7 +88,7 @@ class UploadFileMan extends FileMan
     {
 		$file_name_to_write = $this->useDiskName ? $file->getDiskName() : basename($file->getName());
 
-        return move_uploaded_file($file->getTempPath(), $this->getFullPath() . $path . $file_name_to_write);
+        return move_uploaded_file($file->getTempPath(), $this->getFullPath() . $path . DIRECTORY_SEPARATOR . $file_name_to_write);
     }
 
     public function SaveAll()
