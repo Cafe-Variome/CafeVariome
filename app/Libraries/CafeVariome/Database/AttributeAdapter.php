@@ -39,6 +39,20 @@ class AttributeAdapter extends BaseAdapter
 		return null;
 	}
 
+	public function ReadType(int $id): ?int
+	{
+		$this->builder->select('type');
+		$this->builder->where($this->GetKey(), $id);
+
+		$result = $this->builder->get()->getResult();
+
+		if (count($result) == 1)
+		{
+			return $result[0]->type;
+		}
+
+		return null;
+	}
 
 	/**
     /**
