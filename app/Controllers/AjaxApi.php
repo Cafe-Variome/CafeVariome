@@ -695,7 +695,7 @@ class AjaxApi extends Controller
 		}
     }
 
-	
+
     public function LookupDirectory()
 	{
 		if ($this->request->getMethod() == 'post')
@@ -960,17 +960,18 @@ class AjaxApi extends Controller
     public function getSourceCounts()
     {
 		if ($this->request->getMethod() == 'post') {
-			$sourceModel = new Source();
-			$sourceRecordount = $sourceModel->getSources('source_id, name, record_count', ['status' => 'online']);
+
+			$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+			$sourceList = $sourceAdapter->ReadAllOnline();
 
 			$sc = 0;
 			$maxSourcesToDisplay = 12;
 			$sourceCountList = [];
-			foreach ($sourceRecordount as $srCount) {
+			foreach ($sourceList as $source) {
 				if ($sc > $maxSourcesToDisplay) {
 					break;
 				}
-				array_push($sourceCountList, $srCount['record_count']);
+				array_push($sourceCountList, $source->record_count);
 				$sc++;
 			}
 
