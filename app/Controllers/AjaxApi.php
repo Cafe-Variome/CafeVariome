@@ -700,7 +700,7 @@ class AjaxApi extends Controller
 	{
 		if ($this->request->getMethod() == 'post')
 		{
-			$allowed_formats = ['csv', 'xls', 'xlsx', 'phenopacket', 'json'];
+			$allowed_formats = ['csv', 'xls', 'xlsx', 'phenopacket'];
 			$file_count = 0;
 			$path = $this->request->getVar('lookup_dir');
 
@@ -721,14 +721,14 @@ class AjaxApi extends Controller
 		}
 	}
 
-	public function importFromDirectory()
+	public function ImportFromDirectory()
 	{
-		 if ($this->request->getMethod() == 'post') {
-			 $allowed_formats = ['csv', 'xls', 'xlsx', 'phenopacket', 'json'];
+		 if ($this->request->getMethod() == 'post')
+		 {
+			 $allowed_formats = ['csv', 'xls', 'xlsx', 'phenopacket'];
 
 			 $path = $this->request->getVar('lookup_dir');
 			 $source_id = $this->request->getVar('source_id');
-			 $pipeline_id = $this->request->getVar('pipeline_id');
 			 $user_id = $this->request->getVar('user_id');
 
 			 if (SysFileMan::IsFile($path))
@@ -736,18 +736,29 @@ class AjaxApi extends Controller
 				 if (in_array(strtolower(SysFileMan::GetFileExtension($path)), $allowed_formats))
 				 {
 					 $files_count = 1;
-					 $unsaved_files = [new File(SysFileMan::GetFileName($path), SysFileMan::GetFileSize($path), $path, SysFileMan::GetFileMimeType($path) ,0)];
+					 $unsaved_files = [
+						 new File(
+							 SysFileMan::GetFileName($path),
+							 SysFileMan::GetFileSize($path),
+							 $path, SysFileMan::GetFileMimeType($path) ,0,
+							 true,
+							 27
+						 )
+					 ];
 				 }
 			 }
 			 else
 			 {
-				 $fileMan = new SysFileMan($path, true, $allowed_formats);
+				 $fileMan = new SysFileMan($path, true, $allowed_formats, true, 27);
 				 $unsaved_files = $fileMan->getFiles();
 				 $files_count = count($unsaved_files);
 			 }
 
 			 $basePath = FCPATH . UPLOAD . UPLOAD_DATA;
-			 $fileMan = new SysFileMan($basePath);
+			 $fileMan = new SysFileMan($basePath, false, $allowed_formats, true, 27);
+
+			 $dataFileFactory = new DataFileFactory();
+			 $dataFileAdapter = (new DataFileAdapterFactory())->GetInstance();
 
 			 foreach ($unsaved_files as $key => $file)
 			 {
@@ -763,13 +774,21 @@ class AjaxApi extends Controller
 
 					 if ($fileMan->Save($file, $source_path))
 					 {
-						 $file_name = $file->getName();
-						 $file_id = $this->uploadModel->createUpload($file_name, $source_id, $user_id, false, false, null, $pipeline_id);
+						 $dataFileAdapter->Create($dataFileFactory->GetInstanceFromParameters(
+							 $file->getName(),
+							 $file->getDiskName(),
+							 $file->getSize(),
+							 time(),
+							 0,
+							 $this->authenticator->GetUserId(),
+							 $source_id,
+							 DATA_FILE_STATUS_IMPORTED
+						 ));
+
 						 unset($unsaved_files[$key]);
 					 }
 				 }
 			 }
-
 
 			 $unsaved_files_count = count($unsaved_files);
 
