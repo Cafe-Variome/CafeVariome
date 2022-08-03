@@ -10,6 +10,7 @@
  * @author Vatsalya Maddi
 */
 
+use App\Libraries\CafeVariome\CafeVariome;
 use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
 use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use App\Libraries\CafeVariome\Helpers\Core\URLHelper;
@@ -33,7 +34,7 @@ class BeaconAPI extends ResourceController
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
-		$this->setting =  Settings::getInstance();
+		$this->setting = CafeVariome::Settings();
     }
 
     public function _remap($function)
