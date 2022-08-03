@@ -107,27 +107,19 @@ class ServiceInterface
 		return $results;
 	}
 
-    public function RegisterProcess(int $entity_id, int $total_records, string $name, string $status = "", string $message = "records_count"): bool
+    public function RegisterTask(int $task_id, string $status = ''): bool
     {
-        $message = [
-            'type' => 'registerprocess',
-            'process' => [
-                'pid' => getmypid(),
-                'name' => $name,
-                'entityId' => $entity_id,
-                'message' => $message,
-                'count' => $total_records,
-                'status' => $status,
-                'finished' => false
-            ]
-        ];
+		$message = (new RegisterTaskMessageFactory())->GetInstance($task_id, $status);
 
-        try {
+        try
+		{
             $this->socket->Create()->Connect()->Write($message, 10);
             $this->socket->Close();
 
             return true;
-        } catch (\Exception $ex) {
+        }
+		catch (\Exception $ex)
+		{
             error_log($ex->getMessage());
         }
 
