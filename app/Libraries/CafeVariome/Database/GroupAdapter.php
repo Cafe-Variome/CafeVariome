@@ -54,6 +54,22 @@ class GroupAdapter extends BaseAdapter
 		$this->resetTable();
 	}
 
+	public function ReadAttributeIds(int $id): array
+	{
+		$this->changeTable('attributes_groups');
+		$this->builder->where('group_id', $id);
+		$results = $this->builder->get()->getResult();
+
+		$attribute_ids = [];
+
+		for($c = 0; $c < count($results); $c++)
+		{
+			array_push($attribute_ids, $results[$c]->attribute_id);
+		}
+
+		return $attribute_ids;
+	}
+
 	/**
 	 * Converts general PHP objects to a Group object.
 	 * @param object|null $object
