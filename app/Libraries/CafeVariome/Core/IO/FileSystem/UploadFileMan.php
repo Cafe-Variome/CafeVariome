@@ -152,4 +152,18 @@ class UploadFileMan extends FileMan
 			return round($size);
 		}
 	}
+
+	public static function GetAllowedDataFileFormats(bool $array = true)
+	{
+		$allowedFormats = ['csv', 'xls', 'xlsx', 'phenopacket'];
+
+		if($array)
+		{
+			return $allowedFormats;
+		}
+		else
+		{
+			return implode(',', $allowedFormats);
+		}
+	}
 }
