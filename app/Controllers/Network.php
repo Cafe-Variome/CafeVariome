@@ -6,6 +6,7 @@
  *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
+ * @author Farid Yavari Dizjikan
  *
  */
 
@@ -97,7 +98,8 @@ class Network extends CVUI_Controller{
                 'rules'  => 'required|alpha_dash|is_unique[networks.network_name]',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'uniquename_check' => '{field} already exists.'
+                    'uniquename_check' => '{field} already exists.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
             ]
         ]
@@ -339,6 +341,7 @@ class Network extends CVUI_Controller{
                 'rules'  => 'required|alpha_dash',
                 'errors' => [
                     'required' => '{field} is required.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
             ]
         ]
@@ -437,7 +440,8 @@ class Network extends CVUI_Controller{
                 'rules'  => 'required|alpha_dash|is_natural',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'is_natural' => '{field} must be a positive integer.'
+                    'is_natural' => '{field} must be a positive integer.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
             ]
         ]

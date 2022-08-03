@@ -6,6 +6,7 @@
  *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
+ * @author Farid Yavari Dizjikan
  *
  */
 
@@ -98,23 +99,31 @@ class NetworkGroup extends CVUI_Controller{
                 'rules'  => 'required|alpha_dash|unique_network_group_name_check['. $this->request->getVar('network') . ']',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'unique_network_group_name_check' => '{field} already exists.'
+                    'unique_network_group_name_check' => '{field} already exists.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
             ],
             'desc' => [
                 'label'  => 'Description',
-                'rules' => 'required',
+                'rules' => 'required|alpha_numeric_space',
                 'errors' => [
-                    'required' => '{field} is required.'
+                    'required' => '{field} is required.',
+                    'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
                 ]
             ],
             'network' => [
 				'label'  => 'Network',
-				'rules' => 'string'
+				'rules' => 'string',
+                'errors' => [
+                    'string' => 'The only valid characters in the {field} are alphabets.'
+                ]
             ],
             'group_type' => [
 				'label' => 'Group Type',
-				'rules' => 'string'
+				'rules' => 'string',
+                'errors' => [
+                    'string' => 'The only valid characters in the {field} are alphabets.'
+                ]
             ]
         ]
         );
@@ -204,7 +213,8 @@ class NetworkGroup extends CVUI_Controller{
                 'label'  => 'Group ID',
                 'rules' => 'required|alpha_numeric',
                 'errors' => [
-                    'required' => '{field} is required.'
+                    'required' => '{field} is required.',
+                    'alpha_numeric' => 'The only valid characters in the {field} are alphanumeric.'                   
                 ]
             ]
         ]
