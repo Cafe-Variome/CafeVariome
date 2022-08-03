@@ -242,6 +242,25 @@ abstract class DataInput
 		return $value_id;
 	}
 
+	protected function associateGroupWithAttributes(string $group_name, array $attribute_ids)
+	{
+		$group = $this->groups[$group_name];
+		$group_attributes = $group['attribute_ids'];
+		$attribute_ids_to_add = [];
+		for($c = 0; $c < count($attribute_ids); $c++)
+		{
+			if (!in_array($attribute_ids[$c], $group_attributes))
+			{
+				array_push($attribute_ids_to_add, $attribute_ids[$c]);
+			}
+		}
+
+		$this->groupAdapter->AddAttributes($group['id'], $attribute_ids_to_add);
+
+		$group['attribute_ids'] = array_merge($group_attributes, $attribute_ids);
+		$this->groups[$group_name] = $group;
+	}
+
 	protected function getValueByValueIdAndAttributeName(int $value_id, string $attribute): ?string
 	{
 		if (array_key_exists($attribute, $this->attributes))
