@@ -37,6 +37,20 @@ class ServiceInterface
 		PHPShellHelper::runAsync(getcwd() . "/index.php Task StartService");
     }
 
+	public function PollTasks()
+	{
+		$message = (new PollProgressMessageFactory())->GetInstance();
+
+		$results = "";
+		$this->socket->Create()->Connect()->Write($message);
+		while ($out = $this->socket->Read(2048)) {
+			$results .= $out;
+		}
+		$this->socket->Close();
+
+		return $results;
+	}
+
     public function GetUploadedFilesStatus()
     {
         $message = ['type' => 'uploadedfilesstatus'];
