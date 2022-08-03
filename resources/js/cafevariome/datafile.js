@@ -145,6 +145,168 @@ function exitLoading() {
     $('#cancelBtn').prop('disabled', false);
 }
 
+
+$("#importFiles").submit(function(event) {
+    event.preventDefault();
+});
+
+function lookupDir(event) {
+    var lookup_dir = $('#path').val();
+
+    var csrfTokenObj = getCSRFToken('keyvaluepair');
+    var formData = {'lookup_dir': $('#path').val()};
+    var csrfTokenName = Object.keys(csrfTokenObj)[0];
+    formData[csrfTokenName] = csrfTokenObj[csrfTokenName];
+
+
+    if (lookup_dir == null || lookup_dir == '') {
+        $('#path').addClass('is-invalid');
+        return;
+    }
+    else{
+        $('#path').removeClass('is-invalid');
+    }
+
+    $.ajax({
+        type: 'POST',
+        url: baseurl+'AjaxApi/LookupDirectory',
+        data: formData,
+        dataType: "json",
+        beforeSend: function (jqXHR, settings) {
+            showLoader();
+            clearError();
+            disableLookup();
+            disableImport();
+        },
+        success: function(response)  {
+            count = JSON.parse(response);
+            if (count == 0){
+                $('#lookupCount').text('No file was found.');
+            }
+            else if (count == 1){
+                $('#lookupCount').text(count + ' file was found.');
+            }
+            else{
+                $('#lookupCount').text(count + ' files were found.');
+            }
+            count > 0 ? enableImport() : disableImport();
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            disableImport();
+            showError(textStatus, errorThrown);
+        },
+        complete: function (jqXHR, settings) {
+            hideLoader();
+            enableLookup();
+        }
+    });
+}
+
+function importDir() {
+    var source_id = $('#source_id').val();
+
+    var csrfTokenObj = getCSRFToken('keyvaluepair');
+    var formData = {'lookup_dir': $('#path').val(), 'source_id': source_id};
+    var csrfTokenName = Object.keys(csrfTokenObj)[0];
+    formData[csrfTokenName] = csrfTokenObj[csrfTokenName];
+
+    $.ajax({
+        type: 'POST',
+        url: baseurl+'AjaxApi/ImportFromDirectory',
+        data: formData,
+        dataType: "json",
+        beforeSend:  function (jqXHR, settings) {
+            showLoader();
+            clearError();
+            disableLookup();
+            disableImport();
+        },
+        success: function(response)  {
+            if (response.saved_count == 0){
+                textStatus = 'No file imported.';
+            }
+            else if(response.saved_count == 1){
+                textStatus = response.saved_count + ' file was imported successfully.';
+                $("#importFiles").trigger('reset');
+                disableImport();
+            }
+            else{
+                textStatus = response.saved_count + ' file(s) were imported successfully.';
+                $("#importFiles").trigger('reset');
+                disableImport();
+            }
+
+            if (response.unsaved_count == 1) {
+                textStatus += response.unsaved_count + ' file failed to get imported.';
+            }
+            else if (response.unsaved_count > 1) {
+                textStatus += response.unsaved_count + ' files failed to get imported.';
+            }
+
+            $('#lookupCount').text(textStatus);
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            showError(textStatus, errorThrown);
+        },
+        complete: function (jqXHR, settings){
+            hideLoader();
+            enableLookup();
+        }
+    });
+}
+
+function showLoader() {
+    $('#spinner').show();
+}
+
+function hideLoader() {
+    $('#spinner').hide();
+}
+
+function showLookupBtn() {
+    $('#lookupBtn').show();
+}
+
+function hideLookupBtn() {
+    $('#lookupBtn').hide();
+}
+
+function showImportBtn() {
+    $('#importBtn').show();
+}
+
+function hideImportBtn() {
+    $('#importBtn').hide();
+}
+
+function disableImport() {
+    $('#importBtn').prop('disabled', true);
+}
+
+function enableImport() {
+    $('#importBtn').prop('disabled', false);
+}
+
+function showError(textStatus, errorThrown) {
+    $('#lookupCount').text(textStatus + ': ' + errorThrown);
+    $('#lookupCount').addClass('text-danger');
+}
+
+function clearError() {
+    $('#lookupCount').text('');
+    $('#lookupCount').removeClass('text-danger');
+}
+
+function disableLookup() {
+    $('#path').prop('disabled', true);
+    $('#lookupBtn').prop('disabled', true);
+}
+
+function enableLookup() {
+    $('#path').prop('disabled', false);
+    $('#lookupBtn').prop('disabled', false);
+}
+
 function getCSRFToken(format = 'string'){
     csrf_token = $('input[type=hidden]').val();
     csrf_token_name = $('input[type=hidden]').prop('name');

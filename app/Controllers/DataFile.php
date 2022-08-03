@@ -210,6 +210,65 @@ class DataFile extends CVUI_Controller
 		return view($this->viewDirectory . '/Upload', $data);
 	}
 
+	public function Import(int $source_id)
+	{
+		$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+		$source = $sourceAdapter->Read($source_id);
+		if ($source->isNull())
+		{
+			$this->setStatusMessage("Source was not found.", STATUS_ERROR);
+			return redirect()->to(base_url('Source'));
+		}
+
+		$uidata = new UIData();
+		$uidata->title = "Import Data File(s)";
+
+		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
+		$uidata->javascript = [
+			VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',
+			JS. 'bootstrap-notify.js',
+			JS.'cafevariome/datafile.js'
+		];
+
+		$maximumAllowedUploadSize = UploadFileMan::getMaximumAllowedUploadSize();
+		$uidata->data['maxUploadSize'] = UploadFileMan::parseSizeToByte($maximumAllowedUploadSize);
+		$uidata->data['maxUploadSizeH'] = $maximumAllowedUploadSize;
+		$allowedFormats = UploadFileMan::GetAllowedDataFileFormats(false);
+		$uidata->data['allowedFormats'] = $allowedFormats;
+		$uidata->data['source'] = $source;
+
+		$this->validation->setRules([
+			'path' => [
+				'label'  => 'Absolute Path to File(s)',
+				'rules'  => "required",
+				'errors' => [
+					'required' => '{field} is required.',
+				]
+			]
+		]);
+
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
+			return redirect()->to(base_url($this->controllerName . '/List/' . $source_id));
+		}
+		else
+		{
+			$uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+
+			$uidata->data['path'] = array(
+				'name' => 'path',
+				'id' => 'path',
+				'type' => 'text',
+				'class' => 'form-control',
+				'placeholder' => 'Absolute Path to File(s)',
+				'value' =>set_value('path')
+			);
+		}
+
+		$data = $this->wrapData($uidata);
+		return view($this->viewDirectory . '/Import', $data);
+	}
+
 	public function Create()
 	{
 		$uidata = new UIData();
