@@ -59,10 +59,11 @@ class Ontology extends CVUI_Controller
 			],
 			'desc' => [
 				'label'  => 'Description',
-				'rules'  => 'string|max_length[500]',
+				'rules'  => 'alpha_numeric_space|max_length[500]',
 				'errors' => [
 					'string' => '{field} must be a valid string.',
-					'max_length' => 'Maximum length is 500 characters.'
+					'max_length' => 'Maximum length is 500 characters.',
+					'alpha_numeric_space' => 'The only valid characters for {field} are alphabetical characters, numbers, and spaces.'
 				]
 			],
 			'node_key' => [
@@ -219,9 +220,9 @@ class Ontology extends CVUI_Controller
 			],
 			'desc' => [
 				'label'  => 'Description',
-				'rules'  => 'string|max_length[500]',
+				'rules'  => 'alpha_numeric_space|max_length[500]',
 				'errors' => [
-					'string' => '{field} must be a valid string.',
+					'alpha_numeric_space' => 'The only valid characters for {field} are alphabetical characters, numbers, and spaces.',
 					'max_length' => 'Maximum length is 500 characters.'
 				]
 			],
