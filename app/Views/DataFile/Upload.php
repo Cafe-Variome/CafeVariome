@@ -16,7 +16,7 @@
 	</div>
 <?php endif; ?>
 
-<h4> Upload Data Files to '<?= $source->name ?>'</h4>
+<h4> Upload Data File to '<?= $source->name ?>'</h4>
 <h5>Accepted file formats are: <?= $allowedFormats ?></h5>
 <br>
 <?php if (!is_writable(FCPATH . UPLOAD)):?>
