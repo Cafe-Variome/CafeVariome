@@ -220,7 +220,7 @@ class AjaxApi extends Controller
      * @return string Green(Success)|Yellow(Not enough space on server)|Red(Source is locked) Red(Source doesnt exist)
     */
 
-    public function validateUpload() {
+    private function validateUpload() {
 
 		if ($this->request->getMethod() == 'post') {
 			// Source we are checking against
@@ -262,7 +262,7 @@ class AjaxApi extends Controller
      * @param string $_POST['source'] - The source we must check presense for inside
      * @return string Green | json_encoded array with list of files
      */
-    public function checkJsonPresence() {
+    private function checkJsonPresence() {
 		if ($this->request->getMethod() == 'post') {
 			$duplicates = [];
 			$source_id = $this->request->getVar('source_id');
@@ -293,7 +293,7 @@ class AjaxApi extends Controller
      * @param string $_POST['source'] - The source we must upload into
      * @return N/A
      */
-    public function jsonBatch() {
+    private function jsonBatch() {
 		if ($this->request->getMethod() == 'post') {
 			$source_id = $this->request->getVar('source_id');
 			$user_id = $this->request->getVar('user_id');
@@ -342,7 +342,7 @@ class AjaxApi extends Controller
      * @param string $_POST['source'] - The source we must upload into
      * @return string Green for success
      */
-    public function jsonStart() {
+    private function jsonStart() {
 		if ($this->request->getMethod() == 'post') {
 			// Assign posted source to easier variable
 			$source_id = $this->request->getVar('source_id');
