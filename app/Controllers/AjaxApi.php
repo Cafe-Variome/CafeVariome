@@ -801,40 +801,102 @@ class AjaxApi extends Controller
 		 }
 	}
 
-    public function processFile()
+	/**
+	 * @return false|string|void
+	 * @throws \Exception
+	 */
+    public function ProcessFile()
     {
-		if ($this->request->getMethod() == 'post') {
+		if ($this->request->getMethod() == 'post')
+		{
 			$fileId = $this->request->getVar('fileId');
+			$pipelineId = $this->request->getVar('pipelineId');
 
-			$uploadModel = new Upload();
-			$extension = $uploadModel->getFileExtensionById($fileId);
-
-			$method = '';
-			$overwriteFlag = UPLOADER_DELETE_FILE;
-
-			switch (strtolower($extension)) {
-				case 'csv':
-				case 'xls':
-				case 'xlsx':
-					$method = 'spreadsheetInsert';
-					break;
-				case 'phenopacket':
-				case 'json':
-					$method = 'phenoPacketInsertByFileId';
-					break;
-				case 'vcf':
-					$method = 'vcfInsertByFileId';
-					break;
-				default:
-					return json_encode(0);
+			if(is_null($fileId))
+			{
+				return json_encode([
+					'status' => 1,
+					'message' => 'File Id is null.'
+				]);
 			}
 
-			$uploadModel = new Upload();
-			$uploadModel->resetFileStatus($fileId);
+			if(is_null($pipelineId))
+			{
+				return json_encode([
+					'status' => 1,
+					'message' => 'Pipeline Id is null.'
+				]);
+			}
 
-			PHPShellHelper::runAsync(getcwd() . "/index.php Task " . $method . " " . $fileId . " " . $overwriteFlag);
+			$dataFileAdapter = (new DataFileAdapterFactory())->GetInstance();
+			$pipelineAdapter = (new PipelineAdapterFactory())->GetInstance();
+			$dataFile = $dataFileAdapter->Read($fileId);
+			if ($dataFile->isNull())
+			{
+				return json_encode([
+					'status' => 1,
+					'message' => 'Data file could not be found.'
+				]);
+			}
 
-			return json_encode(1);
+			if ($dataFile->status == DATA_FILE_STATUS_PROCESSING)
+			{
+				return json_encode([
+					'status' => 1,
+					'message' => 'Data file is currently being processed. A new task cannot be started until the current process finishes.'
+				]);
+			}
+
+			$extension = $dataFileAdapter->ReadExtensionById($fileId);
+			$pipeline = $pipelineAdapter->Read($pipelineId);
+
+			if ($pipeline->isNull())
+			{
+				return json_encode([
+					'status' => 1,
+					'message' => 'Pipeline was not found.'
+				]);
+			}
+
+			if ($dataFileAdapter->UpdateStatus($fileId, DATA_FILE_STATUS_PROCESSING))
+			{
+				// Create and a task
+				$task = (new TaskFactory())->GetInstanceFromParameters(
+					$this->authenticator->GetUserId(),
+					TASK_TYPE_FILE_PROCESS,
+					0,
+					TASK_STATUS_CREATED,
+					-1,
+					null,
+					null,
+					null,
+					$dataFile->getID(),
+					$pipeline->getID()
+				);
+				$taskAdapter = (new TaskAdapterFactory())->GetInstance();
+				$taskId = $taskAdapter->Create($task);
+
+				// Start the task through CLI
+				PHPShellHelper::runAsync(getcwd() . "/index.php Task Start $taskId");
+
+				return json_encode([
+					'status' => 0,
+					'message' => 'Processing started successfully.',
+					'task_id' => $taskId
+				]);
+			}
+			else
+			{
+				return json_encode([
+					'status' => 1,
+					'message' => 'Failed to update data file status.'
+				]);
+			}
+
+			return json_encode([
+				'status' => 1,
+				'message' => 'Unknown error occurred.'
+			]);
 		}
     }
 
