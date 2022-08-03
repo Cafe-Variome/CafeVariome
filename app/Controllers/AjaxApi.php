@@ -335,6 +335,7 @@ class AjaxApi extends Controller
     }
 
     /**
+	 * @deprecated
      * Json Start - At this point all files have been uploaded. Lock the source and begin
      * Insert into MySQL
      *
