@@ -58,6 +58,35 @@ class AjaxApi extends Controller
         $this->setting =  CafeVariome::Settings();
         $this->sourceModel = new Source();
         $this->uploadModel = new Upload();
+
+		$this->session = \Config\Services::session();
+
+
+		if ($this->session->has(self::AUTHENTICATOR_SESSION))
+		{
+			if (intval($this->session->get(self::AUTHENTICATOR_SESSION)) > 0)
+			{
+				$authenticatorFactory = new AuthenticatorFactory();
+				$provider = (new SingleSignOnProviderAdapterFactory())->GetInstance()->Read($this->session->get(self::AUTHENTICATOR_SESSION));
+				if (!$provider->isNull())
+				{
+					$this->authenticator = $authenticatorFactory->GetInstance($provider);
+				}
+				else
+				{
+					$this->session->destroy();
+				}
+			}
+			else
+			{
+				if (self::LOCAL_AUTHENTICATION)
+				{
+					// Local authenticator being used
+					$this->authenticator = new LocalAuthenticator();
+				}
+			}
+
+		}
     }
 
     public function query()
