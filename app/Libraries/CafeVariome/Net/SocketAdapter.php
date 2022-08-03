@@ -8,7 +8,7 @@
  *
  */
 
-use App\Models\Settings;
+use App\Libraries\CafeVariome\Net\Service\IMessage;
 
 class SocketAdapter
 {
@@ -84,14 +84,14 @@ class SocketAdapter
 		return $bytesSent;
 	}
 
-    public function Write(array $message, int $delay = 0)
+    public function Write(IMessage $message, int $delay = 0)
     {
-        $this->attachInstallationKey($message);
-        $message = json_encode($message);
+        $jsonMessage = $message->ToJson();
 
-        $bytesWritten = socket_write($this->socket, $message, strlen($message));
+        $bytesWritten = socket_write($this->socket, $jsonMessage, strlen($jsonMessage));
 
-        if ($delay > 0) {
+        if ($delay > 0)
+		{
             $this->delay($delay);
         }
 
