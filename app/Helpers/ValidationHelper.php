@@ -308,7 +308,7 @@ class ValidationHelper
 		return !($valueId > 0);
 	}
 
-	public function valid_username_fields(string $str, & $err): bool
+	public function valid_username_chars(string $str, & $err): bool
 	{
 		$err = null;
 		$regexp = "/^[a-zA-Z0-9-@.]+$/";
