@@ -307,4 +307,21 @@ class ValidationHelper
 		$valueId = $valueModel->getValueIdByNameAndAttributeId($str, $attribute_id);
 		return !($valueId > 0);
 	}
+
+	public function valid_username_fields(string $str, & $err): bool
+	{
+		$err = null;
+		$regexp = "/^[a-zA-Z0-9-@.]+$/";
+
+                if (preg_match($regexp, $str))
+				{
+                    return true;
+                } 
+				else {
+
+					$err = "The only valid characters for usernames are alphanumerics, . or @ .";
+					return false;
+				}
+
+	}
 }
