@@ -80,17 +80,18 @@ class Credential extends CVUI_Controller
 			],
 			'username' => [
 				'label'  => 'Username',
-				'rules'  => 'string|max_length[128]',
+				'rules'  => 'required|valid_username_fields|max_length[128]',
 				'errors' => [
-					'string' => '{field} must be a valid string.',
+					'required' => '{field} is required.',
 					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'password' => [
 				'label'  => 'Password',
-				'rules'  => 'string|max_length[128]',
+				'rules'  => 'required|alpha_numeric_punct|max_length[128]',
 				'errors' => [
-					'string' => '{field} must be a valid string.',
+					'required' => '{field} is required.',
+					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.',
 					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
@@ -185,17 +186,18 @@ class Credential extends CVUI_Controller
 			],
 			'username' => [
 				'label'  => 'Username',
-				'rules'  => 'permit_empty|string|max_length[128]',
+				'rules'  => 'required|valid_username_fields|max_length[128]',
 				'errors' => [
-					'string' => '{field} must be a valid string.',
+					'required' => '{field} is required.',
 					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'password' => [
 				'label'  => 'Password',
-				'rules'  => 'permit_empty|string|max_length[128]',
+				'rules'  => 'required|alpha_numeric_punct|max_length[128]',
 				'errors' => [
-					'string' => '{field} must be a valid string.',
+					'required' => '{field} is required.',
+					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.',
 					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
