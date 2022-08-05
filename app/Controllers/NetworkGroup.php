@@ -113,16 +113,16 @@ class NetworkGroup extends CVUI_Controller{
             ],
             'network' => [
 				'label'  => 'Network',
-				'rules' => 'string',
+				'rules' => 'alpha_numeric_punct',
                 'errors' => [
-                    'string' => 'The only valid characters in the {field} are alphabets.'
+                    'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.'
                 ]
             ],
             'group_type' => [
 				'label' => 'Group Type',
-				'rules' => 'string',
+				'rules' => 'alpha_numeric_punct',
                 'errors' => [
-                    'string' => 'The only valid characters in the {field} are alphabets.'
+                    'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.'
                 ]
             ]
         ]
