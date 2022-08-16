@@ -66,4 +66,9 @@ class Entity implements IEntity
 	{
 		return false;
 	}
+
+	public static function GetProperties(): array
+	{
+		return array_keys(get_class_vars(get_called_class()));
+	}
 }
