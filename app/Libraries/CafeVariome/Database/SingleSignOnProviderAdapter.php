@@ -17,12 +17,12 @@ class SingleSignOnProviderAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'single_sign_on_providers';
+	protected static string $table = 'single_sign_on_providers';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
 	public function ReadUserLoginSingleSignOnProviders(): array
 	{

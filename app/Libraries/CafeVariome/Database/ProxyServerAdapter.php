@@ -17,12 +17,12 @@ class ProxyServerAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'proxy_servers';
+	protected static string $table = 'proxy_servers';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
 	/**
 	 * @inheritDoc

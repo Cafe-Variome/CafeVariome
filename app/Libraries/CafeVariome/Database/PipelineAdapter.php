@@ -16,12 +16,12 @@ class PipelineAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'pipelines';
+	protected static string $table = 'pipelines';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
     /**
      * @inheritDoc

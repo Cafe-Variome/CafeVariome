@@ -16,12 +16,12 @@ class CredentialAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'credentials';
+	protected static string $table = 'credentials';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
 	/**
 	 * Converts general PHP objects to a Credential object.

@@ -16,12 +16,12 @@ class SourceAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'sources';
+	protected static string $table = 'sources';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
 	public function ReadAllOnline(): array
 	{
@@ -40,13 +40,13 @@ class SourceAdapter extends BaseAdapter
 
 	public function Lock(int $id): bool
 	{
-		$this->builder->where($this->key, $id);
+		$this->builder->where(static::$key, $id);
 		return $this->builder->update(['locked' => 1]);
 	}
 
 	public function Unlock(int $id): bool
 	{
-		$this->builder->where($this->key, $id);
+		$this->builder->where(static::$key, $id);
 		return $this->builder->update(['locked' => 0]);
 	}
 

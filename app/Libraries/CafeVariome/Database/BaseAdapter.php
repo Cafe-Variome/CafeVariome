@@ -22,12 +22,12 @@ abstract class BaseAdapter implements IAdapter
 	/**
 	 * @var string name of the corresponding table in the database
 	 */
-	protected string $table;
+	protected static string $table;
 
 	/**
 	 * @var string primary key of the corresponding table in the database
 	 */
-	protected string $key;
+	protected static string $key;
 
 	/**
 	 * @var array list of properties that are foreign keys of other entities
@@ -119,17 +119,17 @@ abstract class BaseAdapter implements IAdapter
 	/**
 	 * @return string name of the database table
 	 */
-	public function GetTable(): string
+	public static function GetTable(): string
 	{
-		return $this->table;
+		return static::$table;
 	}
 
 	/**
 	 * @return string name of the primary key column of the database table
 	 */
-	public function GetKey(): string
+	public static function GetKey(): string
 	{
-		return $this->key;
+		return static::$key;
 	}
 
 	protected function changeTable(string $table)

@@ -16,12 +16,12 @@ class TaskAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'tasks';
+	protected static string $table = 'tasks';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
     /**
      * @inheritDoc

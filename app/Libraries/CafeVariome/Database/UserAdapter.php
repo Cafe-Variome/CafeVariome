@@ -16,12 +16,12 @@ class UserAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'users';
+	protected static string $table = 'users';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
 	public function ReadIdByEmail(string $email): ?int
 	{
@@ -41,7 +41,7 @@ class UserAdapter extends BaseAdapter
 	public function Read(int $id): IEntity
 	{
 		$this->builder->select('id, username, email, first_name, last_name, company, active, remote, phone, last_login, created_on, is_admin, ip_address');
-		$this->builder->where($this->key, $id);
+		$this->builder->where(static::$key, $id);
 		$results = $this->builder->get()->getResult();
 
 		$record = null;
@@ -69,7 +69,7 @@ class UserAdapter extends BaseAdapter
 
 	public function UpdateLastLogin(int $id): bool
 	{
-		$this->builder->where($this->key, $id);
+		$this->builder->where(static::$key, $id);
 		return $this->builder->update(['last_login' => time()]);
 	}
 

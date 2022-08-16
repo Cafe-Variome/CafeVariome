@@ -17,12 +17,12 @@ class ServerAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'servers';
+	protected static string $table = 'servers';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
 	/**
 	 * Converts general PHP objects to a Server object.

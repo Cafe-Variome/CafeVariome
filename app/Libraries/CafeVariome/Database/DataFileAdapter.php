@@ -17,12 +17,12 @@ class DataFileAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'data_files';
+	protected static string $table = 'data_files';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
 	/**
 	 * Converts general PHP objects to a DataFile object.
@@ -47,9 +47,7 @@ class DataFileAdapter extends BaseAdapter
 		$entities = [];
 		for($c = 0; $c < count($results); $c++)
 		{
-			$dataFile = $this->toEntity($results[$c]);
-			$dataFile->user = $userAdapter->toEntity($results[$c]);
-			array_push($entities, $dataFile);
+			$entities[$results[$c]->{static::$key}] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
 		}
 
 		return $entities;
@@ -58,7 +56,7 @@ class DataFileAdapter extends BaseAdapter
 	public function ReadExtensionById(int $id): ?string
 	{
 		$this->builder->select('disk_name');
-		$this->builder->where($this->key, $id);
+		$this->builder->where(static::$key, $id);
 		$results = $this->builder->get()->getResult();
 
 		$extension = null;
@@ -78,7 +76,7 @@ class DataFileAdapter extends BaseAdapter
 
 	public function UpdateStatus(int $id, int $status): bool
 	{
-		$this->builder->where($this->key, $id);
+		$this->builder->where(static::$key, $id);
 		return $this->builder->update(['status' => $status]);
 	}
 
@@ -91,7 +89,7 @@ class DataFileAdapter extends BaseAdapter
 	public function ReadSourceId(int $id): ?int
 	{
 		$this->builder->select('source_id');
-		$this->builder->where($this->key, $id);
+		$this->builder->where(static::$key, $id);
 		$results = $this->builder->get()->getResult();
 
 		if (count($results) == 1)

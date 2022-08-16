@@ -16,16 +16,16 @@ class GroupAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'groups';
+	protected static string $table = 'groups';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
 	public function ReadIdByNameAndSourceId(string $name, int $source_id): ?int
 	{
-		$this->builder->select($this->GetKey());
+		$this->builder->select(static::$key);
 		$this->builder->where('name', $name);
 		$this->builder->where('source_id', $source_id);
 
@@ -33,7 +33,7 @@ class GroupAdapter extends BaseAdapter
 
 		if (count($results) == 1)
 		{
-			return $results[0]->{$this->GetKey()};
+			return $results[0]->{static::$key};
 		}
 
 		return null;
