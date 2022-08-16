@@ -16,12 +16,12 @@ class SettingAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'settings';
+	protected static string $table = 'settings';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'key';
+	protected static string $key = 'id';
 
 	private static ?SettingAdapter $singletonInstance = null;
 
@@ -30,8 +30,42 @@ class SettingAdapter extends BaseAdapter
 	private function __construct()
 	{
 		parent::__construct();
-		$this->settings = parent::ReadAll();
+		$this->settings = $this->ReadAll();
 
+	}
+
+	/**
+	 * @return array
+	 */
+	public function ReadAll(): array
+	{
+		$this->CompileSelect();
+		$this->CompileJoin();
+		$results = $this->builder->get()->getResult();
+
+		$entities = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			$entities[$results[$c]->key] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
+		}
+
+		return $entities;
+	}
+
+	public function ReadByGroup(string $group): array
+	{
+		$this->CompileSelect();
+		$this->CompileJoin();
+		$this->builder->where('group', $group);
+		$results = $this->builder->get()->getResult();
+
+		$entities = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			$entities[$results[$c]->{static::$key}] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
+		}
+
+		return $entities;
 	}
 
 	public static function GetSingletonInstance(): self
