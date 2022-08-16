@@ -42,8 +42,28 @@ class Entity implements IEntity
 	/**
 	 * @return array
 	 */
-	public function toArray(): array
+	public function toArray(bool $primitive_only = true): array
 	{
+		if ($primitive_only)
+		{
+			$object_vars = get_object_vars($this);
+
+			foreach ($object_vars as $var => &$val)
+			{
+				switch (gettype($val))
+				{
+					case 'object':
+					case 'array':
+					case 'resource':
+					case 'unknown type':
+						unset($object_vars[$var]);
+						break;
+				}
+			}
+
+			return $object_vars;
+		}
+
 		return get_object_vars($this);
 	}
 
