@@ -17,23 +17,23 @@ class AttributeAdapter extends BaseAdapter
 	/**
 	 * @inheritDoc
 	 */
-	protected string $table = 'attributes';
+	protected static string $table = 'attributes';
 
 	/**
 	 * @inheritDoc
 	 */
-	protected string $key = 'id';
+	protected static string $key = 'id';
 
 	public function ReadIdByNameAndSourceId(string $name, int $source_id): ?int
 	{
-		$this->builder->select($this->GetKey());
+		$this->builder->select(static::$key);
 		$this->builder->where('name', $name);
 		$this->builder->where('source_id', $source_id);
 		$results = $this->builder->get()->getResult();
 
 		if (count($results) == 1)
 		{
-			return $results[0]->{$this->GetKey()};
+			return $results[0]->{static::$key};
 		}
 
 		return null;
@@ -42,7 +42,7 @@ class AttributeAdapter extends BaseAdapter
 	public function ReadType(int $id): ?int
 	{
 		$this->builder->select('type');
-		$this->builder->where($this->GetKey(), $id);
+		$this->builder->where(static::$key, $id);
 
 		$result = $this->builder->get()->getResult();
 
@@ -57,7 +57,7 @@ class AttributeAdapter extends BaseAdapter
 	public function ReadMinimumAndMaximum(int $id): array
 	{
 		$this->builder->select('min, max');
-		$this->builder->where($this->GetKey(), $id);
+		$this->builder->where(static::$key, $id);
 
 		$result = $this->builder->get()->getResult();
 
@@ -71,19 +71,19 @@ class AttributeAdapter extends BaseAdapter
 
 	public function UpdateType(int $id, int $type): bool
 	{
-		$this->builder->where($this->GetKey(), $id);
+		$this->builder->where(static::$key, $id);
 		return $this->builder->update(['type' => $type]);
 	}
 
 	public function UpdateStorageLocation(int $id, int $storage_location): bool
 	{
-		$this->builder->where($this->GetKey(), $id);
+		$this->builder->where(static::$key, $id);
 		return $this->builder->update(['storage_location' => $storage_location]);
 	}
 
 	public function UpdateMinimumAndMaximum(int $id, float $minimum, float $maximum): bool
 	{
-		$this->builder->where($this->GetKey(), $id);
+		$this->builder->where(static::$key, $id);
 		return $this->builder->update([
 			'min' => $minimum,
 			'max' => $maximum
