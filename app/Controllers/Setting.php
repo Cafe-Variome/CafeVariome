@@ -8,14 +8,13 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Factory\SettingAdapterFactory;
+use App\Libraries\CafeVariome\Factory\SettingFactory;
 use App\Models\UIData;
-use App\Models\Settings;
 use CodeIgniter\Config\Services;
 
 class Setting extends CVUI_Controller
 {
-
-    private $settingModel;
 
     /**
 	 * Constructor
@@ -27,7 +26,7 @@ class Setting extends CVUI_Controller
         parent::initController($request, $response, $logger);
 
 		$this->session = Services::session();
-		$this->db = \Config\Database::connect();
+		$this->dbAdapter = (new SettingAdapterFactory())->GetInstance();
 	}
 
     public function Discovery()
@@ -36,12 +35,11 @@ class Setting extends CVUI_Controller
         $uidata->title = "Discovery Settings";
         $uidata->stickyFooter = false;
 
-        $this->settingModel = Settings::getInstance();
-
-        $settings =  $this->settingModel->getSettingsByGroup('discovery');
+        $settings =  $this->dbAdapter->ReadByGroup('discovery');
         $uidata->data['settings'] = $settings;
 
-        if ($this->request->getPost()) {
+        if ($this->request->getPost())
+		{
             $this->processPost($settings);
 
             return redirect()->to(base_url($this->controllerName.'/Discovery'));
@@ -57,12 +55,11 @@ class Setting extends CVUI_Controller
         $uidata->title = "Endpoint Settings";
         $uidata->stickyFooter = false;
 
-        $this->settingModel = Settings::getInstance();
-
-        $settings =  $this->settingModel->getSettingsByGroup('endpoint');
+        $settings = $this->dbAdapter->ReadByGroup('endpoint');
         $uidata->data['settings'] = $settings;
 
-        if ($this->request->getPost()) {
+        if ($this->request->getPost())
+		{
             $this->processPost($settings);
 
             return redirect()->to(base_url($this->controllerName.'/Endpoint'));
@@ -78,12 +75,11 @@ class Setting extends CVUI_Controller
         $uidata->title = "Main System Settings";
         $uidata->stickyFooter = false;
 
-        $this->settingModel = Settings::getInstance();
-
-        $settings =  $this->settingModel->getSettingsByGroup('main');
+        $settings =  $this->dbAdapter->ReadByGroup('main');
         $uidata->data['settings'] = $settings;
 
-        if ($this->request->getPost()) {
+        if ($this->request->getPost())
+		{
             $this->processPost($settings);
 
             return redirect()->to(base_url($this->controllerName.'/Main'));
@@ -99,9 +95,7 @@ class Setting extends CVUI_Controller
         $uidata->title = "Elastic Search Settings";
         $uidata->stickyFooter = false;
 
-        $this->settingModel = Settings::getInstance();
-
-        $settings =  $this->settingModel->getSettingsByGroup('elasticsearch');
+        $settings = $this->dbAdapter->ReadByGroup('elasticsearch');
         $uidata->data['settings'] = $settings;
 
         if ($this->request->getPost()) {
@@ -120,12 +114,11 @@ class Setting extends CVUI_Controller
         $uidata->title = "Neo4J Settings";
         $uidata->stickyFooter = false;
 
-        $this->settingModel = Settings::getInstance();
-
-        $settings =  $this->settingModel->getSettingsByGroup('neo4j');
+        $settings = $this->dbAdapter->ReadByGroup('neo4j');
         $uidata->data['settings'] = $settings;
 
-        if ($this->request->getPost()) {
+        if ($this->request->getPost())
+		{
             $this->processPost($settings);
 
             return redirect()->to(base_url($this->controllerName.'/Neo4J'));
@@ -137,28 +130,42 @@ class Setting extends CVUI_Controller
 
     private function processPost(array $settings)
     {
+		$currentSettings = $this->dbAdapter->ReadAll();
+
         $errorFlag = false;
-        foreach ($settings as $s) {
-            $settingName = $s['setting_name'];
-            $settingKey = $s["setting_key"];
+        foreach ($settings as $s)
+		{
+            $settingName = $s->name;
+            $settingKey = $s->key;
             $settingVal = trim($this->request->getVar($settingKey));
-            if ($settingVal != $this->setting->settingData[$s["setting_key"]]) {
-                if ($settingKey == 'installation_key') {
+            if ($settingVal != $currentSettings[$settingKey]->value)
+			{
+                if ($settingKey == 'installation_key')
+				{
                     $settingVal = trim($settingVal);
                 }
-                if ($settingKey == 'auth_server') {
+                if ($settingKey == 'auth_server')
+				{
                     $settingVal = trim($settingVal);
                     $valLen = strlen($settingVal);
-                    if(substr($settingVal, $valLen-1, $valLen) != '/'){
+                    if(substr($settingVal, $valLen-1, $valLen) != '/')
+					{
                         $settingVal = $settingVal . '/';
                     }
                 }
-                if ($this->setting->settingData[$s["setting_key"]] == 'on' || $this->setting->settingData[$s["setting_key"]] == 'off') {
+                if ($currentSettings[$settingKey]->value == 'on' || $currentSettings[$settingKey]->value == 'off')
+				{
                     $settingVal = $settingVal == null ? 'off' : 'on';
                 }
-                try {
-                    $this->settingModel->updateSettings(['value' => $settingVal], ['setting_key' =>  $settingKey]);
-                } catch (\Exception $ex) {
+                try
+				{
+					$this->dbAdapter->Update(
+						$s->getID(),
+						(new SettingFactory())->GetInstanceFromParameters($s->key, $s->name, $settingVal, $s->group, $s->info)
+					);
+                }
+				catch (\Exception $ex)
+				{
                     $errorFlag = true;
                     $this->setStatusMessage("There was a problem updating '$settingName'.", STATUS_ERROR);
                 }

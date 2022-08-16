@@ -21,14 +21,14 @@
 <?php foreach ($settings as $s): ?>
 <div class="form-group row">
     <div class="col-3">
-        <?= $s['setting_name'] ?>
+        <?= $s->name ?>
     </div>
     <div class="col-6">
-        <input type="text" class="form-control" name="<?= $s['setting_key'] ?>" value="<?= $s['value'] ?>">
+        <input type="text" class="form-control" name="<?= $s->key ?>" value="<?= $s->value ?>">
     </div>
     <div class="col-3">
-        <?php if($s['info'] != null): ?>
-        <button type="button" class="btn btn-info" data-toggle="tooltip" data-placement="right" title="<?= $s['info'] ?>">
+        <?php if($s->info != null): ?>
+        <button type="button" class="btn btn-info" data-toggle="tooltip" data-placement="right" title="<?= $s->info ?>">
             <i class="fa fa-question-circle"></i>
         </button>
         <?php endif ?>
