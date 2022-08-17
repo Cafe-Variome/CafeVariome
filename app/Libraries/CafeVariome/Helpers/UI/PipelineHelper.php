@@ -10,7 +10,7 @@
 
 class PipelineHelper
 {
-	public static function getSubjectIDLocation(int $sid_location): string
+	public static function GetSubjectIDLocation(int $sid_location): string
 	{
 		switch ($sid_location)
 		{
@@ -28,7 +28,7 @@ class PipelineHelper
 		return 'Undefined';
 	}
 
-	public static function getGrouping(int $grouping): string
+	public static function GetGrouping(int $grouping): string
 	{
 		switch ($grouping)
 		{
@@ -40,7 +40,7 @@ class PipelineHelper
 		return 'Undefined';
 	}
 
-	public static function getExpansionPolicy(int $policy): string
+	public static function GetExpansionPolicy(int $policy): string
 	{
 		switch ($policy)
 		{
