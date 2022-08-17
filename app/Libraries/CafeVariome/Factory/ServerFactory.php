@@ -45,7 +45,7 @@ class ServerFactory extends EntityFactory
 	 * @return Server
 	 * @throws \Exception
 	 */
-	public function getInstanceFromParameters(string $name, string $address, bool $removable = true): Server
+	public function GetInstanceFromParameters(string $name, string $address, bool $removable = true): Server
 	{
 		return new Server(['name' => $name, 'address' => $address, 'removable' => $removable]);
 	}
