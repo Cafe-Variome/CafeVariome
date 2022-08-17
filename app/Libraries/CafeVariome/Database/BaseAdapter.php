@@ -39,13 +39,23 @@ abstract class BaseAdapter implements IAdapter
 	 */
 	protected $builder;
 
+	protected ?string $binding;
+
+	protected string $entity_class;
+
+	protected array $related_entities;
+
 	/**
 	 * constructor
 	 */
 	public function __construct()
 	{
 		$this->db = Database::connect();
-		$this->builder = $this->db->table($this->table);
+		$this->builder = $this->db->table(static::$table);
+		$this->binding = null;
+		$className = explode('\\', get_class($this))[count(explode('\\', get_class($this))) - 1];
+		$this->entity_class = '\\' . CAFEVARIOME_NAMESPACE . '\\' . 'Entities' . '\\' . str_replace('Adapter', '', $className);
+		$this->related_entities = $this->GetRelatedEntities();
 	}
 
 	/**
@@ -64,8 +74,9 @@ abstract class BaseAdapter implements IAdapter
 	 */
 	public function Read(int $id): IEntity
 	{
-		$this->builder->select();
-		$this->builder->where($this->key, $id);
+		$this->CompileSelect();
+		$this->CompileJoin();
+		$this->builder->where(static::$table . '.' . static::$key, $id);
 		$results = $this->builder->get()->getResult();
 
 		$record = null;
@@ -74,7 +85,7 @@ abstract class BaseAdapter implements IAdapter
 			$record = $results[0];
 		}
 
-		return $this->toEntity($record);
+		return $this->binding != null ? $this->BindTo($record) : $this->toEntity($record);
 	}
 
 	/**
@@ -82,14 +93,14 @@ abstract class BaseAdapter implements IAdapter
 	 */
 	public function ReadAll(): array
 	{
-		$this->builder->select();
+		$this->CompileSelect();
+		$this->CompileJoin();
 		$results = $this->builder->get()->getResult();
 
 		$entities = [];
 		for($c = 0; $c < count($results); $c++)
 		{
-			$entities[$results[$c]->{$this->key}] = $this->toEntity($results[$c]);
-		    //array_push($entities, $this->toEntity($results[$c]));
+			$entities[$results[$c]->{static::$key}] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
 		}
 
 		return $entities;
