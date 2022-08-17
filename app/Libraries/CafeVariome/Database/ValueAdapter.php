@@ -77,6 +77,13 @@ class ValueAdapter extends BaseAdapter
 		return $this->builder->update(['frequency' => $frequency]);
 	}
 
+	public function DeleteIfAbsent(int $id): bool
+	{
+		$this->builder->where(static::$key, $id);
+		$this->builder->where('frequency', 0); // Frequency = 0 indicates a value is absent and is no more needed.
+		return $this->builder->delete();
+	}
+
     /**
      * @inheritDoc
      */
