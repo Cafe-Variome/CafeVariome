@@ -48,6 +48,20 @@ class ValueAdapter extends BaseAdapter
 		return null;
 	}
 
+	public function ReadFrequency(int $id): ?float
+	{
+		$this->builder->select('frequency');
+		$this->builder->where(static::$key, $id);
+		$result = $this->builder->get()->getResult();
+
+		if(count($result) == 1)
+		{
+			return $result[0]->frequency;
+		}
+
+		return null;
+	}
+
     /**
      * @inheritDoc
      */
