@@ -14,6 +14,16 @@ use App\Libraries\CafeVariome\Factory\ValueFactory;
 class ValueAdapter extends BaseAdapter
 {
 
+	/**
+	 * @inheritDoc
+	 */
+	protected static string $table = 'values';
+
+	/**
+	 * @inheritDoc
+	 */
+	protected static string $key = 'id';
+
     /**
      * @inheritDoc
      */
