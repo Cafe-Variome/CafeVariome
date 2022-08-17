@@ -245,6 +245,18 @@ abstract class BaseAdapter implements IAdapter
 		$this->builder->select($selectStatement);
 	}
 
+	protected function CompileJoin()
+	{
+		foreach ($this->related_entities as $entity => $details)
+		{
+			$this->builder->join(
+				$details['table'],
+				static::$table . '.' . $entity .'_id = ' . $details['table'] . '.' . $details['primary_key'],
+				$details['nullable'] ? 'LEFT' : 'INNER'
+			);
+		}
+	}
+
 	/**
 	 * @param object|null $object
 	 * @return IEntity
