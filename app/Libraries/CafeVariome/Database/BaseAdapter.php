@@ -186,6 +186,13 @@ abstract class BaseAdapter implements IAdapter
 		return $fc . substr($str, 1);
 	}
 
+	protected function IsPrimitive(string $type): bool
+	{
+		return in_array(
+			$type,
+			['string', 'int', 'integer', 'bool', 'boolean', 'double']
+		);
+	}
 
 	/**
 	 * @param object|null $object
