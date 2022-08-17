@@ -1,5 +1,12 @@
 <?php namespace App\Libraries\CafeVariome\Entities\ViewModels;
 
+/**
+ * BaseViewModel.php
+ * Created 10/08/2022
+ *
+ * @author Mehdi Mehtarizadeh
+ */
+
 abstract class BaseViewModel implements \App\Libraries\CafeVariome\Entities\IEntity
 {
 	protected int $id;

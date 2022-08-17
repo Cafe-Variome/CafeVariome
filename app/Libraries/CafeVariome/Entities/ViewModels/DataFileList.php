@@ -1,5 +1,11 @@
 <?php namespace App\Libraries\CafeVariome\Entities\ViewModels;
 
+/**
+ * DataFileList.php
+ * Created 10/08/2022
+ *
+ * @author Mehdi Mehtarizadeh
+ */
 
 class DataFileList extends BaseViewModel
 {
