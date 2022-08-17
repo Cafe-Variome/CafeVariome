@@ -51,7 +51,7 @@ class SingleSignOnProviderFactory extends EntityFactory
 	 * @return SingleSignOnProvider
 	 * @throws \Exception
 	 */
-	public function getInstanceFromParameters(
+	public function GetInstanceFromParameters(
 		string $name,
 		string $display_name,
 		int $type,

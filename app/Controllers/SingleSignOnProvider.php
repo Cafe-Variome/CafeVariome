@@ -215,7 +215,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				$user_login = $this->request->getVar('user_login') ? true : false;
 				$authentication_policy = $this->request->getVar('authentication_policy');
 
-				$this->dbAdapter->Create((new SingleSignOnProviderFactory())->getInstanceFromParameters(
+				$this->dbAdapter->Create((new SingleSignOnProviderFactory())->GetInstanceFromParameters(
 					$name, $display_name, $type, $port, $authentication_policy, $query, $user_login, $server_id, $credential_id, $proxy_server_id, $icon
 				));
 
@@ -505,7 +505,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				$user_login = $this->request->getVar('user_login') ? true : false;
 				$authentication_policy = $this->request->getVar('authentication_policy');
 
-				$this->dbAdapter->Update($id, (new SingleSignOnProviderFactory())->getInstanceFromParameters(
+				$this->dbAdapter->Update($id, (new SingleSignOnProviderFactory())->GetInstanceFromParameters(
 					$name, $display_name, $type, $port, $authentication_policy, $query, $user_login, $server_id, $credential_id, $proxy_server_id, $icon
 				));
 
