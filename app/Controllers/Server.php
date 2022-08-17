@@ -96,7 +96,7 @@ class Server extends CVUI_Controller
 				$name = $this->request->getVar('name');
 				$address = $this->request->getVar('address');
 
-				$this->dbAdapter->Create((new ServerFactory())->getInstanceFromParameters($name, $address));
+				$this->dbAdapter->Create((new ServerFactory())->GetInstanceFromParameters($name, $address));
 
 				$this->setStatusMessage("Server '$name' was created.", STATUS_SUCCESS);
 			}
@@ -175,7 +175,7 @@ class Server extends CVUI_Controller
 				$name = $this->request->getVar('name');
 				$address = $this->request->getVar('address');
 
-				$this->dbAdapter->Update($id, (new ServerFactory())->getInstanceFromParameters($name, $address, $server->removable));
+				$this->dbAdapter->Update($id, (new ServerFactory())->GetInstanceFromParameters($name, $address, $server->removable));
 
 				$this->setStatusMessage("Server '$name' was updated.", STATUS_SUCCESS);
 
