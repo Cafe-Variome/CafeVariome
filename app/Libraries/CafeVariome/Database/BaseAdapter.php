@@ -113,7 +113,7 @@ abstract class BaseAdapter implements IAdapter
 	 */
 	public function Update(int $id, IEntity $object): bool
 	{
-		$this->builder->where($this->key, $id);
+		$this->builder->where(static::$table . '.' . static::$key, $id);
 		return $this->builder->update($object->toArray());
 	}
 
@@ -123,7 +123,7 @@ abstract class BaseAdapter implements IAdapter
 	 */
 	public function Delete(int $id): bool
 	{
-		$this->builder->where($this->key, $id);
+		$this->builder->where(static::$table . '.' . static::$key, $id);
 		return $this->builder->delete();
 	}
 
@@ -274,11 +274,4 @@ abstract class BaseAdapter implements IAdapter
 			);
 		}
 	}
-
-	/**
-	 * @param object|null $object
-	 * @return IEntity
-	 */
-	public abstract function toEntity(?object $object): IEntity;
-
 }
