@@ -212,6 +212,39 @@ abstract class BaseAdapter implements IAdapter
 		}
 	}
 
+	protected function CompileSelect()
+	{
+		$properties = is_null($this->binding) ? $this->entity_class::GetProperties() : $this->binding::GetProperties();
+
+		$selectStatement = '';
+
+		foreach ($properties as $property)
+		{
+			$reflectionProperty = new \ReflectionProperty($this->binding ?? $this->entity_class, $property);
+
+			if (
+				str_contains($property, '_') &&
+				array_key_exists($rEntity = explode('_', $property)[0], $this->related_entities) &&
+				!str_ends_with($property, '_id')
+			)
+			{
+				$selectStatement .= $this->related_entities[$rEntity]['table'] . '.' . str_replace($rEntity . '_', '', $property) . ' as ' . $property . ', ';
+			}
+			else if (
+				$reflectionProperty->hasType() &&
+				$this->IsPrimitive($reflectionProperty->getType()->getName())
+
+			)
+			{
+				$selectStatement .= static::$table . '.' . $property . ', ';
+			}
+
+		}
+
+		$selectStatement = rtrim($selectStatement, ',');
+		$this->builder->select($selectStatement);
+	}
+
 	/**
 	 * @param object|null $object
 	 * @return IEntity
