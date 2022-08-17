@@ -104,6 +104,8 @@ define('EVENT_PRIORITY_HIGH', 10);
  *
  */
 
+define('CAFEVARIOME_NAMESPACE', 'App\Libraries\CafeVariome');
+
 define('WRITABLE', 'writable' . DIRECTORY_SEPARATOR);
 define('RESOURCES_DIR', "resources". DIRECTORY_SEPARATOR);
 
