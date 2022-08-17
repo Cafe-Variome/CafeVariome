@@ -32,6 +32,22 @@ class ValueAdapter extends BaseAdapter
 		return $this->builder->countAll();
 	}
 
+	public function ReadIdByNameAndAttributeId(string $name, int $attribute_id): ?int
+	{
+		$this->builder->select(static::$key);
+		$this->builder->where('name', $name);
+		$this->builder->where('attribute_id', $attribute_id);
+
+		$results = $this->builder->get()->getResult();
+
+		if (count($results) == 1)
+		{
+			return $results[0]->{static::$key};
+		}
+
+		return null;
+	}
+
     /**
      * @inheritDoc
      */
