@@ -116,6 +116,13 @@ abstract class BaseAdapter implements IAdapter
 		return $this->builder->delete();
 	}
 
+
+	/**
+	 * @param object|null $object
+	 * @return IEntity
+	 */
+	public abstract function toEntity(?object $object): IEntity;
+
 	/**
 	 * @return string name of the database table
 	 */
