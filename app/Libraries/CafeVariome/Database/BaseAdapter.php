@@ -153,6 +153,34 @@ abstract class BaseAdapter implements IAdapter
 		return new $this->binding($data);
 	}
 
+	protected function GetRelatedEntities(): array
+	{
+		$relatedEntities = [];
+
+		$properties = is_null($this->binding) ? $this->entity_class::GetProperties() : $this->binding::GetProperties();
+
+		foreach ($properties as $property)
+		{
+			if (str_ends_with(strtolower($property), '_id'))
+			{
+				$reflectionProperty = new \ReflectionProperty($this->binding ?? $this->entity_class, $property);
+
+				$propertyName = str_replace('_id', '', $property);
+				$entityName = $this->GetEntityName($propertyName);
+				$adapterClass = CAFEVARIOME_NAMESPACE . '\\Database\\' . $entityName . 'Adapter';
+				$relatedEntities[$propertyName] = [
+					'entity' => $entityName,
+					'table' => $adapterClass::GetTable(),
+					'primary_key' => $adapterClass::GetKey(),
+					'nullable' => $reflectionProperty->getType()->allowsNull()
+				];
+			}
+		}
+
+		return $relatedEntities;
+	}
+
+
 	/**
 	 * @param object|null $object
 	 * @return IEntity
