@@ -194,6 +194,24 @@ abstract class BaseAdapter implements IAdapter
 		);
 	}
 
+	protected function GetEntityName(string $singular_name): string
+	{
+		if (str_contains($singular_name, '_'))
+		{
+			$name = '';
+			$nameArray = explode('_', $singular_name);
+			for($c = 0; $c < count($nameArray); $c++)
+			{
+				$name .= $this->ToPascalCase($nameArray[$c]);
+			}
+			return $name;
+		}
+		else
+		{
+			return $this->ToPascalCase($singular_name);
+		}
+	}
+
 	/**
 	 * @param object|null $object
 	 * @return IEntity
