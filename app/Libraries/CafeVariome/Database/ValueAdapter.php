@@ -24,6 +24,14 @@ class ValueAdapter extends BaseAdapter
 	 */
 	protected static string $key = 'id';
 
+	public function CountByAttributeId(int $attribute_id): int
+	{
+		$this->builder->select(static::$key . ', name, display_name, frequency');
+		$this->builder->where('attribute_id', $attribute_id);
+
+		return $this->builder->countAll();
+	}
+
     /**
      * @inheritDoc
      */
