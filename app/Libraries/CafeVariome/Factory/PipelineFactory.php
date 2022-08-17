@@ -33,4 +33,34 @@ class PipelineFactory extends EntityFactory
 
 		return new Pipeline($properties);
 	}
+
+	public function GetInstanceFromParameters(
+		string $name,
+		int $subject_id_location,
+		string $subject_id_attribute_name,
+		string  $subject_id_prefix,
+		int $subject_id_assignment_batch_size,
+		?int $expansion_policy,
+		string $expansion_columns,
+		?string $expansion_attribute_name,
+		int $grouping,
+		?string $group_columns,
+		?string $internal_delimiter
+	)
+	{
+		return new Pipeline([
+			'name' => $name,
+			'subject_id_location' => $subject_id_location,
+			'subject_id_attribute_name' => $subject_id_attribute_name,
+			'subject_id_prefix' => $subject_id_prefix,
+			'subject_id_assignment_batch_size' => $subject_id_assignment_batch_size,
+			'expansion_policy' => $expansion_policy,
+			'expansion_columns' => $expansion_columns,
+			'expansion_attribute_name' => $expansion_attribute_name,
+			'grouping' => $grouping,
+			'group_columns' => $group_columns,
+			'internal_delimiter' => $internal_delimiter
+
+		]);
+	}
 }
