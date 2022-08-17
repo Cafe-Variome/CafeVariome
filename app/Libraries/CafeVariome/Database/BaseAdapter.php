@@ -180,6 +180,12 @@ abstract class BaseAdapter implements IAdapter
 		return $relatedEntities;
 	}
 
+	protected function ToPascalCase(string $str): string
+	{
+		$fc = strtoupper($str[0]);
+		return $fc . substr($str, 1);
+	}
+
 
 	/**
 	 * @param object|null $object
