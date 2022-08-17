@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 01, 2022 at 02:42 PM
+-- Generation Time: Aug 17, 2022 at 12:38 PM
 -- Server version: 5.7.38-0ubuntu0.18.04.1
 -- PHP Version: 8.0.19
 
@@ -49,7 +49,7 @@ CREATE TABLE `attributes` (
 CREATE TABLE `attributes_groups` (
   `attribute_id` int(11) NOT NULL,
   `group_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -146,20 +146,6 @@ CREATE TABLE `groups` (
   `name` varchar(1024) NOT NULL,
   `source_id` int(11) NOT NULL,
   `display_name` varchar(1024) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `menu_items`
---
-
-CREATE TABLE `menu_items` (
-  `id` int(11) NOT NULL,
-  `position` int(11) NOT NULL,
-  `title` varchar(64) NOT NULL,
-  `url` varchar(256) DEFAULT NULL,
-  `page_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -380,6 +366,7 @@ INSERT INTO `servers` (`id`, `name`, `address`, `removable`) VALUES
 --
 
 CREATE TABLE `settings` (
+  `id` int(11) NOT NULL,
   `key` varchar(50) NOT NULL,
   `value` varchar(100) NOT NULL,
   `name` varchar(50) DEFAULT NULL,
@@ -391,27 +378,27 @@ CREATE TABLE `settings` (
 -- Dumping data for table `settings`
 --
 
-INSERT INTO `settings` (`key`, `value`, `name`, `info`, `group`) VALUES
-('allow_registrations', 'off', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'authentication'),
-('auth_server', '', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main'),
-('discovery_requires_login', 'on', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'discovery'),
-('elastic_url', 'http://localhost:9200', 'Elasticsearch Address', 'Elastic search address', 'elasticsearch'),
-('email', 'admin@cafevariome.org', 'Administrator Email', 'Email of the person or group of people responsible for the website.', 'main'),
-('gene_autocomplete_url', 'https://autocomplete.cafevariome.org/Gene/query/', 'Gene Auto-complete Endpoint', 'Endpoint that provides auto-complete service for gene lookup ', 'endpoint'),
-('hpo_autocomplete_url', 'https://autocomplete.cafevariome.org/Hpo/query/', 'HPO Auto-complete Endpoint', 'Endpoint that provides auto-complete service for HPO terms lookup ', 'endpoint'),
-('installation_key', '', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'main'),
-('logo', '', 'Main Logo', 'Main logo that appears on top left side of the public pages. The file must be located in resources/images/logos/', 'main'),
-('neo4j_password', 'neo4j123', 'Neo4J Password', 'Password that is used to communicate with Neo4J REST API.', 'neo4j'),
-('neo4j_port', '7474', 'Neo4J Port', 'The port that the Neo4J REST API is running on. BY default it is 7474.', 'neo4j'),
-('neo4j_server', 'http://localhost', 'Neo4J Server', 'The URL of the Neo4J REST API.', 'neo4j'),
-('neo4j_username', 'neo4j', 'Neo4J Username', 'Username that is used to communicate with Neo4J REST API.', 'neo4j'),
-('orpha_autocomplete_url', 'https://autocomplete.cafevariome.org/Orpha/query/', 'ORPHA Auto-complete Endpoint', 'Endpoint that provides auto-complete service for ORPHA terms lookup ', 'endpoint'),
-('show_sources_in_discover', 'on', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'discovery'),
-('site_author', 'Bioinformatics Research Group - University of Leicester', 'Site Author', 'Name of the owner of the website, whether a person or an organisation, that appears as metadata on public pages.', 'main'),
-('site_description', 'Cafe Variome - Description', 'Site Description', 'Description of the website that appears as metadata in the structure of public pages.', 'main'),
-('site_keywords', 'healthcare data discovery, bioinformatics', 'Keywords', 'Keywords explaining activity of the website that appear as metadata on public pages. They help search engines find this website.', 'main'),
-('site_title', 'Cafe Variome', 'Site Title', 'Title as it appears in the web browser and on top left side of all pages.', 'main'),
-('snomed_autocomplete_url', 'https://autocomplete.cafevariome.org/Snomed/query/', 'SNOMED Auto-complete Endpoint', 'Endpoint that provides auto-complete service for SNOMED terms lookup ', 'endpoint');
+INSERT INTO `settings` (`id`, `key`, `value`, `name`, `info`, `group`) VALUES
+(1, 'allow_registrations', 'off', 'Allow User Registration', 'If set to on then users can register on the site, otherwise the signup is hidden', 'authentication'),
+(2, 'auth_server', '', 'Authorization Server URL', 'Central Cafe Variome Auth server url (WARNING: do not change)', 'main'),
+(3, 'discovery_requires_login', 'off', 'Authorization Required for Discovery?', 'If set to on then discovery searches cannot be done unless a user is logged in.', 'discovery'),
+(4, 'elastic_url', 'http://localhost:9200', 'Elasticsearch Address', 'Elastic search address', 'elasticsearch'),
+(5, 'email', 'admin@cafevariome.org', 'Administrator Email', 'Email of the person or group of people responsible for the website.', 'main'),
+(6, 'gene_autocomplete_url', 'https://autocomplete.cafevariome.org/Gene/query/', 'Gene Auto-complete Endpoint', 'Endpoint that provides auto-complete service for gene lookup ', 'endpoint'),
+(7, 'hpo_autocomplete_url', 'https://autocomplete.cafevariome.org/Hpo/query/', 'HPO Auto-complete Endpoint', 'Endpoint that provides auto-complete service for HPO terms lookup ', 'endpoint'),
+(8, 'installation_key', '', 'Installation Key', 'Unique key for this installation (WARNING: do not change this value unless you know what you are doing)', 'main'),
+(9, 'logo', '', 'Main Logo', 'Main logo that appears on top left side of the public pages. The file must be located in resources/images/logos/', 'main'),
+(10, 'neo4j_password', 'neo4j123', 'Neo4J Password', 'Password that is used to communicate with Neo4J REST API.', 'neo4j'),
+(11, 'neo4j_port', '7474', 'Neo4J Port', 'The port that the Neo4J REST API is running on. BY default it is 7474.', 'neo4j'),
+(12, 'neo4j_server', 'http://localhost', 'Neo4J Server', 'The URL of the Neo4J REST API.', 'neo4j'),
+(13, 'neo4j_username', 'neo4j', 'Neo4J Username', 'Username that is used to communicate with Neo4J REST API.', 'neo4j'),
+(14, 'orpha_autocomplete_url', 'https://autocomplete.cafevariome.org/Orpha/query/', 'ORPHA Auto-complete Endpoint', 'Endpoint that provides auto-complete service for ORPHA terms lookup ', 'endpoint'),
+(15, 'show_sources_in_discover', 'off', 'Show Sources in Discovery', 'If set to off then only the search box will be shown in the discovery interface (i.e. not the sources to search)', 'discovery'),
+(16, 'site_author', 'Bioinformatics Research Group - University of Leicester', 'Site Author', 'Name of the owner of the website, whether a person or an organisation, that appears as metadata on public pages.', 'main'),
+(17, 'site_description', 'Cafe Variome - Description', 'Site Description', 'Description of the website that appears as metadata in the structure of public pages.', 'main'),
+(18, 'site_keywords', 'healthcare data discovery, bioinformatics', 'Keywords', 'Keywords explaining activity of the website that appear as metadata on public pages. They help search engines find this website.', 'main'),
+(19, 'site_title', 'Cafe Variome Central', 'Site Title', 'Title as it appears in the web browser and on top left side of all pages.', 'main'),
+(20, 'snomed_autocomplete_url', 'https://autocomplete.cafevariome.org/Snomed/query/', 'SNOMED Auto-complete Endpoint', 'Endpoint that provides auto-complete service for SNOMED terms lookup ', 'endpoint');
 
 -- --------------------------------------------------------
 
@@ -638,13 +625,6 @@ ALTER TABLE `groups`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `menu_items`
---
-ALTER TABLE `menu_items`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `Page_FK` (`page_id`);
-
---
 -- Indexes for table `networks`
 --
 ALTER TABLE `networks`
@@ -725,7 +705,7 @@ ALTER TABLE `servers`
 -- Indexes for table `settings`
 --
 ALTER TABLE `settings`
-  ADD PRIMARY KEY (`key`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `single_sign_on_providers`
@@ -831,12 +811,6 @@ ALTER TABLE `groups`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `menu_items`
---
-ALTER TABLE `menu_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `network_groups`
 --
 ALTER TABLE `network_groups`
@@ -897,6 +871,12 @@ ALTER TABLE `servers`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
+-- AUTO_INCREMENT for table `settings`
+--
+ALTER TABLE `settings`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+
+--
 -- AUTO_INCREMENT for table `single_sign_on_providers`
 --
 ALTER TABLE `single_sign_on_providers`
@@ -924,7 +904,7 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `users_groups_networks`
@@ -958,8 +938,8 @@ ALTER TABLE `attributes`
 -- Constraints for table `attributes_groups`
 --
 ALTER TABLE `attributes_groups`
-  ADD CONSTRAINT `Attribute_ID_FK` FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`),
-  ADD CONSTRAINT `Group_ID_FK` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`);
+  ADD CONSTRAINT `Attribute_ID_FK` FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `Group_ID_FK` FOREIGN KEY (`group_id`) REFERENCES `groups` (`id`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `attributes_ontology_prefixes_relationships`
@@ -975,12 +955,6 @@ ALTER TABLE `attributes_ontology_prefixes_relationships`
 --
 ALTER TABLE `attribute_mappings`
   ADD CONSTRAINT `Attribute_Mapping_FK` FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
---
--- Constraints for table `menu_items`
---
-ALTER TABLE `menu_items`
-  ADD CONSTRAINT `Page_FK` FOREIGN KEY (`page_id`) REFERENCES `pages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `network_groups_sources`
