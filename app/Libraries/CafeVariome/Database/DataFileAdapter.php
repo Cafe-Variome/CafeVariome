@@ -38,9 +38,8 @@ class DataFileAdapter extends BaseAdapter
 
 	public function ReadBySourceId(int $source_id): array
 	{
-		$userAdapter = (new UserAdapterFactory())->GetInstance();
-		$this->builder->select($this->table . '.*, ' . $userAdapter->GetTable() . '.username, ' . $userAdapter->GetTable() . '.first_name, ' . $userAdapter->GetTable() . '.last_name');
-		$this->builder->join($userAdapter->GetTable(), $this->table . '.user_id = ' . $userAdapter->GetTable() . '.' . $userAdapter->GetKey());
+		$this->CompileSelect();
+		$this->CompileJoin();
 		$this->builder->where('source_id', $source_id);
 		$results = $this->builder->get()->getResult();
 
