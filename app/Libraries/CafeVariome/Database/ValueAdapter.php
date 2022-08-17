@@ -62,6 +62,21 @@ class ValueAdapter extends BaseAdapter
 		return null;
 	}
 
+	public function UpdateFrequency(int $id, float $frequency, bool $add = true): bool
+	{
+		if ($add)
+		{
+			$currentFrequency = $this->ReadFrequency($id);
+			if (!is_null($currentFrequency))
+			{
+				$frequency = $frequency + $currentFrequency;
+			}
+		}
+		$this->builder->where(static::$key, $id);
+
+		return $this->builder->update(['frequency' => $frequency]);
+	}
+
     /**
      * @inheritDoc
      */
