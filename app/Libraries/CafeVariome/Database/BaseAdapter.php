@@ -139,7 +139,18 @@ abstract class BaseAdapter implements IAdapter
 
 	protected function resetTable()
 	{
-		$this->builder = $this->db->table($this->table);
+		$this->builder = $this->db->table(static::$table);
+	}
+
+	public function SetModel(string $class_to_bind)
+	{
+		$this->binding = $class_to_bind;
+		return $this;
+	}
+
+	protected function BindTo(object $data): IEntity
+	{
+		return new $this->binding($data);
 	}
 
 	/**
