@@ -8,6 +8,9 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Entities\ViewModels\PageList;
+use App\Libraries\CafeVariome\Factory\PageAdapterFactory;
+use App\Libraries\CafeVariome\Factory\PageFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
@@ -20,12 +23,14 @@ class Page extends CVUI_Controller
 	 * Constructor
 	 *
 	 */
-    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+	{
         parent::setProtected(true);
         parent::setIsAdmin(true);
         parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
+		$this->dbAdapter = (new PageAdapterFactory())->GetInstance();
     }
 
     public function Index()
@@ -38,11 +43,7 @@ class Page extends CVUI_Controller
         $uidata = new UIData();
         $uidata->title = "Pages";
 
-        $pageModel = new \App\Models\Page();
-
-        $pagesList = $pageModel->getPages();
-
-        $uidata->data['pagesList'] = $pagesList;
+        $uidata->data['pages'] = $this->dbAdapter->SetModel(PageList::class)->ReadAll();
 
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = array(JS.'cafevariome/page.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
@@ -87,22 +88,19 @@ class Page extends CVUI_Controller
 		{
             $pageTitle = $this->request->getVar('ptitle');
             $pageContent = $this->request->getVar('pcontent');
-            $user_id = $this->authenticator->getUserId();
+            $user_id = $this->authenticator->GetUserId();
 
-            $pageData = ['Title' => $pageTitle, 'Content' => $pageContent, 'Author' => $user_id, 'Removable' => 1, 'Active' => 1];
-
-            $pageModel = new \App\Models\Page();
             try
 			{
-                $pageModel->createPage($pageData);
+				$this->dbAdapter->Create((new PageFactory())->GetInstanceFromParameters($pageTitle, $pageContent, $user_id, true, true));
                 $this->setStatusMessage("Page '$pageTitle' was created.", STATUS_SUCCESS);
             }
 			catch (\Exception $ex)
 			{
                 $this->setStatusMessage("There was a problem creating '$pageTitle'.", STATUS_ERROR);
             }
-            return redirect()->to(base_url($this->controllerName.'/List'));
 
+            return redirect()->to(base_url($this->controllerName.'/List'));
         }
         else
 		{
@@ -130,12 +128,19 @@ class Page extends CVUI_Controller
         return view($this->viewDirectory . '/Create.php', $data);
     }
 
-    public function Update(int $page_id)
+    public function Update(int $id)
     {
+		$page = $this->dbAdapter->Read($id);
+
+		if ($page->isNull())
+		{
+			$this->setStatusMessage("Page was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
+
         $uidata = new UIData();
         $uidata->title = "Edit Page";
-
-        $pageModel = new \App\Models\Page();
+		$uidata->data['id'] = $page->getID();
 
         $uidata->javascript = [VENDOR.'tinymce/tinymce/tinymce.min.js', JS.'cafevariome/page.js'];
 
@@ -169,11 +174,9 @@ class Page extends CVUI_Controller
             $pageContent = $this->request->getVar('pcontent');
             $user_id = $this->authenticator->getUserId();
 
-            $updateData = ['Title' => $pageTitle, 'Content' => $pageContent, 'Author' => $user_id];
-
             try
 			{
-                $pageModel->updatePage($updateData, ['id' => $page_id]);
+				$this->dbAdapter->Update($id, (new PageFactory())->GetInstanceFromParameters($pageTitle, $pageContent, $user_id, $page->active, $page->removable));
                 $this->setStatusMessage("Page '$pageTitle' was updated.", STATUS_SUCCESS);
             }
 			catch (\Exception $ex)
@@ -186,23 +189,22 @@ class Page extends CVUI_Controller
 		{
             $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
-            $page = $pageModel->getPage($page_id);
-
             if ($page != null)
 			{
-                $uidata->data['page_id'] = $page['id'];
+                $uidata->data['page_id'] = $page->getID();
+
                 $uidata->data['ptitle'] = array(
                     'name' => 'ptitle',
                     'id' => 'ptitle',
                     'type' => 'text',
                     'class' => 'form-control',
-                    'value' => set_value('ptitle', $page['Title']),
+                    'value' => set_value('ptitle', $page->title),
                 );
 
                 $uidata->data['pcontent'] = array(
                     'name' => 'pcontent',
                     'id' => 'pcontent',
-                    'value' =>set_value('pcontent', $page['Content'], false),
+                    'value' =>set_value('pcontent', $page->content, false),
                 );
             }
             else
@@ -212,87 +214,88 @@ class Page extends CVUI_Controller
             }
         }
 
-
-
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/Update.php', $data);
 
     }
 
-    public function Activate(int $page_id)
+    public function Activate(int $id)
     {
-        $pageModel = new \App\Models\Page();
-        $page = $pageModel->getPage($page_id);
+		$page = $this->dbAdapter->Read($id);
 
-        if ($page != null)
+		if ($page->isNull())
 		{
-            $pageTitle = $page['Title'];
+			$this->setStatusMessage("Page was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
 
-            if (!$page['Active'])
-			{
-                $updateData = ['Active' => 1];
-                try
-				{
-                    $pageModel->updatePage($updateData, ['id' => $page_id]);
-                    $this->setStatusMessage("Page '$pageTitle' was activated.", STATUS_SUCCESS);
-                }
-				catch (\Exception $ex)
-				{
-                    $this->setStatusMessage("There was a problem activating '$pageTitle'.", STATUS_ERROR);
-                }
-            }
-            else
-			{
-                $this->setStatusMessage("Page '$pageTitle' is already active.", STATUS_INFO);
-            }
-        }
-        else
+		$pageTitle = $page->title;
+
+		if (!$page->active)
 		{
-            $this->setStatusMessage("Page was not found.", STATUS_ERROR);
-        }
+			try
+			{
+				$this->dbAdapter->Activate($id);
+				$this->setStatusMessage("Page '$pageTitle' was activated.", STATUS_SUCCESS);
+			}
+			catch (\Exception $ex)
+			{
+				$this->setStatusMessage("There was a problem activating '$pageTitle'.: " . $ex->getMessage(), STATUS_ERROR);
+			}
+		}
+		else
+		{
+			$this->setStatusMessage("Page '$pageTitle' is already active.", STATUS_INFO);
+		}
+
         return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-    public function Deactivate(int $page_id)
+    public function Deactivate(int $id)
     {
-        $pageModel = new \App\Models\Page();
-        $page = $pageModel->getPage($page_id);
+		$page = $this->dbAdapter->Read($id);
 
-        if ($page != 1)
+		if ($page->isNull())
 		{
-            $pageTitle = $page['Title'];
+			$this->setStatusMessage("Page was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
 
-            if ($page['Active'])
-			{
-                $updateData = ['Active' => 0];
-                try
-				{
-                    $pageModel->updatePage($updateData, ['id' => $page_id]);
-                    $this->setStatusMessage("Page '$pageTitle' was deactivated.", STATUS_SUCCESS);
-                }
-				catch (\Exception $ex)
-				{
-                    $this->setStatusMessage("There was a problem deactivating '$pageTitle'.", STATUS_ERROR);
-                }
-            }
-            else
-			{
-                $this->setStatusMessage("Page '$pageTitle' is already deactive.", STATUS_INFO);
-            }
-        }
-        else
+		$pageTitle = $page->title;
+
+		if ($page->active)
 		{
-            $this->setStatusMessage("Page was not found.", STATUS_ERROR);
-        }
+			try
+			{
+				$this->dbAdapter->Deactivate($id);
+				$this->setStatusMessage("Page '$pageTitle' was deactivated.", STATUS_SUCCESS);
+			}
+			catch (\Exception $ex)
+			{
+				$this->setStatusMessage("There was a problem deactivating '$pageTitle': " . $ex->getMessage(), STATUS_ERROR);
+			}
+		}
+		else
+		{
+			$this->setStatusMessage("Page '$pageTitle' is already deactive.", STATUS_INFO);
+		}
+
         return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-    public function Delete(int $page_id)
+    public function Delete(int $id)
     {
+		$page = $this->dbAdapter->Read($id);
+
+		if ($page->isNull())
+		{
+			$this->setStatusMessage("Page was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
+
         $uidata = new UIData();
         $uidata->title = "Delete Page";
-
-        $pageModel = new \App\Models\Page();
+		$uidata->data['page'] = $page;
 
         $this->validation->setRules([
             'confirm' => [
@@ -301,45 +304,27 @@ class Page extends CVUI_Controller
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ],
-
-            'page_id' => [
-                'label'  => 'Page Id',
-                'rules'  => 'required|alpha_dash',
-                'errors' => [
-                    'required' => '{field} is required.',
-                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
-                ]
             ]
         ]);
 
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 		{
-            $pageId = $this->request->getVar('page_id');
             $confirm = $this->request->getVar('confirm');
 
             if ($confirm == 'yes')
 			{
                 try
 				{
-                    $page = $pageModel->getPage($page_id);
-                    if ($page != null)
+					$pageTitle = $page->title;
+					if ($page->removable)
 					{
-                        $pageTitle = $page['Title'];
-                        if ($page['Removable'])
-						{
-                            $pageModel->deletePage($page_id);
-                            $this->setStatusMessage("Page '$pageTitle' was deleted.", STATUS_SUCCESS);
-                        }
-                        else
-						{
-                            $this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
-                        }
-                    }
-                    else
+						$this->dbAdapter->Delete($id);
+						$this->setStatusMessage("Page '$pageTitle' was deleted.", STATUS_SUCCESS);
+					}
+					else
 					{
-                        $this->setStatusMessage("Page does not exist.", STATUS_ERROR);
-                    }
+						$this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
+					}
                 }
 				catch (\Exception $ex)
 				{
@@ -350,29 +335,18 @@ class Page extends CVUI_Controller
         }
         else
 		{
-            $page = $pageModel->getPage($page_id);
-            if ($page != null)
-			{
-                $pageTitle = $page['Title'];
+			$pageTitle = $page->title;
 
-                if (!$page['Removable'])
-				{
-                    $this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
-                    return redirect()->to(base_url($this->controllerName.'/List'));
-                }
-                else
-				{
-                    $uidata->data['page_id'] = $page_id;
-                    $uidata->data['pageTitle'] = $pageTitle;
-                 }
-            }
-            else
+			if (!$page->removable)
 			{
-                $this->setStatusMessage("Page was not found.", STATUS_ERROR);
-                return redirect()->to(base_url($this->controllerName.'/List'));
-            }
-            $data = $this->wrapData($uidata);
-            return view($this->viewDirectory.'/Delete', $data);
+				$this->setStatusMessage("Page '$pageTitle' is not removable.", STATUS_WARNING);
+				return redirect()->to(base_url($this->controllerName.'/List'));
+			}
+
+
         }
+
+		$data = $this->wrapData($uidata);
+		return view($this->viewDirectory.'/Delete', $data);
     }
 }

@@ -1,7 +1,7 @@
 <?php namespace App\Controllers;
 
+use App\Libraries\CafeVariome\Factory\PageAdapterFactory;
 use App\Models\UIData;
-use App\Models\Page;
 
 class Home extends CVUI_Controller
 {
@@ -11,17 +11,17 @@ class Home extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Home';
 		$uidata->stickyFooter = false;
-		$pageModel = new Page();
+		$pageAdapter = (new PageAdapterFactory())->GetInstance();
 		$uidata->data['pageContent'] = '';
 		if (is_numeric($page_id))
 		{
 			($page_id == 0) ? $page_id = 1 : $page_id = $page_id;
-			$page = $pageModel->getActivePage($page_id);
+			$page = $pageAdapter->ReadActive($page_id);
 
-			if ($page != null)
+			if (!$page->isNull())
 			{
-				$uidata->title = $page['Title'];
-				$uidata->data['pageContent'] = $page['Content'];
+				$uidata->title = $page->title;
+				$uidata->data['pageContent'] = $page->content;
 			}
 			else
 			{

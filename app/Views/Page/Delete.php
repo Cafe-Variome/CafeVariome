@@ -8,10 +8,9 @@
 </div>
 <hr>
 
-<?php echo form_open($controllerName."/Delete/" . $page_id); ?>
-<?php echo form_hidden(array('page_id' => $page_id)); ?>
+<?php echo form_open($controllerName."/Delete/" . $page->getID()); ?>
 <div class="form-group">
-<span class="text-danger">Warning: Are you sure you want to delete '<?php echo $pageTitle; ?>'?</span>
+<span class="text-danger">Warning: Are you sure you want to delete '<?php echo $page->title; ?>'?</span>
 </div>
 <div class="form-group">
 	<div class="form-check form-check-inline">
