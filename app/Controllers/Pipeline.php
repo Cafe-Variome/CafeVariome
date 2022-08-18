@@ -8,6 +8,10 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Entities\ViewModels\PipelineDetails;
+use App\Libraries\CafeVariome\Entities\ViewModels\PipelineList;
+use App\Libraries\CafeVariome\Factory\PipelineAdapterFactory;
+use App\Libraries\CafeVariome\Factory\PipelineFactory;
 use App\Libraries\CafeVariome\Helpers\UI\PipelineHelper;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
@@ -28,6 +32,7 @@ class Pipeline extends CVUI_Controller
         parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
+		$this->dbAdapter = (new PipelineAdapterFactory())->GetInstance();
     }
 
     public function Index()
@@ -43,27 +48,26 @@ class Pipeline extends CVUI_Controller
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = array(JS.'cafevariome/pipeline.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
-        $pipelineModel = new \App\Models\Pipeline();
+        $pipelines = $this->dbAdapter->SetModel(PipelineList::class)->ReadAll();
 
-        $pipelines = $pipelineModel->getPipelines();
-
-		foreach ($pipelines as &$pipeline)
-		{
-			$pipeline['subject_id_location'] = PipelineHelper::getSubjectIDLocation($pipeline['subject_id_location']);
-			$pipeline['grouping'] = PipelineHelper::getGrouping($pipeline['grouping']);
-		}
-        $uidata->data['pipelinesList'] = $pipelines;
+        $uidata->data['pipelines'] = $pipelines;
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/List.php', $data);
     }
 
-    public function Delete(int $pipeline_id)
+    public function Delete(int $id)
     {
+		$pipeline = $this->dbAdapter->SetModel(PipelineDetails::class)->Read($id);
+
+		if ($pipeline->isNull())
+		{
+			$this->setStatusMessage("Pipeline was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
+
         $uidata = new UIData();
         $uidata->title = "Delete Pipeline";
-
-        $pipelineModel = new \App\Models\Pipeline();
 
         $this->validation->setRules([
             'confirm' => [
@@ -72,49 +76,30 @@ class Pipeline extends CVUI_Controller
                 'errors' => [
                     'required' => '{field} is required.'
                 ]
-            ],
-
-            'pipeline_id' => [
-                'label'  => 'Pipeline Id',
-                'rules'  => 'required|alpha_dash',
-                'errors' => [
-                    'required' => '{field} is required.',
-                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
-                ]
             ]
         ]);
 
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-            $pipeline_id = $this->request->getVar('pipeline_id');
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
             $confirm = $this->request->getVar('confirm');
-            if ($confirm == 'yes') {
-                try {
-                    $pipeline = $pipelineModel->getPipeline($pipeline_id);
-                    if ($pipeline)  {
-                        $pipelineName = $pipeline['name'];
-                        $pipelineModel->deletePipeline($pipeline_id);
-                        $this->setStatusMessage("Pipeline '$pipelineName' was deleted.", STATUS_SUCCESS);
-                    }
-                    else{
-                        $this->setStatusMessage("Pipeline does not exist.", STATUS_ERROR);
-                    }
-                } catch (\Exception $ex) {
+            if ($confirm == 'yes')
+			{
+                try
+				{
+					$pipelineName = $pipeline->name;
+					$this->dbAdapter->Delete($id);
+					$this->setStatusMessage("Pipeline '$pipelineName' was deleted.", STATUS_SUCCESS);
+                }
+				catch (\Exception $ex)
+				{
                     $this->setStatusMessage("There was a problem deleting the pipeline.", STATUS_ERROR);
                 }
             }
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
-        else {
-            $pipeline = $pipelineModel->getPipeline($pipeline_id);
-            if ($pipeline) {
-                $pipeline_name = $pipeline['name'];
-                $uidata->data['pipeline_id'] = $pipeline_id;
-                $uidata->data['pipeline_name'] = $pipeline_name;
-            }
-            else {
-                $this->setStatusMessage("Pipeline was not found.", STATUS_ERROR);
-                return redirect()->to(base_url($this->controllerName.'/List'));
-            }
+        else
+		{
+			$uidata->data['pipeline'] = $pipeline;
 
             $data = $this->wrapData($uidata);
 
@@ -223,7 +208,7 @@ class Pipeline extends CVUI_Controller
 
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 		{
-			$pipeline_name = $this->request->getVar('name');
+			$name = $this->request->getVar('name');
 			$subject_id_location = $this->request->getVar('subject_id_location');
 			$subject_id_attribute_name = $this->request->getVar('subject_id_attribute_name');
 			$subject_id_prefix = $this->request->getVar('subject_id_prefix');
@@ -237,32 +222,29 @@ class Pipeline extends CVUI_Controller
 
             try
 			{
-                $pipelineModel = new \App\Models\Pipeline();
+				$this->dbAdapter->Create((
+					new PipelineFactory())->GetInstanceFromParameters(
+						$name,
+						$subject_id_location,
+						$subject_id_attribute_name,
+						$subject_id_prefix,
+						$subject_id_assignment_batch_size,
+						$subject_id_expansion_policy,
+						$subject_id_expansion_columns,
+						$expansion_attribute_name,
+						$grouping,
+						$group_columns,
+						$internal_delimiter
+				));
 
-                $data = [
-                    'name' => $pipeline_name,
-                    'subject_id_location' => $subject_id_location,
-                    'subject_id_attribute_name' => $subject_id_attribute_name,
-					'subject_id_prefix' => $subject_id_prefix,
-					'subject_id_assignment_batch_size' => $subject_id_assignment_batch_size,
-					'expansion_policy' => $subject_id_expansion_policy,
-					'expansion_columns' => $subject_id_expansion_columns,
-					'expansion_attribute_name' => $expansion_attribute_name,
-                    'grouping' => $grouping,
-                    'group_columns' => $group_columns,
-                    'internal_delimiter' => $internal_delimiter
-                ];
-
-                $pipelineModel->createPipeline($data);
-
-                $this->setStatusMessage("Pipeline '$pipeline_name' was created.", STATUS_SUCCESS);
+                $this->setStatusMessage("Pipeline '$name' was created.", STATUS_SUCCESS);
             }
 			catch (\Exception $ex)
 			{
-                $this->setStatusMessage("There was a problem creating '$pipeline_name'."  . $ex->getMessage(), STATUS_ERROR);
+                $this->setStatusMessage("There was a problem creating '$name'."  . $ex->getMessage(), STATUS_ERROR);
             }
-            return redirect()->to(base_url($this->controllerName.'/List'));
 
+            return redirect()->to(base_url($this->controllerName.'/List'));
         }
         else
 		{
@@ -283,11 +265,11 @@ class Pipeline extends CVUI_Controller
                 'class' => 'form-control',
                 'value' =>set_value('subject_id_location'),
                 'options' => [
-					SUBJECT_ID_WITHIN_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_WITHIN_FILE),
-					SUBJECT_ID_IN_FILE_NAME => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_IN_FILE_NAME),
-					SUBJECT_ID_PER_BATCH_OF_RECORDS => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_PER_BATCH_OF_RECORDS),
-					SUBJECT_ID_PER_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_PER_FILE),
-					SUBJECT_ID_BY_EXPANSION_ON_COLUMNS => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_BY_EXPANSION_ON_COLUMNS)
+					SUBJECT_ID_WITHIN_FILE => PipelineHelper::GetSubjectIDLocation(SUBJECT_ID_WITHIN_FILE),
+					SUBJECT_ID_IN_FILE_NAME => PipelineHelper::GetSubjectIDLocation(SUBJECT_ID_IN_FILE_NAME),
+					SUBJECT_ID_PER_BATCH_OF_RECORDS => PipelineHelper::GetSubjectIDLocation(SUBJECT_ID_PER_BATCH_OF_RECORDS),
+					SUBJECT_ID_PER_FILE => PipelineHelper::GetSubjectIDLocation(SUBJECT_ID_PER_FILE),
+					SUBJECT_ID_BY_EXPANSION_ON_COLUMNS => PipelineHelper::GetSubjectIDLocation(SUBJECT_ID_BY_EXPANSION_ON_COLUMNS)
 				]
             );
 
@@ -322,9 +304,9 @@ class Pipeline extends CVUI_Controller
 				'class' => 'form-control',
 				'value' =>set_value('subject_id_expansion_policy'),
 				'options' => [
-					SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL => PipelineHelper::getExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL),
-					SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM => PipelineHelper::getExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM),
-					SUBJECT_ID_EXPANDSION_POLICY_MINIMUM => PipelineHelper::getExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_MINIMUM)
+					SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL => PipelineHelper::GetExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL),
+					SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM => PipelineHelper::GetExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM),
+					SUBJECT_ID_EXPANDSION_POLICY_MINIMUM => PipelineHelper::GetExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_MINIMUM)
 				]
 			);
 
@@ -351,8 +333,8 @@ class Pipeline extends CVUI_Controller
                 'class' => 'form-control',
                 'value' =>set_value('grouping'),
                 'options' => [
-					GROUPING_COLUMNS_ALL => PipelineHelper::getGrouping(GROUPING_COLUMNS_ALL),
-					GROUPING_COLUMNS_CUSTOM => PipelineHelper::getGrouping(GROUPING_COLUMNS_CUSTOM)
+					GROUPING_COLUMNS_ALL => PipelineHelper::GetGrouping(GROUPING_COLUMNS_ALL),
+					GROUPING_COLUMNS_CUSTOM => PipelineHelper::GetGrouping(GROUPING_COLUMNS_CUSTOM)
 				]
             );
 
@@ -380,21 +362,16 @@ class Pipeline extends CVUI_Controller
 
     public function Details(int $id)
     {
-        $uidata = new UIData();
-        $uidata->title = "Data Pipeline Details";
+		$pipeline = $this->dbAdapter->SetModel(PipelineDetails::class)->Read($id);
 
-        $pipelineModel = new \App\Models\Pipeline();
-        $pipeline = $pipelineModel->getPipeline($id);
-
-        if($pipeline == null)
+		if ($pipeline->isNull())
 		{
-            $this->setStatusMessage("Pipeline not found.", STATUS_ERROR);
-            return redirect()->to(base_url($this->controllerName.'/List'));
-        }
+			$this->setStatusMessage("Pipeline was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
 
-		$pipeline['subject_id_location_text'] = PipelineHelper::getSubjectIDLocation($pipeline['subject_id_location']);
-		$pipeline['expansion_policy'] = $pipeline['expansion_policy'] != null ? PipelineHelper::getExpansionPolicy($pipeline['expansion_policy']) : 'NA';
-		$pipeline['grouping'] = PipelineHelper::getGrouping($pipeline['grouping']);
+		$uidata = new UIData();
+        $uidata->title = "Data Pipeline Details";
 
         $uidata->data['pipeline'] = $pipeline;
 
@@ -405,11 +382,17 @@ class Pipeline extends CVUI_Controller
 
     public function Update(int $id)
     {
+		$pipeline = $this->dbAdapter->Read($id);
+
+		if ($pipeline->isNull())
+		{
+			$this->setStatusMessage("Pipeline was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
+
         $uidata = new UIData();
         $uidata->title = "Edit Data Pipeline";
         $uidata->javascript = array(JS.'cafevariome/pipeline.js');
-
-        $pipelineModel = new \App\Models\Pipeline();
 
         $this->validation->setRules([
             'name' => [
@@ -508,7 +491,7 @@ class Pipeline extends CVUI_Controller
 		{
             try
 			{
-                $pipeline_name = $this->request->getVar('name');
+                $name = $this->request->getVar('name');
                 $subject_id_location = $this->request->getVar('subject_id_location');
                 $subject_id_attribute_name = $this->request->getVar('subject_id_attribute_name');
 				$subject_id_prefix = $this->request->getVar('subject_id_prefix');
@@ -520,23 +503,21 @@ class Pipeline extends CVUI_Controller
                 $group_columns = $this->request->getVar('group_columns');
                 $internal_delimiter = $this->request->getVar('internal_delimiter');
 
-                $data = [
-                    'name' => $pipeline_name,
-                    'subject_id_location' => $subject_id_location,
-                    'subject_id_attribute_name' => $subject_id_attribute_name,
-					'subject_id_prefix' => $subject_id_prefix,
-					'subject_id_assignment_batch_size' => $subject_id_assignment_batch_size,
-					'expansion_policy' => $subject_id_expansion_policy,
-					'expansion_columns' => $subject_id_expansion_columns,
-					'expansion_attribute_name' => $expansion_attribute_name,
-					'grouping' => $grouping,
-                    'group_columns' => $group_columns,
-                    'internal_delimiter' => $internal_delimiter
-                ];
+				$this->dbAdapter->Update($id, (new PipelineFactory())->GetInstanceFromParameters(
+					$name,
+					$subject_id_location,
+					$subject_id_attribute_name,
+					$subject_id_prefix,
+					$subject_id_assignment_batch_size,
+					$subject_id_expansion_policy,
+					$subject_id_expansion_columns,
+					$expansion_attribute_name,
+					$grouping,
+					$group_columns,
+					$internal_delimiter
+				));
 
-                $pipelineModel->updatePipeline($data, ['id' => $id]);
-
-                $this->setStatusMessage("Pipeline '$pipeline_name' was updated.", STATUS_SUCCESS);
+                $this->setStatusMessage("Pipeline '$name' was updated.", STATUS_SUCCESS);
             }
 			catch (\Exception $ex)
 			{
@@ -548,22 +529,14 @@ class Pipeline extends CVUI_Controller
 		{
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
-            $pipeline = $pipelineModel->getPipeline($id);
-
-            if($pipeline == null)
-			{
-                $this->setStatusMessage("Pipeline not found.", STATUS_ERROR);
-                return redirect()->to(base_url($this->controllerName.'/List'));
-            }
-
-            $uidata->data['pipeline_id'] = $pipeline['id'];
+            $uidata->data['pipeline_id'] = $pipeline->getID();
 
             $uidata->data['name'] = array(
                 'name' => 'name',
                 'id' => 'name',
                 'type' => 'text',
                 'class' => 'form-control',
-                'value' =>set_value('name', $pipeline['name']),
+                'value' =>set_value('name', $pipeline->name),
             );
 
             $uidata->data['subject_id_location'] = array(
@@ -578,8 +551,8 @@ class Pipeline extends CVUI_Controller
 					SUBJECT_ID_PER_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_PER_FILE),
 					SUBJECT_ID_BY_EXPANSION_ON_COLUMNS => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_BY_EXPANSION_ON_COLUMNS)
 				],
-                'value' =>set_value('subject_id_location', $pipeline['subject_id_location']),
-                'selected' => $pipeline['subject_id_location']
+                'value' =>set_value('subject_id_location', $pipeline->subject_id_location),
+                'selected' => $pipeline->subject_id_location
             );
 
             $uidata->data['subject_id_attribute_name'] = array(
@@ -587,7 +560,7 @@ class Pipeline extends CVUI_Controller
                 'id' => 'subject_id_attribute_name',
                 'type' => 'text',
                 'class' => 'form-control',
-                'value' =>set_value('subject_id_attribute_name', $pipeline['subject_id_attribute_name']),
+                'value' =>set_value('subject_id_attribute_name', $pipeline->subject_id_attribute_name),
             );
 
 			$uidata->data['subject_id_prefix'] = array(
@@ -595,7 +568,7 @@ class Pipeline extends CVUI_Controller
 				'id' => 'subject_id_prefix',
 				'type' => 'text',
 				'class' => 'form-control',
-				'value' =>set_value('subject_id_prefix',  $pipeline['subject_id_prefix']),
+				'value' =>set_value('subject_id_prefix',  $pipeline->subject_id_prefix),
 			);
 
 			$uidata->data['subject_id_batch_size'] = array(
@@ -603,7 +576,7 @@ class Pipeline extends CVUI_Controller
 				'id' => 'subject_id_batch_size',
 				'type' => 'text',
 				'class' => 'form-control',
-				'value' =>set_value('subject_id_batch_size', $pipeline['subject_id_assignment_batch_size']),
+				'value' =>set_value('subject_id_batch_size', $pipeline->subject_id_assignment_batch_size),
 			);
 
 			$uidata->data['subject_id_expansion_policy'] = array(
@@ -616,8 +589,8 @@ class Pipeline extends CVUI_Controller
 					SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM => PipelineHelper::getExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM),
 					SUBJECT_ID_EXPANDSION_POLICY_MINIMUM => PipelineHelper::getExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_MINIMUM)
 				],
-				'value' =>set_value('subject_id_expansion_policy', $pipeline['expansion_policy']),
-				'selected' => $pipeline['expansion_policy']
+				'value' =>set_value('subject_id_expansion_policy', $pipeline->expansion_policy),
+				'selected' => $pipeline->expansion_policy
 			);
 
 			$uidata->data['subject_id_expansion_columns'] = array(
@@ -625,7 +598,7 @@ class Pipeline extends CVUI_Controller
 				'id' => 'subject_id_expansion_columns',
 				'type' => 'text',
 				'class' => 'form-control',
-				'value' =>set_value('subject_id_expansion_columns',  $pipeline['expansion_columns']),
+				'value' =>set_value('subject_id_expansion_columns',  $pipeline->expansion_columns),
 			);
 
 			$uidata->data['expansion_attribute_name'] = array(
@@ -633,7 +606,7 @@ class Pipeline extends CVUI_Controller
 				'id' => 'expansion_attribute_name',
 				'type' => 'text',
 				'class' => 'form-control',
-				'value' =>set_value('expansion_attribute_name', $pipeline['expansion_attribute_name']),
+				'value' =>set_value('expansion_attribute_name', $pipeline->expansion_attribute_name),
 			);
 
             $uidata->data['grouping'] = array(
@@ -645,8 +618,8 @@ class Pipeline extends CVUI_Controller
 					GROUPING_COLUMNS_ALL => PipelineHelper::getGrouping(GROUPING_COLUMNS_ALL),
 					GROUPING_COLUMNS_CUSTOM => PipelineHelper::getGrouping(GROUPING_COLUMNS_CUSTOM)
 				],
-                'value' =>set_value('grouping',  $pipeline['grouping']),
-                'selected' => $pipeline['grouping']
+                'value' =>set_value('grouping',  $pipeline->grouping),
+                'selected' => $pipeline->grouping
             );
 
             $uidata->data['group_columns'] = array(
@@ -654,7 +627,7 @@ class Pipeline extends CVUI_Controller
                 'id' => 'group_columns',
                 'type' => 'text',
                 'class' => 'form-control',
-                'value' =>set_value('group_columns',  $pipeline['group_columns']),
+                'value' =>set_value('group_columns',  $pipeline->group_columns),
             );
 
             $uidata->data['internal_delimiter'] = array(
@@ -662,7 +635,7 @@ class Pipeline extends CVUI_Controller
                 'id' => 'internal_delimiter',
                 'type' => 'text',
                 'class' => 'form-control',
-                'value' =>set_value('internal_delimiter', $pipeline['internal_delimiter']),
+                'value' =>set_value('internal_delimiter', $pipeline->internal_delimiter),
             );
         }
 

@@ -8,10 +8,10 @@
 </div>
 <hr>
 
-<?php echo form_open($controllerName."/Delete/" . $pipeline_id); ?>
-<?php echo form_hidden(['pipeline_id' => $pipeline_id]); ?>
+<?php echo form_open($controllerName."/Delete/" . $pipeline->getID()); ?>
+
 <div class="form-group">
-<span class="text-danger">Warning: Are you sure you want to delete '<?= $pipeline_name; ?>'?</span>
+<span class="text-danger">Warning: Are you sure you want to delete '<?= $pipeline->name; ?>'?</span>
 </div>
 <div class="form-group">
 	<div class="form-check form-check-inline">

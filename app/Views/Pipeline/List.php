@@ -27,20 +27,20 @@
 		</tr>
 	</thead>
 	<tbody>
-		<?php foreach ($pipelinesList as $pipeline): ?>
+		<?php foreach ($pipelines as $pipeline): ?>
 		<tr>
-			<td><?= $pipeline['name'] ?></td>
-			<td><?= $pipeline['subject_id_location'] ?></td>
-			<td><?= $pipeline['subject_id_attribute_name'] ?></td>
-			<td><?= $pipeline['grouping']?></td>
+			<td><?= $pipeline->name ?></td>
+			<td><?= $pipeline->subject_id_location ?></td>
+			<td><?= $pipeline->subject_id_attribute_name ?></td>
+			<td><?= $pipeline->grouping?></td>
 			<td>
-				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $pipeline['id']; ?>" data-toggle="tooltip" data-placement="top" title="Edit Pipeline">
+				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $pipeline->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Edit Pipeline">
 					<i class="fa fa-edit text-warning"></i>
 				</a>
-				<a href="<?php echo base_url($controllerName. '/Details'). "/" . $pipeline['id']; ?>" data-toggle="tooltip" data-placement="top" title="View Pipeline">
+				<a href="<?php echo base_url($controllerName. '/Details'). "/" . $pipeline->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Pipeline">
 					<i class="fa fa-eye text-info"></i>
 				</a>
-				<a href="<?php echo base_url($controllerName. '/Delete'). "/" . $pipeline['id']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Pipeline">
+				<a href="<?php echo base_url($controllerName. '/Delete'). "/" . $pipeline->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Delete Pipeline">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 			</td>
