@@ -2,7 +2,7 @@
 
 /**
  * Name: Page.php
- *
+ * @deprecated
  * Created: 19/02/2020
  *
  * @author Mehdi Mehtarizadeh
