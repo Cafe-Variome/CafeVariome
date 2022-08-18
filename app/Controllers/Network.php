@@ -16,7 +16,8 @@ use App\Models\Source;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use CodeIgniter\Config\Services;
 
-class Network extends CVUI_Controller{
+class Network extends CVUI_Controller
+{
 
     /**
 	 * Validation list template.
@@ -33,7 +34,8 @@ class Network extends CVUI_Controller{
 	 * Constructor
 	 *
 	 */
-    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+	{
         parent::setProtected(true);
         parent::setIsAdmin(true);
         parent::initController($request, $response, $logger);
@@ -43,7 +45,8 @@ class Network extends CVUI_Controller{
         $this->userModel = new \App\Models\User();
     }
 
-    public function index(){
+    public function Index()
+	{
         return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
@@ -59,18 +62,21 @@ class Network extends CVUI_Controller{
         $networks = [];
 
         $networkInterface = new NetworkInterface();
-        try {
-            $response = $networkInterface->GetNetworksByInstallationKey($this->setting->settingData['installation_key']);
-            if ($response->status) {
+        try
+		{
+            $response = $networkInterface->GetNetworksByInstallationKey($this->setting->GetInstallationKey());
+            if ($response->status)
+			{
                 $networks = $response->data;
             }
             $master_groups = $this->networkModel->getMasterGroups();
 
             $uidata->data['groups'] = $master_groups;
-        } catch (\Exception $ex) {
+        }
+		catch (\Exception $ex)
+		{
             $uidata->data['message'] = 'There was a problem retrieving networks. Please try again.';
         }
-
 
         $uidata->data['networks'] = $networks;
 
@@ -84,8 +90,8 @@ class Network extends CVUI_Controller{
     /**
      * Create
      */
-    function Create() {
-
+    function Create()
+	{
         $uidata = new UIData();
         $networkGroupModel = new NetworkGroup($this->db);
         $uidata->data['title'] = "Create Network";
@@ -103,18 +109,21 @@ class Network extends CVUI_Controller{
         ]
         );
 
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
             $name = strtolower($this->request->getVar('name')); // Convert the network name to lowercase
-            $installation_url = base_url();
 
             $networkInterface = new NetworkInterface();
             $response = $networkInterface->CreateNetwork(['network_name' => $name, 'network_type' => 1, 'network_threshold' => 0, 'network_status' => 1]);
-            if (!$response->status) {
+            if (!$response->status)
+			{
                 //something failed
-                if ($response->message != Null) {
+                if ($response->message != null)
+				{
                     $this->setStatusMessage($response->message, STATUS_ERROR);
-                }else {
+                }
+				else
+				{
                     $this->setStatusMessage("There was a problem communicating with the network software.", STATUS_ERROR);
                 }
             }
@@ -124,21 +133,24 @@ class Network extends CVUI_Controller{
                 $network_key = $response->data->network_key;
 
                 //Add Installation to Network
-                $addInstallationResponse = $networkInterface->AddInstallationToNetwork(['installation_key' => $this->setting->settingData['installation_key'], 'network_key' => $network_key]);
+                $addInstallationResponse = $networkInterface->AddInstallationToNetwork(['network_key' => $network_key]);
 
                 //create local replication of network
-
-                if (!$addInstallationResponse->status) {
+                if (!$addInstallationResponse->status)
+				{
                     $this->setStatusMessage("There was a problem adding this installation to '$name'.", STATUS_ERROR);
                 }
-                else {
-                    try {
+                else
+				{
+                    try
+					{
                         $this->networkModel->createNetwork(array ('network_name' => $name,
                             'network_key' => $response->data->network_key,
                             'network_type' => 1
                         ));
 
-                        try {
+                        try
+						{
                             $network_master_group_data = array ('name' => $name,
                             'description' => $name,
                             'network_key' => $response->data->network_key,
@@ -149,11 +161,14 @@ class Network extends CVUI_Controller{
 
                             $this->setStatusMessage("Network '$name' was created successfully.", STATUS_SUCCESS);
 
-                        } catch (\Exception $ex) {
+                        }
+						catch (\Exception $ex)
+						{
                             $this->setStatusMessage("There was a problem creating a network group for '$name'.", STATUS_ERROR);
                         }
                     }
-                    catch (\Exception $ex) {
+                    catch (\Exception $ex)
+					{
                         $this->setStatusMessage("There was a problem creating local replica for '$name'.", STATUS_ERROR);
                     }
 
@@ -161,7 +176,8 @@ class Network extends CVUI_Controller{
                 }
             }
        }
-       else {
+       else
+	   {
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
        }
 
