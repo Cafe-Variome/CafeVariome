@@ -10,9 +10,10 @@
 
 class AttributeHelper
 {
-	public static function getAttributeType(int $type): string
+	public static function GetAttributeType(int $type): string
 	{
-		switch ($type){
+		switch ($type)
+		{
 			case ATTRIBUTE_TYPE_UNDEFINED:
 				return 'Undefined';
 			case ATTRIBUTE_TYPE_STRING:
@@ -29,9 +30,10 @@ class AttributeHelper
 		return 'Undefined';
 	}
 
-	public static function getAttributeStorageLocation(int $storage_location): string
+	public static function GetAttributeStorageLocation(int $storage_location): string
 	{
-		switch ($storage_location){
+		switch ($storage_location)
+		{
 			case ATTRIBUTE_STORAGE_UNDEFINED:
 				return 'Undefined';
 			case ATTRIBUTE_STORAGE_ELASTICSEARCH:
