@@ -16,8 +16,8 @@
 	</div>
 <?php endif; ?>
 
-<?php echo form_open($controllerName.'/Update/' . $ontology_id); ?>
-<?php echo form_hidden('id', $ontology_id) ?>
+<?php echo form_open($controllerName.'/Update/' . $id); ?>
+<?php echo form_hidden('id', $id) ?>
 
 <div class="form-group row">
 	<div class="col-6">
