@@ -208,7 +208,7 @@ abstract class BaseAdapter implements IAdapter
 	{
 		return in_array(
 			$type,
-			['string', 'int', 'integer', 'bool', 'boolean', 'double']
+			['string', 'int', 'integer', 'bool', 'boolean', 'double', 'float']
 		);
 	}
 
