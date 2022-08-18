@@ -8,10 +8,9 @@
 </div>
 <hr>
 
-<?php echo form_open($controllerName."/Delete/" . $ontology_id); ?>
-<?php echo form_hidden(['ontology_id' => $ontology_id]); ?>
+<?php echo form_open($controllerName."/Delete/" . $ontology->getID()); ?>
 <div class="form-group">
-	<span class="text-danger">Warning: Are you sure you want to delete '<?= $ontology_name; ?>'?</span>
+	<span class="text-danger">Warning: Are you sure you want to delete '<?= $ontology->name; ?>'?</span>
 </div>
 <div class="form-group">
 	<div class="form-check form-check-inline">
