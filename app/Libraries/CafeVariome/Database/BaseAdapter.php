@@ -232,7 +232,17 @@ abstract class BaseAdapter implements IAdapter
 
 	protected function CompileSelect()
 	{
-		$properties = is_null($this->binding) ? $this->entity_class::GetProperties() : $this->binding::GetProperties();
+		$entityProperties = $this->entity_class::GetProperties();
+		$hasBinding = !is_null($this->binding);
+
+		if ($hasBinding)
+		{
+			$properties = $this->binding::GetProperties();
+		}
+		else
+		{
+			$properties = $entityProperties;
+		}
 
 		$selectStatement = '';
 
@@ -250,8 +260,8 @@ abstract class BaseAdapter implements IAdapter
 			}
 			else if (
 				$reflectionProperty->hasType() &&
-				$this->IsPrimitive($reflectionProperty->getType()->getName())
-
+				$this->IsPrimitive($reflectionProperty->getType()->getName()) &&
+				in_array($property, $entityProperties)
 			)
 			{
 				$selectStatement .= static::$table . '.' . $property . ', ';
