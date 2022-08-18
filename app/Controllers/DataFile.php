@@ -13,6 +13,7 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\DataPipeLine;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\SpreadsheetDataInput;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
+use App\Libraries\CafeVariome\Entities\ViewModels\DataFileList;
 use App\Libraries\CafeVariome\Factory\DataFileAdapterFactory;
 use App\Libraries\CafeVariome\Factory\DataFileFactory;
 use App\Libraries\CafeVariome\Factory\PipelineAdapterFactory;
@@ -73,7 +74,7 @@ class DataFile extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Data Files';
 
-		$dataFiles = $this->dbAdapter->ReadBySourceId($source_id);
+		$dataFiles = $this->dbAdapter->SetModel(DataFileList::class)->ReadBySourceId($source_id);
 		$uidata->data['dataFiles'] = $dataFiles;
 		$uidata->data['source'] = $source;
 

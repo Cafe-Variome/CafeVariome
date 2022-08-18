@@ -36,9 +36,9 @@
 		<td><?= date("H:i:s d-m-Y T", $dataFile->upload_date) ?></td>
 		<td><?= $dataFile->record_count ?></td>
 		<td>
-			<?= $dataFile->user->username ?>
+			<?= $dataFile->user_username ?>
 			<br>
-			(<?= $dataFile->user->first_name ?> <?= $dataFile->user->last_name ?>)
+			(<?= $dataFile->user_first_name ?> <?= $dataFile->user_last_name ?>)
 		</td>
 		<td><?= \App\Libraries\CafeVariome\Helpers\UI\DataFileHelper::GetDataFileStatus($dataFile->status) ?></td>
 		<td id="action-<?= $dataFile->getID() ?>">
