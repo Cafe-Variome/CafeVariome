@@ -57,21 +57,6 @@ abstract class DataInput extends DataPipeLine
 
 	abstract protected function InitializePipeline();
 
-	/**
-	 * @deprecated
-	 * @param int $fileId
-	 * @return array
-	 */
-	protected function getSourceFiles(int $fileId = -1)
-    {
-        if ($fileId != -1) {
-            return $this->uploadModel->getFiles('FileName, pipeline_id', ['id' => $fileId]);
-        }
-        else{
-            return $this->uploadModel->getFiles('FileName, pipeline_id', ['source_id' => $this->sourceId]);
-        }
-    }
-
 	protected function updateSubjectCount()
 	{
 		$totalRecordCount = $this->subjectAdapter->CountBySourceId($this->sourceId);
