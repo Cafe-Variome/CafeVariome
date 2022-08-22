@@ -38,6 +38,16 @@ class SourceAdapter extends BaseAdapter
 		return $entities;
 	}
 
+	public function ReadUID(int $id): ?string
+	{
+		$this->builder->select('uid');
+		$this->builder->where(static::$key, $id);
+
+		$results = $this->builder->get()->getResult();
+
+		return count($results) == 1 ? $results[0]->uid : null;
+	}
+
 	public function Lock(int $id): bool
 	{
 		$this->builder->where(static::$key, $id);
