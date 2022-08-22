@@ -255,37 +255,6 @@ class AjaxApi extends Controller
 
     /**
 	 * @deprecated
-     * Check Json Presence - Check if the server has any of the targeted json files
-     * Already present for this source
-     *
-     * @param array $_POST['files']  - The list of files we must check presence for
-     * @param string $_POST['source'] - The source we must check presense for inside
-     * @return string Green | json_encoded array with list of files
-     */
-    private function checkJsonPresence() {
-		if ($this->request->getMethod() == 'post') {
-			$duplicates = [];
-			$source_id = $this->request->getVar('source_id');
-			$fileNames = $this->request->getVar('fileNames');
-
-			$sourceFiles = $this->uploadModel->getFiles('FileName', ['source_id' => $source_id]);
-
-			foreach ($sourceFiles as $sourceFile) {
-				if (in_array($sourceFile['FileName'], $fileNames)) {
-					array_push($duplicates, $sourceFile['FileName']);
-				}
-			}
-
-			if (count($duplicates) > 0) {
-				return json_encode($duplicates);
-			} else {
-				return json_encode("Green");
-			}
-		}
-    }
-
-    /**
-	 * @deprecated
      * Json Batch - At this point all checks have been performed. Upload the json files in
      * Batches of 20 (as limited by php.ini)
      *
