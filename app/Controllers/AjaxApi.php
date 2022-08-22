@@ -563,42 +563,6 @@ class AjaxApi extends Controller
 		}
     }
 
-	/**
-	 * @deprecated
-	 * @return false|string|void
-	 * @throws \Exception
-	 * @deprecated
-	 */
-    private function vcfStart() {
-		if ($this->request->getMethod() == 'post') {
-			$pairingsPath = FCPATH . UPLOAD . UPLOAD_PAIRINGS;
-			$fileMan = new UploadFileMan($pairingsPath);
-
-			$source_id = $this->request->getVar('source_id');
-			$user_id = $this->request->getVar('user_id');
-			$uid = $this->request->getVar('uid');
-			$overwrite = $this->request->getVar('fAction');
-
-			// Get ID for source and lock it so further updates and uploads cannot occur until update is finished
-			$this->sourceModel->lockSource($source_id);
-			$this->uploadModel->addUploadJobRecord($source_id, $uid, $user_id);
-
-			$path = $uid . ".json";
-
-			if ($fileMan->Exists($path)) {
-				$fileMan->Delete($path);
-			}
-
-			if ($overwrite == "overwrite") {
-				PHPShellHelper::runAsync(getcwd() . "/index.php Task vcfInsertBySourceId " . $source_id . " " . UPLOADER_DELETE_ALL);
-			} elseif ($overwrite == "append") {
-				PHPShellHelper::runAsync(getcwd() . "/index.php Task vcfInsertBySourceId " . $source_id . " " . UPLOADER_DELETE_NONE);
-			}
-
-			return json_encode("Green");
-		}
-    }
-
     /**
 	 * deprecated
      * spreadsheetUpload - Perform Upload for CSV/XLS/XLSX files
