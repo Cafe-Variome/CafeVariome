@@ -490,24 +490,7 @@ class AjaxApi extends Controller
 			return json_encode($sourceCountList);
 		}
     }
-
-	/**
-	 * @return false|string|void
-	 * @deprecated
-	 */
-    private function getSourceStatus(){
-
-		if ($this->request->getMethod() == 'post') {
-			$source_id = $this->request->getVar('source_id');
-			$uploadModel = new Upload();
-			$output = ['Files' => [], 'Error' => []];
-			$output['Files'] = $uploadModel->getFilesStatusBySourceId($source_id);
-			$output['Error'] = $uploadModel->getFileErrorsBySourceId($source_id);
-
-			return json_encode($output);
-		}
-    }
-
+	
 	public function getOntologyPrefixesAndRelationships()
 	{
 		$ontology_id = $this->request->getVar('ontology_id');
