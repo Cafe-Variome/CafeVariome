@@ -394,53 +394,6 @@ class AjaxApi extends Controller
 		}
     }
 
-	/**
-	 * @return false|string|void
-	 * @deprecated
-	 */
-    private function vcfBatch() {
-		if ($this->request->getMethod() == 'post') {
-			$basePath = FCPATH . UPLOAD;
-			$fileMan = new UploadFileMan($basePath);
-
-			$source_id = $this->request->getVar('source_id');
-			$uid = $this->request->getVar('uid');
-			$user_id = $this->request->getVar('user_id');
-			$pipeline_id = $this->request->getVar('pipeline_id');
-
-			if ($fileMan->Exists(UPLOAD_PAIRINGS . $uid . ".json")) {
-				$pairings = json_decode($fileMan->Read(UPLOAD_PAIRINGS . $uid . ".json"), true);
-				$source_path = UPLOAD_DATA . $source_id . DIRECTORY_SEPARATOR;
-
-				// Check the number of files we are uploading
-				$filesCount = $fileMan->countFiles();
-				$userFiles = $fileMan->getFiles();
-
-				for ($i = 0; $i < $filesCount; $i++) {
-					// Check the mime and extension for the file we are currently uploading
-					$fileName = $userFiles[$i]->getName();
-					$mime = $userFiles[$i]->getType();
-					$extension = $userFiles[$i]->getExtension();
-
-					if ($mime != "text/vcard" && $extension == "json") {
-						error_log("failure");
-					}
-
-					if ($fileMan->Save($userFiles[$i], $source_path)) {
-						// 13/08/2019 POTENTIAL BUG
-						// The value for patient must be specified as it is always set to 0 (false)
-						$this->uploadModel->createUpload($fileName, $source_id, $user_id, $pairings[$fileName][0], $pairings[$fileName][1], null, $pipeline_id);
-					} else {
-						// if it failed to upload report error
-						// TODO: Make it return failure and reflect in JS for this eventuality
-					}
-				}
-
-				return json_encode("Green");
-			}
-		}
-    }
-
     public function LookupDirectory()
 	{
 		if ($this->request->getMethod() == 'post')
