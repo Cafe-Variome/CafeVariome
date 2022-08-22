@@ -207,33 +207,6 @@ class AjaxApi extends Controller
 			PHPShellHelper::runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
 		}
 	}
-	
-    /**
-	 * @deprecated
-     * Json Start - At this point all files have been uploaded. Lock the source and begin
-     * Insert into MySQL
-     *
-     * @param string $_POST['source'] - The source we must upload into
-     * @return string Green for success
-     */
-    private function jsonStart() {
-		if ($this->request->getMethod() == 'post') {
-			// Assign posted source to easier variable
-			$source_id = $this->request->getVar('source_id');
-			$user_id = $this->request->getVar('user_id');
-			// Get ID for source and lock it so further updates and uploads cannot occur
-			// Until update is finished
-			$this->sourceModel->lockSource($source_id);
-			$uid = md5(uniqid(rand(), true));
-			$this->uploadModel->addUploadJobRecord($source_id, $uid, $user_id);
-
-			// Create thread to begin SQL insert in the background
-			PHPShellHelper::runAsync(getcwd() . "/index.php Task phenoPacketInsertBySourceId " . $source_id . " 00");
-
-			// Report to front end that the process has now begun
-			echo json_encode("Green");
-		}
-    }
 
 	/**
 	 * @return false|string|void
