@@ -255,56 +255,6 @@ class AjaxApi extends Controller
 
     /**
 	 * @deprecated
-     * Json Batch - At this point all checks have been performed. Upload the json files in
-     * Batches of 20 (as limited by php.ini)
-     *
-     * @param array $_FILES          - The list of files we must upload
-     * @param string $_POST['source'] - The source we must upload into
-     * @return N/A
-     */
-    private function jsonBatch() {
-		if ($this->request->getMethod() == 'post') {
-			$source_id = $this->request->getVar('source_id');
-			$user_id = $this->request->getVar('user_id');
-			$pipeline_id = $this->request->getVar('pipeline_id');
-
-			$basePath = FCPATH . UPLOAD . UPLOAD_DATA;
-			// Create the source upload directory if it doesnt exist
-			$source_path = $source_id;
-
-			$fileMan = new UploadFileMan($basePath);
-			if (!$fileMan->Exists($source_path)) {
-				$fileMan->CreateDirectory($source_path);
-			}
-
-			$source_path = $source_id . DIRECTORY_SEPARATOR;
-
-			if (!$fileMan->Exists($source_path)) {
-				$fileMan->CreateDirectory($source_path);
-			}
-
-			$files = $fileMan->getFiles();
-
-			foreach ($files as $file)
-			{
-				$error = '';
-				if (!$fileMan->isValid($file, $error)) {
-					return false;
-				}
-
-				if ($fileMan->Save($file, $source_path)) {
-					$this->uploadModel->createUpload($file->getName(), $source_id, $user_id, false, false, null, $pipeline_id);
-				} else {
-					return false;
-				}
-			}
-
-			return true;
-		}
-    }
-
-    /**
-	 * @deprecated
      * Json Start - At this point all files have been uploaded. Lock the source and begin
      * Insert into MySQL
      *
