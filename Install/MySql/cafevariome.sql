@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 17, 2022 at 12:38 PM
+-- Generation Time: Aug 22, 2022 at 11:14 AM
 -- Server version: 5.7.38-0ubuntu0.18.04.1
 -- PHP Version: 8.0.19
 
@@ -127,7 +127,7 @@ CREATE TABLE `data_files` (
 CREATE TABLE `eavs` (
   `id` int(15) NOT NULL,
   `source_id` int(11) NOT NULL,
-  `file_id` int(11) NOT NULL,
+  `data_file_id` int(11) NOT NULL,
   `subject_id` int(11) NOT NULL,
   `attribute_id` int(11) NOT NULL,
   `value_id` int(11) DEFAULT NULL,
@@ -281,18 +281,18 @@ INSERT INTO `ontology_relationships` (`id`, `name`, `ontology_id`) VALUES
 
 CREATE TABLE `pages` (
   `id` int(11) NOT NULL,
-  `Title` varchar(50) NOT NULL,
-  `Content` mediumtext NOT NULL,
-  `Author` int(11) UNSIGNED NOT NULL,
-  `Active` bit(1) NOT NULL,
-  `Removable` bit(1) NOT NULL
+  `title` varchar(256) NOT NULL,
+  `content` mediumtext NOT NULL,
+  `user_id` int(11) UNSIGNED NOT NULL,
+  `active` bit(1) NOT NULL,
+  `removable` bit(1) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
 -- Dumping data for table `pages`
 --
 
-INSERT INTO `pages` (`id`, `Title`, `Content`, `Author`, `Active`, `Removable`) VALUES
+INSERT INTO `pages` (`id`, `title`, `content`, `user_id`, `active`, `removable`) VALUES
 (1, 'Home', '<p><span style=\"font-size: 18pt;\">This is a Cafe Variome installation. Cafe Variome is a health data discovery platform. <br /></span></p>\r\n<p><span style=\"font-size: 18pt;\">To find out more about it, visit <a href=\"https://cafevariome.org\">https://cafevariome.org</a></span></p>\r\n<p>&nbsp;</p>\r\n<p><span style=\"font-size: 18pt;\">You can edit the content of this page through the admin dashboard.</span></p>', 1, b'1', b'0'),
 (2, 'Contact', '<p>...</p>', 1, b'1', b'0');
 
@@ -480,6 +480,7 @@ CREATE TABLE `tasks` (
   `error_code` tinyint(3) UNSIGNED NOT NULL,
   `error_message` varchar(4096) DEFAULT NULL,
   `pipeline_id` int(11) DEFAULT NULL,
+  `source_id` int(11) DEFAULT NULL,
   `user_id` int(11) NOT NULL,
   `status` tinyint(3) UNSIGNED NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -679,7 +680,7 @@ ALTER TABLE `ontology_relationships`
 --
 ALTER TABLE `pages`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `Author_FK` (`Author`);
+  ADD KEY `Author_FK` (`user_id`);
 
 --
 -- Indexes for table `pipelines`
@@ -868,7 +869,7 @@ ALTER TABLE `proxy_servers`
 -- AUTO_INCREMENT for table `servers`
 --
 ALTER TABLE `servers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `settings`
@@ -880,7 +881,7 @@ ALTER TABLE `settings`
 -- AUTO_INCREMENT for table `single_sign_on_providers`
 --
 ALTER TABLE `single_sign_on_providers`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `sources`
@@ -904,7 +905,7 @@ ALTER TABLE `tasks`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `users_groups_networks`
@@ -985,7 +986,7 @@ ALTER TABLE `ontology_relationships`
 -- Constraints for table `pages`
 --
 ALTER TABLE `pages`
-  ADD CONSTRAINT `Author_FK` FOREIGN KEY (`Author`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `Author_FK` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `proxy_servers`
