@@ -595,6 +595,7 @@ class AjaxApi extends Controller
     }
 
 	/**
+	 * @deprecated
 	 * @return false|string|void
 	 * @throws \Exception
 	 * @deprecated
