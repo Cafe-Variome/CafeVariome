@@ -207,52 +207,7 @@ class AjaxApi extends Controller
 			PHPShellHelper::runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
 		}
 	}
-
-    /**
-	 * @deprecated
-     * validateUpload - Ensure the source we are wanting to upload to is an actual source
-     * Users can change the parameter on url to what they wish
-     * Check if the source is locked by another update/upload operation
-     * Perform check that there is enough space on the webserver to upload given file/files
-     * Echo result to js front end to determine response to user
-     * @param string $source - The source name we will be uploading to and checking against
-     * @param int $size      - The size in bytes of file/files to be uploaded
-     * @return string Green(Success)|Yellow(Not enough space on server)|Red(Source is locked) Red(Source doesnt exist)
-    */
-
-    private function validateUpload() {
-
-		if ($this->request->getMethod() == 'post') {
-			// Source we are checking against
-			$source_id = $this->request->getVar('source_id');
-			$space_needed = $this->request->getVar('size');
-
-			// check if it exists
-			$sourceExists = $this->sourceModel->getSource($source_id);
-			if ($sourceExists) {
-				// Since it exists get its source id and then check if its locked
-				$isLocked = $this->sourceModel->isSourceLocked($source_id);
-				if (!$isLocked) {
-					// if its not locked check if we have enough space on the server
-					$free = diskfreespace(FCPATH);
-					if ($space_needed > $free) {
-						// There is not enough space on server
-						return json_encode("Yellow");
-					} else {
-						// All checks passed
-						return json_encode("Green");
-					}
-				} else {
-					// The source is locked
-					return json_encode("Locked");
-				}
-			} else {
-				// The source target doesnt exist
-				return json_encode("Red");
-			}
-		}
-    }
-
+	
     /**
 	 * @deprecated
      * Json Start - At this point all files have been uploaded. Lock the source and begin
