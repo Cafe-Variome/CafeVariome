@@ -99,7 +99,7 @@ abstract class DataInput extends DataPipeLine
 
 	protected function createEAV(int $group_id, int $file_id, int $subject_id, int $attribute_id, int $value_id)
 	{
-		$this->db->insert("INSERT IGNORE INTO eavs (group_id, source_id, file_id, subject_id, attribute_id, value_id) VALUES ('$group_id', '$this->sourceId', '$file_id', '$subject_id', '$attribute_id', '$value_id');");
+		$this->db->insert("INSERT IGNORE INTO eavs (group_id, source_id, data_file_id, subject_id, attribute_id, value_id) VALUES ('$group_id', '$this->sourceId', '$file_id', '$subject_id', '$attribute_id', '$value_id');");
 	}
 
 	protected function createSubject(string $name): int
