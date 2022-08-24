@@ -1,8 +1,7 @@
 <?php namespace App\Libraries\CafeVariome\Helpers\Core;
 
 use App\Libraries\CafeVariome\CafeVariome;
-use App\Models\Settings;
-use App\Models\Source;
+use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 
 /**
  * ElasticsearchHelper.php
