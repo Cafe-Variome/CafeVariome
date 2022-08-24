@@ -64,7 +64,8 @@ class Demon
 									'finished' => $incomingMessage->finished,
 									'status' => $incomingMessage->status,
 									'process_id' => $incomingMessage->process_id,
-									'data_file_id' => $task->data_file_id
+									'data_file_id' => $task->data_file_id,
+									'source_id' => $task->source_id
 								];
 							}
 
@@ -101,6 +102,7 @@ class Demon
 									$resp[$taskId]['finished'] = $taskInfo['finished'];
 									$resp[$taskId]['status'] = $taskInfo['status'];
 									$resp[$taskId]['data_file_id'] = $taskInfo['data_file_id'];
+									$resp[$taskId]['source_id'] = $taskInfo['source_id'];
 
 									if($taskInfo['finished'])
 									{
