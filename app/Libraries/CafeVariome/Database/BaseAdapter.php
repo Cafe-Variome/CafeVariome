@@ -179,18 +179,20 @@ abstract class BaseAdapter implements IAdapter
 
 		foreach ($properties as $property)
 		{
-			if (str_ends_with(strtolower($property), '_id'))
+			$reflectionProperty = new \ReflectionProperty($this->binding ?? $this->entity_class, $property);
+			$reflectionType = $reflectionProperty->getType();
+			if (str_ends_with(strtolower($property), '_id') || $reflectionType->getName() == 'array')
 			{
-				$reflectionProperty = new \ReflectionProperty($this->binding ?? $this->entity_class, $property);
-
 				$propertyName = str_replace('_id', '', $property);
 				$entityName = $this->GetEntityName($propertyName);
 				$adapterClass = CAFEVARIOME_NAMESPACE . '\\Database\\' . $entityName . 'Adapter';
+
 				$relatedEntities[$propertyName] = [
 					'entity' => $entityName,
 					'table' => $adapterClass::GetTable(),
 					'primary_key' => $adapterClass::GetKey(),
-					'nullable' => $reflectionProperty->getType()->allowsNull()
+					'type' => $reflectionType->getName(),
+					'nullable' => $reflectionType->allowsNull()
 				];
 			}
 		}
