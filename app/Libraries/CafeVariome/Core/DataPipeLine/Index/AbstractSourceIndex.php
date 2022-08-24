@@ -100,9 +100,25 @@ abstract class AbstractSourceIndex
 		$this->serviceInterface->RegisterProcess($source_id, 1, $this->jobName, $message);
 	}
 
-	protected function reportProgress(int $source_id, int $records_processed, int $total_records, string $status = "", bool $finished = false)
+	protected function ReportProgress(?int $progress = null, string $status = '', bool $finished = false)
 	{
-		$this->serviceInterface->ReportProgress($source_id, $records_processed, $total_records, $this->jobName, $status, $finished);
+		if (is_null($progress))
+		{
+			$progress = $this->CalculateProgressInPercent();
+		}
+		$response = $this->serviceInterface->ReportProgress($this->taskId, $progress, $status, $finished);
+
+		if ($response['response_received'])
+		{
+			$payload = $response['payload'];
+			if (is_array($payload) && count($payload) == 1)
+			{
+				foreach ($payload as $taskId => $value)
+				{
+					$this->continue = $value['continue'];
+				}
+			}
+		}
 	}
 
 }
