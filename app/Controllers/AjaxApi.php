@@ -405,12 +405,83 @@ class AjaxApi extends Controller
 				]);
 			}
 
-			return json_encode([
+	public function ShutdownService()
+	{
+		if ($this->request->getMethod() == 'post')
+		{
+			$serviceInterface = new ServiceInterface();
+
+			if(!$serviceInterface->ping())
+			{
+				// Service not running
+				return json_encode([
 				'status' => 1,
-				'message' => 'Unknown error occurred.'
+				'message' => 'Service is not running.'
 			]);
+
+			}
+
+			$serviceInterface->Shutdown();
+
+			sleep(5);
+
+			if(!$serviceInterface->ping())
+			{
+				// Shutdown was successful;
+				return json_encode([
+					'status' => 0,
+					'message' => 'Service shutdown was successful.'
+				]);
+			}
+			else
+			{
+				// Shutdown was not successful;
+				return json_encode([
+					'status' => 1,
+					'message' => 'Service shutdown was not successful.'
+				]);
+			}
 		}
-    }
+	}
+
+	public function StartService()
+	{
+		if ($this->request->getMethod() == 'post')
+		{
+			$serviceInterface = new ServiceInterface();
+
+			if($serviceInterface->ping())
+			{
+				// Service is running
+				return json_encode([
+					'status' => 1,
+					'message' => 'Service is already running.'
+				]);
+
+			}
+
+			$serviceInterface->Start();
+
+			sleep(5);
+
+			if($serviceInterface->ping())
+			{
+				// Shutdown was successful;
+				return json_encode([
+					'status' => 0,
+					'message' => 'Service has started.'
+				]);
+			}
+			else
+			{
+				// Shutdown was not successful;
+				return json_encode([
+					'status' => 1,
+					'message' => 'Service cannot be started.'
+				]);
+			}
+		}
+	}
 
     public function processFiles()
     {
