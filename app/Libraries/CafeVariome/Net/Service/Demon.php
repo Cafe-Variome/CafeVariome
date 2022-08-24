@@ -240,4 +240,10 @@ class Demon
 			}
 		}
 	}
+
+	public function Shutdown()
+	{
+		error_log('Shutting down daemon.');
+		exit();
+	}
 }
