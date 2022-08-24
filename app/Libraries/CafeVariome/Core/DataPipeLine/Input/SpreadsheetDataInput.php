@@ -393,52 +393,52 @@ class SpreadsheetDataInput extends DataInput
 
     protected function applyPipeline(int $pipeline_id)
     {
-        $pipeline = $this->pipelineModel->getPipeline($pipeline_id);
+        $pipeline = $this->piplineAdapter->Read($pipeline_id);
 
-        if ($pipeline != null)
+        if (!$pipeline->isNull())
 		{
-            $this->configuration['subject_id_location'] = $pipeline['subject_id_location'];
-            $this->configuration['grouping_policy'] = $pipeline['grouping'];
+            $this->configuration['subject_id_location'] = $pipeline->subject_id_location;
+            $this->configuration['grouping_policy'] = $pipeline->grouping;
 
             if (
-				$pipeline['subject_id_location'] == SUBJECT_ID_WITHIN_FILE &&
-				$pipeline['subject_id_attribute_name'] != null &&
-				$pipeline['subject_id_attribute_name'] != ''
+				$pipeline->subject_id_location == SUBJECT_ID_WITHIN_FILE &&
+				$pipeline->subject_id_attribute_name != null &&
+				$pipeline->subject_id_attribute_name != ''
 			)
 			{
-                $this->configuration['subject_id_attribute_name'] = $pipeline['subject_id_attribute_name'];
+                $this->configuration['subject_id_attribute_name'] = $pipeline->subject_id_attribute_name;
             }
-			else if($pipeline['subject_id_location'] == SUBJECT_ID_PER_BATCH_OF_RECORDS)
+			else if($pipeline->subject_id_location == SUBJECT_ID_PER_BATCH_OF_RECORDS)
 			{
-				$this->configuration['subject_id_assigment_batch_size'] = $pipeline['subject_id_assignment_batch_size'];
-				$this->configuration['subject_id_prefix'] = $pipeline['subject_id_prefix'];
+				$this->configuration['subject_id_assigment_batch_size'] = $pipeline->subject_id_assignment_batch_size;
+				$this->configuration['subject_id_prefix'] = $pipeline->subject_id_prefix;
 			}
-			else if($pipeline['subject_id_location'] == SUBJECT_ID_BY_EXPANSION_ON_COLUMNS)
+			else if($pipeline->subject_id_location == SUBJECT_ID_BY_EXPANSION_ON_COLUMNS)
 			{
-				$this->configuration['expansion_policy'] = $pipeline['expansion_policy'];
-				$this->configuration['expansion_columns'] = $pipeline['expansion_columns'];
-				$this->configuration['expansion_attribute_name'] = $pipeline['expansion_attribute_name'];
+				$this->configuration['expansion_policy'] = $pipeline->expansion_policy;
+				$this->configuration['expansion_columns'] = $pipeline->expansion_columns;
+				$this->configuration['expansion_attribute_name'] = $pipeline->expansion_attribute_name;
 			}
 
             if (
-				$pipeline['grouping'] == GROUPING_COLUMNS_CUSTOM &&
-				$pipeline['group_columns'] != null &&
-				$pipeline['group_columns'] != ''
+				$pipeline->grouping == GROUPING_COLUMNS_CUSTOM &&
+				$pipeline->group_columns != null &&
+				$pipeline->group_columns != ''
 			)
 			{
-                $this->configuration['grouping_policy'] = $pipeline['grouping'];
-                $this->configuration['group_end_positions'] = $pipeline['group_columns'];
+                $this->configuration['grouping_policy'] = $pipeline->grouping;
+                $this->configuration['group_end_positions'] = $pipeline->group_columns;
             }
 
             $valid_delimiters = [',', '/', ';', ':', '|', '*', '&', '%', '$', '!', '~', '#', '-', '_', '+', '=', '^'];
 
             if (
-				$pipeline['internal_delimiter'] != null &&
-				$pipeline['internal_delimiter'] != '' &&
-				in_array($pipeline['internal_delimiter'], $valid_delimiters)
+				$pipeline->internal_delimiter != null &&
+				$pipeline->internal_delimiter != '' &&
+				in_array($pipeline->internal_delimiter, $valid_delimiters)
 			)
 			{
-                $this->configuration['internal_delimiter'] = $pipeline['internal_delimiter'];
+                $this->configuration['internal_delimiter'] = $pipeline->internal_delimiter;
             }
         }
     }
