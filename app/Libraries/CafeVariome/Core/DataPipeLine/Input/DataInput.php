@@ -23,8 +23,6 @@ abstract class DataInput extends DataPipeLine
 {
 	protected $db;
     protected $fileMan;
-    protected $eavModel;
-    protected $pipelineModel;
     protected $pipeline_id;
     protected $fileName;
     protected $reader;
