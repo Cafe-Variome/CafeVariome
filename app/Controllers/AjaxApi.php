@@ -25,6 +25,7 @@ use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
 use App\Libraries\CafeVariome\Factory\TaskFactory;
+use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Controller;
 use Config\Database;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
