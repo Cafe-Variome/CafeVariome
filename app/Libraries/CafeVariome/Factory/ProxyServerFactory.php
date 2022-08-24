@@ -35,7 +35,7 @@ class ProxyServerFactory extends EntityFactory
 	 * @return ProxyServer
 	 * @throws \Exception
 	 */
-	public function getInstanceFromParameters(string $name, int $port, int $server_id, ?int $credential_id): ProxyServer
+	public function GetInstanceFromParameters(string $name, int $port, int $server_id, ?int $credential_id): ProxyServer
 	{
 		return new ProxyServer([
 			'name' => $name,

@@ -140,7 +140,7 @@ class ProxyServer extends CVUI_Controller
 
 			try
 			{
-				$this->dbAdapter->Create((new ProxyServerFactory())->getInstanceFromParameters($name, $port, $server_id, $credential_id));
+				$this->dbAdapter->Create((new ProxyServerFactory())->GetInstanceFromParameters($name, $port, $server_id, $credential_id));
 				$this->setStatusMessage("Proxy server '$name' was created.", STATUS_SUCCESS);
 			}
 			catch (\Exception $ex)
@@ -278,7 +278,7 @@ class ProxyServer extends CVUI_Controller
 
 			try
 			{
-				$this->dbAdapter->Update($id, (new ProxyServerFactory())->getInstanceFromParameters($name, $port, $server_id, $credential_id));
+				$this->dbAdapter->Update($id, (new ProxyServerFactory())->GetInstanceFromParameters($name, $port, $server_id, $credential_id));
 				$this->setStatusMessage("Proxy server '' was updated.", STATUS_SUCCESS);
 			}
 			catch (\Exception $ex)
