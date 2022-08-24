@@ -44,7 +44,7 @@ class ElasticsearchHelper
 		return strtolower($prefix);
 	}
 
-	public static function getSourceIndexName(int $source_id): string
+	public static function GetSourceIndexName(int $source_id): ?string
 	{
 		$sourceModel = new Source();
 		$uid = $sourceModel->getSourceUID($source_id);
