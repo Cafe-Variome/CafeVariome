@@ -191,15 +191,26 @@
 									</span>
 								<?php endif ?>
 							</div>
-							<div class="col-4">Service</div>
+							<div class="col-4">
+								Service
+								(
+								<span id="spinner" class="spinner-border spinner-border-sm text-warning" role="status" aria-hidden="true" style="display:none"></span>
+								<span id="shutdownService" class="icon text-50" data-toggle="tooltip" data-placement="top" title="Shutdown" onclick="shutdownService();" style="<?= $serviceStatus ? '' : 'display:none' ?>">
+									<i class="fa fa-stop text-danger"></i>
+								</span>
+								<span id="startService"class="icon text-50" data-toggle="tooltip" data-placement="top" title="Start" onclick="startService();" style="<?= $serviceStatus ? 'display:none' : '' ?>">
+									<i class="fa fa-play text-primary"></i>
+								</span>
+								)
+							</div>
 							<div class="col-2">
 							<?php if($serviceStatus): ?>
-									<span class="icon text-50">
-									<i class="fas fa-check text-success"></i>
+									<span id="serviceStatus" class="icon text-50">
+										<i class="fas fa-check text-success"></i>
 									</span>
 								<?php else: ?>
-									<span class="icon text-50">
-									<i class="fas fa-cross text-secondary"></i>
+									<span id="serviceStatus" class="icon text-50">
+										<i class="fas fa-cross text-secondary"></i>
 									</span>
 								<?php endif ?>
 							</div>
@@ -209,11 +220,11 @@
 							<div class="col-2">
 							<?php if($neo4jStatus): ?>
 									<span class="icon text-50">
-									<i class="fas fa-check text-success"></i>
+										<i class="fas fa-check text-success"></i>
 									</span>
 								<?php else: ?>
 									<span class="icon text-50">
-									<i class="fas fa-cross text-secondary"></i>
+										<i class="fas fa-cross text-secondary"></i>
 									</span>
 								<?php endif ?>
 							</div>
@@ -221,11 +232,11 @@
 							<div class="col-2">
 								<?php if($openIDStatus): ?>
 									<span class="icon text-50">
-									<i class="fas fa-check text-success"></i>
+										<i class="fas fa-check text-success"></i>
 									</span>
 								<?php else: ?>
 									<span class="icon text-white-50">
-									<i class="fas fa-cross text-secondary"></i>
+										<i class="fas fa-cross text-secondary"></i>
 									</span>
 								<?php endif ?>
 							</div>
