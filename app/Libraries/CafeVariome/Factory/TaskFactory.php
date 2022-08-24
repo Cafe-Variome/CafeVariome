@@ -60,6 +60,7 @@ class TaskFactory extends EntityFactory
 		?int $ended,
 		?int $data_file_id,
 		?int $pipeline_id,
+		?int $source_id,
 		int $overwrite = UPLOADER_DELETE_FILE
 	): Task
 	{
@@ -74,6 +75,7 @@ class TaskFactory extends EntityFactory
 			'ended' => $ended,
 			'data_file_id' => $data_file_id,
 			'pipeline_id' => $pipeline_id,
+			'source_id' => $source_id,
 			'overwrite' => $overwrite
 		]);
 	}
