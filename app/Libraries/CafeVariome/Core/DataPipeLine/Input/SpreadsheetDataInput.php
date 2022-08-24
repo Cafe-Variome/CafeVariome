@@ -43,7 +43,7 @@ class SpreadsheetDataInput extends DataInput
 
 				if ($this->overwrite == UPLOADER_DELETE_FILE)
 				{
-					$this->ReportProgress(0, false, 'Deleting existing data for the file');
+					$this->ReportProgress(0, 'Deleting existing data for the file');
 					$this->DeleteExistingRecords($file_id);
 				}
 
