@@ -85,12 +85,6 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 						 $task->status = TASK_STATUS_FAILED;
 					 }
 
-//					 if ($dataFile->status == DATA_FILE_STATUS_PROCESSING)
-//					 {
-//						 $task->SetError(TASK_ERROR_DUPLICATE);
-//						 $task->status = TASK_STATUS_CENCELLED;
-//					 }
-
 					 $extension = $dataFileAdapter->ReadExtensionById($task->data_file_id);
 					 $pipeline = $pipelineAdapter->Read($task->pipeline_id);
 
