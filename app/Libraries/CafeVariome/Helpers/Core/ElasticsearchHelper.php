@@ -23,7 +23,7 @@ class ElasticsearchHelper
 	 * @param void
 	 * @return string
 	 */
-	public static function getIndexPrefix(): string
+	public static function GetIndexPrefix(): string
 	{
 		$setting = CafeVariome::Settings();
 
