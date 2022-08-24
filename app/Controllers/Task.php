@@ -18,6 +18,7 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4JSourceIndex;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceSourceIndex;
 use App\Libraries\CafeVariome\Factory\DataFileAdapterFactory;
 use App\Libraries\CafeVariome\Factory\PipelineAdapterFactory;
+use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
 use App\Libraries\CafeVariome\Net\Service\Demon;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
@@ -34,7 +35,6 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
  class Task extends Controller
  {
 	 protected $dbAdapter;
-
 
 	 /**
 	  * Constructor
@@ -149,10 +149,80 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 					 }
 
 					 $this->dbAdapter->Update($task_id, $task);
+					 break;
+				 case TASK_TYPE_SOURCE_INDEX_ELASTICSEARCH:
+				 case TASK_TYPE_SOURCE_INDEX_NEO4J:
+				 case TASK_TYPE_SOURCE_INDEX_USER_INTERFACE:
 
-					 break;
-				 case TASK_TYPE_SOURCE_INDEX:
-					 break;
+					 if (is_null($task->source_id))
+					 {
+						 $task->SetError(TASK_ERROR_SOURCE_ID_NULL);
+						 $task->status = TASK_STATUS_FAILED;
+					 }
+					 else
+					 {
+						 $sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+
+						 $source = $sourceAdapter->Read($task->source_id);
+
+						 if ($source->isNull())
+						 {
+
+						 }
+
+						 $this->dbAdapter->Update($task_id, $task);
+
+						 if ($task->error_code == TASK_ERROR_NO_ERROR)
+						 {
+							 // Mark task as started
+							 $task->status = TASK_STATUS_STARTED;
+							 $this->dbAdapter->Update($task_id, $task);
+
+
+							 $serviceInterface = new ServiceInterface();
+							 $serviceInterface->RegisterTask($task_id); // Register task in Demon
+							 try
+							 {
+								 $indexPipeline = null;
+								 switch($task->type)
+								 {
+									 case TASK_TYPE_SOURCE_INDEX_ELASTICSEARCH:
+										 $indexPipeline = new ElasticsearchSourceIndex($task);
+										 break;
+									 case TASK_TYPE_SOURCE_INDEX_NEO4J:
+										 $indexPipeline = new Neo4JSourceIndex($task);
+										 break;
+
+									 case TASK_TYPE_SOURCE_INDEX_USER_INTERFACE:
+										 $indexPipeline = new UserInterfaceSourceIndex($task);
+										 break;
+								 }
+
+								 if (!is_null($indexPipeline))
+								 {
+										 // Mark task as processing
+										 $task->status = TASK_STATUS_PROCESSING;
+										 $this->dbAdapter->Update($task_id, $task);
+
+										 $indexPipeline->IndexSource();
+
+										 // Mark task as finished
+										 $task->status = TASK_STATUS_FINISHED;
+										 $task->ended = time();
+								 }
+							 }
+							 catch(\Exception $ex)
+							 {
+								 $exceptionMessage = $ex->getMessage();
+								 $task->SetError(TASK_ERROR_RUNTIME_ERROR, $exceptionMessage);
+							 }
+
+						 }
+					 }
+
+					 $this->dbAdapter->Update($task_id, $task);
+
+				 break;
 			 }
 		 }
 	 }
