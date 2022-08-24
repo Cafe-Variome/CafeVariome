@@ -38,7 +38,12 @@ class Task extends Entity
 	/**
 	 * @var int|null id of the pipeline used to process the job
 	 */
-	public int $pipeline_id;
+	public ?int $pipeline_id;
+
+	/**
+	 * @var int|null id of the source the task is associated with
+	 */
+	public ?int $source_id;
 
 	/**
 	 * @var int progress in percentage
