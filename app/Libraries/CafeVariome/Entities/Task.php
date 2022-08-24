@@ -36,7 +36,7 @@ class Task extends Entity
 	public int $user_id;
 
 	/**
-	 * @var int id of the pipeline used to process the job
+	 * @var int|null id of the pipeline used to process the job
 	 */
 	public int $pipeline_id;
 
