@@ -101,6 +101,8 @@ class Task extends Entity
 				return 'Data File Id is null.';
 			case TASK_ERROR_PIPELINE_ID_NULL:
 				return 'Pipeline Id is null.';
+			case TASK_ERROR_SOURCE_ID_NULL:
+				return 'Source Id is null.';
 			case TASK_ERROR_DATA_FILE_NULL:
 				return 'Data File record does not exist.';
 			case TASK_ERROR_PIPELINE_NULL:
