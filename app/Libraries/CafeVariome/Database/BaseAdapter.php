@@ -1,8 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Database;
 
-use App\Libraries\CafeVariome\Entities\IEntity;
-use \Config\Database;
-
 /**
  * BaseAdapter.php
  * Created 22/04/2022
@@ -11,6 +8,9 @@ use \Config\Database;
  * @author Mehdi Mehtarizadeh
  *
  */
+
+use App\Libraries\CafeVariome\Entities\IEntity;
+use \Config\Database;
 
 abstract class BaseAdapter implements IAdapter
 {
