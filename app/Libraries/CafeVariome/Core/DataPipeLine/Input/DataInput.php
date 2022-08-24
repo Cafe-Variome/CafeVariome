@@ -21,6 +21,7 @@ use App\Models\OntologyPrefix;
 
 abstract class DataInput extends DataPipeLine
 {
+	protected bool $continue;
 	protected $db;
     protected $fileMan;
     protected $pipeline_id;
