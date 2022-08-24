@@ -45,9 +45,13 @@ class ElasticsearchHelper
 
 	public static function GetSourceIndexName(int $source_id): ?string
 	{
-		$sourceModel = new Source();
-		$uid = $sourceModel->getSourceUID($source_id);
-		$prefix = ElasticsearchHelper::getIndexPrefix();
+		$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+		$uid = $sourceAdapter->ReadUID($source_id);
+		if (is_null($uid))
+		{
+			return null;
+		}
+		$prefix = self::GetIndexPrefix();
 		return $prefix . '_' . $source_id . '_' . $uid;
 	}
 
