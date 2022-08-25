@@ -96,12 +96,12 @@ class NetworkGroup extends CVUI_Controller{
         $this->validation->setRules([
             'group_name' => [
                 'label'  => 'Group name',
-                'rules'  => 'required|alpha_dash|unique_network_group_name_check['. $this->request->getVar('network') . ']',
+                'rules'  => 'required|alpha_numeric_space|unique_network_group_name_check['. $this->request->getVar('network') . ']',
                 'errors' => [
                     'required' => '{field} is required.',
                     'unique_network_group_name_check' => '{field} already exists.',
-                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
-                ]
+					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
+				]
             ],
             'desc' => [
                 'label'  => 'Description',
@@ -109,20 +109,22 @@ class NetworkGroup extends CVUI_Controller{
                 'errors' => [
                     'required' => '{field} is required.',
                     'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
-                ]
+					// @TODO custom role to allow commas
+				]
             ],
-            'network' => [
+            'network_key' => [
 				'label'  => 'Network',
-				'rules' => 'alpha_numeric_punct',
+				'rules' => 'reqired|int',
                 'errors' => [
-                    'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.'
-                ]
+					'required' => '{field} is required.',
+					'integer' => 'The only valid input for {field} is integers.'
+				]
             ],
             'group_type' => [
 				'label' => 'Group Type',
-				'rules' => 'alpha_numeric_punct',
+				'rules' => 'alpha_dash',
                 'errors' => [
-                    'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.'
+                    'alpha_dash' => 'The only valid characters for {field} are alphanumeric characters, dashes, and underscores.'
                 ]
             ]
         ]
@@ -148,7 +150,7 @@ class NetworkGroup extends CVUI_Controller{
 
 		}
 		else {
-			$response = $networkInterface->GetNetworksByInstallationKey($this->setting->settingData['installation_key']);
+			$response = $networkInterface->GetNetworksByInstallationKey($this->setting->GetInstallationKey());
 			$networks = [];
 			if ($response->status) {
 				$networks = $response->data;
@@ -214,7 +216,7 @@ class NetworkGroup extends CVUI_Controller{
                 'rules' => 'required|alpha_numeric',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'alpha_numeric' => 'The only valid characters in the {field} are alphanumeric.'                   
+                    'alpha_numeric' => 'The only valid characters in the {field} are alphanumeric.'
                 ]
             ]
         ]

@@ -86,6 +86,7 @@ class OntologyPrefix extends CVUI_Controller
 					'max_length' => 'Maximum length is 50 characters.'
 				]
 			]
+			//@TODO add check for ontology ID to make sure it's an integer!
 		]);
 
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
@@ -148,6 +149,7 @@ class OntologyPrefix extends CVUI_Controller
 					'max_length' => 'Maximum length is 50 characters.'
 				]
 			]
+			//@TODO add check for ontology ID to make sure it's an integer AND REQUIRED!
 		]);
 
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {

@@ -89,6 +89,7 @@ class Credential extends CVUI_Controller
 				'label'  => 'Password',
 				'rules'  => 'permit_empty|alpha_numeric_punct|max_length[128]',
 				'errors' => [
+					//@ HOW TO ACCEPT SAFE PASSWORDS THAT HAVE ROGUE CHARACTERS like 123%$£<up
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.',
 					'max_length' => 'Maximum length is 128 characters.'
 				]

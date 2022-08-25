@@ -63,7 +63,7 @@ class User extends CVUI_Controller
                 'errors' => [
                     'required' => '{field} is required.',
                     'is_unique' => '{field} already exists.',
-                    'valid_email' => 'Please check the Email field. It does not appear to be valid.'
+                    'valid_email' => 'Please check the {field}. It does not appear to be a valid email.'
                 ]
             ],
             'first_name' => [
@@ -71,7 +71,7 @@ class User extends CVUI_Controller
                     'rules'  => 'required|alpha_space',
                     'errors' => [
                         'required' => '{field} is required.',
-						'alpha_space' => 'The only valid characters in the {field} are alphabets or space characters.'
+						'alpha_space' => 'The only valid input for the {field} are alphabetical characters and spaces.'
                     ]
             ],
             'last_name' => [
@@ -79,7 +79,7 @@ class User extends CVUI_Controller
                 'rules'  => 'required|alpha_space',
                 'errors' => [
                     'required' => '{field} is required.',
-					'alpha_space' => 'The only valid characters in the {field} are alphabets or space characters.'
+					'alpha_space' => 'The only valid input for the {field} are alphabetical characters and spaces.'
                 ]
             ],
             'company' => [
@@ -87,7 +87,7 @@ class User extends CVUI_Controller
                 'rules'  => 'required|alpha_numeric_space',
                 'errors' => [
                     'required' => '{field} is required.',
-					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
+					'alpha_numeric_space' => 'The only valid characters for the {field} are alphanumeric characters or spaces.'
                 ]
             ]
         ]
@@ -232,19 +232,19 @@ class User extends CVUI_Controller
 
 		$this->validation->setRules([
 			'first_name' => [
-					'label'  => 'First Name',
-					'rules'  => 'required|alpha_space',
-					'errors' => [
-						'required' => '{field} is required.',
-						'alpha_space' => 'The only valid characters in the {field} are alphabets or space characters.'
-					]
+				'label'  => 'First Name',
+				'rules'  => 'required|alpha_space',
+				'errors' => [
+					'required' => '{field} is required.',
+					'alpha_space' => 'The only valid input for the {field} are alphabetical characters and spaces.'
+				]
 			],
 			'last_name' => [
 				'label'  => 'Last Name',
 				'rules'  => 'required|alpha_space',
 				'errors' => [
 					'required' => '{field} is required.',
-					'alpha_space' => 'The only valid characters in the {field} are alphabets or space characters.'
+					'alpha_space' => 'The only valid input for the {field} are alphabetical characters and spaces.'
 				]
 			],
 			'company' => [
@@ -252,7 +252,7 @@ class User extends CVUI_Controller
 				'rules'  => 'required|alpha_numeric_space',
 				'errors' => [
 					'required' => '{field} is required.',
-					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
+					'alpha_numeric_space' => 'The only valid characters for the {field} are alphanumeric characters or spaces.'
 				]
 			]
 		]

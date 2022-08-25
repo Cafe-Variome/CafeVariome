@@ -95,11 +95,11 @@ class Network extends CVUI_Controller{
         $this->validation->setRules([
             'name' => [
                 'label'  => 'Network Name',
-                'rules'  => 'required|alpha_dash|is_unique[networks.network_name]',
+                'rules'  => 'required|alpha_numeric_space|is_unique[networks.network_name]',
                 'errors' => [
                     'required' => '{field} is required.',
                     'uniquename_check' => '{field} already exists.',
-                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters or spaces.'
                 ]
             ]
         ]
@@ -336,6 +336,8 @@ class Network extends CVUI_Controller{
         $uidata->data['title'] = "Join Network";
         // Validate form input
         $this->validation->setRules([
+			//@TODO to add a check for network key to make sure it is an integer and is required!
+			//@TODO add a validator for free text (like description) and use it for justification.
             'justification' => [
                 'label'  => 'Justification',
                 'rules'  => 'required|alpha_dash',

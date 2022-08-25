@@ -310,13 +310,14 @@ class ValidationHelper
 
 	public function valid_username_chars(string $str, & $err): bool
 	{
+		//@TODO add underscores and dashes as allowed input.
 		$err = null;
 		$regexp = "/^[a-zA-Z0-9-@.]+$/";
 
                 if (preg_match($regexp, $str))
 				{
                     return true;
-                } 
+                }
 				else {
 
 					$err = "The only valid characters for usernames are alphanumerics, . or @ .";
