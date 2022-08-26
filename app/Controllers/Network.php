@@ -90,6 +90,7 @@ class Network extends CVUI_Controller{
         $uidata = new UIData();
         $networkGroupModel = new NetworkGroup($this->db);
         $uidata->data['title'] = "Create Network";
+        $networkInterface = new NetworkInterface();
 
         // Validate form input
         $this->validation->setRules([
@@ -126,7 +127,7 @@ class Network extends CVUI_Controller{
                 $network_key = $response->data->network_key;
 
                 //Add Installation to Network
-                $addInstallationResponse = $networkInterface->AddInstallationToNetwork(['installation_key' => $this->setting->settingData['installation_key'], 'network_key' => $network_key]);
+                $addInstallationResponse = $networkInterface->AddInstallationToNetwork(['installation_key' => $this->setting->GetInstallationKey(), 'network_key' => $network_key]);
 
                 //create local replication of network
 
