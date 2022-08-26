@@ -328,7 +328,7 @@ class ValidationHelper
 	public function text_validator(string $str, & $err): bool
 	{
 		$err = null;
-		$regexp = "/^[a-zA-Z0-9-@.-_,%~$*+=|:&£ ]+$/";
+		$regexp = "/^[a-zA-Z0-9-@.-_,%~$*+=|:&£ ?!]+$/";
 
                 if (preg_match($regexp, $str))
 				{

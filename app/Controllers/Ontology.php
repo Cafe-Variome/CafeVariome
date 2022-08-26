@@ -59,10 +59,8 @@ class Ontology extends CVUI_Controller
 			],
 			'desc' => [
 				'label'  => 'Description',
-				'rules'  => 'alpha_numeric_space|max_length[65535]',
+				'rules'  => 'text_validator|max_length[65535]',
 				'errors' => [
-					'alpha_numeric_space' => 'The only valid characters for {field} are alphabetical characters, numbers, and spaces.',
-					// @TODO custom role to allow commas
 					'max_length' => 'Maximum length for {field} is 65,535 characters.'
 				]
 			],
@@ -220,10 +218,8 @@ class Ontology extends CVUI_Controller
 			],
 			'desc' => [
 				'label'  => 'Description',
-				'rules'  => 'alpha_numeric_punct|max_length[65535]',
+				'rules'  => 'text_validator|max_length[65535]',
 				'errors' => [
-					'alpha_numeric_punct' => 'The only valid characters in the {field} are alphanumeric or space characters.',
-					// @TODO custom role to allow commas
 					'max_length' => 'Maximum length for {field} is 65,535 characters.'
 				]
 			],

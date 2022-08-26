@@ -105,16 +105,15 @@ class NetworkGroup extends CVUI_Controller{
             ],
             'desc' => [
                 'label'  => 'Description',
-                'rules' => 'required|alpha_numeric_space',
+                'rules' => 'required|text_validator|max_length[65535]',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
-					// @TODO custom role to allow commas
+                    'max_length' => 'Maximum length for {field} is 65,535 characters.'
 				]
             ],
             'network_key' => [
 				'label'  => 'Network',
-				'rules' => 'reqired|int',
+				'rules' => 'reqired|integer',
                 'errors' => [
 					'required' => '{field} is required.',
 					'integer' => 'The only valid input for {field} is integers.'

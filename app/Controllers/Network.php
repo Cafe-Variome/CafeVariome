@@ -336,13 +336,12 @@ class Network extends CVUI_Controller{
         $uidata->data['title'] = "Join Network";
         // Validate form input
         $this->validation->setRules([
-			//@TODO to add a check for network key to make sure it is an integer and is required!
-			//@TODO add a validator for free text (like description) and use it for justification.
             'justification' => [
                 'label'  => 'Justification',
-                'rules'  => 'required|text_validator',
+                'rules'  => 'required|text_validator|max_length[65535]',
                 'errors' => [
-                    'required' => '{field} is required.'
+                    'required' => '{field} is required.',
+                    'max_length' => 'Maximum length for {field} is 65,535 characters.'
                 ]
             ],
             'networks' => [
