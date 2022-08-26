@@ -87,8 +87,14 @@ class OntologyRelationship extends CVUI_Controller
 					'unique_ontology_relationship' => '{field} already exists.',
 					'max_length' => 'Maximum length is 100 characters.'
 				]
+			],
+			'ontology_id' => [
+				'label'  => 'ontology_id',
+				'rules'  => 'integer',
+				'errors' => [
+					'integer' => 'The only valid input for {field} is integers.'
+				]
 			]
-			//@TODO add check for ontology ID to make sure it's an integer!
 		]);
 
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
@@ -150,8 +156,14 @@ class OntologyRelationship extends CVUI_Controller
 					'unique_ontology_relationship' => '{field} already exists.',
 					'max_length' => 'Maximum length is 100 characters.'
 				]
+			],
+			'relationship_id' => [
+				'label'  => 'relationship_id',
+				'rules'  => 'integer',
+				'errors' => [
+					'integer' => 'The only valid input for {field} is integers.'
+				]
 			]
-			//@TODO add check for ontology ID to make sure it's an integer!
 		]);
 
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {

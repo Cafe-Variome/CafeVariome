@@ -85,8 +85,14 @@ class OntologyPrefix extends CVUI_Controller
 					'unique_ontology_prefix' => '{field} already exists.',
 					'max_length' => 'Maximum length is 50 characters.'
 				]
+			],
+			'ontology_id' => [
+				'label'  => 'ontology_id',
+				'rules'  => 'integer',
+				'errors' => [
+					'integer' => 'The only valid input for {field} is integers.'
+				]
 			]
-			//@TODO add check for ontology ID to make sure it's an integer!
 		]);
 
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
@@ -148,8 +154,14 @@ class OntologyPrefix extends CVUI_Controller
 					'unique_ontology_prefix' => '{field} already exists.',
 					'max_length' => 'Maximum length is 50 characters.'
 				]
+			],
+			'ontology_id' => [
+				'label'  => 'ontology_id',
+				'rules'  => 'integer',
+				'errors' => [
+					'integer' => 'The only valid input for {field} is integers.'
+				]
 			]
-			//@TODO add check for ontology ID to make sure it's an integer AND REQUIRED!
 		]);
 
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
