@@ -340,10 +340,17 @@ class Network extends CVUI_Controller{
 			//@TODO add a validator for free text (like description) and use it for justification.
             'justification' => [
                 'label'  => 'Justification',
-                'rules'  => 'required|alpha_dash',
+                'rules'  => 'required|text_validator',
+                'errors' => [
+                    'required' => '{field} is required.'
+                ]
+            ],
+            'networks' => [
+                'label'  => 'networks',
+                'rules'  => 'required|integer',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
+                    'integer' => 'The only valid input for {field} is integers.'
                 ]
             ]
         ]
