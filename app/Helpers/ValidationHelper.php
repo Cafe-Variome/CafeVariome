@@ -255,29 +255,37 @@ class ValidationHelper
 
 	public function unique_ontology_prefix(string $str, string $fields, array $data, & $err): bool
 	{
-		$prefixModel = new \App\Models\OntologyPrefix();
-		if (strpos($fields, ',') !== false){
+		$ontologyPrefixAdapter = (new OntologyPrefixAdapterFactory())->GetInstance();
+		if (strpos($fields, ',') !== false)
+		{
 			$ontology_id = $data['ontology_id'];
-			$relationship_id = $data['prefix_id'];
-			return !$prefixModel->ontologyPrefixExists($str, $ontology_id, $relationship_id);
+			$ontology_prefix_id = $data['ontology_prefix_id'];
+			$ontologyPrefix = $ontologyPrefixAdapter->ReadByNameAndOntologyId($str, $ontology_id);
+
+			return $ontologyPrefix->isNull() ||  $ontology_prefix_id == $ontologyPrefix->getID();
 		}
-		else{
+		else
+		{
 			$ontology_id = $data[$fields];
-			return !$prefixModel->ontologyPrefixExists($str, $ontology_id);
+			return $ontologyPrefixAdapter->ReadByNameAndOntologyId($str, $ontology_id)->isNull();
 		}
 	}
 
 	public function unique_ontology_relationship(string $str, string $fields, array $data, & $err): bool
 	{
-		$relationshipModel = new \App\Models\OntologyRelationship();
-		if (strpos($fields, ',') !== false){
+		$ontologyRelationshipAdapter = (new OntologyRelationshipAdapterFactory())->GetInstance();
+		if (strpos($fields, ',') !== false)
+		{
 			$ontology_id = $data['ontology_id'];
-			$relationship_id = $data['relationship_id'];
-			return !$relationshipModel->ontologyRelationshipExists($str, $ontology_id, $relationship_id);
+			$ontology_relationship_id = $data['ontology_relationship_id'];
+			$ontology_relationship = $ontologyRelationshipAdapter->ReadByNameAndOntologyId($str, $ontology_id);
+
+			return $ontology_relationship->isNull() || $ontology_relationship_id == $ontology_relationship->getID();
 		}
-		else{
+		else
+		{
 			$ontology_id = $data[$fields];
-			return !$relationshipModel->ontologyRelationshipExists($str, $ontology_id);
+			return $ontologyRelationshipAdapter->ReadByNameAndOntologyId($str, $ontology_id);
 		}
 	}
 
