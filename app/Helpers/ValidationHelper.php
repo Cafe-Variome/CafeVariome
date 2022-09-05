@@ -1,10 +1,5 @@
 <?php namespace App\Helpers;
 
-use App\Models\Attribute;
-use App\Models\AttributeMapping;
-use App\Models\Value;
-use App\Models\ValueMapping;
-
 /**
  * ValidationHelper.php
  *
@@ -14,6 +9,14 @@ use App\Models\ValueMapping;
  *
  * This class contains helper functions for form validation.
  */
+
+
+use App\Libraries\CafeVariome\Factory\OntologyPrefixAdapterFactory;
+use App\Libraries\CafeVariome\Factory\OntologyRelationshipAdapterFactory;
+use App\Models\Attribute;
+use App\Models\AttributeMapping;
+use App\Models\Value;
+use App\Models\ValueMapping;
 
 class ValidationHelper
 {
