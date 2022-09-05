@@ -19,7 +19,7 @@ abstract class AbstractResult
 
 	protected function getESIndexName(int $source_id): string
 	{
-		return ElasticsearchHelper::getSourceIndexName($source_id);
+		return ElasticsearchHelper::GetSourceIndexName($source_id);
 	}
 
 	protected function getNeo4JInstance(): Neo4J
