@@ -118,6 +118,22 @@ class AttributeAdapter extends BaseAdapter
 		return count($result) == 1;
 	}
 	
+	public function CreateOntologyAssociation(int $attribute_id, int $prefix_id, int $relationship_id, int $ontology_id): int
+	{
+		$this->changeTable('attributes_ontology_prefixes_relationships');
+
+		$association_id = $this->builder->insert([
+			'attribute_id' => $attribute_id,
+			'prefix_id' => $prefix_id,
+			'relationship_id' => $relationship_id,
+			'ontology_id' => $ontology_id
+		]);
+
+		$this->resetTable();
+
+		return $association_id;
+	}
+
 	public function UpdateType(int $id, int $type): bool
 	{
 		$this->builder->where(static::$key, $id);
