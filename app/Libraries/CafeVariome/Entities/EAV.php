@@ -18,7 +18,7 @@ class EAV extends Entity
 
 	public int $group_id;
 
-	public int $file_id;
+	public int $data_file_id;
 
 	public bool $indexed;
 
