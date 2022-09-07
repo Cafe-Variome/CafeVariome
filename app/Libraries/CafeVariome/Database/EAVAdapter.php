@@ -94,6 +94,22 @@ class EAVAdapter extends BaseAdapter
 		return null;
 	}
 
+	public function ReadLastIdBySubjectId(int $subject_id): ?int
+	{
+		$this->builder->select('id');
+		$this->builder->where('subject_id', $subject_id);
+		$this->builder->orderBy('id', 'DESC');
+		$this->builder->limit(1);
+
+		$query = $this->builder->get()->getResult();
+		if (count($query) == 1)
+		{
+			return $query[0]->id;
+		}
+
+		return -1;
+	}
+
 	public function ReadBySourceIdAndAttributeIds(int $source_id, array $attribute_ids, int $limit, int $offset, bool $unindexedOnly = true)
 	{
 		$this->builder->select('id, subject_id, group_id, data_file_id, attribute_id, value_id');
