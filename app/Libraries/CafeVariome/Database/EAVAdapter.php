@@ -125,6 +125,16 @@ class EAVAdapter extends BaseAdapter
 		return $this->builder->get()->getResult();
 	}
 
+	public function ReadValueFrequenciesBySourceIdAndFileId(int $source_id, int $file_id)
+	{
+		$this->builder->select('value_id, count(value_id) as frequency');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->where('data_file_id', $file_id);
+		$this->builder->groupBy('value_id');
+
+		return $this->builder->get()->getResult();
+	}
+
 	public function UpdateIndexedBySourceIdAndAttributeIds(int $source_id, array $attribute_ids): bool
 	{
 		$data = ['indexed' => 1];
