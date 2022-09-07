@@ -25,7 +25,7 @@ class UserAdapter extends BaseAdapter
 
 	public function ReadIdByEmail(string $email): ?int
 	{
-		$this->builder->select('id');
+		$this->builder->select(static::$key);
 		$this->builder->where('email', $email);
 		$results = $this->builder->get()->getResult();
 
