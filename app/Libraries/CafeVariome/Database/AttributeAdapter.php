@@ -85,6 +85,23 @@ class AttributeAdapter extends BaseAdapter
 		return $ids;
 	}
 
+	public function ReadBySourceId(int $source_id)
+	{
+		$this->CompileSelect();
+		$this->CompileJoin();
+		$this->builder->where(static::$table . '.source_id', $source_id);
+
+		$results = $this->builder->get()->getResult();
+
+		$entities = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			$entities[$results[$c]->{static::$key}] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
+		}
+
+		return $entities;
+	}
+
 	public function UpdateType(int $id, int $type): bool
 	{
 		$this->builder->where(static::$key, $id);
