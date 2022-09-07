@@ -69,6 +69,22 @@ class AttributeAdapter extends BaseAdapter
 		return [];
 	}
 
+	public function ReadIdsBySourceIdAndStorageLocation(int $source_id, int $storage_location): array
+	{
+		$this->builder->select('id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->where('storage_location', $storage_location);
+		$result = $this->builder->get()->getResult();
+
+		$ids = [];
+		foreach ($result as $id)
+		{
+			array_push($ids, $id->id);
+		}
+
+		return $ids;
+	}
+
 	public function UpdateType(int $id, int $type): bool
 	{
 		$this->builder->where(static::$key, $id);
