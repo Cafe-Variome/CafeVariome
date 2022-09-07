@@ -21,11 +21,11 @@ class EAVAdapter extends BaseAdapter
 	{
 		$this->builder->select('id');
 		$this->builder->where('source_id', $source_id);
-		$this->builder->whereIn('attribute_id', $attribute_ids);
 		if($unindexedOnly)
 		{
 			$this->builder->where('indexed', false);
 		}
+		$this->builder->whereIn('attribute_id', $attribute_ids);
 
 		return $this->builder->countAllResults();
 	}
