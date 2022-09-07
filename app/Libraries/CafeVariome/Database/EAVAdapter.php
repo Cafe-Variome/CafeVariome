@@ -160,6 +160,12 @@ class EAVAdapter extends BaseAdapter
 		return $this->builder->update($data);
 	}
 
+	public function DeleteByFileId(int $file_id): bool
+	{
+		$this->builder->where('data_file_id', $file_id);
+		return $this->builder->delete();
+	}
+
     /**
      * @inheritDoc
      */
