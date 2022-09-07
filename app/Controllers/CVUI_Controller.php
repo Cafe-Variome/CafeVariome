@@ -14,7 +14,6 @@ use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
 use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use CodeIgniter\Controller;
 use App\Models\UIData;
-use App\Models\Settings;
 use App\Models\URISegment;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 
