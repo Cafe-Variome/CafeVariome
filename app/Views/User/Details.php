@@ -55,15 +55,20 @@
 				<td><?= $user->active ? 'Active' : 'Inactive' ?></td>
             </tr>
         </table>
-        <hr />
-        <a href="<?= base_url($controllerName . '/Update') . "/" . $user->getID(); ?>" class="btn btn-warning bg-gradient-warning">
-            <i class="fa fa-edit"></i>&nbsp;Edit
-		</a>
+    </div>
+</div>
+<hr />
+<div class="row mb-5">
+	<div class="col">
 		<a href="<?php echo base_url($controllerName); ?>" class="btn btn-secondary bg-gradient-secondary">
 			<i class="fas fa-fw fa-user"></i> View Users
 		</a>
-		<hr />
-    </div>
+		<a href="<?= base_url($controllerName . '/Update') . "/" . $user->getID(); ?>" class="btn btn-warning bg-gradient-warning">
+			<i class="fa fa-edit"></i>&nbsp;Edit User
+		</a>
+		<a href="<?= base_url($controllerName . '/Delete') . "/" . $user->getID(); ?>" class="btn btn-danger bg-gradient-danger">
+			<i class="fa fa-trash"></i>&nbsp;Delete User
+		</a>
+	</div>
 </div>
-
 <?= $this->endSection() ?>
