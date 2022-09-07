@@ -102,6 +102,22 @@ class AttributeAdapter extends BaseAdapter
 		return $entities;
 	}
 
+	public function AssociationExists(int $attribute_id, int $ontology_id, int $prefix_id, int $relationship_id): bool
+	{
+		$this->changeTable('attributes_ontology_prefixes_relationships as aop');
+
+		$this->builder->where('aop.attribute_id', $attribute_id);
+		$this->builder->where('aop.ontology_id', $ontology_id);
+		$this->builder->where('aop.prefix_id', $prefix_id);
+		$this->builder->where('aop.relationship_id', $relationship_id);
+
+		$result = $this->builder->get()->getResult();
+
+		$this->resetTable();
+
+		return count($result) == 1;
+	}
+	
 	public function UpdateType(int $id, int $type): bool
 	{
 		$this->builder->where(static::$key, $id);
