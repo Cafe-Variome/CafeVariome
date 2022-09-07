@@ -16,7 +16,7 @@
 	</div>
 </div>
 <?php endif; ?>
-<?= form_open($controllerName . '/Update/' . $attribute_id) ?>
+<?= form_open($controllerName . '/Update/' . $id) ?>
 <div class="form-group row">
 	<div class="col-6">
 		<?php echo form_label('Attribute Name', 'name'); ?>

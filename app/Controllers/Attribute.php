@@ -1,10 +1,5 @@
 <?php namespace App\Controllers;
 
-use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
-use App\Models\UIData;
-use App\Libraries\CafeVariome\Helpers\UI\AttributeHelper;
-use CodeIgniter\Config\Services;
-
 /**
  * Attribute.php
  * Created 15/09/2021
@@ -13,11 +8,25 @@ use CodeIgniter\Config\Services;
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Database\SourceAdapter;
+use App\Libraries\CafeVariome\Entities\ViewModels\AttributeAssociation;
+use App\Libraries\CafeVariome\Entities\ViewModels\AttributeDetails;
+use App\Libraries\CafeVariome\Entities\ViewModels\AttributeList;
+use App\Libraries\CafeVariome\Entities\ViewModels\OntologyDropDown;
+use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
+use App\Libraries\CafeVariome\Factory\AttributeFactory;
+use App\Libraries\CafeVariome\Factory\OntologyAdapterFactory;
+use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
+use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
+use App\Models\UIData;
+use CodeIgniter\Config\Services;
+
 class Attribute extends CVUI_Controller
 {
 	private $validation;
-	private $sourceModel;
 	private $attributeModel;
+
+	private SourceAdapter $sourceAdapter;
 
 	/**
 	 * Validation list template.
@@ -37,7 +46,9 @@ class Attribute extends CVUI_Controller
 		parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-		$this->sourceModel = new \App\Models\Source();
+		$this->sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+		$this->dbAdapter = (new AttributeAdapterFactory())->GetInstance();
+
 		$this->attributeModel = new \App\Models\Attribute();
 	}
 
@@ -48,23 +59,21 @@ class Attribute extends CVUI_Controller
 
 	public function List(int $source_id)
 	{
-		$source_name = $this->sourceModel->getSourceNameByID($source_id);
-		if ($source_name == null || $source_id <= 0) {
+		$source = $this->sourceAdapter->Read($source_id);
+
+		if ($source->isNull())
+		{
+			$this->setStatusMessage("Source was not found.", STATUS_ERROR);
 			return redirect()->to(base_url('Source'));
 		}
 
 		$uidata = new UIData();
 		$uidata->title = 'Attributes';
 
-		$attributes = $this->attributeModel->getAttributesBySourceId($source_id);
+		$attributes = $this->dbAdapter->SetModel(AttributeList::class)->ReadBySourceId($source_id);
 
-		foreach ($attributes as &$attribute) {
-			$attribute['type_text'] = AttributeHelper::getAttributeType($attribute['type']);
-			$attribute['storage_location'] = AttributeHelper::getAttributeStorageLocation($attribute['storage_location']);
-		}
-
-		$uidata->data['sourceId'] = $source_id;
-		$uidata->data['source_name'] = $source_name;
+		$uidata->data['source_id'] = $source->getID();
+		$uidata->data['source_name'] = $source->name;
 		$uidata->data['attributes'] = $attributes;
 
 		$uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
@@ -75,18 +84,19 @@ class Attribute extends CVUI_Controller
 		return view($this->viewDirectory . '/List', $data);
 	}
 
-	public function Update(int $attribute_id)
+	public function Update(int $id)
 	{
-		$uidata = new UIData();
-		$uidata->title = 'Edit Attribute';
-
-		$attribute = $this->attributeModel->getAttribute($attribute_id);
-		if ($attribute == null || $attribute_id <= 0) {
+		$attribute = $this->dbAdapter->Read($id);
+		if ($attribute == null || $id <= 0)
+		{
 			return redirect()->to(base_url('Source'));
 		}
 
-		$uidata->data['attribute_id'] = $attribute['id'];
-		$source_id = $attribute['source_id'];
+		$uidata = new UIData();
+		$uidata->title = 'Edit Attribute';
+
+		$uidata->data['id'] = $attribute->getID();
+		$source_id = $attribute->source_id;
 		$uidata->data['source_id'] = $source_id;
 
 		$this->validation->setRules([
@@ -99,31 +109,47 @@ class Attribute extends CVUI_Controller
 			]
 		]);
 
-		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
 			$name = $this->request->getVar('name');
 			$display_name = $this->request->getVar('display_name');
-			$show_in_interface = ($this->request->getVar('show_in_interface') != null) ? true : false;
-			$include_in_interface_index = ($this->request->getVar('include_in_interface_index') != null) ? true : false;
+			$show_in_interface = ($this->request->getVar('show_in_interface') != null) ? 1 : 0;
+			$include_in_interface_index = ($this->request->getVar('include_in_interface_index') != null) ? 1 : 0;
 
-			try {
-				$this->attributeModel->updateAttribute($attribute_id, $display_name, $show_in_interface, $include_in_interface_index);
+			try
+			{
+				$this->dbAdapter->Update($id, (new AttributeFactory())->GetInstanceFromParameters(
+					$attribute->name,
+					$source_id,
+					$display_name,
+					$attribute->type,
+					$attribute->min,
+					$attribute->max,
+					$show_in_interface,
+					$include_in_interface_index,
+					$attribute->storage_location
+				));
 
 				if(
-					$attribute['display_name'] != $display_name ||
-					$attribute['show_in_interface'] !== $show_in_interface ||
-					$attribute['include_in_interface_index'] !== $include_in_interface_index
+					$attribute->display_name != $display_name ||
+					$attribute->show_in_interface !== $show_in_interface ||
+					$attribute->include_in_interface_index !== $include_in_interface_index
 				)
 				{
 					PHPShellHelper::runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
 				}
 
 				$this->setStatusMessage("Attribute '$name' was updated.", STATUS_SUCCESS);
-			} catch (\Exception $ex) {
+			}
+			catch (\Exception $ex)
+			{
 				$this->setStatusMessage("There was a problem updating '$name'.", STATUS_ERROR);
 			}
-			return redirect()->to(base_url($this->controllerName . '/List/' . $source_id));
 
-		} else {
+			return redirect()->to(base_url($this->controllerName . '/List/' . $source_id));
+		}
+		else
+		{
 			$uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
 			$uidata->data['name'] = array(
@@ -132,7 +158,7 @@ class Attribute extends CVUI_Controller
 				'type' => 'text',
 				'class' => 'form-control',
 				'readonly' => 'true', // Don't allow the user to edit the attribute name
-				'value' => set_value('name', $attribute['name']),
+				'value' => set_value('name', $attribute->name),
 			);
 
 			$uidata->data['display_name'] = array(
@@ -140,23 +166,23 @@ class Attribute extends CVUI_Controller
 				'id' => 'display_name',
 				'type' => 'text',
 				'class' => 'form-control',
-				'value' => set_value('name', $attribute['display_name']),
+				'value' => set_value('name', $attribute->display_name),
 			);
 
 			$uidata->data['show_in_interface'] = array(
-				'name' => 'show_in_interface',
+				'name' => 'show_in_interface[]',
 				'id' => 'show_in_interface',
 				'class' => 'custom-control-input',
-				'value' => set_value('show_in_interface', $attribute['show_in_interface']),
-				'checked' => $attribute['show_in_interface'] ? true : false
+				'value' => set_value('show_in_interface', $attribute->show_in_interface),
+				'checked' => (bool)$attribute->show_in_interface
 			);
 
 			$uidata->data['include_in_interface_index'] = array(
-				'name' => 'include_in_interface_index',
+				'name' => 'include_in_interface_index[]',
 				'id' => 'include_in_interface_index',
 				'class' => 'custom-control-input',
-				'value' => set_value('include_in_interface_index', $attribute['include_in_interface_index']),
-				'checked' => $attribute['include_in_interface_index'] ? true : false
+				'value' => set_value('include_in_interface_index', $attribute->include_in_interface_index),
+				'checked' => (bool)$attribute->include_in_interface_index
 			);
 
 			$data = $this->wrapData($uidata);
@@ -164,113 +190,106 @@ class Attribute extends CVUI_Controller
 		}
 	}
 
-	public function Details(int $attribute_id)
+	public function Details(int $id)
 	{
-		$attribute = $this->attributeModel->getAttribute($attribute_id);
-		if ($attribute == null || $attribute_id <= 0) {
+		$attribute = $this->dbAdapter->SetModel(AttributeDetails::class)->Read($id);
+		if ($attribute == null || $id <= 0)
+		{
 			return redirect()->to(base_url('Source'));
 		}
 
 		$uidata = new UIData();
 		$uidata->title = 'Attribute Details';
-		$uidata->data['attribute_id'] = $attribute['id'];
-		$source_id = $attribute['source_id'];
-		$uidata->data['source_id'] = $source_id;
-		$uidata->data['source_name'] = $this->sourceModel->getSourceNameById($source_id);
-		$uidata->data['name'] = $attribute['name'];
-		$uidata->data['display_name'] = $attribute['display_name'];
-		$uidata->data['type'] = AttributeHelper::getAttributeType($attribute['type']);
-		$uidata->data['minimum'] = null;
-		$uidata->data['maximum'] = null;
-		if ($attribute['type'] == ATTRIBUTE_TYPE_NUMERIC_REAL || $attribute['type'] == ATTRIBUTE_TYPE_NUMERIC_INTEGER || $attribute['type'] == ATTRIBUTE_TYPE_NUMERIC_NATURAL) {
-			$uidata->data['minimum'] = $attribute['min'];
-			$uidata->data['maximum'] = $attribute['max'];
-		}
-		$uidata->data['storage_location'] = AttributeHelper::getAttributeStorageLocation($attribute['storage_location']);
-		$uidata->data['show_in_interface'] = $attribute['show_in_interface'];
-		$uidata->data['include_in_interface_index'] = $attribute['include_in_interface_index'];
+		$uidata->data['attribute'] = $attribute;
 
 		$data = $this->wrapData($uidata);
 		return view($this->viewDirectory . '/Details', $data);
 	}
 
-	public function OntologyAssociations(int $attribute_id)
+	public function OntologyAssociations(int $id)
 	{
-		$attribute = $this->attributeModel->getAttribute($attribute_id);
-		if ($attribute == null || $attribute_id <= 0 || $attribute['type'] != ATTRIBUTE_TYPE_ONTOLOGY_TERM) {
+		$attribute = $this->dbAdapter->SetModel(AttributeAssociation::class)->Read($id);
+		if ($attribute == null || $id <= 0)
+		{
 			return redirect()->to(base_url('Source'));
 		}
 
 		$uidata = new UIData();
 		$uidata->title = 'Ontology Associations';
-		$uidata->data['attribute_name'] = $attribute['name'];
-		$uidata->data['attribute_id'] = $attribute_id;
-		$source_id = $this->attributeModel->getSourceIdByAttributeId($attribute_id);
-		$source_name = $this->sourceModel->getSourceNameByID($source_id);
-		$uidata->data['source_id'] = $source_id;
-		$uidata->data['source_name'] = $source_name;
+		$uidata->data['attribute'] = $attribute;
+
 
 		$uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
 		$uidata->javascript = array(JS . 'cafevariome/attribute.js', VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
 
-		if ($this->request->getPost()) {
+		if ($this->request->getPost())
+		{
 			$ontology_id = $this->request->getVar('ontology');
 			$prefix_id = $this->request->getVar('prefix');
 			$relationship_id = $this->request->getVar('relationship');
 
-			try {
-				if (!$this->attributeModel->attributeAssociationExists($attribute_id, $ontology_id, $prefix_id, $relationship_id)) {
-					$this->attributeModel->associateAttributeWithOntologyPrefixAndRelationship($attribute_id, $prefix_id, $relationship_id, $ontology_id);
+			try
+			{
+				if (!$this->dbAdapter->AssociationExists($id, $ontology_id, $prefix_id, $relationship_id))
+				{
+					$this->dbAdapter->CreateOntologyAssociation($id, $prefix_id, $relationship_id, $ontology_id);
 					$this->setStatusMessage("Attribute association was created.", STATUS_SUCCESS);
 
-					return redirect()->to(base_url($this->controllerName . '/OntologyAssociations/' . $attribute_id));
-				} else {
+					return redirect()->to(base_url($this->controllerName . '/OntologyAssociations/' . $id));
+				}
+				else
+				{
 					//Association already exists and cannot be created.
 					$uidata->data['statusMessage'] = "Ontology association already exists.";
 				}
-			} catch (\Exception $ex) {
+			}
+			catch (\Exception $ex)
+			{
 				$uidata->data['statusMessage'] = "There was a problem in associating the attribute with the selected ontology prefix and ontology relationship.";
 			}
 		}
+		else
+		{
+			$attributeOntologyAssociations = $this->dbAdapter->ReadOntologyPrefixesAndRelationships($id);
 
-		$attributeOntologyAssociations = $this->attributeModel->getOntologyPrefixesAndRelationshipsByAttributeId($attribute_id);
+			$uidata->data['attributeOntologyAssociations'] = $attributeOntologyAssociations;
 
-		$uidata->data['attributeOntologyAssociations'] = $attributeOntologyAssociations;
+			$ontologyAdapter = (new OntologyAdapterFactory())->GetInstance();
+			$ontologies = $ontologyAdapter->SetModel(OntologyDropDown::class)->ReadAll();
 
-		$ontologyModel = new \App\Models\Ontology();
-		$ontologies = $ontologyModel->getOntologies();
+			$ontology_data = [0 => 'Please select an ontology:'];
+			$relationship_data = [0 => 'Please select an ontology to load relationships.'];
+			$prefix_data = [0 => 'Please select an ontology to load prefixes.'];
 
-		$ontology_data = [0 => 'Please select an ontology:'];
-		$relationship_data = [0 => 'Please select an ontology to load relationships.'];
-		$prefix_data = [0 => 'Please select an ontology to load prefixes.'];
+			foreach ($ontologies as $ontology)
+			{
+				$ontology_data[$ontology->getID()] = $ontology->name;
+			}
 
-		foreach ($ontologies as $ontology) {
-			$ontology_data[$ontology['id']] = $ontology['name'];
+			$uidata->data['ontology'] = [
+				'id' => 'ontology',
+				'name' => 'ontology',
+				'type' => 'dropdown',
+				'options' => $ontology_data,
+				'class' => 'form-control'
+			];
+
+			$uidata->data['relationship'] = [
+				'id' => 'relationship',
+				'name' => 'relationship',
+				'type' => 'dropdown',
+				'options' => $relationship_data,
+				'class' => 'form-control'
+			];
+
+			$uidata->data['prefix'] = [
+				'id' => 'prefix',
+				'name' => 'prefix',
+				'type' => 'dropdown',
+				'options' => $prefix_data,
+				'class' => 'form-control'
+			];
 		}
-
-		$uidata->data['ontology'] = [
-			'id' => 'ontology',
-			'name' => 'ontology',
-			'type' => 'dropdown',
-			'options' => $ontology_data,
-			'class' => 'form-control'
-		];
-
-		$uidata->data['relationship'] = [
-			'id' => 'relationship',
-			'name' => 'relationship',
-			'type' => 'dropdown',
-			'options' => $relationship_data,
-			'class' => 'form-control'
-		];
-
-		$uidata->data['prefix'] = [
-			'id' => 'prefix',
-			'name' => 'prefix',
-			'type' => 'dropdown',
-			'options' => $prefix_data,
-			'class' => 'form-control'
-		];
 
 		$data = $this->wrapData($uidata);
 
