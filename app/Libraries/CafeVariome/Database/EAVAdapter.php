@@ -46,6 +46,21 @@ class EAVAdapter extends BaseAdapter
 		return $this->builder->countAllResults();
 	}
 
+	public function CountUniqueSubjectIdsBySourceIdAndAttributeIds(int $source_id, array $attribute_ids, bool $unindexedOnly = true): int
+	{
+		$this->builder->select('subject_id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+
+		if($unindexedOnly)
+		{
+			$this->builder->where('indexed', false);
+		}
+		$this->builder->distinct();
+
+		return $this->builder->countAllResults();
+	}
+
 	public function ReadUniqueGroupIdsAndSubjectIdsBySourceIdAndAttributeIds(int $source_id, array $attribute_ids, int $limit, int $offset, bool $unindexedOnly = true)
 	{
 		$this->builder->select('group_id, subject_id, data_file_id');
