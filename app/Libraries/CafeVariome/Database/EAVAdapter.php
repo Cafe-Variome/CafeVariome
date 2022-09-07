@@ -135,6 +135,22 @@ class EAVAdapter extends BaseAdapter
 		return $this->builder->get()->getResult();
 	}
 
+	public function ReadUniqueSubjectIdsAndFileIdsBySourceIdAndAttributeIds(int $source_id, array $attribute_ids, int $limit, int $offset, bool $unindexedOnly = true): array
+	{
+		$this->builder->select('subject_id, data_file_id');
+		$this->builder->distinct();
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		if($unindexedOnly)
+		{
+			$this->builder->where('indexed', false);
+		}
+		$this->builder->where('id>', $offset);
+		$this->builder->limit($limit);
+
+		return $this->builder->get()->getResult();
+	}
+
 	public function UpdateIndexedBySourceIdAndAttributeIds(int $source_id, array $attribute_ids): bool
 	{
 		$data = ['indexed' => 1];
