@@ -27,10 +27,4 @@ class Attribute extends Entity
 	public bool $include_in_interface_index;
 
 	public int $storage_location;
-
-	public function __construct(array $properties)
-	{
-		parent::__construct($properties);
-	}
-
 }
