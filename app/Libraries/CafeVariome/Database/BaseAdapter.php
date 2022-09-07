@@ -88,6 +88,22 @@ abstract class BaseAdapter implements IAdapter
 		return $this->binding != null ? $this->BindTo($record) : $this->toEntity($record);
 	}
 
+	public function ReadByIds(array $ids): array
+	{
+		$this->CompileSelect();
+		$this->CompileJoin();
+		$this->builder->whereIn(static::$table . '.' . static::$key, $ids);
+		$results = $this->builder->get()->getResult();
+
+		$entities = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			$entities[$results[$c]->{static::$key}] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
+		}
+
+		return $entities;
+	}
+
 	/**
 	 * @return array
 	 */
