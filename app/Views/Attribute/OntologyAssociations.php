@@ -3,7 +3,7 @@
 
 <div class="row">
 	<div class="col">
-		<h2><?= $title ?> of '<?= $attribute_name ?>'</h2>
+		<h2><?= $title ?> of '<?= $attribute->name ?>'</h2>
 	</div>
 </div>
 <hr>
@@ -17,8 +17,8 @@
 	</div>
 <?php endif; ?>
 
-<?= form_open($controllerName.'/OntologyAssociations/' . $attribute_id) ?>
-<input type="hidden" name="attribute_id" id="attribute_id" value="<?= $attribute_id ?>" />
+<?= form_open($controllerName.'/OntologyAssociations/' . $attribute->getID()) ?>
+<input type="hidden" name="attribute_id" id="attribute_id" value="<?= $attribute->getID() ?>" />
 <input type="hidden" id="csrf_token" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
 
 <div class="form-group row">
@@ -60,11 +60,11 @@
 	<tbody>
 	<?php foreach ($attributeOntologyAssociations as $association): ?>
 		<tr>
-			<td><?= $association['ontology_name'] ?></td>
-			<td><?= $association['prefix_name'] ?></td>
-			<td><?= $association['relationship_name'] ?></td>
+			<td><?= $association->ontology_name ?></td>
+			<td><?= $association->prefix_name ?></td>
+			<td><?= $association->relationship_name ?></td>
 			<td>
-				<a href="<?= base_url($controllerName. '/DeleteAssociation'). "/" . $association['id'] ; ?>" data-toggle="tooltip" data-placement="top" title="Delete Association">
+				<a href="<?= base_url($controllerName. '/DeleteAssociation'). "/" . $association->id ; ?>" data-toggle="tooltip" data-placement="top" title="Delete Association">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 			</td>
@@ -75,14 +75,14 @@
 <hr>
 <div class="row mb-5">
 	<div class="col">
-		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url($controllerName . '/List/' . $source_id) ?>">
-			<i class="fa fa-arrow-left"></i> Go Back to List of Attributes for <?= $source_name ?>
+		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url($controllerName . '/List/' . $attribute->source_id) ?>">
+			<i class="fa fa-arrow-left"></i> Go Back to List of Attributes for <?= $attribute->source_name ?>
 		</a>
 		<a class="btn btn-primary bg-gradient-primary" target="_blank" href="<?= base_url('Ontology') ?>">
 			<i class="fa fa-project-diagram"></i> View Ontologies
 		</a>
-		<a class="btn btn-success bg-gradient-success" target="_blank" href="<?= base_url('Value/List/' . $attribute_id) ?>">
-			<i class="fa fa-list"></i> View Values of <?= $attribute_name ?>
+		<a class="btn btn-success bg-gradient-success" target="_blank" href="<?= base_url('Value/List/' . $attribute->getID()) ?>">
+			<i class="fa fa-list"></i> View Values of <?= $attribute->name ?>
 		</a>
 	</div>
 </div>
