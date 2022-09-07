@@ -38,6 +38,21 @@ class UserAdapter extends BaseAdapter
 		return null;
 	}
 
+	public function ReadEmail(int $id): ?string
+	{
+		$this->builder->select('email');
+		$this->builder->where(static::$table . '.' . static::$key, $id);
+		$results = $this->builder->get()->getResult();
+
+		if (count($results) == 1)
+		{
+			$record = $results[0];
+			return $record->email;
+		}
+
+		return null;
+	}
+
 	public function Read(int $id): IEntity
 	{
 		$this->builder->select('id, username, email, first_name, last_name, company, active, remote, phone, last_login, created_on, is_admin, ip_address');
