@@ -32,4 +32,9 @@ class Source extends Entity
 
 	public bool $status;
 
+	public function GetElasticSearchIndexName(string $prefix): string
+	{
+		return $prefix . '_' . $this->id . '_' . $this->uid;
+	}
+
 }
