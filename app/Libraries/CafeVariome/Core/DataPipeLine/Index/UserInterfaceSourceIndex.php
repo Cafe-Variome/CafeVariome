@@ -1,8 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Core\DataPipeLine\Index;
 
-use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
-use App\Models\Value;
-
 /**
  * Name UserInterfaceDataIndex.php
  *
@@ -11,67 +8,66 @@ use App\Models\Value;
  *
  */
 
+use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
+use App\Libraries\CafeVariome\Entities\Task;
+
 class UserInterfaceSourceIndex extends AbstractSourceIndex
 {
-	private Value $valueModel;
-
-	public function __construct(int $source_id)
+	public function __construct(Task $task)
 	{
-		parent::__construct($source_id);
-		$this->initiateSource();
-		$this->jobName = 'uiindex';
+		parent::__construct($task->source_id);
+		$this->continue = true;
+		$this->overwrite = $task->overwrite;
+		$this->taskId = $task->getID();
+
 		$this->processedRecords = 0;
 		$this->totalRecords = 0;
 		$this->totalEAVsCount = 0;
-		$this->valueModel = new Value();
 	}
 
     public function IndexSource()
     {
-		$this->registerProcess($this->sourceId);
-
-		$attributes = $this->attributeModel->getAttributesBySourceId($this->sourceId, true);
+		$attributes = $this->attributeAdapter->ReadBySourceId($this->sourceId, true);
 		$this->totalRecords = count($attributes);
 
-		$this->reportProgress($this->sourceId, $this->processedRecords, $this->totalRecords, 'Generating user interface index');
+		$this->ReportProgress(null, 'Generating user interface index');
 
 		$attributesValues = [];
 		$attributesDisplayNames = [];
 		$valuesDisplayNames = [];
 
-		$attributesCount = count($attributes);
-		for($i = 0; $i < $attributesCount; $i++)
+		foreach($attributes as &$attribute)
 		{
 			$attributeValues = [];
 
-			$attribute = $attributes[$i];
-			$attribute_name = $attribute['name'];
-			$attributesDisplayNames[$attribute_name] = $attribute['display_name'];
+			$attribute_name = $attribute->name;
+			$attributesDisplayNames[$attribute_name] = $attribute->display_name;
 
-			$values = $this->valueModel->getValuesByAttributeId($attribute['id'], true);
-			$valuesCount = count($values);
-			for($j = 0; $j < $valuesCount; $j++)
+			$values = $this->valueAdapter->ReadByAttributeId($attribute->getID(), true);
+
+			foreach($values as $value)
 			{
-				$value_name = $values[$j]['name'];
-				$value_display_name = $values[$j]['display_name'];
+				$value_name = $value->name;
+				$value_display_name = $value->display_name;
 
-				array_push($attributeValues, $values[$j]['name']);
-				if (array_key_exists($value_name, $valuesDisplayNames)){
-					if (!in_array($value_display_name, $valuesDisplayNames[$value_name])){
+				array_push($attributeValues, $value->name);
+				if (array_key_exists($value_name, $valuesDisplayNames))
+				{
+					if (!in_array($value_display_name, $valuesDisplayNames[$value_name]))
+					{
 						array_push($valuesDisplayNames[$value_name], $value_display_name);
 					}
 				}
-				else{
+				else
+				{
 					$valuesDisplayNames[$value_name] = [$value_display_name];
 				}
-				unset($values[$j]);
 			}
 
 			$attributesValues[$attribute_name] = $attributeValues;
-			unset($attributes[$i]);
 
 			$this->processedRecords++;
-			$this->reportProgress($this->sourceId, $this->processedRecords, $this->totalRecords);
+			$this->ReportProgress();
 		}
 
 		$indexData = [
@@ -91,6 +87,8 @@ class UserInterfaceSourceIndex extends AbstractSourceIndex
 
 		$fileMan->Write($indexName, json_encode($indexData));
 
-		$this->reportProgress($this->sourceId, 1, 1, 'Finished', true);
+		$this->sourceAdapter->Unlock($this->sourceId);
+
+		$this->ReportProgress(null, 'Finished', true);
 	}
 }

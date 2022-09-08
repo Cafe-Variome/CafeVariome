@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Libraries\CafeVariome\Core\DataPipeLine\Index;
+<?php namespace App\Libraries\CafeVariome\Core\DataPipeLine\Index;
 
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
@@ -17,7 +15,6 @@ class UserInterfaceNetworkIndex extends AbstractNetworkIndex
     {
 		$basePath = FCPATH . USER_INTERFACE_INDEX_DIR;
 		$fileMan = new SysFileMan($basePath);
-		$sources = $this->sourceModel->getSourcesByNetwork($this->networkKey); // Get sources that are in the network
 
 		$sourcesIndexData = [
 			'source_ids' => [],
@@ -26,8 +23,8 @@ class UserInterfaceNetworkIndex extends AbstractNetworkIndex
 			'values_display_names' => [],
 		];
 
-		foreach ($sources as $source) {
-			$source_id = $source['source_id'];
+		foreach ($this->sourceIds as $source_id)
+		{
 			$indexName = $this->getSourceUIIndexName($source_id);
 
 			if ($fileMan->Exists($indexName)){
@@ -225,7 +222,7 @@ class UserInterfaceNetworkIndex extends AbstractNetworkIndex
 
 	private function getSourceUIIndexName(int $source_id): string
 	{
-		$uid = $this->sourceModel->getSourceUID($source_id);
+		$uid = $this->sourceAdapter->ReadUID($source_id);
 		return $source_id . '_' . $uid . '.json';
 	}
 }
