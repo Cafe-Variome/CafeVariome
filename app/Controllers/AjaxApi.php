@@ -94,17 +94,16 @@ class AjaxApi extends Controller
 	{
         $networkInterface = new NetworkInterface();
 
-		$session = \Config\Services::session();
-
         //Check to see if user is logged in
-        if (!$session->has(AUTHENTICATOR_SESSION_NAME))
+        if (!$this->session->has(AUTHENTICATOR_SESSION_NAME))
 		{
 			return json_encode(['timeout' => 'Your session has timed out. You need to login again.']);
 		}
+
 		$authenticatorFactory = new AuthenticatorFactory();
 		$authenticator = $authenticatorFactory->GetInstance(
 			(new SingleSignOnProviderAdapterFactory())->GetInstance()->Read(
-				$session->get(AUTHENTICATOR_SESSION_NAME)
+				$this->session->get(AUTHENTICATOR_SESSION_NAME)
 			));
 
 		if (!$authenticator->LoggedIn())
@@ -114,11 +113,12 @@ class AjaxApi extends Controller
 
         $network_key = $this->request->getVar('network_key');
         $queryString = json_encode($this->request->getVar('jsonAPI'));
-        $token = $authenticator->GetRefreshToken(['refresh_token' => $session->get(SSO_REFRESH_TOKEN_SESSION_NAME)]);
+        $token = $authenticator->GetRefreshToken(['refresh_token' => $this->session->get(SSO_REFRESH_TOKEN_SESSION_NAME)]);
 
         $user_id = $authenticator->GetUserIdByToken($token);
 
-        try {
+        try
+		{
             $results = [];
             $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler();
             $loaclResults = $cafeVariomeQuery->CompileAndRunQuery($queryString, $network_key, $user_id); // Execute locally
@@ -127,15 +127,19 @@ class AjaxApi extends Controller
             $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
             $installations = [];
 
-            if ($response->status) {
+            if ($response->status)
+			{
                 $installations = $response->data;
 
-                foreach ($installations as $installation) {
-                    if ($installation->installation_key != $this->setting->getInstallationKey()) {
+                foreach ($installations as $installation)
+				{
+                    if ($installation->installation_key != $this->setting->getInstallationKey())
+					{
                         // Send the query
                         $queryNetInterface = new QueryNetworkInterface($installation->base_url);
                         $queryResponse = $queryNetInterface->query($queryString, (int) $network_key, $authenticator->GetBaseURL(), $token);
-                        if ($queryResponse->status) {
+                        if ($queryResponse->status)
+						{
                             array_push($results, json_encode($queryResponse->data));
                         }
                     }
@@ -143,7 +147,9 @@ class AjaxApi extends Controller
             }
 
             return json_encode($results);
-        } catch (\Exception $ex) {
+        }
+		catch (\Exception $ex)
+		{
             return json_encode(['error' => 'There was a problem executing the query. Please try again with a different query.'.$ex->getMessage()]);
         }
     }
