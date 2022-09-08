@@ -48,11 +48,15 @@ class ValueAdapter extends BaseAdapter
 		return null;
 	}
 
-	public function ReadByAttributeId(int $attribute_id): array
+	public function ReadByAttributeId(int $attribute_id, ?bool $include_in_interface_index = null): array
 	{
 		$this->CompileSelect();
 		$this->CompileJoin();
 		$this->builder->where(static::$table . '.attribute_id', $attribute_id);
+		if (!is_null($include_in_interface_index))
+		{
+			$this->builder->where(static::$table . '.include_in_interface_index', $include_in_interface_index );
+		}
 
 		$results = $this->builder->get()->getResult();
 
