@@ -37,6 +37,21 @@ class OntologyAdapter extends BaseAdapter
 	}
 
 
+	public function CreateOntologyAttributeAssociation(int $attribute_id, int $prefix_id, int $relationship_id, int $ontology_id): int
+	{
+		$this->changeTable('attributes_ontology_prefixes_relationships');
+
+		$insert_id = $this->builder->insert([
+			'attribute_id' => $attribute_id,
+			'prefix_id' => $prefix_id,
+			'relationship_id' => $relationship_id,
+			'ontology_id' => $ontology_id
+		]);
+		$this->resetTable();
+
+		return $insert_id;
+	}
+
 	/**
      * @inheritDoc
      */
