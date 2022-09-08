@@ -1,8 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-use App\Models\Elastic;
-use App\Models\Source;
-
 /**
  * MutationQuery.php
  * Created 13/07/2021
@@ -11,6 +8,8 @@ use App\Models\Source;
  * @author Mehdi Mehtarizadeh
  *
  */
+
+use App\Libraries\CafeVariome\Entities\Source;
 
 class MutationQuery extends AbstractQuery
 {
@@ -21,19 +20,22 @@ class MutationQuery extends AbstractQuery
 		$this->aggregate_size = ELASTICSERACH_AGGREGATE_SIZE;
 	}
 
-	public function execute(array $clause, int $source_id, bool $iscount)
+	public function Execute(array $clause, Source $source)
 	{
 		$es_client = $this->getESInstance();
-		$es_index = $this->getESIndexName($source_id);
+		$es_index = $source->GetElasticSearchIndexName($this->GetESIndexPrefix());
+		$source_id = $source->getID();
 
 		$paramsnew = ['index' => $es_index];
 		$paramsnew['body']['query']['bool']['must'][0]['term']['source'] = $source_id;
 
 		$glist = $clause['genes'];
 
-		if (!empty($glist)) {
+		if (!empty($glist))
+		{
 			$genearr = [];
-			foreach ($glist as $key => $value) {
+			foreach ($glist as $key => $value)
+			{
 				$tmp = [];
 				$tmp[]['match'] = ['attribute' => $key];
 				$tmp[]['match'] = ['value.raw' => $value];
@@ -46,9 +48,11 @@ class MutationQuery extends AbstractQuery
 
 		$mutlist = $clause['mutation'];
 
-		if (!empty($mutlist)) {
+		if (!empty($mutlist))
+		{
 			$protaffarr = [];
-			foreach ($mutlist as $key => $value) {
+			foreach ($mutlist as $key => $value)
+			{
 				$tmp = [];
 				$tmp[]['match'] = ['attribute' => $key];
 				$tmp[]['match'] = ['value.raw' => $value];
@@ -63,15 +67,6 @@ class MutationQuery extends AbstractQuery
 
 		$esquery = $es_client->search($paramsnew);
 
-		if ($iscount)
-		{
-			$result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
-		}
-		else
-		{
-			$result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
-		}
-
-		return $result;
+		return array_column($esquery['aggregations']['punique']['buckets'], 'key');
 	}
 }

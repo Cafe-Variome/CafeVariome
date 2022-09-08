@@ -1,8 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-
-use App\Models\Source;
-
 /**
  * HPOSimilarityQuery.php
  * Created 05/06/2021
@@ -13,6 +10,8 @@ use App\Models\Source;
  *
  */
 
+use App\Libraries\CafeVariome\Entities\Source;
+
 class HPOSimilarityQuery extends AbstractQuery
 {
 
@@ -21,10 +20,10 @@ class HPOSimilarityQuery extends AbstractQuery
 
 	}
 
-	public function execute(array $clause, int $source_id, bool $iscount)
+	public function Execute(array $clause, Source $source)
 	{
-		$sourceModel = new Source();
-		$sourceUID = $sourceModel->getSourceUID($source_id);
+		$source_id = $source->getID();
+		$sourceUID = $source->uid;
 
 		if (array_key_exists('r',$clause))
 		{
@@ -86,16 +85,8 @@ class HPOSimilarityQuery extends AbstractQuery
 				$pat_ids[] = $record->get('subjectid');
 			}
 
-			$pat_ids = array_unique($pat_ids);
+			return array_unique($pat_ids);
 
-			if($iscount === true)
-			{
-				return $records->count();
-			}
-			else
-			{
-				return $pat_ids;
-			}
 		}
 	}
 

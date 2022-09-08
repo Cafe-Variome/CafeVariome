@@ -1,9 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-
-use App\Models\Source;
-use Laudis\Neo4j\Types\CypherList;
-
 /**
  * ORPHASimilarityQuery.php
  * Created 05/06/2021
@@ -14,6 +10,10 @@ use Laudis\Neo4j\Types\CypherList;
  *
  */
 
+use App\Libraries\CafeVariome\Entities\Source;
+use Laudis\Neo4j\Types\CypherList;
+
+
 class ORPHASimilarityQuery extends AbstractQuery
 {
 	public function __construct()
@@ -21,10 +21,10 @@ class ORPHASimilarityQuery extends AbstractQuery
 
 	}
 
-	public function execute(array $clause, int $source_id, bool $iscount)
+	public function Execute(array $clause, Source $source)
 	{
-		$sourceModel = new Source();
-		$sourceUID = $sourceModel->getSourceUID($source_id);
+		$source_id = $source->getID();
+		$sourceUID = $source->uid;
 
 		if (array_key_exists('r',$clause))
 		{
@@ -44,14 +44,7 @@ class ORPHASimilarityQuery extends AbstractQuery
 			// if just orpha
 			if($r == 1 && $s == 100 && $hpo == 'false')
 			{
-				if($iscount === true)
-				{
-					return count($pat_ids);
-				}
-				else
-				{
-					return $pat_ids;
-				}
+				return $pat_ids;
 			}
 			else
 			{
@@ -306,14 +299,7 @@ class ORPHASimilarityQuery extends AbstractQuery
 			$timediff = $endtime - $starttime;
 			error_log($timediff);
 
-			if($iscount === true)
-			{
-				return count($pat_ids);
-			}
-			else
-			{
-				return $pat_ids;
-			}
+			return $pat_ids;
 		}
 	}
 

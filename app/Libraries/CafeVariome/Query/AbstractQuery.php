@@ -1,15 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-
-use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
-use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
-use App\Models\Attribute;
-use App\Models\AttributeMapping;
-use App\Models\Settings;
-use App\Models\Value;
-use App\Models\ValueMapping;
-use Elasticsearch\ClientBuilder;
-
 /**
  * AbstractQuery.php
  * Created 13/07/2021
@@ -18,10 +8,20 @@ use Elasticsearch\ClientBuilder;
  *
  */
 
+use App\Libraries\CafeVariome\CafeVariome;
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
+use App\Libraries\CafeVariome\Entities\Source;
+use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
+use App\Models\Attribute;
+use App\Models\AttributeMapping;
+use App\Models\Value;
+use App\Models\ValueMapping;
+use Elasticsearch\ClientBuilder;
+
 abstract class AbstractQuery
 {
 
-	public abstract function execute(array $clause, int $source_id, bool $iscount);
+	public abstract function Execute(array $clause, Source $source);
 
 	protected function getNeo4JInstance(): Neo4J
 	{
@@ -30,13 +30,18 @@ abstract class AbstractQuery
 
 	protected function getESInstance(): \Elasticsearch\Client
 	{
-		$setting = Settings::getInstance();
+		$setting = CafeVariome::Settings();
 
-		$hosts = array($setting->getElasticSearchUri());
+		$hosts = array($setting->GetElasticSearchUri());
 		return ClientBuilder::create()->setHosts($hosts)->build();
 	}
 
-	protected function getESIndexName(int $source_id): string
+	protected function GetESIndexPrefix(): string
+	{
+		return ElasticsearchHelper::GetIndexPrefix();
+	}
+
+	protected function GetESIndexName(int $source_id): string
 	{
 		return ElasticsearchHelper::GetSourceIndexName($source_id);
 	}

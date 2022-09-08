@@ -1,8 +1,6 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-use App\Models\EAV;
-use App\Models\Elastic;
-use App\Models\Source;
+use App\Libraries\CafeVariome\Entities\Source;
 
 /**
  * PhenotypeQuery.php
@@ -24,15 +22,16 @@ class PhenotypeQuery extends AbstractQuery
 		$this->aggregate_size = ELASTICSERACH_AGGREGATE_SIZE;
 	}
 
-	public function execute(array $clause, int $source_id, bool $iscount)
+	public function Execute(array $clause, Source $source)
 	{
 		$es_client = $this->getESInstance();
-		$es_index = $this->getESIndexName($source_id);
+		$es_index = $source->GetElasticSearchIndexName($this->GetESIndexPrefix());
+		$source_id = $source->getID();
 
 		$operator = $clause['operator'];
 		$value = $clause['value'];
 
-		$isnot = ($iscount == true && substr($operator,0,6) === 'is not') ? true : false;
+		$isnot = substr($operator,0,6) === 'is not' ? true : false;
 
 		switch($operator)
 		{
@@ -66,17 +65,18 @@ class PhenotypeQuery extends AbstractQuery
 
 		$esquery = $es_client->search($paramsnew);
 
-		if ($iscount) $result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
-		else $result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
-		if ($isnot){
+		$result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
+		if ($isnot)
+		{
 			$eavModel = new EAV();
 			$uniqueSubjectIdsArray = $eavModel->getEAVs('subject_id', ['source_id'=> $source_id, 'elastic' => 1], true);
 			$uniqueSubjectIds = [];
-			foreach ($uniqueSubjectIdsArray as $uid) {
+			foreach ($uniqueSubjectIdsArray as $uid)
+			{
 				array_push($uniqueSubjectIds, $uid['subject_id']);
 			}
-			$all_ids = ($iscount==TRUE) ? count($uniqueSubjectIds) : $uniqueSubjectIds;
-			$result = $iscount==TRUE ? $all_ids - $result : array_diff($all_ids,$result) ;
+
+			$result = array_diff($uniqueSubjectIds, $result) ;
 		}
 
 		return $result;

@@ -1,8 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-use App\Models\Elastic;
-use App\Models\Source;
-
 /**
  * SubjectVariantQuery.php
  * Created 14/07/2021
@@ -13,6 +10,8 @@ use App\Models\Source;
  *
  */
 
+use App\Libraries\CafeVariome\Entities\Source;
+
 class SubjectVariantQuery extends AbstractQuery
 {
 
@@ -21,13 +20,15 @@ class SubjectVariantQuery extends AbstractQuery
 		$this->aggregate_size = ELASTICSERACH_AGGREGATE_SIZE;
 	}
 
-	public function execute(array $clause, int $source_id, bool $iscount)
+	public function Execute(array $clause, Source $source)
 	{
 		$es_client = $this->getESInstance();
-		$es_index = $this->getESIndexName($source_id);
+		$es_index = $source->GetElasticSearchIndexName($this->GetESIndexPrefix());
+		$source_id = $source->getID();
 
 		$arr = [];
-		foreach ($clause as $key => $value) { // replace with actual parameters
+		foreach ($clause as $key => $value)
+		{ // replace with actual parameters
 			$tmp = [];
 			$tmp[]['match'] = ['attribute' => $key];
 			$tmp[]['match'] = ['value.raw' => $value];
@@ -44,15 +45,6 @@ class SubjectVariantQuery extends AbstractQuery
 
 		$esquery = $es_client->search($paramsnew);
 
-		if ($iscount)
-		{
-			$result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
-		}
-		else
-		{
-			$result = array_column($esquery['aggregations']['punique']['buckets'], 'key');
-		}
-
-		return $result;
+		return array_column($esquery['aggregations']['punique']['buckets'], 'key');
 	}
 }

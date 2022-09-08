@@ -1,7 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-use App\Models\Elastic;
-
 /**
  * EAVQuery.php
  * Created 05/07/2021
@@ -12,6 +10,8 @@ use App\Models\Elastic;
  * @author Mehdi Mehtarizadeh
  *
  */
+
+use App\Libraries\CafeVariome\Entities\Source;
 
 class EAVQuery extends AbstractQuery
 {
@@ -24,11 +24,11 @@ class EAVQuery extends AbstractQuery
 		$this->uniqueSubjectIds = $uniqueSubjectIds;
 	}
 
-	public function execute(array $clause, int $source_id, bool $iscount)
+	public function Execute(array $clause, Source $source)
 	{
-		$es_index = $this->getESIndexName($source_id);
 		$es_client = $this->getESInstance();
-
+		$es_index = $source->GetElasticSearchIndexName($this->GetESIndexPrefix());
+		$source_id = $source->getID();
 		$attribute = $clause['attribute'];
 		$operator = $clause['operator'];
 		$isnot =  (substr($operator,0,6) === 'is not' || $operator === '!=') ? true : false;
@@ -38,7 +38,7 @@ class EAVQuery extends AbstractQuery
 		if ($attributeObj == null)
 		{
 			// No attribute or mapping for the incoming attribute in the source exists. No need to query ES.
-			return $iscount ? 0 : [];
+			return [];
 		}
 		else
 		{
@@ -54,7 +54,7 @@ class EAVQuery extends AbstractQuery
 			)
 			{
 				// No value or mapping for the incoming value in the source exists. No need to query ES.
-				return $iscount ? 0 : [];
+				return [];
 			}
 			else
 			{
@@ -117,17 +117,9 @@ class EAVQuery extends AbstractQuery
 
 				if ($isnot)
 				{
-					$all_ids = ($iscount == true) ? count($this->uniqueSubjectIds) : $this->uniqueSubjectIds;
-					$result = ($iscount == true) ? $all_ids - $result : array_diff($all_ids, $result) ;
+					$all_ids = $this->uniqueSubjectIds;
+					$result = array_diff($all_ids, $result) ;
 				}
-				else
-				{
-					if ($iscount)
-					{
-						$result = $esquery['hits']['total'] > 0 && count($esquery['aggregations']['punique']['buckets']) > 0 ? count($esquery['aggregations']['punique']['buckets']) : 0;
-					}
-				}
-
 
 				return $result;
 			}
