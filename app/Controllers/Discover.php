@@ -36,9 +36,9 @@ class Discover extends CVUI_Controller{
 		$this->validation = Services::validation();
     }
 
-    public function index()
+    public function Index()
 	{
-        return redirect()->to(base_url($this->controllerName. '/Select_Network'));
+        return redirect()->to(base_url($this->controllerName. '/SelectNetwork'));
     }
 
     public function SelectNetwork()
