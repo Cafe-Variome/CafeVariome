@@ -115,6 +115,26 @@ class DiscoveryGroupAdapter extends BaseAdapter
 		return $ds_ids;
 	}
 
+	public function ReadByUserId(int $user_id): array
+	{
+		$this->changeTable('discovery_group_users');
+
+		$this->builder->select('discovery_group_id');
+		$this->builder->where('user_id', $user_id);
+
+		$results = $this->builder->get()->getResult();
+
+		$discoveryGroupIds = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			array_push($discoveryGroupIds, $results[$c]->discovery_group_id);
+		}
+
+		$this->resetTable();
+
+		return $discoveryGroupIds;
+	}
+
 	public function ReadByNameAndNetworkId(string $name, int $network_id): IEntity
 	{
 		$this->builder->select();
