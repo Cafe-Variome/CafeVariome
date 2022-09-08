@@ -248,48 +248,47 @@ class Attribute extends CVUI_Controller
 				$uidata->data['statusMessage'] = "There was a problem in associating the attribute with the selected ontology prefix and ontology relationship.";
 			}
 		}
-		else
+
+		$attributeOntologyAssociations = $this->dbAdapter->ReadOntologyPrefixesAndRelationships($id);
+
+		$uidata->data['attributeOntologyAssociations'] = $attributeOntologyAssociations;
+
+		$ontologyAdapter = (new OntologyAdapterFactory())->GetInstance();
+		$ontologies = $ontologyAdapter->SetModel(OntologyDropDown::class)->ReadAll();
+
+		$ontology_data = [0 => 'Please select an ontology:'];
+		$relationship_data = [0 => 'Please select an ontology to load relationships.'];
+		$prefix_data = [0 => 'Please select an ontology to load prefixes.'];
+
+		foreach ($ontologies as $ontology)
 		{
-			$attributeOntologyAssociations = $this->dbAdapter->ReadOntologyPrefixesAndRelationships($id);
-
-			$uidata->data['attributeOntologyAssociations'] = $attributeOntologyAssociations;
-
-			$ontologyAdapter = (new OntologyAdapterFactory())->GetInstance();
-			$ontologies = $ontologyAdapter->SetModel(OntologyDropDown::class)->ReadAll();
-
-			$ontology_data = [0 => 'Please select an ontology:'];
-			$relationship_data = [0 => 'Please select an ontology to load relationships.'];
-			$prefix_data = [0 => 'Please select an ontology to load prefixes.'];
-
-			foreach ($ontologies as $ontology)
-			{
-				$ontology_data[$ontology->getID()] = $ontology->name;
-			}
-
-			$uidata->data['ontology'] = [
-				'id' => 'ontology',
-				'name' => 'ontology',
-				'type' => 'dropdown',
-				'options' => $ontology_data,
-				'class' => 'form-control'
-			];
-
-			$uidata->data['relationship'] = [
-				'id' => 'relationship',
-				'name' => 'relationship',
-				'type' => 'dropdown',
-				'options' => $relationship_data,
-				'class' => 'form-control'
-			];
-
-			$uidata->data['prefix'] = [
-				'id' => 'prefix',
-				'name' => 'prefix',
-				'type' => 'dropdown',
-				'options' => $prefix_data,
-				'class' => 'form-control'
-			];
+			$ontology_data[$ontology->getID()] = $ontology->name;
 		}
+
+		$uidata->data['ontology'] = [
+			'id' => 'ontology',
+			'name' => 'ontology',
+			'type' => 'dropdown',
+			'options' => $ontology_data,
+			'class' => 'form-control'
+		];
+
+		$uidata->data['relationship'] = [
+			'id' => 'relationship',
+			'name' => 'relationship',
+			'type' => 'dropdown',
+			'options' => $relationship_data,
+			'class' => 'form-control'
+		];
+
+		$uidata->data['prefix'] = [
+			'id' => 'prefix',
+			'name' => 'prefix',
+			'type' => 'dropdown',
+			'options' => $prefix_data,
+			'class' => 'form-control'
+		];
+
 
 		$data = $this->wrapData($uidata);
 
@@ -298,8 +297,10 @@ class Attribute extends CVUI_Controller
 
 	public function DeleteAssociation(int $association_id)
 	{
-		$association = $this->attributeModel->getAttributeOntologyAssociation($association_id);
-		if ($association == null || $association_id <= 0){
+		$ontologyAdapter = (new OntologyAdapterFactory())->GetInstance();
+		$association = $ontologyAdapter->ReadAttributeOntologyAssociation($association_id);
+		if ($association == null || $association_id <= 0)
+		{
 			return redirect()->to(base_url('Source'));
 		}
 
@@ -331,22 +332,28 @@ class Attribute extends CVUI_Controller
 			]
 		]);
 
-		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
 			$association_id = $this->request->getVar('association_id');
 			$confirm = $this->request->getVar('confirm');
-			if ($confirm == 'yes') {
+			if ($confirm == 'yes')
+			{
 				try {
-					$association = $this->attributeModel->getAttributeOntologyAssociation($association_id);
-					if ($association)  {
+					$association = $ontologyAdapter->ReadAttributeOntologyAssociation($association_id);
+					if ($association)
+					{
 						$attribute_id = $association['attribute_id'];
-						$this->attributeModel->deleteAttributeOntologyAssociation($association_id);
+						$ontologyAdapter->DeleteAttributeOntologyAssociation($association_id);
 						$this->setStatusMessage("Ontology association was deleted.", STATUS_SUCCESS);
 						return redirect()->to(base_url($this->controllerName.'/OntologyAssociations/' . $attribute_id));
 					}
-					else{
+					else
+					{
 						$this->setStatusMessage("Ontology association not exist.", STATUS_ERROR);
 					}
-				} catch (\Exception $ex) {
+				}
+				catch (\Exception $ex)
+				{
 					$this->setStatusMessage("There was a problem deleting the ontology association.", STATUS_ERROR);
 				}
 			}
