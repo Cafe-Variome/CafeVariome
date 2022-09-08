@@ -629,6 +629,7 @@ class Source extends CVUI_Controller
 		$uidata->data['indexSize'] = $indexSize == '-' ? $indexSize : SourceHelper::formatSize($indexSize);
 		$uidata->data['indexDocIndexed'] = $indexDocIndexed;
 		$uidata->data['indexDocDeleted'] = $indexDocDeleted;
+		$uidata->data['lastTaskId'] = (new TaskAdapterFactory())->GetInstance()->ReadLastProcessingTaskIdBySourceIdAndType($source->getID(), TASK_TYPE_SOURCE_INDEX_ELASTICSEARCH);
 
 		$uidata->javascript = [JS."cafevariome/elasticsearch.js"];
 
@@ -702,6 +703,7 @@ class Source extends CVUI_Controller
 		$uidata->data['indexStatusText'] = SourceHelper::getNeo4JIndexStatus($indexStatus);
 		$uidata->data['indexedSubjectsCount'] = $indexedSubjectsCount;
 		$uidata->data['relationshipsCount'] = $relationshipsCount;
+		$uidata->data['lastTaskId'] = (new TaskAdapterFactory())->GetInstance()->ReadLastProcessingTaskIdBySourceIdAndType($source->getID(), TASK_TYPE_SOURCE_INDEX_NEO4J);
 
 		$uidata->javascript = [JS."cafevariome/neo4j.js"];
 
