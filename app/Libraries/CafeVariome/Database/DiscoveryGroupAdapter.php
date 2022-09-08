@@ -55,12 +55,12 @@ class DiscoveryGroupAdapter extends BaseAdapter
 		$this->resetTable();
 	}
 
-	public function ReadSelectedUserIds(int $id): array
+	public function ReadAssociatedUserIds(array $ids): array
 	{
 		$this->changeTable('discovery_group_users');
 
 		$this->builder->select('user_id');
-		$this->builder->where('discovery_group_id', $id);
+		$this->builder->whereIn('discovery_group_id', $ids);
 
 		$results = $this->builder->get()->getResult();
 
@@ -75,24 +75,44 @@ class DiscoveryGroupAdapter extends BaseAdapter
 		return $user_ids;
 	}
 
-	public function ReadSelectedSourceIds(int $id): array
+	public function ReadAssociatedSourceIds(array $ids): array
 	{
 		$this->changeTable('discovery_group_sources');
 
 		$this->builder->select('source_id');
-		$this->builder->where('discovery_group_id', $id);
+		$this->builder->whereIn('discovery_group_id', $ids);
 
 		$results = $this->builder->get()->getResult();
 
-		$user_ids = [];
+		$source_ids = [];
 		for($c = 0; $c < count($results); $c++)
 		{
-			array_push($user_ids, $results[$c]->source_id);
+			array_push($source_ids, $results[$c]->source_id);
 		}
 
 		$this->resetTable();
 
-		return $user_ids;
+		return $source_ids;
+	}
+
+	public function ReadAssociatedIdsAndSourceIds(array $ids): array
+	{
+		$this->changeTable('discovery_group_sources');
+
+		$this->builder->select('discovery_group_id, source_id');
+		$this->builder->whereIn('discovery_group_id', $ids);
+
+		$results = $this->builder->get()->getResult();
+
+		$ds_ids = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			array_push($ds_ids, $results[$c]);
+		}
+
+		$this->resetTable();
+
+		return $ds_ids;
 	}
 
 	public function ReadByNameAndNetworkId(string $name, int $network_id): IEntity
@@ -110,6 +130,23 @@ class DiscoveryGroupAdapter extends BaseAdapter
 		}
 
 		return $this->toEntity($record);
+	}
+
+	public function ReadByNetworkId(int $network_id): array
+	{
+		$this->CompileSelect();
+		$this->CompileJoin();
+		$this->builder->where(static::$table . '.network_id', $network_id);
+
+		$results = $this->builder->get()->getResult();
+
+		$entities = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			$entities[$results[$c]->{static::$key}] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
+		}
+
+		return $entities;
 	}
 
 	public function DeleteUserAssociations(int $id)
