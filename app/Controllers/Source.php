@@ -151,27 +151,6 @@ class Source extends CVUI_Controller
 			{
 				$source_id = $this->dbAdapter->Create($source);
 
-                if ($this->request->getVar('source_display'))
-				{
-                    $group_data_array = array();
-                    foreach ($this->request->getVar('source_display') as $src_group_data)
-					{
-                        // Need to explode the group multi select to get the group_id and the network_key since the value is comma separated as I needed to pass both in the value
-                        $group_data_array[] = $src_group_data;
-                    }
-                    $networkModel->addSourceFromInstallationToMultipleNetworkGroups($source_id, $group_data_array);
-                }
-
-                if ($this->request->getVar('count_display'))
-				{
-                    $group_data_array = array();
-                    foreach ($this->request->getVar('count_display') as $count_group_data)
-					{
-                        $group_data_array[] = $count_group_data;
-                    }
-                    $networkModel->addSourceFromInstallationToMultipleNetworkGroups($source_id, $group_data_array);
-                }
-
                 $this->setStatusMessage("Source '$name' was created successfully.", STATUS_SUCCESS);
 
             }
