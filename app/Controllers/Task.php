@@ -215,6 +215,7 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 							 {
 								 $exceptionMessage = $ex->getMessage();
 								 $task->SetError(TASK_ERROR_RUNTIME_ERROR, $exceptionMessage);
+								 $this->sourceAdapter->Unlock($this->sourceId);
 							 }
 
 						 }
