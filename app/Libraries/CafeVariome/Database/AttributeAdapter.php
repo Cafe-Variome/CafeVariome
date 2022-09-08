@@ -85,11 +85,15 @@ class AttributeAdapter extends BaseAdapter
 		return $ids;
 	}
 
-	public function ReadBySourceId(int $source_id)
+	public function ReadBySourceId(int $source_id, ?bool $include_in_interface_index = null)
 	{
 		$this->CompileSelect();
 		$this->CompileJoin();
 		$this->builder->where(static::$table . '.source_id', $source_id);
+		if (!is_null($include_in_interface_index))
+		{
+			$this->builder->where(static::$table . '.include_in_interface_index', $include_in_interface_index );
+		}
 
 		$results = $this->builder->get()->getResult();
 
