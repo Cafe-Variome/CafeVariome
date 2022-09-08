@@ -3,7 +3,7 @@
 /**
  * Name Ontology.php
  * @author Mehdi Mehtarizadeh
- *
+ * @deprecated
  * Model class for Ontology entities.
  */
 
