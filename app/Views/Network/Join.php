@@ -16,37 +16,28 @@
 		</div>
 	</div>
 <?php endif; ?>
-<?php if (isset($networks)): ?>
-	<?php if (array_key_exists('error', $networks)): ?>
-		<p>There are no networks available for you to join (or you are already a member of all existing networks).</p>
-		<p>Go to the <a href="<?php echo base_url($controllerName. '/Create'); ?>">create networks page</a> if you would like to start a new network.</p>
-	<?php else: ?>
-		<?php echo form_open($controllerName. '/Join', ['name' => 'joinNetwork']); ?>
-		<div class="row mb-2">
-			<div class="col">
-				Select a network you wish to join.
-			</div>
-		</div>
-		<div class="form-group">
-			<select name="networks" id="networks" class="form-control">
-			<?php foreach ($networks as $network) : ?>
-				<option value="<?php echo $network->network_key; ?>" selected="selected"><?php echo $network->network_name; ?></option>
-			<?php endforeach; ?>
-			</select>
-		</div>
-			<?php $network_count = count($networks) + 1; ?>
-		<div class="form-group">
-			<label for="justification">Justification</label>
-			<?php echo form_textarea($justification); ?>
-		</div>
 
+<?php echo form_open($controllerName. '/Join', ['name' => 'joinNetwork']); ?>
+<div class="form-group row">
+	<div class="col-6">
+		<?= form_label('Network', 'network') ?>
+		<?= form_dropdown($network) ?>
+	</div>
+	<div class="col-6"></div>
+</div>
+<div class="form-group row">
+	<div class="col-6">
+		<label for="justification">Justification</label>
+		<?php echo form_textarea($justification); ?>
+	</div>
+	<div class="col-6"></div>
+</div>
+<div class="form-group row">
+	<div class="col">
 		<button type="submit" class="btn btn-primary bg-gradient-primary"><i class="fa fa-sign-in-alt"></i>  Join Network</button>
 		<a href="<?php echo base_url('Network'); ?>" class="btn btn-secondary bg-gradient-secondary"><i class="fas fa-fw fa-network-wired"></i> View Networks</a>
-		<?php echo form_close(); ?>
-	<?php endif; ?>
-<?php else: ?>
-	<p>There was a problem finding available networks to join, please contact admin@cafevariome.org if the problem persists</p>
-<?php endif; ?>
-
+	</div>
+</div>
+<?php echo form_close(); ?>
 
 <?= $this->endSection() ?>

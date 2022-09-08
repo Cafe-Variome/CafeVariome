@@ -22,13 +22,16 @@
 	</div>
 <?php endif; ?>
 <?php echo form_open($controllerName.'/Create', ['name' => 'createNetwork']); ?>
-<div class="form-group">
-<?php echo form_label('Network Name', 'name'); ?>
-
-<?php echo form_input($name); ?>
-	<small class="form-text text-muted">
-	(no spaces allowed but underscores and dashes are accepted, <br />uppercase characters will be converted to lowercase)
-	</small>
+<div class="form-group row">
+	<div class="col-6">
+	<?php echo form_label('Network Name', 'name'); ?>
+	<?php echo form_input($name); ?>
+	</div>
+	<div class="col-6 pt-4">
+		<small class="form-text text-muted">
+		(no spaces allowed but underscores and dashes are accepted, uppercase characters will be converted to lowercase)
+		</small>
+	</div>
 </div>
 <div class="form-group row">
 	<div class="col">

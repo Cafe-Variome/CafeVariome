@@ -45,19 +45,7 @@
 			</td>
 			<td><?php echo $network->installations_count; ?></td>
 			<td>
-				<a href="<?php echo base_url($controllerName.'/Update_Threshold' . '/' . $network->network_key . '/1') ?>" data-toggle="tooltip" data-placement="top" title="Edit Network Threshold">
-					<span class="fa fa-tachometer-alt text-warning"></i>
-				</a>
-			<?php if (isset($groups[$network->network_name])): ?>
-				<a href="<?php echo base_url($controllerName.'/Update_Users' . '/' . $groups[$network->network_name] . '/1') ?>" data-toggle="tooltip" data-placement="top" title="Edit Users in Network">
-					<span class="fa fa-user text-info"></i>
-				</a>
-			<?php else: ?>
-				<a data-toggle="tooltip" data-placement="top" title="Users of this network cannot be edited on this installation.">
-					<span class="fa fa-user text-default"></i>
-				</a>
-			<?php endif; ?>
-				<a href="<?php echo base_url($controllerName.'/Leave' . '/' . $network->network_key . '/' . $network->network_name); ?>" data-toggle="tooltip" data-placement="top" title="Leave Network">
+				<a href="<?php echo base_url($controllerName.'/Leave' . '/' . $network->network_key); ?>" data-toggle="tooltip" data-placement="top" title="Leave Network">
 					<i class="fa fa-door-open text-danger"></i>
 				</a>
 			</td>

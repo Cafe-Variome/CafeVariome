@@ -9,10 +9,10 @@
  *
  */
 
-use App\Models\User;
-use App\Models\NetworkGroup;
+use App\Libraries\CafeVariome\Factory\NetworkAdapterFactory;
+use App\Libraries\CafeVariome\Factory\NetworkFactory;
+use App\Libraries\CafeVariome\Factory\UserAdapterFactory;
 use App\Models\UIData;
-use App\Models\Source;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use CodeIgniter\Config\Services;
 
@@ -27,9 +27,6 @@ class Network extends CVUI_Controller
 	 */
     protected $validationListTemplate = 'list';
 
-    private $networkModel;
-
-    private $userModel;
     /**
 	 * Constructor
 	 *
@@ -41,8 +38,7 @@ class Network extends CVUI_Controller
         parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-        $this->networkModel = new \App\Models\Network();
-        $this->userModel = new \App\Models\User();
+		$this->dbAdapter = (new NetworkAdapterFactory())->GetInstance();
     }
 
     public function Index()
@@ -69,13 +65,10 @@ class Network extends CVUI_Controller
 			{
                 $networks = $response->data;
             }
-            $master_groups = $this->networkModel->getMasterGroups();
-
-            $uidata->data['groups'] = $master_groups;
         }
 		catch (\Exception $ex)
 		{
-            $uidata->data['message'] = 'There was a problem retrieving networks. Please try again.';
+            $uidata->data['message'] = 'There was a problem retrieving networks: ' . $ex->getMessage();
         }
 
         $uidata->data['networks'] = $networks;
@@ -90,17 +83,16 @@ class Network extends CVUI_Controller
     /**
      * Create
      */
-    function Create()
+    public function Create()
 	{
         $uidata = new UIData();
-        $networkGroupModel = new NetworkGroup($this->db);
         $uidata->data['title'] = "Create Network";
 
         // Validate form input
         $this->validation->setRules([
             'name' => [
                 'label'  => 'Network Name',
-                'rules'  => 'required|alpha_dash|is_unique[networks.network_name]',
+                'rules'  => 'required|alpha_dash|is_unique[networks.name]',
                 'errors' => [
                     'required' => '{field} is required.',
                     'uniquename_check' => '{field} already exists.'
@@ -127,9 +119,9 @@ class Network extends CVUI_Controller
                     $this->setStatusMessage("There was a problem communicating with the network software.", STATUS_ERROR);
                 }
             }
-            else {
+            else
+			{
                 //operation successful
-
                 $network_key = $response->data->network_key;
 
                 //Add Installation to Network
@@ -142,35 +134,16 @@ class Network extends CVUI_Controller
                 }
                 else
 				{
-                    try
+					try
 					{
-                        $this->networkModel->createNetwork(array ('network_name' => $name,
-                            'network_key' => $response->data->network_key,
-                            'network_type' => 1
-                        ));
+						$this->dbAdapter->Create((new NetworkFactory())->GetInstanceFromParameters($response->data->network_key, $name));
+						$this->setStatusMessage("Network '$name' was created successfully.", STATUS_SUCCESS);
 
-                        try
-						{
-                            $network_master_group_data = array ('name' => $name,
-                            'description' => $name,
-                            'network_key' => $response->data->network_key,
-                            'group_type' => "master",
-                            'url' => $this->setting->getInstallationKey()
-                            );
-                            $network_group_id = $networkGroupModel->createNetworkGroup($network_master_group_data);
-
-                            $this->setStatusMessage("Network '$name' was created successfully.", STATUS_SUCCESS);
-
-                        }
-						catch (\Exception $ex)
-						{
-                            $this->setStatusMessage("There was a problem creating a network group for '$name'.", STATUS_ERROR);
-                        }
-                    }
-                    catch (\Exception $ex)
+					}
+					catch (\Exception $ex)
 					{
-                        $this->setStatusMessage("There was a problem creating local replica for '$name'.", STATUS_ERROR);
-                    }
+						$this->setStatusMessage("There was a problem creating a local record of '$name':" . $ex->getMessage(), STATUS_ERROR);
+					}
 
                     return redirect()->to(base_url($this->controllerName.'/List'));
                 }
@@ -188,7 +161,6 @@ class Network extends CVUI_Controller
             'class' => 'form-control',
             'value' =>set_value('name'),
         );
-        $uidata->data['validation'] = $this->validation;
 
         $data = $this->wrapData($uidata);
 
@@ -196,7 +168,13 @@ class Network extends CVUI_Controller
 
     }
 
-    function Update_Users(int $id, $isMaster = false) {
+	/**
+	 * @deprecated
+	 * @param int $id
+	 * @param $isMaster
+	 * @return \CodeIgniter\HTTP\RedirectResponse|string
+	 */
+    private function Update_Users(int $id, $isMaster = false) {
 
         $uidata = new UIData();
         $uidata->title = "Edit User Network Groups";
@@ -341,15 +319,21 @@ class Network extends CVUI_Controller
         }
     }
 
-    /**
-     *
-     */
-    function Join(){
-
+    public function Join()
+	{
         $uidata = new UIData();
         $uidata->data['title'] = "Join Network";
         // Validate form input
         $this->validation->setRules([
+			'network' => [
+				'label' => 'Network',
+				'rules' => 'required|integer|greater_than[0]',
+				'errors' => [
+					'required' => '{field} is required.',
+					'integer' => '{field} must be an integer.',
+					'greater_than' => 'Please select a network.',
+				]
+			],
             'justification' => [
                 'label'  => 'Justification',
                 'rules'  => 'required|alpha_dash',
@@ -362,32 +346,50 @@ class Network extends CVUI_Controller
 
         $uidata->javascript = array(JS.'cafevariome/network.js');
 
-
         $networkInterface = new NetworkInterface();
 
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-
-            $network_key = $this->request->getVar('networks');
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
+            $network_key = $this->request->getVar('network');
             $justification = $this->request->getVar('justification');
 
-            $userModel = new User();
-
-            $user_id = $this->authenticator->getUserId();
-            $user = $userModel->getUserById($user_id);
-            $email = $user[0]->email;
+			$userAdapter = (new UserAdapterFactory())->GetInstance();
+			$email = $userAdapter->ReadEmail($this->authenticator->getUserId());
 
             $join_response = $networkInterface->RequestToJoinNetwork($network_key, $email, $justification);
-            if ($join_response->status) {
+            if ($join_response->status)
+			{
                 $this->setStatusMessage("Your request to join the network was sent successfully.", STATUS_SUCCESS);
             }
-            else{
+            else
+			{
                 $this->setStatusMessage("There was a problem communicating with network software.", STATUS_ERROR);
             }
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
-        else {
-
+        else
+		{
             $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+
+			$networks_response = $networkInterface->GetAvailableNetworks();
+
+			$networks = [0 => 'Please select a network to join.'];
+
+			if ($networks_response->status == 1)
+			{
+				foreach ($networks_response->data as $network)
+				{
+					$networks[$network->network_key] = $network->network_name;
+				}
+			}
+
+			$uidata->data['network'] = [
+				'id' => 'network',
+				'name' => 'network',
+				'type' => 'dropdown',
+				'options' => $networks,
+				'class' => 'form-control'
+			];
 
             $uidata->data['justification'] = array(
                 'name' => 'justification',
@@ -399,16 +401,6 @@ class Network extends CVUI_Controller
                 'value' => set_value('justification'),
             );
 
-            $networks_response = $networkInterface->GetAvailableNetworks();
-
-            $networks = [];
-
-            if ($networks_response->status == 1) {
-                $networks = $networks_response->data;
-            }
-
-            $uidata->data['networks'] = $networks;
-
             $data = $this->wrapData($uidata);
 
             return view($this->viewDirectory.'/Join', $data);
@@ -418,7 +410,7 @@ class Network extends CVUI_Controller
     /**
      * @deprecated
      */
-    function create_remote_user() {
+    private function create_remote_user() {
 
         if (isset($_POST['rUser'])) {
             $remote_email = htmlentities(filter_var($_POST['rUser'], FILTER_VALIDATE_EMAIL), ENT_QUOTES);
@@ -438,7 +430,12 @@ class Network extends CVUI_Controller
         }
     }
 
-    function Update_Threshold($network_key) {
+	/**
+	 * @deprecated
+	 * @param $network_key
+	 * @return \CodeIgniter\HTTP\RedirectResponse|string
+	 */
+    private function Update_Threshold($network_key) {
 
         $networkInterface = new NetworkInterface();
         $response = $networkInterface->GetNetworkThreshold((int)$network_key);
@@ -499,17 +496,18 @@ class Network extends CVUI_Controller
     public function Leave(int $network_key)
     {
         $networkInterface = new NetworkInterface();
-        $networkResponse = $networkInterface->GetNetwork((int)$network_key);
+        $networkResponse = $networkInterface->GetNetwork($network_key);
 
         $uidata = new UIData();
         $uidata->title = "Leave Network";
 
-        if (!$networkResponse->status || $networkResponse->data == null) {
+        if (!$networkResponse->status || $networkResponse->data == null)
+		{
             $this->setStatusMessage("There was a problem communicating with network software.", STATUS_ERROR);
             return redirect()->to(base_url($this->controllerName.'/List'));
         }
-        else {
-
+        else
+		{
             $this->validation->setRules([
                 'confirm' => [
                     'label'  => 'confirmation',
@@ -520,19 +518,25 @@ class Network extends CVUI_Controller
                 ]
             ]);
 
-            if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-                if ($this->request->getVar('confirm') == 'yes') {
+            if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+			{
+                if ($this->request->getVar('confirm') == 'yes')
+				{
                     $name = $this->request->getVar('name');
                     $networkResponse = $networkInterface->LeaveNetwork($network_key);
                     $this->setStatusMessage("Your installation has successfully left '$name'.", STATUS_SUCCESS);
 
-                    if ($networkResponse->status) {
+                    if ($networkResponse->status)
+					{
                         //Left the network.
                         //Now delete the local replica if it exists.
-                        try {
-                            $this->networkModel->deleteNetwork($network_key);
-                        } catch (\Exception $ex) {
-                            $this->setStatusMessage("There was a problem removing local replica for '$name'.", STATUS_ERROR, true);
+                        try
+						{
+                            $this->dbAdapter->Delete($network_key);
+                        }
+						catch (\Exception $ex)
+						{
+                            $this->setStatusMessage("There was a problem removing local record of '$name': " . $ex->getMessage(), STATUS_ERROR, true);
                         }
                         return redirect()->to(base_url($this->controllerName.'/List'));
                     }
@@ -553,5 +557,4 @@ class Network extends CVUI_Controller
             return view($this->viewDirectory.'/Leave', $data);
         }
     }
-
 }
