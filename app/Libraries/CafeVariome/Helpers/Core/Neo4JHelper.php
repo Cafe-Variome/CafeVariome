@@ -1,7 +1,6 @@
 <?php namespace App\Libraries\CafeVariome\Helpers\Core;
 
 use App\Libraries\CafeVariome\CafeVariome;
-use App\Models\Settings;
 use Laudis\Neo4j\Authentication\Authenticate;
 use Laudis\Neo4j\ClientBuilder;
 

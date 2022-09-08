@@ -13,8 +13,6 @@ use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Factory\UserAdapterFactory;
 use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use App\Models\UIData;
-use App\Models\Settings;
-use App\Models\Source;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
 use App\Models\NetworkRequest;
 use App\Libraries\CafeVariome\Net\NetworkInterface;

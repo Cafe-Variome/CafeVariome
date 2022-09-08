@@ -17,8 +17,6 @@ use App\Libraries\CafeVariome\Auth\LocalAuthenticator;
 use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
 use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use App\Models\UIData;
-use App\Models\Settings;
-use App\Helpers\AuthHelper;
 
 class Auth extends CVUI_Controller
 {

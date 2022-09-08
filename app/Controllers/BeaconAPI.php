@@ -17,7 +17,6 @@ use App\Libraries\CafeVariome\Helpers\Core\URLHelper;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 use App\Libraries\CafeVariome\Query\Compiler;
-use App\Models\Settings;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;

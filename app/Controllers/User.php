@@ -12,10 +12,6 @@ star *
 use App\Libraries\CafeVariome\Factory\UserAdapterFactory;
 use App\Libraries\CafeVariome\Factory\UserFactory;
 use App\Models\UIData;
-use App\Models\Settings;
-use App\Models\Network;
-use App\Models\Source;
-use App\Helpers\AuthHelper;
 use CodeIgniter\Config\Services;
 
 class User extends CVUI_Controller

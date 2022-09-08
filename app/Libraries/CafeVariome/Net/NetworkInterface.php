@@ -2,17 +2,15 @@
 
 /**
  * NetworkInterface.php
- * 
+ *
  * Created: 31/10/2019
- * 
+ *
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
- * 
+ *
  * This class interfaces the software with the authentication server and handles data sent/received to the server.
- * It is mainly for CRUD operation of shared entities. 
+ * It is mainly for CRUD operation of shared entities.
  */
-
-use App\Models\Settings;
 
 class NetworkInterface extends AbstractNetworkInterface
 {
@@ -27,7 +25,7 @@ class NetworkInterface extends AbstractNetworkInterface
         $curlOptions = [CURLOPT_RETURNTRANSFER => TRUE,
                         CURLOPT_HTTPHEADER => ['Expect:'] //Removing Expect header results in speed-up on some LAMPs running with CENTOS];
         ];
-        
+
         $this->networkAdapter = new cURLAdapter(null, $curlOptions);
 
         if ($this->networkAdapterConfig->useProxy) {
@@ -131,12 +129,12 @@ class NetworkInterface extends AbstractNetworkInterface
         $response = $this->networkAdapter->Send();
         return $this->processResponse($response);
     }
-    
+
     protected function adapterw(string $uriTail, array $data)
     {
         $this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
         $this->networkAdapter->setOption(CURLOPT_POST, true);
-        $data['installation_key'] = $this->installation_key; 
+        $data['installation_key'] = $this->installation_key;
         $this->networkAdapter->setOption(CURLOPT_POSTFIELDS, $data);
     }
 
