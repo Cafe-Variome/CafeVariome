@@ -827,6 +827,7 @@ class Source extends CVUI_Controller
 		$uidata->data['indexSize'] = $indexSize == '-' ? $indexSize : SourceHelper::formatSize($indexSize);
 		$uidata->data['indexCreationDate'] = $indexCreationDate;
 		$uidata->data['indexStatusText'] = SourceHelper::getUserInterfaceIndexStatus($indexStatus);
+		$uidata->data['lastTaskId'] = (new TaskAdapterFactory())->GetInstance()->ReadLastProcessingTaskIdBySourceIdAndType($source->getID(), TASK_TYPE_SOURCE_INDEX_ELASTICSEARCH);
 
 		$uidata->javascript = [JS."cafevariome/userinterfaceindex.js"];
 

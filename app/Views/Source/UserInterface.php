@@ -8,22 +8,28 @@
 </div>
 <hr>
 <input type="hidden" id="csrf_token" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+<input type="hidden" id="lastTaskId" value="<?= $lastTaskId ?>" />
+
 <table class="table table-bordered table-striped">
 	<tr>
 		<th>Index Name</th>
 		<td>
 			<?= $indexName ?>
 		</td>
-		<td id="status-<?= $sourceId ?>"></td>
-	</tr>
-	<tr>
-		<th>Index Status</th>
-		<td><?= $indexStatusText ?></td>
 		<td id="action-<?= $sourceId ?>">
 			<button onclick="regenUI('<?= $sourceId; ?>');" class="btn btn-primary bg-gradient-primary">
 				Index Data
 			</button>
+			<span id="spinner" class="spinner-border spinner-border-sm text-warning" role="status" aria-hidden="true" style="display:none"></span>
+			<br>
+			<span id="statusMessage"></span>
 		</td>
+	</tr>
+	<tr>
+		<th>Index Status</th>
+		<td><?= $indexStatusText ?></td>
+		<td id="status-<?= $sourceId ?>"></td>
+
 	</tr>
 	<tr>
 		<th>Index Details</th>
