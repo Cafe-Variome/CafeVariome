@@ -65,41 +65,6 @@ class Source extends CVUI_Controller
         $sources = $this->dbAdapter->ReadAll();
         $uidata->data['sources'] = $sources;
 
-        $source_ids_array = array(); // Array for storing all source IDs for this install
-        foreach ($sources as $source)
-		{
-            $source_ids_array[] = $source->getID();
-        }
-
-        // Create pipe separated string of source IDs to post to API call
-        $source_ids = implode("|", $source_ids_array);
-
-		// Pass all the source IDs for this install to auth server in one call and get all the network groups for each source
-
-        $networkModel = new \App\Models\Network($this->db);
-        $source_ids_exploded = explode('|', $source_ids);
-
-        $groups_for_source_ids = [];
-        foreach ( $source_ids_exploded as $source_id )
-		{
-            $groups = $networkModel->getCurrentNetworkGroupsForSourceInInstallation($source_id);
-            $groups_for_source_ids[$source_id] = $groups;
-        }
-
-        if ( $groups_for_source_ids )
-		{
-           $returned_groups = json_decode(json_encode($groups_for_source_ids), TRUE);
-        }
-
-        // Loop through each source
-        foreach ($returned_groups as $source_id => $selected_groups)
-		{
-            if (!empty($selected_groups))
-			{ // If there's groups assigned to this source then pass to the view
-                $uidata->data['source_network_groups'][$source_id] = $selected_groups;
-            }
-        }
-
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = array(JS.'cafevariome/source.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 

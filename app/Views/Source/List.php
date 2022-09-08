@@ -21,7 +21,6 @@
 		<tr>
 			<th>Name</th>
 			<th>Record Count</th>
-			<th>Assigned Group(s)</th>
 			<th>Status</th>
 			<th>Quick Actions</th>
 		</tr>
@@ -34,21 +33,6 @@
 				<span class="text-muted" style="font-size:10px;">Displayed as (<?php echo $source->display_name; ?>)</span>
 			</td>
 			<td><?= $source->record_count; ?></td>
-			<td>
-				<?php
-					if ( isset($source_network_groups)):
-						if (array_key_exists($source->getID(), $source_network_groups)):
-							foreach ($source_network_groups[$source->getID()] as $group):
-								echo $group['description'] . " (Network:" . $group['network_name'] . ")<br />";
-							endforeach;
-						else:
-							echo "No groups assigned";
-						endif;
-					else:
-						echo "No groups assigned";
-					endif;
-				?>
-			</td>
 			<td>
 				<?= \App\Libraries\CafeVariome\Helpers\UI\SourceHelper::getSourceStatus($source->status) ?>
 			</td>
