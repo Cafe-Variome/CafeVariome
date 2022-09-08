@@ -496,7 +496,7 @@ class Source extends CVUI_Controller
 				{
 					$hosts = [$this->setting->GetElasticSearchUri()];
                     $elasticModel = new ElasticSearch($hosts);
-                    $elasticModel->deleteIndex(ElasticsearchHelper::getSourceIndexName($id));
+                    $elasticModel->deleteIndex(ElasticsearchHelper::GetSourceIndexName($id));
                 }
 				catch (\Exception $ex)
 				{
@@ -584,7 +584,7 @@ class Source extends CVUI_Controller
 		$indexStatus = ELASTICSEARCH_INDEX_STATUS_UNKNOWN;
 		if ($elasticStatus){
 			$elasticsearch = new ElasticSearch([$this->setting->GetElasticSearchUri()]);
-			$indexName = ElasticsearchHelper::getSourceIndexName($id);
+			$indexName = ElasticsearchHelper::GetSourceIndexName($id);
 			if ($elasticsearch->indexExists($indexName)){
 				$indexStatus = ELASTICSEARCH_INDEX_STATUS_CREATED;
 				$indexStats = $elasticsearch->getIndicesStats();
