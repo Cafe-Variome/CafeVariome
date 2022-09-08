@@ -160,7 +160,8 @@ class AjaxApi extends Controller
      * @return string in json format, phenotype and hpo data
      *
      */
-    public function getPhenotypeAttributes(int $network_key) {
+    public function GetPhenotypeAttributes(int $network_key)
+	{
         if ($this->request->getMethod() == 'post')
         {
 			$userInterfaceNetworkIndex = new UserInterfaceNetworkIndex($network_key);
