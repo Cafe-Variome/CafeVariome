@@ -4,7 +4,7 @@
  * Name: Pipeline.php
  *
  * Created: 18/05/2021
- *
+ * @deprecated
  * @author Mehdi Mehtarizadeh
  *
  */

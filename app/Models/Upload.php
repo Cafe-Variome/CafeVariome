@@ -5,7 +5,7 @@
  * Created 01/08/2019
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- *
+ * @deprecated
  * Upload model class that handles operations on data files.
  */
 

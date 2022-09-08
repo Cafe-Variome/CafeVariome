@@ -5,7 +5,7 @@
  * @author Owen Lancaster
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- *
+ * @deprecated
  * User model class that handles operations on User entity.
  */
 
