@@ -1,9 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-use App\Models\Attribute;
-use App\Models\Ontology;
-use App\Models\Source;
-
 /**
  * Neo4JResult.php
  * Created 27/10/2021
@@ -12,17 +8,21 @@ use App\Models\Source;
  *
  */
 
+use App\Models\Attribute;
+use App\Models\Ontology;
+use App\Libraries\CafeVariome\Entities\Source;
+
 class Neo4JOntologyResult extends AbstractResult
 {
 
-    public function extract(array $ids, string $attribute, int $source_id): array
-    {
+	public function Extract(array $ids, string $attribute, Source $source): array
+	{
 		$neo4jClient = $this->getNeo4JInstance();
 		$attributeModel = new Attribute();
 		$ontologyModel = new Ontology();
-		$sourceModel = new Source();
 
-		$sourceUID = $sourceModel->getSourceUID($source_id);
+		$source_id = $source->getID();
+		$sourceUID = $source->uid;
 		$attributeId = $attributeModel->getAttributeIdByNameAndSourceId($attribute, $source_id);
 		$ontologyAssociations = $attributeModel->getOntologyAssociationsByAttributeId($attributeId);
 

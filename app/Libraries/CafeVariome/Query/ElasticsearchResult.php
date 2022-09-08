@@ -1,8 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-use App\Models\Settings;
-use Elasticsearch\ClientBuilder;
-
 /**
  * ElasticsearchResult.php
  * Created 23/07/2021
@@ -11,6 +8,9 @@ use Elasticsearch\ClientBuilder;
  *
  */
 
+use App\Libraries\CafeVariome\CafeVariome;
+use App\Libraries\CafeVariome\Entities\Source;
+use Elasticsearch\ClientBuilder;
 
 class ElasticsearchResult extends AbstractResult
 {
@@ -21,10 +21,11 @@ class ElasticsearchResult extends AbstractResult
 		$this->aggregate_size = ELASTICSERACH_EXTRACT_AGGREGATE_SIZE;
 	}
 
-    public function extract(array $ids, string $attribute, int $source_id): array
+    public function Extract(array $ids, string $attribute, Source $source): array
     {
 		$elasticClient = $this->getESInstance();
-		$es_index = $this->getESIndexName($source_id);
+		$source_id = $source->getID();
+		$es_index = $source->GetElasticSearchIndexName($this->GetESIndexPrefix());
 
 		$paramsnew = ['index' => $es_index];
 
@@ -57,9 +58,9 @@ class ElasticsearchResult extends AbstractResult
 
 	protected function getESInstance(): \Elasticsearch\Client
 	{
-		$setting = Settings::getInstance();
+		$setting = CafeVariome::Settings();
 
-		$hosts = array($setting->getElasticSearchUri());
+		$hosts = array($setting->GetElasticSearchUri());
 		return ClientBuilder::create()->setHosts($hosts)->build();
 	}
 }
