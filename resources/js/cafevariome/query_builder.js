@@ -470,36 +470,48 @@ $(function() {
                             $.each(resp, function(key, val1) {
                                 //$('#resTbl tbody').empty();
                                 trow = "<tr id = " + key + "><td>" + key + "</a></td>";
-                                if (val1['records']['subjects'] != "Access Denied") {
-                                    var records = val1['records']['subjects'];
-                                    var source_display = val1['source_display'];
-                                    source_data[key] = val1['details'];
-                                    result_data[key] = records;
-                                    trow += '<td>';
-                                    if (records.length > 0 || Object.keys(records).length > 0) {
-                                        if (source_display){
-                                            trow += '<a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal" data-sourcename="' + key + '">' + Object.keys(records).length + '</a>';
+                                var payload = val1['payload'];
+                                source_data[key] = val1['details'];
+                                switch (val1['type'])
+                                {
+                                    case 'existence':
+                                        trow += '<td>';
+                                        trow +=  payload;
+                                        trow += '</td><td>';
+                                        break;
+                                    case 'boolean':
+                                        trow += '<td>';
+                                        if (isNaN(parseInt(payload)) && payload === true)
+                                        {
+                                            trow += 'Results below threshold exist.';
+                                        }
+                                        else
+                                        {
+                                            trow += payload;
+                                        }
+                                        trow += '</td><td>';
+
+                                        break;
+                                    case 'count':
+                                        trow += '<td>';
+                                        trow +=  payload;
+                                        trow += '</td><td>';
+                                        break;
+                                    case 'list':
+                                        var records = payload['subjects'];
+                                        result_data[key] = records;
+                                        trow += '<td>';
+                                        if (val1['count'] > 0 || Object.keys(records).length > 0) {
+                                            trow += '<a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal" data-sourcename="' + key + '">' + val1['count'] + '</a>';
                                         }
                                         else{
-                                            trow +=  Object.keys(records).length;
+                                            trow += '0';
                                         }
-                                    }
-                                    else{
-                                        trow += '0';
-                                    }
-                                    trow += '</td><td>';
+                                        trow += '</td><td>';
+                                        break;
+                                }
+                                trow += '<a type="button" class="btn btn-info active" data-toggle="modal" data-target="#sourceModal" data-sourcename="' + key + '"><i class="fa fa-database"></i></a>';
 
-                                    if (source_display){
-                                        trow += '<a type="button" class="btn btn-info active" data-toggle="modal" data-target="#sourceModal" data-sourcename="' + key + '"><i class="fa fa-database"></i></a>';
-                                    }
-                                    else{
-                                        trow += 'Not Available';
-                                    }
-                                    trow += '</td>';
-                                }
-                                else{
-                                    trow += '<td>Access Denied</td><td>-</td>';
-                                }
                                 trow += "</tr>";
                                     $('#query_result tbody').append(trow);
                                 //}
