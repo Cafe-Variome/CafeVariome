@@ -1,44 +1,59 @@
-function regenElastic(id,append) {
-    if (append) {
-        callElastic(id,true);
-    }
-    else {
+function regenElastic(id,overwrite) {
+    if (overwrite) {
         force = confirm('A forced Regeneration will completely rebuild your ElasticSearch Index. Do you wish to continue?');
         if (force) {
-            callElastic(id,false);
+            callElastic(id,true);
         }
         else{
             return;
         }
     }
+    else {
+        callElastic(id,false);
+    }
 }
 
-function callElastic(id, append) {
+function callElastic(source_id, overwrite) {
 
-    var postData = {'source_id': id, 'append': append};
+    var postData = {'source_id': source_id, 'overwrite': overwrite};
     var csrfTokenObj = getCSRFToken('keyvaluepair');
     var csrfTokenName = Object.keys(csrfTokenObj)[0];
     postData[csrfTokenName] = csrfTokenObj[csrfTokenName];
 
-    $.ajax({url  : baseurl + 'AjaxApi/elasticStart',
+    $.ajax({url  : baseurl + 'AjaxApi/IndexDataToElasticsearch',
         type: 'POST',
         data : postData,
         dataType: 'json',
-        success: function (data) {
-            $.notify({
-                // options
-                message: 'ElasticSearch is now regenerating.'},{
-                // settings
-                timer: 200
-            });
+        beforeSend:  function (jqXHR, settings) {
+            enterLoading();
+        },
+        success: function (response) {
+            switch (response.status) {
+                case 0:
+                    $('#statusMessage').addClass('text-success');
+                    $('#statusMessage').html(response.message);
+
+                    var taskId = response.task_id;
+                    $('#lastTaskId').val(taskId);
+                    $('#status-' + source_id).empty();
+                    $('#status-' + source_id).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + taskId + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div><p id='statusmessage-" + taskId + "' style='font-size: 10px'></p>");
+                    $('#action-' + source_id).children().prop('disabled', true);
+                    break;
+                case 1:
+                    $('#statusMessage').addClass('text-danger');
+                    $('#statusMessage').html('There was an error while processing the request: <br> Error Message: ' + response.message);
+                    break;
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $('#statusMessage').addClass('text-danger');
+            $('#statusMessage').html('There was an error while processing the request: <br> Error Code: ' + jqXHR.status + '<br> Error Message: ' + errorThrown);
+
+        },
+        complete: function (jqXHR, settings) {
+            exitLoading();
         }
     });
-
-    $('#status-' + id.toString()).empty();
-    $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div><p id='statusmessage-" + id.toString() + "' style='font-size: 10px'></p>");
-
-    $('#action-' + id.toString()).children().prop('disabled', true);
-
 }
 
 function getCSRFToken(format = 'string'){
@@ -55,38 +70,50 @@ function getCSRFToken(format = 'string'){
     }
 }
 
+function enterLoading() {
+    clearStatusMessage();
+    $('#spinner').show();
+    $('#processBtn').prop('disabled', true);
+}
+
+function exitLoading() {
+    $('#spinner').hide();
+    $('#processBtn').prop('disabled', false);
+}
+
+function clearStatusMessage()
+{
+    $('#statusMessage').html('');
+    $('#statusMessage').attr('class', '');
+}
+
 $(document).ready(function() {
-    var eventSource = new EventSource(baseurl + 'ServiceApi/pollElasticSearch');
+    var eventSource = new EventSource(baseurl + 'ServiceApi/PollTasks');
 
     eventSource.onmessage = function(event) {
         id = event.lastEventId;
-        edata = JSON.parse(event.data);
-        progress = edata.progress;
-        status = edata.status;
+        var edata = JSON.parse(event.data);
+        var progress = edata.progress;
+        var status = edata.status;
+        var idString = id.toString();
+        var sourceId = edata.source_id;
+        var lastTaskId = $('#lastTaskId').val();
 
-        if (progress > -1) {
-            if($('#progressbar-' + id.toString()).length){
-                $('#progressbar-' + id.toString()).removeClass('bg-success');
-
-                $('#progressbar-' + id.toString()).text(progress.toString() + '%');
-                $('#progressbar-' + id.toString()).css( "width", progress.toString() + '%');
-                $('#statusmessage-' + id.toString()).html(status);
-
+        if (progress > -1 && lastTaskId == idString) {
+            if($('#status-' + sourceId).html() == '')
+            {
+                $('#status-' + sourceId).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + idString + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100'>0%</div></div><p id='statusmessage-" + idString + "' style='font-size: 10px'></p>");
             }
-            else{
-                $('#status-' + id.toString()).empty();
-                $('#status-' + id.toString()).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + id.toString() + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='0'>0%</div></div><p id='statusmessage-" + id.toString() + "' style='font-size: 10px'>" + status + "</p>")
-                $('#action-' + id.toString()).children().prop('disabled', true);
-
-                $('#progressbar-' + id.toString()).text(progress.toString() + '%');
-                $('#progressbar-' + id.toString()).css('width', progress.toString() + '%');
-            }
+            $('#progressbar-' + idString).text(progress.toString() + '%');
+            $('#progressbar-' + idString).css( 'width', progress.toString() + '%' );
+            $('#statusmessage-' + idString).html(status);
         }
 
         if(progress == 100 && status.toLowerCase() == 'finished')
         {
-            $('#progressbar-' + id.toString()).addClass('bg-success');
-            $('#action-' + id.toString()).children().prop('disabled', false);
+            $('#progressbar-' + idString).addClass('bg-success');
+            $('#action-' + sourceId).children().prop('disabled', false);
+            clearStatusMessage();
         }
     };
 

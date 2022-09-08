@@ -8,6 +8,7 @@
 </div>
 <hr>
 <input type="hidden" id="csrf_token" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
+<input type="hidden" id="lastTaskId" value="<?= $lastTaskId ?>" />
 <table class="table table-bordered table-striped">
 	<tr>
 		<th>Neo4J Service Status</th>
@@ -23,23 +24,26 @@
 	<tr>
 		<th>Index Status</th>
 		<td><?= $indexStatusText ?></td>
-		<td id="status-<?= $sourceId ?>"></td>
-	</tr>
-	<tr>
-		<th>Data Status</th>
-		<td><?= $dataStatusText ?></td>
 		<td id="action-<?= $sourceId ?>">
 			<?php if($isRunning): ?>
 				<?php if($dataStatus == NEO4J_DATA_STATUS_FULLY_INDEXED || $dataStatus == NEO4J_DATA_STATUS_NOT_INDEXED): ?>
-					<button onclick="regenNeo4J('<?= $sourceId; ?>', false);" class="btn btn-primary bg-gradient-primary">
+					<button onclick="regenNeo4J('<?= $sourceId; ?>', true);" class="btn btn-primary bg-gradient-primary">
 						<?= ($dataStatus == NEO4J_DATA_STATUS_NOT_INDEXED) ? 'Index Data' : 'Re-index Data' ?>
 					</button>
 				<?php endif; ?>
 				<?php if($dataStatus == NEO4J_DATA_STATUS_PARTIALLY_INDEXED): ?>
-					<button onclick="regenNeo4J('<?= $sourceId; ?>', true);" class="btn btn-success">Index Appended Data</button>
+					<button onclick="regenNeo4J('<?= $sourceId; ?>', false);" class="btn btn-success">Index Appended Data</button>
 				<?php endif; ?>
 			<?php endif; ?>
+			<span id="spinner" class="spinner-border spinner-border-sm text-warning" role="status" aria-hidden="true" style="display:none"></span>
+			<br>
+			<span id="statusMessage"></span>
 		</td>
+	</tr>
+	<tr>
+		<th>Data Status</th>
+		<td><?= $dataStatusText ?></td>
+		<td id="status-<?= $sourceId ?>"></td>
 	</tr>
 	<tr>
 		<th>Index Details</th>
