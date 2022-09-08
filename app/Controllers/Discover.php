@@ -47,30 +47,38 @@ class Discover extends CVUI_Controller{
         $uidata->title = "Select Network";
 
         $networkInterface = new NetworkInterface();
-        $networkModel = new Network();
 
-        $user_id = $this->session->get('user_id');
+        $user_id = $this->authenticator->GetUserId();
 
         $authorisedNetworks = [];
         $instalattionNetworks = [];
 
-        $userNetworks = $networkModel->getNetworksUserMemberOf($user_id);
-        $instalattionNtworksResp = $networkInterface->GetNetworksByInstallationKey($this->setting->getInstallationKey());
+		$discoveryGroupAdapter = (new DiscoveryGroupAdapterFactory())->GetInstance();
+		$discoveryGroupIds = $discoveryGroupAdapter->ReadByUserId($user_id);
 
-        if ($instalattionNtworksResp->status) {
+		$discoveryGroups = $discoveryGroupAdapter->SetModel(DiscoveryGroupList::class)->ReadByIds($discoveryGroupIds);
+
+        $instalattionNtworksResp = $networkInterface->GetNetworksByInstallationKey($this->setting->GetInstallationKey());
+
+        if ($instalattionNtworksResp->status)
+		{
             $instalattionNetworks = $instalattionNtworksResp->data;
         }
 
-        foreach ($instalattionNetworks as $iNetwork) {
-            foreach ($userNetworks as $uNetwork) {
-                if ($iNetwork->network_key == $uNetwork['network_key']) {
-                    array_push($authorisedNetworks, $iNetwork);
+        foreach ($instalattionNetworks as $iNetwork)
+		{
+            foreach ($discoveryGroups as $discoveryGroup)
+			{
+                if ($iNetwork->network_key == $discoveryGroup->network_id)
+				{
+                    array_push($authorisedNetworks, $discoveryGroup);
                 }
             }
         }
 
-        if (count($authorisedNetworks) == 1) {
-            return redirect()->to(base_url($this->controllerName. '/query_builder/' . $authorisedNetworks[0]->network_key));
+        if (count($authorisedNetworks) == 1)
+		{
+            return redirect()->to(base_url($this->controllerName. '/QueryBuilder/' . $authorisedNetworks[0]->network_key));
         }
 
         $uidata->data['networks'] = $authorisedNetworks;
@@ -78,7 +86,7 @@ class Discover extends CVUI_Controller{
         $uidata->javascript = array(JS."cafevariome/discover.js");
 
         $data = $this->wrapData($uidata);
-        return view($this->viewDirectory.'/Select_Network', $data);
+        return view($this->viewDirectory.'/SelectNetwork', $data);
     }
 
     public function QueryBuilder(int $network_id)
