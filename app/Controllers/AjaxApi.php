@@ -691,7 +691,12 @@ class AjaxApi extends Controller
 		}
 	}
 
-    public function processFiles()
+	/**
+	 * @deprecated
+	 * @return false|string|void
+	 * @throws \Exception
+	 */
+    private function processFiles()
     {
 		if ($this->request->getMethod() == 'post') {
 			$fileIds = $this->request->getVar('fileIds');
