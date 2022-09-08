@@ -30,18 +30,22 @@ class ServiceApi extends ResourceController
 	{
 		$si = new ServiceInterface();
 		$result = "retry: 3000\nid: 0\ndata: {\"progress\": \"-1\", \"status\": \"\"}\n\n";
-		try {
+		try
+		{
 			$fileStatus = json_decode($si->PollTasks(), true);
 
-			if (json_last_error() == JSON_ERROR_NONE && count($fileStatus) > 0) {
+			if (json_last_error() == JSON_ERROR_NONE && count($fileStatus) > 0)
+			{
 				$result = "retry: 1000\n";
-				foreach ($fileStatus as $taskId => $value) {
-					//$result .= "id: " . $taskId . "\ndata: " . $value ."\n\n";
+				foreach ($fileStatus as $taskId => $value)
+				{
 					$result .= "id: " . $taskId . "\n";
-					$result .= "data: {\"progress\": \"" . $value['progress'] . "\", \"status\": \"" . $value['status'] . "\", \"data_file_id\": \"" . $value['data_file_id'] . "\"}\n\n";
+					$result .= "data: {\"progress\": \"" . $value['progress'] . "\", \"status\": \"" . $value['status'] . "\", \"data_file_id\": \"" . $value['data_file_id'] . "\", \"source_id\": \"" . $value['source_id'] . "\"}\n\n";
 				}
 			}
-		} catch (\Exception $ex) {
+		}
+		catch (\Exception $ex)
+		{
 
 		}
 
@@ -51,6 +55,42 @@ class ServiceApi extends ResourceController
 
 		return $this->respond($result);
 
+	}
+
+	public function PollTask()
+	{
+		if ($this->request->getMethod() == 'post')
+		{
+			$task_id = $this->request->getVar('task_id');
+			$si = new ServiceInterface();
+			$result = "retry: 3000\nid: 0\ndata: {\"progress\": \"-1\", \"status\": \"\"}\n\n";
+
+			try
+			{
+				$fileStatus = json_decode($si->PollTasks(), true);
+
+				if (json_last_error() == JSON_ERROR_NONE && count($fileStatus) > 0)
+				{
+					$result = "retry: 1000\n";
+					if (array_key_exists($task_id, $fileStatus))
+					{
+						$task = $fileStatus[$task_id];
+						$result .= "id: " . $task_id . "\n";
+						$result .= "data: {\"progress\": \"" . $task['progress'] . "\", \"status\": \"" . $task['status'] . "\", \"data_file_id\": \"" . $task['data_file_id'] . "\", \"source_id\": \"" . $task['source_id'] . "\"}\n\n";
+					}
+				}
+			}
+			catch (\Exception $ex)
+			{
+
+			}
+
+			$this->response->setHeader("Content-Type", "text/event-stream");
+			$this->response->setHeader("Cache-Control", "no-cache");
+
+
+			return $this->respond($result);
+		}
 	}
 
     public function pollUploadedFiles()
