@@ -36,7 +36,6 @@ class Compiler
 		$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
 
 		$session = \Config\Services::session();
-		$setting = Settings::getInstance();
 
 		$query = Sanitizer::Sanitize($query);
 		$query_array = json_decode($query, 1);
