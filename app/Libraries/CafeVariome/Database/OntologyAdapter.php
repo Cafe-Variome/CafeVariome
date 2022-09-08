@@ -68,6 +68,22 @@ class OntologyAdapter extends BaseAdapter
 		return $result;
 	}
 
+	public function ReadAttributeOntologyAssociation(int $association_id)
+	{
+		$this->changeTable('attributes_ontology_prefixes_relationships as aop');
+		$this->builder->select('aop.id as id, ontologies.name as ontology_name, ontology_prefixes.name as prefix_name, ontology_relationships.name as relationship_name, ' . AttributeAdapter::GetTable() . '.name as attribute_name, '. AttributeAdapter::GetTable() . '.' . AttributeAdapter::GetKey() . ' as attribute_id');
+		$this->builder->where('aop.id', $association_id);
+		$this->builder->join(static::$table, 'aop.ontology_id = '. static::$table . '.' .static::$key);
+		$this->builder->join(AttributeAdapter::GetTable(), 'aop.attribute_id = ' . AttributeAdapter::GetTable() . '.' . AttributeAdapter::GetKey());
+		$this->builder->join('ontology_prefixes', 'aop.prefix_id = ontology_prefixes.id');
+		$this->builder->join('ontology_relationships', 'aop.relationship_id = ontology_relationships.id');
+		$result = $this->builder->get()->getResultArray();
+		$this->resetTable();
+
+		return count($result) == 1 ? $result[0] : null;
+	}
+
+
 	public function ReadOntologyAssociationsByAttributeId(int $attribute_id): array
 	{
 		$this->changeTable('attributes_ontology_prefixes_relationships');
