@@ -588,7 +588,8 @@ class AjaxApi extends Controller
 					null,
 					null,
 					$dataFile->getID(),
-					$pipeline->getID()
+					$pipeline->getID(),
+					$dataFile->source_id
 				);
 				$taskAdapter = (new TaskAdapterFactory())->GetInstance();
 				$taskId = $taskAdapter->Create($task);
@@ -609,6 +610,8 @@ class AjaxApi extends Controller
 					'message' => 'Failed to update data file status.'
 				]);
 			}
+		}
+    }
 
 	public function ShutdownService()
 	{
@@ -766,7 +769,7 @@ class AjaxApi extends Controller
 			return json_encode($sourceCountList);
 		}
     }
-	
+
 	public function getOntologyPrefixesAndRelationships()
 	{
 		$ontology_id = $this->request->getVar('ontology_id');
