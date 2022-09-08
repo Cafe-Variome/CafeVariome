@@ -89,10 +89,12 @@ class Discover extends CVUI_Controller
         $uidata = new UIData();
         $networkInterface = new NetworkInterface();
 
-        if ($network_key) {
-            $this->session->set(array('network_key' => $network_key));
+        if ($network_id)
+		{
+            $this->session->set(array('network_key' => $network_id));
         }
-        else {
+        else
+		{
             return redirect()->to(base_url($this->controllerName. '/Select_Network'));
         }
 
@@ -114,7 +116,10 @@ class Discover extends CVUI_Controller
 
         $uidata->data["elasticSearchEnabled"] = true;
         $uidata->data["message"] = null;
-        if (!$this->checkElasticSearch()) {
+
+		$elasticSearch = new ElasticSearch([$this->setting->GetElasticSearchUri()]);
+        if (!$elasticSearch->ping())
+		{
             $uidata->data["elasticSearchEnabled"] = false;
             $uidata->data["message"] = "The query builder interface is currently not accessible as Elasticsearch is not running. Please get an administrator to start Elasticsearch and then try again.";
         }
@@ -139,18 +144,6 @@ class Discover extends CVUI_Controller
 
         $data = $this->wrapData($uidata);
 
-        return view($this->viewDirectory. '/Query_Builder', $data);
-    }
-
-    function checkElasticSearch() {
-        $hosts = (array)$this->setting->settingData['elastic_url'];
-        $client = Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
-
-        try {
-            $indices = $client->cat()->indices(array('index' => '*'));
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return view($this->viewDirectory. '/QueryBuilder', $data);
     }
 }
