@@ -1,21 +1,23 @@
-<?php
+<?php namespace App\Libraries\CafeVariome\Core\DataPipeLine\Index;
 
-namespace App\Libraries\CafeVariome\Core\DataPipeLine\Index;
-
-use App\Models\Source;
+use App\Libraries\CafeVariome\Database\DiscoveryGroupAdapter;
+use App\Libraries\CafeVariome\Database\SourceAdapter;
+use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
+use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 
 abstract class AbstractNetworkIndex
 {
-
 	protected int $networkKey;
-	protected Source $sourceModel;
-	protected array $sources;
+	protected DiscoveryGroupAdapter $discoveryGroupAdapter;
+	protected SourceAdapter $sourceAdapter;
+	protected array $sourceIds;
 
 	public function __construct(int $network_key)
 	{
 		$this->networkKey = $network_key;
-		$this->sourceModel = new \App\Models\Source();
-		$this->sources = [];
+		$this->discoveryGroupAdapter = (new DiscoveryGroupAdapterFactory())->GetInstance();
+		$this->sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+		$this->sourceIds = [];
 		$this->getSourcesInNetwork();
 	}
 
@@ -23,11 +25,14 @@ abstract class AbstractNetworkIndex
 
 	private function getSourcesInNetwork()
 	{
-		$sources = $this->sourceModel->getSourcesByNetwork($this->networkKey); // Get sources that are in the network
-		foreach ($sources as $source) {
-			if (!in_array($source['source_id'], $this->sources)){
-				array_push($this->sources, $source['source_id']);
-			}
+		$discoveryGroups = $this->discoveryGroupAdapter->ReadByNetworkId($this->networkKey);
+		$discoveryGroupIds = [];
+
+		foreach ($discoveryGroups as $discoveryGroup)
+		{
+			array_push($discoveryGroupIds, $discoveryGroup->getID());
 		}
+
+		$this->sourceIds = $this->discoveryGroupAdapter->ReadAssociatedSourceIds($discoveryGroupIds);
 	}
 }
