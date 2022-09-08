@@ -129,25 +129,6 @@ class Source extends CVUI_Controller
         ]
         );
 
-        // Get all available groups for the networks this installation is a member of from auth central for multi select list
-        $networkModel = new \App\Models\Network();
-
-        $networkGroups = $networkModel->getNetworkGroupsForInstallation();
-
-        $srcDisplayGroups = [];
-        $countDisplayGroups = [];
-
-		foreach ( $networkGroups as $ng ) {
-            if ($ng['group_type'] == 'source_display') {
-                $srcDisplayGroups[$ng['id'] . ',' . $ng['network_key']] = $ng['name'] . '(' . $ng['network_name'] . ')';
-            }
-            elseif ($ng['group_type'] == 'count_display') {
-                $countDisplayGroups[$ng['id'] . ',' . $ng['network_key']] = $ng['name'] . '(' . $ng['network_name'] . ')';
-            }
-        }
-        $uidata->data['srcDSPGroups'] = $srcDisplayGroups;
-        $uidata->data['countDSPGroups'] = $countDisplayGroups;
-
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
             $name = $this->request->getVar('name');
             $display_name = $this->request->getVar('display_name');
