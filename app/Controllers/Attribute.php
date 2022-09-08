@@ -24,7 +24,6 @@ use CodeIgniter\Config\Services;
 class Attribute extends CVUI_Controller
 {
 	private $validation;
-	private $attributeModel;
 
 	private SourceAdapter $sourceAdapter;
 
@@ -48,8 +47,6 @@ class Attribute extends CVUI_Controller
 		$this->validation = Services::validation();
 		$this->sourceAdapter = (new SourceAdapterFactory())->GetInstance();
 		$this->dbAdapter = (new AttributeAdapterFactory())->GetInstance();
-
-		$this->attributeModel = new \App\Models\Attribute();
 	}
 
 	public function Index()
