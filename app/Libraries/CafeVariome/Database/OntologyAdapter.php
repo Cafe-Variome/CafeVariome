@@ -24,6 +24,18 @@ class OntologyAdapter extends BaseAdapter
 	 */
 	protected static string $key = 'id';
 
+	public function ReadOntologyPrefixIdsAndRelationshipIdsByAttributeId(int $attribute_id): array
+	{
+		$this->changeTable('attributes_ontology_prefixes_relationships');
+		$this->builder->select('prefix_id, relationship_id');
+		$this->builder->where('attribute_id', $attribute_id);
+
+		$result = $this->builder->get()->getResult();
+		$this->resetTable();
+
+		return $result;
+	}
+
 
 	/**
      * @inheritDoc
