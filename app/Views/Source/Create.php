@@ -57,16 +57,6 @@
 		<?php echo form_dropdown($status); ?>
 	</div>
 </div>
-<div class="form-group row">
-	<div class=col-6>
-		<?php echo form_label('Source Display Access Group', 'source_display'); ?>
-		<?php echo form_multiselect('source_display[]', $srcDSPGroups , $selected_source_display, ['id'=> 'source_display', 'class' => 'form-control']); ?>
-	</div>
-	<div class=col-6>
-		<?php echo form_label('Count Display Access Group', 'count_display'); ?>
-		<?php echo form_multiselect('count_display[]', $countDSPGroups , $selected_count_display, ['id'=> 'count_display', 'class' => 'form-control']); ?>
-	</div>
-</div>
 
 <div class="form-group row">
 	<div class=col-12>
