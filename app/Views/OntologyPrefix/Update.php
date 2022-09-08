@@ -17,13 +17,13 @@
 	</div>
 <?php endif; ?>
 
-<?php echo form_open($controllerName.'/Update/' . $prefix_id); ?>
-<?php echo form_hidden(['prefix_id' => $prefix_id]); ?>
-<?php echo form_hidden(['ontology_id' => $ontology_id]); ?>
+<?php echo form_open($controllerName.'/Update/' . $ontologyPrefix->getID()); ?>
+<?php echo form_hidden(['ontology_prefix_id' => $ontologyPrefix->getID()]); ?>
+<?php echo form_hidden(['ontology_id' => $ontologyPrefix->ontology_id]); ?>
 	<div class="form-group row">
 		<div class="col-6">
 			<?php echo form_label('Ontology Name:', 'ontology_name'); ?>
-			<?= $ontology_name ?>
+			<?= $ontologyPrefix->ontology_name ?>
 		</div>
 		<div class="col-6">
 		</div>
@@ -43,8 +43,8 @@
 			<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
 				<i class="fa fa-save"></i> Save Changes
 			</button>
-			<a href="<?= base_url($controllerName) . '/List/' . $ontology_id;?>" class="btn btn-secondary bg-gradient-secondary" >
-				<i class="fa fa-project-diagram"></i> View Ontology Prefixes of <?= $ontology_name ?>
+			<a href="<?= base_url($controllerName) . '/List/' . $ontologyPrefix->ontology_id;?>" class="btn btn-secondary bg-gradient-secondary" >
+				<i class="fa fa-project-diagram"></i> View Ontology Prefixes of <?= $ontologyPrefix->name ?>
 			</a>
 		</div>
 	</div>

@@ -8,10 +8,9 @@
 </div>
 <hr>
 
-<?php echo form_open($controllerName."/Delete/" . $relationship_id); ?>
-<?php echo form_hidden(['ontology_relationship_id' => $relationship_id]); ?>
+<?php echo form_open($controllerName."/Delete/" . $ontologyRelationship->getID()); ?>
 <div class="form-group">
-	<span class="text-danger">Warning: Are you sure you want to delete '<?= $ontology_relationship_name; ?>'?</span>
+	<span class="text-danger">Warning: Are you sure you want to delete '<?= $ontologyRelationship->name; ?>'?</span>
 </div>
 <div class="form-group">
 	<div class="form-check form-check-inline">
@@ -29,7 +28,7 @@
 		<button type="submit" name="submit" class="btn btn-danger bg-gradient-danger">
 			<i class="fa fa-trash"></i>  Delete Ontology Relationship
 		</button>
-		<a href="<?= base_url($controllerName) . '/List/' . $ontology_id;?>" class="btn btn-secondary bg-gradient-secondary">
+		<a href="<?= base_url($controllerName) . '/List/' . $ontologyRelationship->ontology_id;?>" class="btn btn-secondary bg-gradient-secondary">
 			Cancel
 		</a>
 	</div>
