@@ -166,6 +166,12 @@ class EAVAdapter extends BaseAdapter
 		return $this->builder->delete();
 	}
 
+	public function DeleteBySourceId(int $source_id)
+	{
+		$this->builder->where('source_id', $source_id);
+		return $this->builder->delete();
+	}
+
     /**
      * @inheritDoc
      */

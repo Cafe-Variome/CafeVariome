@@ -11,8 +11,10 @@
  */
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\ElasticSearch;
+use App\Libraries\CafeVariome\Factory\EAVAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceFactory;
+use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
 use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use App\Libraries\CafeVariome\Helpers\Core\Neo4JHelper;
 use App\Libraries\CafeVariome\Helpers\UI\SourceHelper;
@@ -522,7 +524,8 @@ class Source extends CVUI_Controller
 					{
                         delete_files($dirPath, true);
                     }
-                } catch (\Exception $ex)
+                }
+				catch (\Exception $ex)
 				{
                     $this->setStatusMessage("There was an error in deleting files of the source.", STATUS_ERROR, true);
                     $error_flag = true;
@@ -532,7 +535,8 @@ class Source extends CVUI_Controller
 				{
                     try
 					{
-                        $this->sourceModel->deleteSourceFromEAVs($id);
+						$EAVAdapter = (new EAVAdapterFactory())->GetInstance();
+						$EAVAdapter->DeleteBySourceId($id);
 						$this->dbAdapter->Delete($id);
                         $this->setStatusMessage("Source was deleted.", STATUS_SUCCESS, true);
                     }
