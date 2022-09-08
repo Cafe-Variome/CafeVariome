@@ -146,12 +146,12 @@
             <li class="nav-item <?= $controllerName == 'NetworkGroup' ? 'active' : ''?>">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseNetGroup" aria-expanded="true" aria-controls="collapseNetGroup">
                 <i class="fas fa-fw fa-user-friends"></i>
-                    <span>Network Groups</span>
+                    <span>Discovery Groups</span>
                 </a>
-                <div id="collapseNetGroup" class="collapse <?= $controllerName == 'NetworkGroup' ? 'show' : ''?>" aria-labelledby="headingNetGroup" data-parent="#accordionSidebar">
+                <div id="collapseNetGroup" class="collapse <?= $controllerName == 'DiscoveryGroup' ? 'show' : ''?>" aria-labelledby="headingNetGroup" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="<?= base_url('NetworkGroup/Create') ?>">Create a Network Group</a>
-                        <a class="collapse-item" href="<?= base_url('NetworkGroup/List') ?>">View Network Groups</a>
+                        <a class="collapse-item" href="<?= base_url('DiscoveryGroup/Create') ?>">Create a Discovery Group</a>
+                        <a class="collapse-item" href="<?= base_url('DiscoveryGroup/List') ?>">View Discovery Groups</a>
                     </div>
                 </div>
             </li>
