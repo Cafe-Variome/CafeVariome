@@ -25,16 +25,12 @@ use CodeIgniter\Config\Services;
 
 class Source extends CVUI_Controller
 {
-
     /**
 	 * Validation list template.
 	 *
 	 * @var string
 	 */
     protected $validationListTemplate = 'list';
-
-
-    private $sourceModel;
 
     /**
 	 * Constructor
@@ -48,7 +44,6 @@ class Source extends CVUI_Controller
 
 		$this->validation = Services::validation();
 		$this->dbAdapter = (new SourceAdapterFactory())->GetInstance();
-        $this->sourceModel = new \App\Models\Source();
         helper('filesystem');
     }
 
