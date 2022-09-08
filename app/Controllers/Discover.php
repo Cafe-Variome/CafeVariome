@@ -9,20 +9,15 @@
  *
  */
 
+use App\Libraries\CafeVariome\Core\DataPipeLine\Index\ElasticSearch;
+use App\Libraries\CafeVariome\Entities\ViewModels\DiscoveryGroupList;
 use App\Models\UIData;
-use App\Models\Settings;
-use App\Models\Source;
-use App\Models\Network;
-use App\Libraries\CafeVariome\Auth\KeyCloak;
-use App\Libraries\CafeVariome;
-use App\Libraries\CafeVariome\Query;
-use App\Helpers\AuthHelper;
 use CodeIgniter\Config\Services;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
-use Elasticsearch;
+use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
 
-class Discover extends CVUI_Controller{
-
+class Discover extends CVUI_Controller
+{
     /**
 	 * Constructor
 	 *
