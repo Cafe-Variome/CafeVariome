@@ -123,7 +123,7 @@ $(function() {
     // urls object
     const urls = {'qb_config': baseurl + 'resources/js/config.json',
                   'qb_json': baseurl + 'resources/js/querybuilder.json',
-                  'phen_json': baseurl + 'AjaxApi/getPhenotypeAttributes/' + $('#network_key').val()
+                  'phen_json': baseurl + 'AjaxApi/GetPhenotypeAttributes/' + $('#network_key').val()
                 };
     // error object
     const error = {
