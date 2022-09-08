@@ -1,6 +1,7 @@
 <?php namespace App\Models;
 
 /**
+ * @deprecated
  * Settings.php
  * @author: Mehdi Mehtarizadeh
  * Created: 18/06/2019

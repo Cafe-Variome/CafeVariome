@@ -2,7 +2,7 @@
 
 /**
  * NetworkGroup.php
- *
+ * @deprecated
  * Created: 20/08/2019
  *
  * @author Mehdi Mehtarizadeh
