@@ -92,7 +92,10 @@ class SingleSignOnProvider extends CVUI_Controller
 
 		foreach ($credentials as $credential)
 		{
-			$credentialsList[$credential->getID()] = $credential->name . ($credential->hide_username ? ' [Username is hidden]' : ' [' . $credential->username . ']');
+			if (!empty($credential->username ))
+			{
+				$credentialsList[$credential->getID()] = $credential->name . ($credential->hide_username ? ' [Username is hidden]' : ' [' . $credential->username . ']');
+			}
 		}
 
 		$proxyServerAdapterFactory = new ProxyServerAdapterFactory();

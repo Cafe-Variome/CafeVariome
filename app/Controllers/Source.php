@@ -80,48 +80,57 @@ class Source extends CVUI_Controller
         $this->validation->setRules([
             'name' => [
                 'label'  => 'Source Name',
-                'rules'  => 'required|alpha_numeric_space|max_length[30]|is_unique[sources.name]',
+                'rules'  => 'required|alpha_numeric_space|max_length[128]|is_unique[sources.name]',
                 'errors' => [
                     'required' => '{field} is required.',
-					'max_length' => 'Maximum length for {field} is 30 characters.',
-                    'uniquename_check' => '{field} already exists.'
+					'max_length' => 'Maximum length for {field} is 128 characters.',
+                    'uniquename_check' => '{field} already exists.',
+					'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
                 ]
             ],
             'owner_name' => [
                     'label'  => 'Owner Name',
-                    'rules'  => 'required|alpha_numeric_space',
+                    'rules'  => 'required|alpha_numeric_space|max_length[256]',
                     'errors' => [
-                        'required' => '{field} is required.'
-                    ]
+                        'required' => '{field} is required.',
+						'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.',
+						'max_length' => 'Maximum length for {field} is 256 characters.'
+					]
             ],
             'owner_email' => [
                 'label'  => 'Owner Email',
-                'rules'  => 'valid_email|required',
+                'rules'  => 'valid_email|required|max_length[128]',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'valid_email' => 'Please check the Email field. It does not appear to be valid.'
-                ]
+                    'valid_email' => 'Please check the {field}}. It does not appear to be a valid email address.',
+					'max_length' => 'Maximum length for {field} is 128 characters.'
+				]
             ],
             'uri' => [
                 'label'  => 'Source URI',
-                'rules'  => 'required|valid_url',
+                'rules'  => 'required|valid_url|max_length[128]',
                 'errors' => [
-                    'required' => '{field} is required.'
-                ]
+                    'required' => '{field} is required.',
+					'valid_url' => 'Please check the {field}. It does not appear to be a valid URI.',
+					'max_length' => 'Maximum length for {field} is 128 characters.'
+				]
             ],
             'description' => [
                 'label'  => 'Source Description',
-                'rules'  => 'required|alpha_numeric_space',
+                'rules'  => 'required|text_validator|max_length[65535]',
                 'errors' => [
-                    'required' => '{field} is required.'
-                ]
+                    'required' => '{field} is required.',
+					'max_length' => 'Maximum length for {field} is 65,535 characters.'
+				]
             ],
             'status' => [
                 'label'  => 'Source Status',
-                'rules'  => 'required',
+                'rules'  => 'required|integer|max_length[3]',
                 'errors' => [
-                    'required' => '{field} is required.'
-                ]
+                    'required' => '{field} is required.',
+					'integer' => 'The only valid input for {field} is integers.',
+					'max_length' => 'Maximum length for {field} is 3 digits.'
+				]
             ]
         ]
         );
@@ -247,53 +256,65 @@ class Source extends CVUI_Controller
 
         //validate form input
 
-        $this->validation->setRules([
-            'name' => [
-                'label'  => 'Source Name',
-                'rules'  => 'required|alpha_numeric_space|max_length[30]',
-                'errors' => [
-					'required' => '{field} is required.',
-					'max_length' => 'Maximum length for {field} is 30 characters.',
-                ]
-            ],
-			'owner_name' => [
-				'label'  => 'Owner Name',
-				'rules'  => 'required|alpha_numeric_space',
-				'errors' => [
-					'required' => '{field} is required.'
+		$this->validation->setRules([
+				'name' => [
+					'label'  => 'Source Name',
+					'rules'  => 'required|alpha_numeric_space|max_length[128]|is_unique[sources.name]',
+					'errors' => [
+						'required' => '{field} is required.',
+						'max_length' => 'Maximum length for {field} is 128 characters.',
+						'uniquename_check' => '{field} already exists.',
+						'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.'
+					]
+				],
+				'owner_name' => [
+					'label'  => 'Owner Name',
+					'rules'  => 'required|alpha_numeric_space|max_length[256]',
+					'errors' => [
+						'required' => '{field} is required.',
+						'alpha_numeric_space' => 'The only valid characters in the {field} are alphanumeric or space characters.',
+						'max_length' => 'Maximum length for {field} is 256 characters.'
+					]
+				],
+				'owner_email' => [
+					'label'  => 'Owner Email',
+					'rules'  => 'valid_email|required|max_length[128]',
+					'errors' => [
+						'required' => '{field} is required.',
+						'valid_email' => 'Please check the {field}}. It does not appear to be a valid email address.',
+						'max_length' => 'Maximum length for {field} is 128 characters.'
+					]
+				],
+				'uri' => [
+					'label'  => 'Source URI',
+					'rules'  => 'required|valid_url|max_length[128]',
+					'errors' => [
+						'required' => '{field} is required.',
+						'valid_url' => 'Please check the {field}. It does not appear to be a valid URI.',
+						'max_length' => 'Maximum length for {field} is 128 characters.'
+					]
+				],
+				'description' => [
+					'label'  => 'Source Description',
+					'rules'  => 'required|alpha_numeric_punct|max_length[65535]',
+					'errors' => [
+						'required' => '{field} is required.',
+						'alpha_numeric_punct' => 'The only valid characters in the {field} are alphanumeric or space characters.',
+						// @TODO custom role to allow commas
+						'max_length' => 'Maximum length for {field} is 65,535 characters.'
+					]
+				],
+				'status' => [
+					'label'  => 'Source Status',
+					'rules'  => 'required|integer|max_length[3]',
+					'errors' => [
+						'required' => '{field} is required.',
+						'integer' => 'The only valid input for {field} is integers.',
+						'max_length' => 'Maximum length for {field} is 3 digits.'
+					]
 				]
-			],
-            'owner_email' => [
-                'label'  => 'Owner Email',
-                'rules'  => 'valid_email|required',
-                'errors' => [
-                    'required' => '{field} is required.',
-                    'valid_email' => 'Please check the Email field. It does not appear to be valid.'
-                ]
-            ],
-            'uri' => [
-                'label'  => 'Source URI',
-                'rules'  => 'required|valid_url',
-                'errors' => [
-                    'required' => '{field} is required.'
-                ]
-            ],
-            'description' => [
-                'label'  => 'Source Description',
-                'rules'  => 'required|alpha_numeric_space',
-                'errors' => [
-                    'required' => '{field} is required.'
-                ]
-            ],
-            'status' => [
-                'label'  => 'Source Status',
-                'rules'  => 'required',
-                'errors' => [
-                    'required' => '{field} is required.'
-                ]
-            ],
-        ]
-        );
+			]
+		);
 
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 		{

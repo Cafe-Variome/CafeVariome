@@ -6,6 +6,7 @@
  * Created: 19/08/2019
  *
  * @author Mehdi Mehtarizadeh
+ * @author Farid Yavari Dizjikan
  *
  * This class contains helper functions for form validation.
  */
@@ -334,5 +335,71 @@ class ValidationHelper
 		$attribute_id = $data[$fields];
 		$valueId = $valueModel->getValueIdByNameAndAttributeId($str, $attribute_id);
 		return !($valueId > 0);
+	}
+
+	public function valid_username_chars(string $str, & $err): bool
+	{
+		$err = null;
+		$regexp = "/^[a-zA-Z0-9-@.-_]+$/";
+
+            if (preg_match($regexp, $str))
+			{
+                return true;
+            }
+			else {
+
+				$err = "The only valid characters for usernames are alphanumerics, . or @ .";
+				return false;
+			}
+
+	}
+
+	public function text_validator(string $str, & $err): bool
+	{
+		$err = null;
+		$regexp = "/^[a-zA-Z0-9-@.-_,%~$*+=|:&£ ?!]+$/";
+
+            if (preg_match($regexp, $str))
+			{
+                return true;
+            }
+			else {
+
+				$err = "The only valid characters for texts are alphanumerics,spaces,.,-,_,%,~,$,*,+,=,|,:,&,£,@,?,! or , .";
+				return false;
+			}
+
+	}
+
+	public function password_strict_check(string $pwd, & $err): bool
+	{
+		$err = null;
+
+		if ((strlen($pwd<8)) and (preg_match("#[0-9]+#", $pwd)) and (preg_match("#[a-zA-Z]+#", $pwd)) and (!preg_match("#[(.-_,%~$*+=|:&£?!)]+#", $pwd))) {
+			return true;
+		}
+		else {
+
+			$err = "The password must be atleast 8 characters and include atleast one letter, number or special characters as follows: (.-_,%~$*+=|:&£?!)";
+			return false;
+		}
+
+	}
+
+	public function credentail_password_check(string $pwd, & $err): bool
+	{
+		$err = null;
+		$regexp = "/^[a-zA-Z0-9-.-_,%~$*+=|:&£ ?!]+$/";
+
+            if (preg_match($regexp, $pwd))
+			{
+                return true;
+            }
+			else {
+
+				$err = "The only valid characters for credentail passwords are alphanumerics,.,-,_,%,~,$,*,+,=,|,:,&,£,?,! or , .";
+				return false;
+			}
+
 	}
 }

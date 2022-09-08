@@ -6,6 +6,7 @@
  * Created: 19/02/2020
  *
  * @author Mehdi Mehtarizadeh
+ * @author Farid Yavari Dizjikan
  */
 
 use App\Libraries\CafeVariome\Entities\ViewModels\PageList;
@@ -67,7 +68,8 @@ class Page extends CVUI_Controller
                 'errors' => [
                     'required' => '{field} is required.',
                     'uniquename_check' => '{field} already exists.',
-                    'max_length' => 'Maximum length is 50 characters.'
+                    'max_length' => 'Maximum length is 50 characters.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
                 ]
             ],
@@ -77,7 +79,8 @@ class Page extends CVUI_Controller
                 'rules' => 'required|alpha_dash|max_length[65535]',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'max_length' => 'Maximum length is 65,535 characters.'
+                    'max_length' => 'Maximum length is 65,535 characters.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
             ]
         ]
@@ -152,7 +155,8 @@ class Page extends CVUI_Controller
                 'errors' => [
                     'required' => '{field} is required.',
                     'uniquename_check' => '{field} already exists.',
-                    'max_length' => 'Maximum length is 50 characters.'
+                    'max_length' => 'Maximum length is 50 characters.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
                 ]
             ],
@@ -162,7 +166,8 @@ class Page extends CVUI_Controller
                 'rules' => 'required|alpha_dash|max_length[65535]',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'max_length' => 'Maximum length is 65,535 characters.'
+                    'max_length' => 'Maximum length is 65,535 characters.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
             ]
         ]);
