@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Aug 22, 2022 at 11:14 AM
+-- Generation Time: Sep 08, 2022 at 04:30 PM
 -- Server version: 5.7.38-0ubuntu0.18.04.1
 -- PHP Version: 8.0.19
 
@@ -31,7 +31,7 @@ CREATE TABLE `attributes` (
   `id` int(11) NOT NULL,
   `name` varchar(100) NOT NULL,
   `display_name` varchar(200) NOT NULL,
-  `source_id` int(11) NOT NULL,
+  `source_id` int(11) UNSIGNED NOT NULL,
   `type` tinyint(3) NOT NULL,
   `min` double NOT NULL,
   `max` double NOT NULL,
@@ -121,6 +121,42 @@ CREATE TABLE `data_files` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `discovery_groups`
+--
+
+CREATE TABLE `discovery_groups` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `name` varchar(128) NOT NULL,
+  `description` varchar(512) NOT NULL,
+  `network_id` int(11) NOT NULL,
+  `policy` tinyint(3) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `discovery_group_sources`
+--
+
+CREATE TABLE `discovery_group_sources` (
+  `discovery_group_id` int(11) UNSIGNED NOT NULL,
+  `source_id` int(11) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `discovery_group_users`
+--
+
+CREATE TABLE `discovery_group_users` (
+  `discovery_group_id` int(11) UNSIGNED NOT NULL,
+  `user_id` int(11) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `eavs`
 --
 
@@ -155,38 +191,8 @@ CREATE TABLE `groups` (
 --
 
 CREATE TABLE `networks` (
-  `network_key` int(11) NOT NULL,
-  `network_name` mediumtext NOT NULL,
-  `network_type` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `network_groups`
---
-
-CREATE TABLE `network_groups` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `name` varchar(100) NOT NULL,
-  `description` varchar(100) NOT NULL,
-  `network_key` int(11) NOT NULL,
-  `group_type` varchar(50) NOT NULL,
-  `url` varchar(256) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `network_groups_sources`
---
-
-CREATE TABLE `network_groups_sources` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `source_id` int(11) NOT NULL,
-  `group_id` int(11) UNSIGNED NOT NULL,
-  `installation_key` varchar(32) CHARACTER SET latin1 NOT NULL,
-  `network_key` int(11) NOT NULL
+  `id` int(11) NOT NULL,
+  `name` varchar(512) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
@@ -215,12 +221,12 @@ CREATE TABLE `network_requests` (
 
 CREATE TABLE `ontologies` (
   `id` int(11) NOT NULL,
-  `name` varchar(200) NOT NULL,
-  `description` varchar(500) DEFAULT NULL,
-  `node_key` varchar(100) NOT NULL,
-  `node_type` varchar(100) NOT NULL,
-  `key_prefix` varchar(100) DEFAULT NULL,
-  `term_name` varchar(100) DEFAULT NULL
+  `name` varchar(256) NOT NULL,
+  `description` text,
+  `node_key` varchar(128) NOT NULL,
+  `node_type` varchar(128) NOT NULL,
+  `key_prefix` varchar(128) DEFAULT NULL,
+  `term_name` varchar(128) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -436,7 +442,7 @@ INSERT INTO `single_sign_on_providers` (`id`, `server_id`, `name`, `display_name
 --
 
 CREATE TABLE `sources` (
-  `id` int(11) NOT NULL,
+  `id` int(11) UNSIGNED NOT NULL,
   `uid` varchar(11) NOT NULL,
   `name` varchar(128) NOT NULL,
   `display_name` varchar(128) NOT NULL,
@@ -516,19 +522,6 @@ CREATE TABLE `users` (
 INSERT INTO `users` (`id`, `ip_address`, `username`, `password`, `email`, `created_on`, `last_login`, `active`, `first_name`, `last_name`, `company`, `phone`, `is_admin`, `token`, `remote`) VALUES
 (1, '127.0.0.1', 'admin@cafevariome.org', '$2y$12$g2P1T2RBeLrG94gJjdF/H.Lu1b40U5YLe6DHQFQ.pW/O24sjrJ68e', 'admin@cafevariome.org', 1268889823, 1659359084, 1, 'Admin', 'Admin', 'Brookes Lab', '', 1, NULL, 0);
 
--- --------------------------------------------------------
-
---
--- Table structure for table `users_groups_networks`
---
-
-CREATE TABLE `users_groups_networks` (
-  `id` int(11) UNSIGNED NOT NULL,
-  `user_id` int(11) UNSIGNED NOT NULL,
-  `group_id` int(11) UNSIGNED NOT NULL,
-  `installation_key` varchar(100) NOT NULL,
-  `network_key` int(15) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- --------------------------------------------------------
 
@@ -606,6 +599,30 @@ ALTER TABLE `data_files`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `discovery_groups`
+--
+ALTER TABLE `discovery_groups`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `name` (`name`),
+  ADD KEY `network_key` (`network_id`),
+  ADD KEY `type` (`policy`);
+
+--
+-- Indexes for table `discovery_group_sources`
+--
+ALTER TABLE `discovery_group_sources`
+  ADD PRIMARY KEY (`discovery_group_id`,`source_id`),
+  ADD UNIQUE KEY `discovery_group_id` (`discovery_group_id`,`source_id`),
+  ADD KEY `Source_FK` (`source_id`);
+
+--
+-- Indexes for table `discovery_group_users`
+--
+ALTER TABLE `discovery_group_users`
+  ADD PRIMARY KEY (`user_id`,`discovery_group_id`),
+  ADD UNIQUE KEY `discovery_group_id` (`discovery_group_id`,`user_id`);
+
+--
 -- Indexes for table `eavs`
 --
 ALTER TABLE `eavs`
@@ -629,24 +646,7 @@ ALTER TABLE `groups`
 -- Indexes for table `networks`
 --
 ALTER TABLE `networks`
-  ADD PRIMARY KEY (`network_key`);
-
---
--- Indexes for table `network_groups`
---
-ALTER TABLE `network_groups`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `name` (`name`),
-  ADD KEY `network_key` (`network_key`),
-  ADD KEY `type` (`group_type`);
-
---
--- Indexes for table `network_groups_sources`
---
-ALTER TABLE `network_groups_sources`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `source_id` (`source_id`),
-  ADD KEY `group_id` (`group_id`);
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Indexes for table `network_requests`
@@ -744,14 +744,6 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `uc_email` (`email`);
 
 --
--- Indexes for table `users_groups_networks`
---
-ALTER TABLE `users_groups_networks`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `source_id` (`user_id`),
-  ADD KEY `group_id` (`group_id`);
-
---
 -- Indexes for table `values`
 --
 ALTER TABLE `values`
@@ -800,6 +792,12 @@ ALTER TABLE `data_files`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `discovery_groups`
+--
+ALTER TABLE `discovery_groups`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `eavs`
 --
 ALTER TABLE `eavs`
@@ -810,18 +808,6 @@ ALTER TABLE `eavs`
 --
 ALTER TABLE `groups`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `network_groups`
---
-ALTER TABLE `network_groups`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `network_groups_sources`
---
-ALTER TABLE `network_groups_sources`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `network_requests`
@@ -908,12 +894,6 @@ ALTER TABLE `users`
   MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
--- AUTO_INCREMENT for table `users_groups_networks`
---
-ALTER TABLE `users_groups_networks`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `values`
 --
 ALTER TABLE `values`
@@ -958,17 +938,24 @@ ALTER TABLE `attribute_mappings`
   ADD CONSTRAINT `Attribute_Mapping_FK` FOREIGN KEY (`attribute_id`) REFERENCES `attributes` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints for table `network_groups_sources`
+-- Constraints for table `discovery_group_sources`
 --
-ALTER TABLE `network_groups_sources`
-  ADD CONSTRAINT `NetworkGroupIDFK` FOREIGN KEY (`group_id`) REFERENCES `network_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `SourceIDFK` FOREIGN KEY (`source_id`) REFERENCES `sources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `discovery_group_sources`
+  ADD CONSTRAINT `DiscoveryGroup_FK1` FOREIGN KEY (`discovery_group_id`) REFERENCES `discovery_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `Source_FK` FOREIGN KEY (`source_id`) REFERENCES `sources` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `discovery_group_users`
+--
+ALTER TABLE `discovery_group_users`
+  ADD CONSTRAINT `DiscoveryGroup_FK` FOREIGN KEY (`discovery_group_id`) REFERENCES `discovery_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `User_FK` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `network_requests`
 --
 ALTER TABLE `network_requests`
-  ADD CONSTRAINT `NetworkRequest_NetworkKey_FK` FOREIGN KEY (`network_key`) REFERENCES `networks` (`network_key`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `NetworkRequest_NetworkKey_FK` FOREIGN KEY (`network_key`) REFERENCES `networks` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `ontology_prefixes`
@@ -1002,13 +989,6 @@ ALTER TABLE `single_sign_on_providers`
   ADD CONSTRAINT `CredentialsIdFK` FOREIGN KEY (`credential_id`) REFERENCES `credentials` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `ProxyServerFK` FOREIGN KEY (`proxy_server_id`) REFERENCES `proxy_servers` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `ServerIdFK` FOREIGN KEY (`server_id`) REFERENCES `servers` (`id`) ON UPDATE CASCADE;
-
---
--- Constraints for table `users_groups_networks`
---
-ALTER TABLE `users_groups_networks`
-  ADD CONSTRAINT `GroupIDFK` FOREIGN KEY (`group_id`) REFERENCES `network_groups` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  ADD CONSTRAINT `UserFK` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `values`
