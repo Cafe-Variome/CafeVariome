@@ -259,6 +259,9 @@ class Compiler
 				}
 				else
 				{
+					$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+					$source = $sourceAdapter->Read($source_id);
+
 					$isNot = false;
 					if (array_key_exists('operator',$lookup))
 					{
@@ -267,9 +270,9 @@ class Compiler
 					if ($isNot)
 					{
 						$matchAllQuery = new MatchAllQuery();
-						$this->uniqueSubjectIds = $matchAllQuery->execute([], $source_id, false);
+						$this->uniqueSubjectIds = $matchAllQuery->Execute([], $source);
 					}
-					$ids = $this->execute_clause($type, $lookup, $source_id, false);
+					$ids = $this->execute_clause($type, $lookup, $source);
 					$idsCache[$pointer] = $ids;
 
 				}
@@ -411,31 +414,31 @@ class Compiler
 		return $sids;
 	}
 
-	private function execute_clause(string $type, array $clause, int $source_id, bool $iscount)
+	private function execute_clause(string $type, array $clause, Source $source)
 	{
 		switch (strtolower($type))
 		{
 			case 'eav':
 				$eavQuery = new EAVQuery($this->uniqueSubjectIds);
-				return $eavQuery->execute($clause, $source_id, $iscount);
+				return $eavQuery->Execute($clause, $source);
 			case 'sim':
 				$HPOSimilarityQuery = new HPOSimilarityQuery();
-				return $HPOSimilarityQuery->execute($clause, $source_id, $iscount);
+				return $HPOSimilarityQuery->Execute($clause, $source);
 			case 'ordo':
 				$ORPHASimilarityQuery = new ORPHASimilarityQuery();
-				return $ORPHASimilarityQuery->execute($clause, $source_id, $iscount);
+				return $ORPHASimilarityQuery->Execute($clause, $source);
 			case 'matchall':
 				$matchAllQuery = new MatchAllQuery();
-				return $matchAllQuery->execute($clause, $source_id, $iscount);
+				return $matchAllQuery->Execute($clause, $source);
 			case 'phenotype':
 				$phenotypeQuery = new PhenotypeQuery();
-				return $phenotypeQuery->execute($clause, $source_id, $iscount);
+				return $phenotypeQuery->Execute($clause, $source);
 			case 'subjectvariant':
 				$subjectvariantQuery = new SubjectVariantQuery();
-				return $subjectvariantQuery->execute($clause, $source_id, $iscount);
+				return $subjectvariantQuery->Execute($clause, $source);
 			case 'mutation':
 				$mutationQuery = new MutationQuery();
-				return $mutationQuery->execute($clause, $source_id, $iscount);
+				return $mutationQuery->Execute($clause, $source);
 		}
 	}
 }
