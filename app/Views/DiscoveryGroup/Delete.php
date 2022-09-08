@@ -16,9 +16,9 @@
 		</div>
 	</div>
 <?php endif; ?>
-<?php echo form_open($controllerName . "/Delete/" . $group_id); ?>
+<?php echo form_open($controllerName . "/Delete/" . $discoveryGroup->getID()); ?>
 <div class="form-group">
-    <span class="text-danger">Are you sure you want to delete the group?</span>
+    <span class="text-danger">Are you sure you want to delete '<?= $discoveryGroup->name ?>'?</span>
 </div>
 <div class="form-group">
     <div class="form-check form-check-inline">
@@ -30,7 +30,6 @@
         <label for="confirm" class="form-check-label">No</label>
     </div>
 </div>
-<?php echo form_hidden(array('id' => $group_id)); ?>
 
 <div class="form-group row">
     <div class="col">
