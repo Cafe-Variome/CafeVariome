@@ -35,10 +35,26 @@ class ValidationHelper
      * @author Mehdi Mehtarizadeh
      */
 
-    public function unique_network_group_name_check(string $group_name, string $network_key): bool
+    public function unique_discovery_group_name_check(string $str, string $fields, array $data, & $err): bool
     {
-        $networkGroupModel = new \App\Models\NetworkGroup();
-        return ($networkGroupModel->getNetworkGroups('', array('network_key' => $network_key, 'name' => $group_name)) ? false : true);
+		$discoveryGroupAdapter = (new DiscoveryGroupAdapterFactory())->GetInstance();
+
+		if (strpos($fields, ',') !== false)
+		{
+			$fieldsArray = explode(',', $fields);
+			$network_id = $fieldsArray[0];
+			$discovery_group_id = $fieldsArray[1];
+
+			$discoveryGroup = $discoveryGroupAdapter->ReadByNameAndNetworkId($str, $network_id);
+
+			return $discoveryGroup->isNull() || $discovery_group_id == $discoveryGroup->getID();
+		}
+		else
+		{
+			$network_id = $fields;
+			return $discoveryGroupAdapter->ReadByNameAndNetworkId($str, $network_id)->isNull();
+		}
+
     }
 
     public function valid_delimiter(string $delimiter): bool
