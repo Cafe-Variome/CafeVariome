@@ -262,6 +262,8 @@ abstract class DataInput extends DataPipeLine
 	protected function associateGroupWithAttributes(string $group_name, array $attribute_ids)
 	{
 		$group_name = trim(strtolower(preg_replace('/\s+/', '_', $group_name))); // replace spaces with underline
+		$group_name = $this->sanitiseString($group_name);
+
 		$group = $this->groups[$group_name];
 		$group_attributes = $group['attribute_ids'];
 		$attribute_ids_to_add = [];
