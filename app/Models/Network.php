@@ -8,7 +8,7 @@
 * @author Gregory Warren
 * @author Mehdi Mehtarizadeh
 *
-*
+* @deprecated
 */
 
 use CodeIgniter\Model;
