@@ -445,7 +445,7 @@ $(function() {
             var csrfTokenName = Object.keys(csrfTokenObj)[0];
             queryData[csrfTokenName] = csrfTokenObj[csrfTokenName];
 
-            queryXHR = $.ajax({url: baseurl + 'AjaxApi/query',
+            queryXHR = $.ajax({url: baseurl + 'AjaxApi/Query',
                 type: 'POST',
                 data: queryData,
                 dataType: 'json',
