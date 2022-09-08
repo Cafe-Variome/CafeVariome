@@ -449,7 +449,11 @@ $(function() {
                 type: 'POST',
                 data: queryData,
                 dataType: 'json',
+                beforeSend: function (jqXHR, settings) {
+                    $('#query_error').text('');
+                },
                 success: function (data) {
+                    $('#query_result').show();
                     result_data = {};
                     source_data = {};
                     $.each(data, function(key, val) {
@@ -503,8 +507,19 @@ $(function() {
                         }
                     })
                 },
-                'complete': function(data) {
-                    $('#query_result').show();
+                error: function(jqXHR, textStatus, errorThrown) {
+                    if(jqXHR.status == 403)
+                    {
+                        $('#query_error').text('Page has been expired. Please refresh the page.');
+                    }
+                    else
+                    {
+                        $('#query_result').hide();
+                        $('#query_error').text(textStatus + ': ' + errorThrown);
+                    }
+
+                },
+                complete: function(data) {
                     $('#build_query').removeClass('disabled');
                     $('#waiting').hide();
                     $('#cancel_query').hide();
