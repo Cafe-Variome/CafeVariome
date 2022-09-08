@@ -83,6 +83,13 @@ class OntologyAdapter extends BaseAdapter
 		return count($result) == 1 ? $result[0] : null;
 	}
 
+	public function DeleteAttributeOntologyAssociation(int $association_id)
+	{
+		$this->changeTable('attributes_ontology_prefixes_relationships');
+		$this->builder->where('id', $association_id);
+		$this->builder->delete();
+		$this->resetTable();
+	}
 
 	public function ReadOntologyAssociationsByAttributeId(int $attribute_id): array
 	{
