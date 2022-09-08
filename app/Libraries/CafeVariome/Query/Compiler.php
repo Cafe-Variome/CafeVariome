@@ -1,10 +1,5 @@
 <?php namespace App\Libraries\CafeVariome\Query;
 
-use App\Models\Attribute;
-use App\Models\Elastic;
-use App\Models\Settings;
-use App\Models\Source;
-
 /**
  * Compiler.php
  * Created 05/07/2021
@@ -17,6 +12,13 @@ use App\Models\Source;
  *
  */
 
+use App\Libraries\CafeVariome\Entities\Source;
+use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
+use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
+use App\Libraries\CafeVariome\Net\NetworkInterface;
+use App\Models\Attribute;
+use App\Models\Elastic;
+
 class Compiler
 {
 	private $query;
@@ -27,10 +29,12 @@ class Compiler
 		$this->uniqueSubjectIds = [];
 	}
 
-	public function CompileAndRunQuery(string $query, int $network_key, int $user_id): string
+	public function CompileAndRunQuery(string $query, int $network_id, int $user_id): string
 	{
 		$attributeModel = new Attribute();
-		$sourceModel = new Source();
+		$discoveryGroupAdapter = (new DiscoveryGroupAdapterFactory())->GetInstance();
+		$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+
 		$session = \Config\Services::session();
 		$setting = Settings::getInstance();
 
@@ -41,23 +45,57 @@ class Compiler
 			throw new \Exception('Query is not in a correct JSON format.');
 		}
 
-		$installation_key = $setting->getInstallationKey();
 		$user_id = ($session->get('user_id') != null) ? $session->get('user_id') : $user_id;
 
-		$master_group_sources = $this->getNetworkGroups($user_id, $network_key, $installation_key, 'master');
-		$source_display_group_sources = $this->getNetworkGroups($user_id, $network_key, $installation_key, 'source_display');
-		$count_display_group_sources = $this->getNetworkGroups($user_id, $network_key, $installation_key, 'count_display');
+		$userDiscoveryGroupIds = $discoveryGroupAdapter->ReadByUserId($user_id);
+		$userDiscoveryGroups = $discoveryGroupAdapter->ReadByIds($userDiscoveryGroupIds);
+
+
+		$networkDiscoveryGroups = [];
+
+		foreach ($userDiscoveryGroups as &$discoveryGroup)
+		{
+			if ($discoveryGroup->network_id == $network_id)
+			{
+				$networkDiscoveryGroups[$discoveryGroup->getID()] = $discoveryGroup;
+			}
+		}
+
+		$sourcesPolicies = [];
+
+		$discoveryGroupsSourceIds = $discoveryGroupAdapter->ReadAssociatedIdsAndSourceIds(array_keys($networkDiscoveryGroups));
+
+		foreach ($discoveryGroupsSourceIds as $discoveryGroupSourceId)
+		{
+			if (array_key_exists($discoveryGroupSourceId->discovery_group_id, $networkDiscoveryGroups))
+			{
+				if (in_array($discoveryGroupSourceId->source_id, $sourcesPolicies))
+				{
+					if ($sourcesPolicies[$discoveryGroupSourceId->source_id] < $networkDiscoveryGroups[$discoveryGroupSourceId->discovery_group_id]->policy)
+					{
+						$sourcesPolicies[$discoveryGroupSourceId->source_id] = $networkDiscoveryGroups[$discoveryGroupSourceId->discovery_group_id]->policy;
+					}
+				}
+				else
+				{
+					$sourcesPolicies[$discoveryGroupSourceId->source_id] = $networkDiscoveryGroups[$discoveryGroupSourceId->discovery_group_id]->policy;
+				}
+			}
+		}
 
 		$attributes = [];
-		if (array_key_exists('attributes', $query_array['requires']['response']['components'])){
+		if (array_key_exists('attributes', $query_array['requires']['response']['components']))
+		{
 			$attributes = $query_array['requires']['response']['components']['attributes'];
 		}
 
-		if (!isset($query_array['query']) || empty($query_array['query'])) {
+		if (!isset($query_array['query']) || empty($query_array['query']))
+		{
 			$query_array['query']['components']['matchAll'][0] = [];
 		}
 
-		if(!isset($query_array['logic']) || empty($query_array['logic'])) {
+		if(!isset($query_array['logic']) || empty($query_array['logic']))
+		{
 			$this->makeLogic($query_array); // no logic section provided
 		}
 
