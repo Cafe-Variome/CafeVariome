@@ -14,6 +14,7 @@
 use App\Libraries\CafeVariome\Factory\PollProgressMessageFactory;
 use App\Libraries\CafeVariome\Factory\RegisterTaskMessageFactory;
 use App\Libraries\CafeVariome\Factory\ReportProgressMessageFactory;
+use App\Libraries\CafeVariome\Factory\ShutdownMessageFactory;
 use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 
 class ServiceInterface
@@ -44,6 +45,21 @@ class ServiceInterface
 		$results = "";
 		$this->socket->Create()->Connect()->Write($message);
 		while ($out = $this->socket->Read(2048)) {
+			$results .= $out;
+		}
+		$this->socket->Close();
+
+		return $results;
+	}
+
+	public function Shutdown()
+	{
+		$message = (new ShutdownMessageFactory())->GetInstance();
+
+		$results = "";
+		$this->socket->Create()->Connect()->Write($message);
+		while ($out = $this->socket->Read(2048))
+		{
 			$results .= $out;
 		}
 		$this->socket->Close();
@@ -156,11 +172,5 @@ class ServiceInterface
 				'payload' => null
 			];
         }
-
-		return [
-			'response_received' => false,
-			'error' => null,
-			'payload' => null
-		];
     }
 }
