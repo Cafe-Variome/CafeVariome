@@ -319,6 +319,11 @@
 		<a class="btn btn-secondary btn-lg" id="reset_query"><i class="fa fa-trash"></i> Reset</a>
     </div>
 </div>
+<div class="row">
+	<div class="col">
+		<span class="text-danger" id="query_error"></span>
+	</div>
+</div>
 
 <hr/>
 <!-- Loader -->
@@ -331,8 +336,8 @@
 <table id="query_result" class="table table-hover table-bordered table-striped" style="display:none;">
     <thead>
         <tr>
-            <th>Source</th>
-            <th>Counts</th>
+            <th>Source Name</th>
+            <th>Results</th>
 			<th>Source Details</th>
         </tr>
     </thead>

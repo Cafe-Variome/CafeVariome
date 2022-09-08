@@ -41,7 +41,7 @@ class Discover extends CVUI_Controller{
         return redirect()->to(base_url($this->controllerName. '/Select_Network'));
     }
 
-    public function select_network()
+    public function SelectNetwork()
 	{
         $uidata = new UIData();
         $uidata->title = "Select Network";
@@ -81,7 +81,7 @@ class Discover extends CVUI_Controller{
         return view($this->viewDirectory.'/Select_Network', $data);
     }
 
-    public function query_builder($network_key = null)
+    public function QueryBuilder(int $network_id)
 	{
         $uidata = new UIData();
         $networkInterface = new NetworkInterface();
