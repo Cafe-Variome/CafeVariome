@@ -103,14 +103,15 @@ class Discover extends CVUI_Controller
         $user_id = $this->authenticator->getUserId();
 
         $uidata->data['user_id'] = $user_id;
-        $uidata->data['network_key'] = $network_key;
+        $uidata->data['network_key'] = $network_id;
 
-        error_log("User: " . $this->session->get('email') . " has chosen network: $network_key || " . date("Y-m-d H:i:s"));
+        error_log("User: " . $this->session->get('email') . " has chosen network: $network_id || " . date("Y-m-d H:i:s"));
 
         $installations = [];
-        $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key);
+        $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_id);
 
-        if($response->status){
+        if($response->status)
+		{
             $installations = $response->data;
         }
 
