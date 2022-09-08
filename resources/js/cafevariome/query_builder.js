@@ -471,7 +471,7 @@ $(function() {
                                 //$('#resTbl tbody').empty();
                                 trow = "<tr id = " + key + "><td>" + key + "</a></td>";
                                 var payload = val1['payload'];
-                                source_data[key] = val1['details'];
+                                source_data[key] = val1['source'];
                                 switch (val1['type'])
                                 {
                                     case 'existence':
