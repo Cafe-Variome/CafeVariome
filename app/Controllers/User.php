@@ -187,24 +187,9 @@ class User extends CVUI_Controller
         $uidata->title = "Users";
         $uidata->stickyFooter = false;
 
-        $networkModel = new Network($this->db);
-
-		$uidata->data['message'] = $this->session->getFlashdata('activation_email_unsuccessful');
-
         $uidata->data['users'] = $this->dbAdapter->ReadAll();
 
-		$users_groups_data = $networkModel->getCurrentNetworkGroupsForUsers();
 
-        $users_groups = array();
-		// If there were groups fetch from auth server for users then add them to the view
-		if (! array_key_exists('error', $users_groups_data))
-		{
-			foreach ( $users_groups_data as $group )
-			{
-				$users_groups[$group['user_id']][] = array('network_name' => $group['network_name'], 'group_id' => $group['group_id'], 'group_name' => $group['name'], 'group_description' => $group['description']);
-			}
-			$uidata->data['users_groups'] = $users_groups;
-		}
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
 
         $uidata->javascript = array(JS."cafevariome/components/datatable.js", JS."cafevariome/user.js", VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');

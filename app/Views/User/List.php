@@ -21,9 +21,8 @@
         <tr>
             <th>ID</th>
             <th>Name</th>
-             <th>Email</th>
-             <th>Last Login</th>
-            <th>Network Groups</th>
+			<th>Email</th>
+			<th>Last Login</th>
             <th>Status</th>
             <th>Role</th>
             <th>Action</th>
@@ -36,16 +35,6 @@
                 <td><?= $user->first_name . " " . $user->last_name; ?></td>
                  <td><?= $user->email; ?></td>
                  <td><?= $user->last_login ? date("H:i:s d-m-Y T", $user->last_login) : 'This user has not logged in yet.' ; ?></td>
-                <td>
-                    <?php if (isset($users_groups)) : ?>
-                        <?php if (array_key_exists($user->getID(), $users_groups)) : ?>
-                            <?php foreach ($users_groups[$user->getID()] as $group) : ?>
-                                <?php echo "<i>'" . $group['group_description'] . "' Network Group</i> (Network: " . $group['network_name'] . ");<br/>" ?>
-                                <?php endforeach ?>
-                        <?php else : echo "None"; ?>
-                        <?php endif; ?>
-                    <?php endif; ?>
-                </td>
                 <td><?= $user->active ? 'Active' : 'Inactive' ?></td>
                 <td><?= $user->is_admin ? 'Admin' : 'User' ?></td>
                 <td>
