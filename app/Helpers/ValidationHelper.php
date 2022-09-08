@@ -11,6 +11,7 @@
  */
 
 
+use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
 use App\Libraries\CafeVariome\Factory\OntologyPrefixAdapterFactory;
 use App\Libraries\CafeVariome\Factory\OntologyRelationshipAdapterFactory;
 use App\Models\Attribute;
