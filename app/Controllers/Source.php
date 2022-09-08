@@ -244,23 +244,6 @@ class Source extends CVUI_Controller
 		$uidata->data['title'] = "Edit Source";
 		$uidata->data['id'] = $source->getID();
 
-        $networkModel = new \App\Models\Network();
-
-        $networkGroups = $networkModel->getNetworkGroupsForInstallation();
-
-        $srcDisplayGroups = [];
-        $countDisplayGroups = [];
-
-		foreach ( $networkGroups as $ng ) {
-            if ($ng['group_type'] == 'source_display') {
-                $srcDisplayGroups[$ng['id'] . ',' . $ng['network_key']] = $ng['name'] . '(' . $ng['network_name'] . ')';
-            }
-            elseif ($ng['group_type'] == 'count_display') {
-                $countDisplayGroups[$ng['id'] . ',' . $ng['network_key']] = $ng['name'] . '(' . $ng['network_name'] . ')';
-            }
-        }
-        $uidata->data['srcDSPGroups'] = $srcDisplayGroups;
-        $uidata->data['countDSPGroups'] = $countDisplayGroups;
 
         //validate form input
 
@@ -342,32 +325,6 @@ class Source extends CVUI_Controller
 
 				$this->dbAdapter->Update($id, $source);
 
-                $group_data_array = array();
-                // Check if there any groups selected
-                if ($this->request->getVar('source_display'))
-				{
-                    foreach ($this->request->getVar('source_display') as $src_group_data)
-					{
-                        // Need to explode the group multi select to get the group_id and the network_key since the value is comma separated as I needed to pass both in the value
-                        $group_data_array[] = $src_group_data;
-                    }
-                }
-                if ($this->request->getVar('count_display'))
-				{
-                    foreach ($this->request->getVar('count_display') as $count_group_data) {
-                        $group_data_array[] = $count_group_data;
-                    }
-                }
-                if (count($group_data_array) > 0)
-				{
-                    $group_post_data = implode("|", $group_data_array);
-                    $networkModel->updateNetworkGroupsBySourceId($id, $group_post_data);
-
-                }
-                else
-				{
-                    $networkModel->updateNetworkGroupsBySourceId($id);
-                }
                 $this->setStatusMessage("Source '$name' was updated.", STATUS_SUCCESS);
 
             } catch (\Exception $ex) {
@@ -379,23 +336,6 @@ class Source extends CVUI_Controller
         }
 		else
 		{
-            // Get all the network groups that this source from this installation is currently in so that these can be pre selected in the multiselect list
-            $networkGroups = $networkModel->getCurrentNetworkGroupsForSourceInInstallation($id);
-            $selected_source_display = [];
-            $selected_count_display = [];
-
-            foreach ($networkGroups as $ng) {
-                if ($ng['group_type'] == 'source_display') {
-                    $selected_source_display[] = $ng['id'] . ',' . $ng['network_key'];
-                }
-                elseif ($ng['group_type'] == 'count_display') {
-                    $selected_count_display[] = $ng['id'] . ',' . $ng['network_key'];
-                }
-            }
-
-            $uidata->data['selected_source_display'] = $selected_source_display ? $selected_source_display :[];
-            $uidata->data['selected_count_display'] = $selected_count_display ? $selected_count_display :[];
-
 			$uidata->data['source'] = $source;
 
 			$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
