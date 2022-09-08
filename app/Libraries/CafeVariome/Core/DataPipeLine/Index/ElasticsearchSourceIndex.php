@@ -9,17 +9,20 @@
  *
  */
 
+use App\Libraries\CafeVariome\CafeVariome;
+use App\Libraries\CafeVariome\Entities\Task;
 use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
-use \App\Models\Settings;
 
 class ElasticsearchSourceIndex extends AbstractSourceIndex
 {
-	public function __construct(int $source_id, bool $append)
+	public function __construct(Task $task)
 	{
-		parent::__construct($source_id);
-		$this->append = $append;
+		parent::__construct($task->source_id);
+		$this->continue = true;
+		$this->overwrite = $task->overwrite;
+		$this->taskId = $task->getID();
+
 		$this->dbInstance =  new ElasticSearch([$this->getEndPointURI()]);
-		$this->jobName = 'elasticsearchindex';
 		$this->processedRecords = 0;
 		$this->totalRecords = 0;
 		$this->totalEAVsCount = 0;
@@ -27,84 +30,93 @@ class ElasticsearchSourceIndex extends AbstractSourceIndex
 
     public function IndexSource()
     {
-		$this->registerProcess($this->sourceId);
+		$index_name = ElasticsearchHelper::GetSourceIndexName($this->sourceId);
 
-		$index_name = ElasticsearchHelper::getSourceIndexName($this->sourceId);
-
-		if (!$this->append){
+		if ($this->overwrite)
+		{
 			$this->dbInstance->deleteIndex($index_name);
 		}
 
-		if (!$this->dbInstance->indexExists($index_name)){
+		if (!$this->dbInstance->indexExists($index_name))
+		{
 			$this->dbInstance->createIndex($index_name, $this->getMapping());
 		}
 
 		//Get attribute Ids that must be stored on Elasticsearch
-		$attribute_ids = $this->attributeModel->getAttributeIdsBySourceIdAndStorageLocation($this->sourceId, ATTRIBUTE_STORAGE_ELASTICSEARCH);
+		$attribute_ids = $this->attributeAdapter->ReadIdsBySourceIdAndStorageLocation($this->sourceId, ATTRIBUTE_STORAGE_ELASTICSEARCH);
+
+		$this->sourceAdapter->Lock($this->sourceId);
 
 		$this->createParentDocuments($attribute_ids);
 		$this->createChildDocuments($attribute_ids);
 
-		$this->eavModel->setIndexedFlagBySourceIdAndAttributeIds($this->sourceId, $attribute_ids);
-		$this->sourceModel->unlockSource($this->sourceId);
+		$this->EAVAdapter->UpdateIndexedBySourceIdAndAttributeIds($this->sourceId, $attribute_ids);
 
-		$this->reportProgress($this->sourceId, 1, 1, 'Finished', true);
+		$this->sourceAdapter->Unlock($this->sourceId);
+
+		$this->ReportProgress(100, 'Finished', true);
 	}
 
 	private function createParentDocuments(array $attribute_ids)
 	{
-		$index_name = ElasticsearchHelper::getSourceIndexName($this->sourceId);
+		$index_name = ElasticsearchHelper::GetSourceIndexName($this->sourceId);
 		$bulk = [];
 		$offset = 0;
 		$currId = 0;
 		$batchSize = EAV_BATCH_SIZE;
 
 		// Get total EAV records by source_id
-		$this->totalEAVsCount = $this->eavModel->countEAVsBySourceIdAndAttributeIds($this->sourceId, $attribute_ids, $this->append);
+		$this->totalEAVsCount = $this->EAVAdapter->CountBySourceIdAndAttributeIds($this->sourceId, $attribute_ids, !$this->overwrite);
 		// Get unique subject_ids by source_id
-		$uniqueUIDsCount = $this->eavModel->countUniqueUIDsBySourceIdAndAttributeIds($this->sourceId, $attribute_ids, $this->append);
+		$uniqueUIDsCount = $this->EAVAdapter->CountUniqueGroupsBySourceIdAndAttributeIds($this->sourceId, $attribute_ids, !$this->overwrite);
 		//Total number of Elasticsearch documents to be created.
 		$this->totalRecords = $this->totalEAVsCount + $uniqueUIDsCount;
 
-		$this->reportProgress($this->sourceId, $this->processedRecords, $this->totalRecords, 'Generating Elasticsearch index');
+		$this->ReportProgress(0, 'Generating Elasticsearch index');
 
 		while ($offset < $uniqueUIDsCount)
 		{
-			$unique_ids = $this->eavModel->getUniqueUIDsAndSubjectIdsBySourceIdAndAttributeIds($this->sourceId, $attribute_ids, $batchSize, $currId, $this->append);
+			if (is_null($currId)) break;
+
+			$unique_ids = $this->EAVAdapter->ReadUniqueGroupIdsAndSubjectIdsBySourceIdAndAttributeIds($this->sourceId, $attribute_ids, $batchSize, $currId, !$this->overwrite);
 			$uid_count = count($unique_ids);
 
-			if ($uid_count == 0){
+			if ($uid_count == 0)
+			{
 				break;
 			}
 
-			$currId = $this->eavModel->getLastIdByUID($unique_ids[$uid_count - 1]['uid']);
+			$currId = $this->EAVAdapter->ReadLastIdByGroupIdAndSubjectId($unique_ids[$uid_count - 1]->subject_id, $unique_ids[$uid_count - 1]->group_id);
 
 			// start making all the parent documents in ElasticSearch
-			for ($i = 0; $i < $uid_count; $i++) {
+			for ($i = 0; $i < $uid_count; $i++)
+			{
 				$bulk['body'][] = [
 					'index'=>[
-						'_id' => $unique_ids[$i]['uid'],
+						'_id' => $unique_ids[$i]->subject_id . '_' . $unique_ids[$i]->group_id,
 						'_index' => $index_name
 					]
 				];
 				$bulk['body'][] = [
-					'subject_id' => $unique_ids[$i]['subject_id'],
+					'subject_id' => $this->getSubjectById($unique_ids[$i]->subject_id),
 					'eav_rel' => [
 						'name' => 'sub'
 					],
 					'type' => 'sub',
 					'source_id' => $this->sourceId,
-					'file_id' => $unique_ids[$i]['file_id']
+					'file_id' => $unique_ids[$i]->data_file_id
 				];
 
 				unset($unique_ids[$i]);
 				$this->processedRecords++;
 
-				if ($this->processedRecords % EAV_BATCH_SIZE == 0){
+				if ($this->processedRecords % EAV_BATCH_SIZE == 0)
+				{
 					$responses = $this->dbInstance->indexDocuments($bulk);
 					$bulk = [];
 					unset ($responses);
-					$this->reportProgress($this->sourceId, $this->processedRecords, $this->totalRecords);
+
+					$this->ReportProgress();
 				}
 			}
 
@@ -112,66 +124,73 @@ class ElasticsearchSourceIndex extends AbstractSourceIndex
 		}
 
 		// Send the last documents through, if any
-		if (!empty($bulk['body'])){
+		if (!empty($bulk['body']))
+		{
 			$responses = $this->dbInstance->indexDocuments($bulk);
 			$bulk = [];
 			unset ($responses);
-			$this->reportProgress($this->sourceId, $this->processedRecords, $this->totalRecords);
+
+			$this->ReportProgress();
 		}
 	}
 
 	private function createChildDocuments(array $attribute_ids)
 	{
-		$index_name = ElasticsearchHelper::getSourceIndexName($this->sourceId);
+		$index_name = ElasticsearchHelper::GetSourceIndexName($this->sourceId);
 		$bulk=[];
 		$offset = 0;
 		$currId = 0;
 		$batchSize = EAV_BATCH_SIZE;
 
-		while ($offset < $this->totalEAVsCount){
+		while ($offset < $this->totalEAVsCount)
+		{
 			// Get current limit chunk of data
-			$eavdata = $this->eavModel->getEAVsBySourceIdAndAttributeIds($this->sourceId, $attribute_ids, $batchSize, $currId, $this->append);
+			$eavdata = $this->EAVAdapter->ReadBySourceIdAndAttributeIds($this->sourceId, $attribute_ids, $batchSize, $currId, !$this->overwrite);
 			$eav_count = count($eavdata);
 			$lastRec = end($eavdata);
-			$currId = $lastRec['id'];
+			$currId = $lastRec->id;
 			reset($eavdata);
 
 			// Loop through limit chunk
-			for ($i = 0; $i < $eav_count; $i++) {
-				//$eavdata[$i]['attribute'] = preg_replace('/\s+/', '_', $eavdata[$i]['attribute']);
-				$attribute_id = $eavdata[$i]['attribute_id'];
-				$value_id = $eavdata[$i]['value_id'];
+			for ($i = 0; $i < $eav_count; $i++)
+			{
+				$attribute_id = $eavdata[$i]->attribute_id;
+				$value_id = $eavdata[$i]->value_id;
+				$subject_id = $eavdata[$i]->subject_id;
+				$group_id = $eavdata[$i]->group_id;
+				$subject_name = $this->getSubjectById($subject_id);
 				$attribute_name = $this->getAttributeNameById($attribute_id);
 				$value_name = $this->getValueNameByIdAndAttributeId($value_id, $attribute_id);
 
-				$bulk['routing'] = $eavdata[$i]['uid'];
+				$bulk['routing'] = $subject_id . '_' . $group_id;
 				$bulk['body'][] = [
 					'index' => [
 						'_index' => $index_name
 					]
 				];
 				$bulk['body'][] = [
-					'subject_id' => $eavdata[$i]['subject_id'],
+					'subject_id' => $subject_name,
 					'attribute' => $attribute_name,
 					'value' => strtolower($value_name),
 					'eav_rel' => [
 						'name' => 'eav',
-						'parent' => $eavdata[$i]['uid']
+						'parent' => $subject_id . '_' . $group_id
 					],
 					'type' => 'eav',
 					'source_id' => $this->sourceId,
-					'file_id' => $eavdata[$i]['file_id']
+					'file_id' => $eavdata[$i]->data_file_id
 				];
 
 				unset($eavdata[$i]);
 				$this->processedRecords++;
 
-				if ($this->processedRecords % EAV_BATCH_SIZE == 0){
+				if ($this->processedRecords % EAV_BATCH_SIZE == 0)
+				{
 					$responses = $this->dbInstance->indexDocuments($bulk);
 					$bulk=[];
 					unset ($responses);
 
-					$this->reportProgress($this->sourceId, $this->processedRecords, $this->totalRecords);
+					$this->ReportProgress();
 				}
 			}
 
@@ -180,9 +199,11 @@ class ElasticsearchSourceIndex extends AbstractSourceIndex
 		}
 
 		// Send the last set of documents through
-		if (!empty($bulk['body'])){
+		if (!empty($bulk['body']))
+		{
 			$responses = $this->dbInstance->indexDocuments($bulk);
-			$this->reportProgress($this->sourceId, $this->processedRecords, $this->totalRecords);
+
+			$this->ReportProgress();
 			unset ($responses);
 		}
 	}
@@ -215,7 +236,7 @@ class ElasticsearchSourceIndex extends AbstractSourceIndex
 
 	private function getEndPointURI()
 	{
-		$setting = Settings::getInstance();
-		return $setting->getElasticSearchUri();
+		$setting = CafeVariome::Settings();
+		return $setting->GetElasticSearchUri();
 	}
 }
