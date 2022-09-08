@@ -176,46 +176,243 @@ class AjaxApi extends Controller
         }
     }
 
-	 /**
-	  * elasticStart - Begin ElasticSearch regeneration
-	  *
-	  * @param int $source_id        - The source id for the elasticsearch index
-	  * @param int $append       - 1 if we are adding to index instead of fully regenerating
-	  * @return void
-	  */
-	 public function elasticStart()
+	/**
+	 * @return false|string|void
+	 * @throws \Exception
+	 */
+	 public function IndexDataToElasticsearch()
 	 {
-		 if ($this->request->getMethod() == 'post'){
+		 if ($this->request->getMethod() == 'post')
+		 {
 			 $source_id = $this->request->getVar('source_id');
-			 $append = $this->request->getVar('append') === 'true' ? 1 : 0;
-			 PHPShellHelper::runAsync(getcwd() . "/index.php Task IndexDataToElasticsearch $source_id $append");
-	 	}
+			 $overwrite = $this->request->getVar('overwrite') === 'true' ? 1 : 0;
+
+			 if(is_null($source_id))
+			 {
+				 return json_encode([
+					 'status' => 1,
+					 'message' => 'Source Id is null.'
+				 ]);
+			 }
+
+			 $sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+
+			 $source = $sourceAdapter->Read($source_id);
+
+			 if ($source->isNull())
+			 {
+				 return json_encode([
+					 'status' => 1,
+					 'message' => 'Source could not be found.'
+				 ]);
+			 }
+
+			 if ($source->locked)
+			 {
+				 return json_encode([
+					 'status' => 1,
+					 'message' => 'Cannot proceed to index data since another operation is being carried out on the source.'
+				 ]);
+			 }
+
+			 //Lock the source
+			 if($sourceAdapter->Lock($source_id))
+			 {
+				 // Create and a task
+				 $task = (new TaskFactory())->GetInstanceFromParameters(
+					 $this->authenticator->GetUserId(),
+					 TASK_TYPE_SOURCE_INDEX_ELASTICSEARCH,
+					 0,
+					 TASK_STATUS_CREATED,
+					 -1,
+					 null,
+					 null,
+					 null,
+					 null,
+					 null,
+					 $source_id,
+					 $overwrite
+				 );
+
+				 $taskAdapter = (new TaskAdapterFactory())->GetInstance();
+				 $taskId = $taskAdapter->Create($task);
+
+				 // Start the task through CLI
+				 PHPShellHelper::runAsync(getcwd() . "/index.php Task Start $taskId");
+
+				 return json_encode([
+					 'status' => 0,
+					 'message' => 'Processing started successfully.',
+					 'task_id' => $taskId
+				 ]);
+			 }
+			 else
+			 {
+				 return json_encode([
+					 'status' => 1,
+					 'message' => 'Failed to lock the source.'
+				 ]);
+			 }
+		 }
 	 }
 
 	/**
-	 * neo4jStart - Begin Neo4J regeneration
-	 *
-	 * @param int $source_id        - The source id for the neo4j index
-	 * @param int $append       - 1 if we are adding to index instead of fully regenerating
-	 * @return void
+	 * @return false|string
+	 * @throws \Exception
 	 */
-	public function neo4jStart()
-	{
-		if ($this->request->getMethod() == 'post'){
-			$source_id = $this->request->getVar('source_id');
-			$append = $this->request->getVar('append') === 'true' ? 1 : 0;
-			PHPShellHelper::runAsync(getcwd() . "/index.php Task IndexDataToNeo4J $source_id $append");
-		}
-	}
-
-	public function userInterfaceStart()
+	public function IndexDataToNeo4J()
 	{
 		if ($this->request->getMethod() == 'post') {
 			$source_id = $this->request->getVar('source_id');
-			PHPShellHelper::runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
+			$overwrite = $this->request->getVar('overwrite') === 'true' ? 1 : 0;
+
+			if ($this->request->getMethod() == 'post') {
+				$source_id = $this->request->getVar('source_id');
+				$overwrite = $this->request->getVar('overwrite') === 'true' ? 1 : 0;
+
+				if (is_null($source_id)) {
+					return json_encode([
+						'status' => 1,
+						'message' => 'Source Id is null.'
+					]);
+				}
+
+				$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+
+				$source = $sourceAdapter->Read($source_id);
+
+				if ($source->isNull()) {
+					return json_encode([
+						'status' => 1,
+						'message' => 'Source could not be found.'
+					]);
+				}
+
+				if ($source->locked) {
+					return json_encode([
+						'status' => 1,
+						'message' => 'Cannot proceed to index data since another operation is being carried out on the source.'
+					]);
+				}
+
+				//Lock the source
+				if ($sourceAdapter->Lock($source_id)) {
+					// Create and a task
+					$task = (new TaskFactory())->GetInstanceFromParameters(
+						$this->authenticator->GetUserId(),
+						TASK_TYPE_SOURCE_INDEX_NEO4J,
+						0,
+						TASK_STATUS_CREATED,
+						-1,
+						null,
+						null,
+						null,
+						null,
+						null,
+						$source_id,
+						$overwrite
+					);
+
+					$taskAdapter = (new TaskAdapterFactory())->GetInstance();
+					$taskId = $taskAdapter->Create($task);
+
+					// Start the task through CLI
+					PHPShellHelper::runAsync(getcwd() . "/index.php Task Start $taskId");
+
+					return json_encode([
+						'status' => 0,
+						'message' => 'Processing started successfully.',
+						'task_id' => $taskId
+					]);
+				} else {
+					return json_encode([
+						'status' => 1,
+						'message' => 'Failed to lock the source.'
+					]);
+				}
+			}
 		}
 	}
-	
+
+	/**
+	 * @return false|string
+	 * @throws \Exception
+	 */
+	public function CreateUserInterfaceIndex()
+	{
+		if ($this->request->getMethod() == 'post')
+		{
+			$source_id = $this->request->getVar('source_id');
+			$overwrite = $this->request->getVar('overwrite') === 'true' ? 1 : 0;
+
+			if(is_null($source_id))
+			{
+				return json_encode([
+					'status' => 1,
+					'message' => 'Source Id is null.'
+				]);
+			}
+
+			$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+
+			$source = $sourceAdapter->Read($source_id);
+
+			if ($source->isNull())
+			{
+				return json_encode([
+					'status' => 1,
+					'message' => 'Source could not be found.'
+				]);
+			}
+
+			if ($source->locked)
+			{
+				return json_encode([
+					'status' => 1,
+					'message' => 'Cannot proceed to index data since another operation is being carried out on the source.'
+				]);
+			}
+
+			//Lock the source
+			if($sourceAdapter->Lock($source_id)) {
+				// Create and a task
+				$task = (new TaskFactory())->GetInstanceFromParameters(
+					$this->authenticator->GetUserId(),
+					TASK_TYPE_SOURCE_INDEX_USER_INTERFACE,
+					0,
+					TASK_STATUS_CREATED,
+					-1,
+					null,
+					null,
+					null,
+					null,
+					null,
+					$source_id,
+					$overwrite
+				);
+
+				$taskAdapter = (new TaskAdapterFactory())->GetInstance();
+				$taskId = $taskAdapter->Create($task);
+
+				// Start the task through CLI
+				PHPShellHelper::runAsync(getcwd() . "/index.php Task Start $taskId");
+
+				return json_encode([
+					'status' => 0,
+					'message' => 'Processing started successfully.',
+					'task_id' => $taskId
+				]);
+			}
+			else
+			{
+				return json_encode([
+					'status' => 1,
+					'message' => 'Failed to lock the source.'
+				]);
+			}
+		}
+	}
+
     public function LookupDirectory()
 	{
 		if ($this->request->getMethod() == 'post')
