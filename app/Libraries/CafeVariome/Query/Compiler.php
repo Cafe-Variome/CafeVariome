@@ -103,52 +103,105 @@ class Compiler
 		$decoupled = $this->decouple($query_array['logic']); // convert to ORs(AND, AND)
 		$pointer_query = $this->generate_pointer_query($decoupled);
 
-		$sources = $sourceModel->getOnlineSources();
+		$sources = $sourceAdapter->ReadAllOnline();
 
 		$results = [];
-		foreach ($sources as $source) {
-			$source_id = $source['source_id'];
-			if(!in_array($source_id, $master_group_sources) && !in_array($source_id, $source_display_group_sources) && !in_array($source_id, $count_display_group_sources)) continue;
+		foreach ($sources as $source)
+		{
+			$source_id = $source->getID();
+			if(!array_key_exists($source_id, $sourcesPolicies))
+				continue;
 
-			$results[$source['name']]['records']['subjects'] = "Access Denied";
-			if (array_key_exists($source_id, $source_display_group_sources) || array_key_exists($source_id, $count_display_group_sources))
+			switch($sourcesPolicies[$source_id])
 			{
-				$ids = $this->execute_query($pointer_query, $source['source_id']);
-				$records = [];
-				$records['subjects'] = $ids;
-				$records['attributes'] = [];
+				case DISCOVERY_GROUP_POLICY_EXISTENCE:
+					$results[$source->display_name] = [
+						'type' => 'existence',
+						'payload' =>  'Access Denied',
+						'source' => $source
+					];
+					break;
+				case DISCOVERY_GROUP_POLICY_BOOLEAN:
+					$networkInterface = new NetworkInterface();
+					$thresholdResponse = $networkInterface->GetNetworkThreshold($network_id);
+					if ($thresholdResponse->status)
+					{
+						$network_threshold = $thresholdResponse->data->network_threshold;
+						$ids = $this->execute_query($pointer_query, $source_id);
+						$idsCount = count($ids);
+						$payload = 0;
 
-				foreach ($attributes as $attribute){
-					if (count($ids) > 0) {
-						$attributeId = $attributeModel->getAttributeIdByNameAndSourceId($attribute, $source_id);
-						$attributeObject = $attributeModel->getAttribute($attributeId);
+						if ($idsCount > $network_threshold)
+						{
+							$payload = $idsCount;
+						}
+						else if($idsCount <= $network_threshold && $idsCount > 0)
+						{
+							$payload = true;
+						}
 
-						if ($attributeObject != null) {
-							switch ($attributeObject['storage_location']) {
-								case ATTRIBUTE_STORAGE_ELASTICSEARCH:
-									$elasticResult = new ElasticsearchResult();
-									$records['attributes'][$attribute] = $elasticResult->extract($ids, $attribute, $source_id);
-									break;
-								case ATTRIBUTE_STORAGE_NEO4J:
-									if ($attributeObject['type'] == ATTRIBUTE_TYPE_ONTOLOGY_TERM) {
-										$neo4jOntologyResult = new Neo4JOntologyResult();
-										$records['attributes'][$attribute] = $neo4jOntologyResult->extract($ids, $attribute, $source_id);
-									}
-									break;
+						$results[$source->display_name] = [
+							'type' => 'boolean',
+							'payload' =>  $payload,
+							'source' => $source
+						];
+					}
+					break;
+
+				case DISCOVERY_GROUP_POLICY_COUNT:
+					$ids = $this->execute_query($pointer_query, $source_id);
+
+					$results[$source->display_name] = [
+						'type' => 'count',
+						'payload' => count($ids),
+						'source' => $source
+					];
+					break;
+
+				case DISCOVERY_GROUP_POLICY_LIST_WITH_ATTRIBUTES:
+					$ids = $this->execute_query($pointer_query, $source_id);
+
+					$records = [];
+					$records['subjects'] = $ids;
+					$records['attributes'] = [];
+
+					foreach ($attributes as $attribute)
+					{
+						if (count($ids) > 0) {
+							$attributeId = $attributeModel->getAttributeIdByNameAndSourceId($attribute, $source_id);
+							$attributeObject = $attributeModel->getAttribute($attributeId);
+
+							if ($attributeObject != null) {
+								switch ($attributeObject['storage_location']) {
+									case ATTRIBUTE_STORAGE_ELASTICSEARCH:
+										$elasticResult = new ElasticsearchResult();
+										$records['attributes'][$attribute] = $elasticResult->extract($ids, $attribute, $source_id);
+										break;
+									case ATTRIBUTE_STORAGE_NEO4J:
+										if ($attributeObject['type'] == ATTRIBUTE_TYPE_ONTOLOGY_TERM) {
+											$neo4jOntologyResult = new Neo4JOntologyResult();
+											$records['attributes'][$attribute] = $neo4jOntologyResult->extract($ids, $attribute, $source_id);
+										}
+										break;
+								}
 							}
 						}
+						else{
+							$records['attributes'][$attribute] = [];
+						}
 					}
-					else{
-						$records['attributes'][$attribute] = [];
-					}
-				}
 
-				$results[$source['name']] = [
-					'records' => $records,
-					'source_display' => array_key_exists($source_id, $source_display_group_sources),
-					'details' => $source
-				];
+					$results[$source->display_name] = [
+						'type' => 'list',
+						'count' => count($ids),
+						'payload' => $records,
+						'source' => $source
+					];
+					break;
 			}
+
+
+
 		}
 
 		return json_encode($results);
