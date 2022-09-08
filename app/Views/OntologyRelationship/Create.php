@@ -17,13 +17,13 @@
 	</div>
 <?php endif; ?>
 
-<?php echo form_open($controllerName.'/Create/' . $ontology_id); ?>
-<?php echo form_hidden(['ontology_id' => $ontology_id]); ?>
+<?php echo form_open($controllerName.'/Create/' . $ontology->getID()); ?>
+<?php echo form_hidden(['ontology_id' => $ontology->getID()]); ?>
 
 	<div class="form-group row">
 		<div class="col-6">
 			<?php echo form_label('Ontology Name:', 'ontology_name'); ?>
-			<?= $ontology_name ?>
+			<?= $ontology->name ?>
 		</div>
 		<div class="col-6">
 		</div>
@@ -43,8 +43,8 @@
 			<button type="submit" name="submit" class="btn btn-success bg-gradient-success">
 				<i class="fa fa-plus"></i> Create Ontology Relationship
 			</button>
-			<a href="<?= base_url($controllerName) . '/List/' . $ontology_id;?>" class="btn btn-secondary bg-gradient-secondary" >
-				<i class="fa fa-project-diagram"></i> View Ontology Prefixes of <?= $ontology_name ?>
+			<a href="<?= base_url($controllerName) . '/List/' . $ontology->getID();?>" class="btn btn-secondary bg-gradient-secondary" >
+				<i class="fa fa-project-diagram"></i> View Ontology Prefixes of <?= $ontology->name ?>
 			</a>
 		</div>
 	</div>

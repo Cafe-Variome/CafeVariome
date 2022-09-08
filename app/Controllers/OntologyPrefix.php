@@ -1,5 +1,10 @@
 <?php namespace App\Controllers;
 
+use App\Libraries\CafeVariome\Entities\ViewModels\OntologyDropDown;
+use App\Libraries\CafeVariome\Entities\ViewModels\OntologyPrefixWithOntologyName;
+use App\Libraries\CafeVariome\Factory\OntologyAdapterFactory;
+use App\Libraries\CafeVariome\Factory\OntologyPrefixAdapterFactory;
+use App\Libraries\CafeVariome\Factory\OntologyPrefixFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
@@ -13,9 +18,9 @@ use CodeIgniter\Config\Services;
 
 class OntologyPrefix extends CVUI_Controller
 {
-	private $ontologyModel;
-	private $prefixModel;
 	private $validation;
+
+	private $ontologyAdapter;
 
 	/**
 	 * Validation list template.
@@ -35,8 +40,8 @@ class OntologyPrefix extends CVUI_Controller
 		parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
-		$this->ontologyModel = new \App\Models\Ontology();
-		$this->prefixModel = new \App\Models\OntologyPrefix();
+		$this->dbAdapter = (new OntologyPrefixAdapterFactory())->GetInstance();
+		$this->ontologyAdapter = (new OntologyAdapterFactory())->GetInstance();
 	}
 
 	public function Index()
@@ -46,8 +51,9 @@ class OntologyPrefix extends CVUI_Controller
 
 	public function List(int $ontology_id)
 	{
-		$ontology_name = $this->ontologyModel->getOntologyNameById($ontology_id);
-		if ($ontology_name == null || $ontology_id <= 0){
+		$ontology = $this->ontologyAdapter->SetModel(OntologyDropDown::class)->Read($ontology_id);
+		if ($ontology->isNull())
+		{
 			return redirect()->to(base_url('Ontology'));
 		}
 
@@ -57,9 +63,8 @@ class OntologyPrefix extends CVUI_Controller
 		$uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
 		$uidata->javascript = array(JS.'cafevariome/ontologyprefix.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
 
-		$uidata->data['prefixes'] = $this->prefixModel->getOntologyPrefixes($ontology_id);
-		$uidata->data['ontology_name'] = $ontology_name;
-		$uidata->data['ontology_id'] = $ontology_id;
+		$uidata->data['prefixes'] = $this->dbAdapter->ReadByOntologyId($ontology_id);
+		$uidata->data['ontology'] = $ontology;
 
 		$data = $this->wrapData($uidata);
 
@@ -68,12 +73,15 @@ class OntologyPrefix extends CVUI_Controller
 
 	public function Create(int $ontology_id)
 	{
-		$ontology_name = $this->ontologyModel->getOntologyNameById($ontology_id);
+		$ontology = $this->ontologyAdapter->SetModel(OntologyDropDown::class)->Read($ontology_id);
+		if ($ontology->isNull())
+		{
+			return redirect()->to(base_url('Ontology'));
+		}
 
 		$uidata = new UIData();
 		$uidata->title = 'Create Ontology Prefix';
-		$uidata->data['ontology_name'] = $ontology_name;
-		$uidata->data['ontology_id'] = $ontology_id;
+		$uidata->data['ontology'] = $ontology;
 
 		$this->validation->setRules([
 			'name' => [
@@ -92,7 +100,9 @@ class OntologyPrefix extends CVUI_Controller
 			try {
 				$name = $this->request->getVar('name');
 				$ontology_id = $this->request->getVar('ontology_id');
-				$this->prefixModel->createOntologyPrefix($name, $ontology_id);
+				$this->dbAdapter->Create(
+					(new OntologyPrefixFactory())->GetInstanceFromParameters($name, $ontology_id)
+				);
 
 				$this->setStatusMessage("Ontology prefix '$name' was created.", STATUS_SUCCESS);
 			}
@@ -123,24 +133,20 @@ class OntologyPrefix extends CVUI_Controller
 
 	public function Update(int $id)
 	{
-		$ontologyPrefix = $this->prefixModel->getOntologyPrefix($id);
-		if ($ontologyPrefix == null || $id <= 0){
+		$ontologyPrefix = $this->dbAdapter->SetModel(OntologyPrefixWithOntologyName::class)->Read($id);
+		if ($ontologyPrefix->isNull())
+		{
 			return redirect()->to(base_url('Ontology'));
 		}
 
 		$uidata = new UIData();
 		$uidata->title = 'Update Ontology Prefix';
-		$uidata->data['prefix_id'] = $id;
-
-		$ontology = $this->ontologyModel->getOntologyNameById($ontologyPrefix['ontology_id']);
-		$uidata->data['ontology_name'] = $ontology;
-		$ontology_id = $ontologyPrefix['ontology_id'];
-		$uidata->data['ontology_id'] = $ontology_id;
-
+		$uidata->data['ontologyPrefix'] = $ontologyPrefix;
+		$ontology_id = $ontologyPrefix->ontology_id;
 		$this->validation->setRules([
 			'name' => [
 				'label'  => 'Name',
-				'rules'  => 'required|alpha_numeric_punct|unique_ontology_prefix[ontology_id, prefix_id]|max_length[50]',
+				'rules'  => 'required|alpha_numeric_punct|unique_ontology_prefix[ontology_id, ontology_prefix_id]|max_length[50]',
 				'errors' => [
 					'required' => '{field} is required.',
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.',
@@ -150,11 +156,14 @@ class OntologyPrefix extends CVUI_Controller
 			]
 		]);
 
-		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-			try {
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
+			try
+			{
 				$name = $this->request->getVar('name');
-				$id = $this->request->getVar('prefix_id');
-				$this->prefixModel->updateOntologyPrefix($id, $name);
+				$this->dbAdapter->Update(
+					$id, (new OntologyPrefixFactory())->GetInstanceFromParameters($name, $ontology_id)
+				);
 
 				$this->setStatusMessage("Ontology prefix '$name' was updated.", STATUS_SUCCESS);
 			}
@@ -174,7 +183,7 @@ class OntologyPrefix extends CVUI_Controller
 				'id' => 'name',
 				'type' => 'text',
 				'class' => 'form-control',
-				'value' =>set_value('name', $ontologyPrefix['name'])
+				'value' =>set_value('name', $ontologyPrefix->name)
 			);
 		}
 
@@ -185,17 +194,16 @@ class OntologyPrefix extends CVUI_Controller
 
 	public function Delete(int $id)
 	{
-		$ontologyPrefix = $this->prefixModel->getOntologyPrefix($id);
-		if($ontologyPrefix == null || $id <= 0){
+		$ontologyPrefix = $this->dbAdapter->Read($id);
+		if ($ontologyPrefix->isNull())
+		{
 			return redirect()->to(base_url('Ontology'));
 		}
 
 		$uidata = new UIData();
 		$uidata->title = "Delete Ontology Prefix";
-		$uidata->data['prefix_id'] = $id;
-		$uidata->data['ontology_prefix_name'] = $ontologyPrefix['name'];
-		$ontology_id = $ontologyPrefix['ontology_id'];
-		$uidata->data['ontology_id'] = $ontology_id;
+		$uidata->data['ontologyPrefix'] = $ontologyPrefix;
+		$ontology_id = $ontologyPrefix->ontology_id;
 
 		$this->validation->setRules([
 			'confirm' => [
@@ -204,43 +212,33 @@ class OntologyPrefix extends CVUI_Controller
 				'errors' => [
 					'required' => '{field} is required.'
 				]
-			],
-
-			'ontology_prefix_id' => [
-				'label'  => 'Ontology Prefix Id',
-				'rules'  => 'required|alpha_dash',
-				'errors' => [
-					'required' => '{field} is required.',
-					'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
-				]
 			]
 		]);
 
-		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-			$id = $this->request->getVar('ontology_prefix_id');
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
 			$confirm = $this->request->getVar('confirm');
-			if ($confirm == 'yes') {
-				try {
-					$ontologyPrefix = $this->prefixModel->getOntologyPrefix($id);
-					if ($ontologyPrefix)  {
-						$ontologyPrefixName = $ontologyPrefix['name'];
-						$this->prefixModel->deleteOntologyPrefix($id);
-						$this->setStatusMessage("Ontology prefix '$ontologyPrefixName' was deleted.", STATUS_SUCCESS);
-					}
-					else{
-						$this->setStatusMessage("Ontology prefix does not exist.", STATUS_ERROR);
-					}
-				} catch (\Exception $ex) {
+			if ($confirm == 'yes')
+			{
+				try
+				{
+					$ontologyPrefixName = $ontologyPrefix->name;
+					$this->dbAdapter->Delete($id);
+					$this->setStatusMessage("Ontology prefix '$ontologyPrefixName' was deleted.", STATUS_SUCCESS);
+
+				}
+				catch (\Exception $ex)
+				{
 					$this->setStatusMessage("There was a problem deleting the ontology prefix.", STATUS_ERROR);
 				}
 			}
 			return redirect()->to(base_url($this->controllerName.'/List/' . $ontology_id));
 		}
-		else {
+		else
+		{
 			$data = $this->wrapData($uidata);
 
 			return view($this->viewDirectory.'/Delete', $data);
 		}
 	}
-
 }
