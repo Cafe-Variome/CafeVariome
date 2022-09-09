@@ -340,7 +340,7 @@ class ValidationHelper
 	public function valid_username_chars(string $str, & $err): bool
 	{
 		$err = null;
-		$regexp = "/^[a-zA-Z0-9-@.-_]+$/";
+		$regexp = "/^[a-zA-Z0-9-@.-_]+$/u";
 
             if (preg_match($regexp, $str))
 			{
@@ -357,15 +357,14 @@ class ValidationHelper
 	public function text_validator(string $str, & $err): bool
 	{
 		$err = null;
-		$regexp = "/^[a-zA-Z0-9-@.-_,%~$*+=|:&£ ?!]+$/";
-
-            if (preg_match($regexp, $str))
+		
+            if (preg_match('/^[\p{L}\p{N}\p{Z},.?!$£%+_-~&=:@;*%]+$/u', $str))
 			{
                 return true;
             }
 			else {
 
-				$err = "The only valid characters for texts are alphanumerics,spaces,.,-,_,%,~,$,*,+,=,|,:,&,£,@,?,! or , .";
+				$err = "The only valid characters for texts are alphanumerics,spaces,.,-,_,%,~,$,*,+,=,:,&,£,@,!,;,? or , .";
 				return false;
 			}
 
@@ -389,7 +388,7 @@ class ValidationHelper
 	public function credentail_password_check(string $pwd, & $err): bool
 	{
 		$err = null;
-		$regexp = "/^[a-zA-Z0-9-.-_,%~$*+=|:&£ ?!]+$/";
+		$regexp = "/^[a-zA-Z0-9-.-_,%~$*+=|:&£ ?!]+$/u";
 
             if (preg_match($regexp, $pwd))
 			{
