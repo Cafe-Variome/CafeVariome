@@ -336,13 +336,13 @@ class ValidationHelper
 		$valueId = $valueModel->getValueIdByNameAndAttributeId($str, $attribute_id);
 		return !($valueId > 0);
 	}
-
+    
+	# valid_username_chars function (validaror) is defined for acceptable characters for usernames.
 	public function valid_username_chars(string $str, & $err): bool
 	{
 		$err = null;
-		$regexp = "/^[a-zA-Z0-9-@.-_]+$/u";
 
-            if (preg_match($regexp, $str))
+            if (preg_match('/^[\p{L}\p{N}.@]+$/u', $str))
 			{
                 return true;
             }
@@ -354,6 +354,7 @@ class ValidationHelper
 
 	}
 
+    # text_validator function (validator) is defined for acceptable characters for texts.
 	public function text_validator(string $str, & $err): bool
 	{
 		$err = null;
@@ -370,6 +371,7 @@ class ValidationHelper
 
 	}
 
+	# password_strict_check function (validator) is defined for acceptable characters for passwords and considering password length.
 	public function password_strict_check(string $pwd, & $err): bool
 	{
 		$err = null;
@@ -385,18 +387,19 @@ class ValidationHelper
 
 	}
 
+	# credentail_password_check function (validator) is defined for acceptable characters for Credentials passwords.
 	public function credentail_password_check(string $pwd, & $err): bool
 	{
 		$err = null;
-		$regexp = "/^[a-zA-Z0-9-.-_,%~$*+=|:&£ ?!]+$/u";
+		$regexp = "/^[a-zA-Z0-9-.-_,%~$*+=|:&£?!]+$/u";
 
-            if (preg_match($regexp, $pwd))
+            if (preg_match('/^[\p{L}\p{N},.?!$£%+_-~&=:@*%]+$/u', $pwd))
 			{
                 return true;
             }
 			else {
 
-				$err = "The only valid characters for credentail passwords are alphanumerics,.,-,_,%,~,$,*,+,=,|,:,&,£,?,! or , .";
+				$err = "The only valid characters for credentail passwords are alphanumerics,.,-,_,%,~,$,*,+,=,:,&,£,@,!,? or , .";
 				return false;
 			}
 
