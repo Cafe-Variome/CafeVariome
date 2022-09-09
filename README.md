@@ -1,11 +1,10 @@
 ## Cafe Variome
 ---
 
-This is the repository for Cafe Variome in CodeIgniter 4.  
-  
-There is a separate repository for documentation [here](https://github.com/CafeVariomeUoL/CafeVariomeDocs).
+This is the repository for Cafe Variome in CodeIgniter 4. 
 
-This application needs to work with the [Cafe Variome Net](https://github.com/CafeVariomeUoL/CafeVariomeNet).
+For documentation, please go to https://www.cafevariome.org/
+  
 
 ## Installation
 ---  
