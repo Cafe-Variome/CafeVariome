@@ -391,7 +391,6 @@ class ValidationHelper
 	public function credentail_password_check(string $pwd, & $err): bool
 	{
 		$err = null;
-		$regexp = "/^[a-zA-Z0-9-.-_,%~$*+=|:&£?!]+$/u";
 
             if (preg_match('/^[\p{L}\p{N},.?!$£%+_-~&=:@*%]+$/u', $pwd))
 			{
