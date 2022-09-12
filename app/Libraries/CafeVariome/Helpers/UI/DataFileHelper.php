@@ -19,7 +19,7 @@ class DataFileHelper
 			case DATA_FILE_STATUS_IMPORTED:
 				return 'Imported';
 			case DATA_FILE_STATUS_PROCESSING:
-				return 'Procesing';
+				return 'Processing';
 			case DATA_FILE_STATUS_PROCESSED:
 				return 'Processed';
 			case DATA_FILE_STATUS_MISSING:
