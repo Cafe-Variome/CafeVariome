@@ -10,14 +10,12 @@ IndexIgnore *
 
 # Deny access to filenames starting with dot(.)
 <FilesMatch "^\.">
-	Order allow,deny
-	Deny from all
+	Require all denied
 </FilesMatch>
 
 # Deny access to sensitive files
 <FilesMatch "^composer*|^build*|^README.md|^php*">
-	Order allow,deny
-	Deny from all
+	Require all denied
 </FilesMatch>
 
 # ----------------------------------------------------------------------
