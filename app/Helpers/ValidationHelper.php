@@ -336,9 +336,17 @@ class ValidationHelper
 		$valueId = $valueModel->getValueIdByNameAndAttributeId($str, $attribute_id);
 		return !($valueId > 0);
 	}
-    
-	# valid_username_chars function (validaror) is defined for acceptable characters for usernames.
-	public function valid_username_chars(string $str, & $err): bool
+
+	/**
+	 * @param string $str
+	 * @param string $fields
+	 * @param array $data
+	 * @param $err
+	 * @return bool
+	 * @author Farid Yavazri Dizjikan
+	 * defined for acceptable characters for texts.
+	 */
+	public function text_validator(string $str, string $fields, array $data, & $err): bool
 	{
 		$err = null;
 
