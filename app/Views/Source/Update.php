@@ -7,12 +7,11 @@
 	</div>
 </div>
 <hr>
-<p>Please enter the source information below.</p>
-<?php if($message): ?>
+<?php if($statusMessage): ?>
 	<div class="row">
 		<div class="col">
-			<div class="alert alert-info">
-			<?php echo $message ?>
+			<div class="alert alert-<?= $statusMessageType ?>">
+				<?php echo $statusMessage ?>
 			</div>
 		</div>
 	</div>

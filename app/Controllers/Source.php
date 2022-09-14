@@ -174,7 +174,7 @@ class Source extends CVUI_Controller
         }
 		else
 		{
-            $uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+            $uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
 			$uidata->data['name'] = array(
 				'name' => 'name',
@@ -359,7 +359,7 @@ class Source extends CVUI_Controller
 		{
 			$uidata->data['source'] = $source;
 
-			$uidata->data['message'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
+			$uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
 			$uidata->data['name'] = array(
 				'name' => 'name',
