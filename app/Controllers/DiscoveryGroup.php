@@ -339,7 +339,7 @@ class DiscoveryGroup extends CVUI_Controller
 					$this->dbAdapter->CreateSourceAssociations($id, $sources);
 				}
 
-				$this->setStatusMessage("Discovery group '$name' was created.", STATUS_SUCCESS);
+				$this->setStatusMessage("Discovery group '$name' was updated.", STATUS_SUCCESS);
 			}
 			catch (\Exception $ex)
 			{
