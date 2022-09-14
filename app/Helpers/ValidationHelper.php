@@ -374,23 +374,5 @@ class ValidationHelper
 			$err = "The password must be atleast 8 characters and include atleast one letter, number or special characters as follows: (.-_,%~$*+=|:&£?!)";
 			return false;
 		}
-
-	}
-
-	# credentail_password_check function (validator) is defined for acceptable characters for Credentials passwords.
-	public function credentail_password_check(string $pwd, & $err): bool
-	{
-		$err = null;
-
-            if (preg_match('/^[\p{L}\p{N},.?!$£%+_-~&=:@*%]+$/u', $pwd))
-			{
-                return true;
-            }
-			else {
-
-				$err = "The only valid characters for credentail passwords are alphanumerics,.,-,_,%,~,$,*,+,=,:,&,£,@,!,? or , .";
-				return false;
-			}
-
 	}
 }
