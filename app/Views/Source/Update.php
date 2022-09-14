@@ -17,7 +17,7 @@
 	</div>
 <?php endif; ?>
 <?php echo form_open($controllerName.'/Update/' . $id); ?>
-
+<?php echo form_hidden('id', $id); ?>
 <div class="form-group row">
 	<div class=col-6>
 		<?php echo form_label('Source Name', 'name'); ?>

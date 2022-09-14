@@ -258,7 +258,7 @@ class Source extends CVUI_Controller
 		$this->validation->setRules([
 				'name' => [
 					'label'  => 'Source Name',
-					'rules'  => 'required|alpha_numeric_space|max_length[128]|is_unique[sources.name]',
+					'rules'  => 'required|alpha_numeric_space|max_length[128]|is_unique[sources.name,id,{id}]',
 					'errors' => [
 						'required' => '{field} is required.',
 						'max_length' => 'Maximum length for {field} is 128 characters.',
