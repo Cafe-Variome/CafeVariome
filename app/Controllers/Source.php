@@ -102,7 +102,7 @@ class Source extends CVUI_Controller
                 'rules'  => 'valid_email|required|max_length[128]',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'valid_email' => 'Please check the {field}}. It does not appear to be a valid email address.',
+                    'valid_email' => 'Please check the {field}. It does not appear to be a valid email address.',
 					'max_length' => 'Maximum length for {field} is 128 characters.'
 				]
             ],
@@ -281,7 +281,7 @@ class Source extends CVUI_Controller
 					'rules'  => 'valid_email|required|max_length[128]',
 					'errors' => [
 						'required' => '{field} is required.',
-						'valid_email' => 'Please check the {field}}. It does not appear to be a valid email address.',
+						'valid_email' => 'Please check the {field}. It does not appear to be a valid email address.',
 						'max_length' => 'Maximum length for {field} is 128 characters.'
 					]
 				],
