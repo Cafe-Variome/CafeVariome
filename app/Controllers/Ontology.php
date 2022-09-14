@@ -61,7 +61,7 @@ class Ontology extends CVUI_Controller
 			],
 			'desc' => [
 				'label'  => 'Description',
-				'rules'  => 'text_validator|max_length[65535]',
+				'rules'  => 'text_validator[Description]|max_length[65535]',
 				'errors' => [
 					'max_length' => 'Maximum length for {field} is 65,535 characters.'
 				]
@@ -225,7 +225,7 @@ class Ontology extends CVUI_Controller
 			],
 			'desc' => [
 				'label'  => 'Description',
-				'rules'  => 'text_validator|max_length[65535]',
+				'rules'  => 'text_validator[Description]|max_length[65535]',
 				'errors' => [
 					'max_length' => 'Maximum length for {field} is 65,535 characters.'
 				]
