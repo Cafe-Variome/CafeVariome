@@ -117,7 +117,7 @@ class Source extends CVUI_Controller
             ],
             'description' => [
                 'label'  => 'Source Description',
-                'rules'  => 'required|text_validator|max_length[65535]',
+                'rules'  => 'required|text_validator[Source Description]|max_length[65535]',
                 'errors' => [
                     'required' => '{field} is required.',
 					'max_length' => 'Maximum length for {field} is 65,535 characters.'
@@ -295,11 +295,9 @@ class Source extends CVUI_Controller
 				],
 				'description' => [
 					'label'  => 'Source Description',
-					'rules'  => 'required|alpha_numeric_punct|max_length[65535]',
+					'rules'  => 'required|text_validator[Source Description]|max_length[65535]',
 					'errors' => [
 						'required' => '{field} is required.',
-						'alpha_numeric_punct' => 'The only valid characters in the {field} are alphanumeric or space characters.',
-						// @TODO custom role to allow commas
 						'max_length' => 'Maximum length for {field} is 65,535 characters.'
 					]
 				],
