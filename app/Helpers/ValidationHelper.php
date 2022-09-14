@@ -342,33 +342,15 @@ class ValidationHelper
 	{
 		$err = null;
 
-            if (preg_match('/^[\p{L}\p{N}.@]+$/u', $str))
-			{
-                return true;
-            }
-			else {
-
-				$err = "The only valid characters for usernames are alphanumerics, . or @ .";
-				return false;
-			}
-
-	}
-
-    # text_validator function (validator) is defined for acceptable characters for texts.
-	public function text_validator(string $str, & $err): bool
-	{
-		$err = null;
-		
-            if (preg_match('/^[\p{L}\p{N}\p{Z},.?!$£%+_-~&=:@;*%]+$/u', $str))
-			{
-                return true;
-            }
-			else {
-
-				$err = "The only valid characters for texts are alphanumerics,spaces,.,-,_,%,~,$,*,+,=,:,&,£,@,!,;,? or , .";
-				return false;
-			}
-
+		if (preg_match('/^[\p{L}\p{N}\p{Z},\/\().?!$£%+_-~&=:@;*%]+$/u', $str))
+		{
+			return true;
+		}
+		else
+		{
+			$err = "The only valid input for $fields are alphabetic characters, numbers, spaces, curly brackets, and some punctuation marks.";
+			return false;
+		}
 	}
 
 	# password_strict_check function (validator) is defined for acceptable characters for passwords and considering password length.
