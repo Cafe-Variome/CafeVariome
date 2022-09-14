@@ -90,6 +90,11 @@ abstract class BaseAdapter implements IAdapter
 
 	public function ReadByIds(array $ids): array
 	{
+		if (count($ids) == 0)
+		{
+			return [];
+		}
+
 		$this->CompileSelect();
 		$this->CompileJoin();
 		$this->builder->whereIn(static::$table . '.' . static::$key, $ids);
