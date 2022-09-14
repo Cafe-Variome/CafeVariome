@@ -51,54 +51,53 @@ class Ontology extends CVUI_Controller
 		$this->validation->setRules([
 			'name' => [
 				'label'  => 'Name',
-				'rules'  => 'required|alpha_numeric_space|is_unique[ontologies.name]|max_length[50]',
+				'rules'  => 'required|alpha_numeric_space|is_unique[ontologies.name]|max_length[128]',
 				'errors' => [
 					'required' => '{field} is required.',
 					'alpha_numeric_space' => 'The only valid characters for {field} are alphabetical characters, numbers, and spaces.',
-					'uniquename_check' => '{field} already exists.',
-					'max_length' => 'Maximum length is 50 characters.'
+					'is_unique' => '{field} already exists.',
+					'max_length' => 'Maximum length for {field} is 128 characters.'
 				]
 			],
 			'desc' => [
 				'label'  => 'Description',
-				'rules'  => 'string|max_length[500]',
+				'rules'  => 'text_validator[Description]|max_length[65535]',
 				'errors' => [
-					'string' => '{field} must be a valid string.',
-					'max_length' => 'Maximum length is 500 characters.'
+					'max_length' => 'Maximum length for {field} is 65,535 characters.'
 				]
 			],
 			'node_key' => [
 				'label'  => 'Node Key',
-				'rules'  => 'required|alpha_space|max_length[100]',
+				'rules'  => 'required|alpha_dash|max_length[128]',
 				'errors' => [
 					'required' => '{field} is required.',
-					'alpha_space' => 'The only valid characters for {field} are alphabetical characters and spaces.',
-					'max_length' => 'Maximum length is 100 characters.'
+					'alpha_dash' => 'The only valid characters for {field} are alphabetical characters, underscores, dashes, and numbers.',
+					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'node_type' => [
 				'label'  => 'Node Type',
-				'rules'  => 'required|alpha_space|max_length[100]',
+				'rules'  => 'required|alpha_dash|max_length[128]',
 				'errors' => [
 					'required' => '{field} is required.',
-					'alpha_space' => 'The only valid characters for {field} are alphabetical characters and spaces.',
-					'max_length' => 'Maximum length is 100 characters.'
+					'alpha_dash' => 'The only valid characters for {field} are alphabetical characters, underscores, dashes, and numbers.',
+					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'key_prefix' => [
 				'label'  => 'Key Prefix',
-				'rules'  => 'permit_empty|alpha_numeric_punct|max_length[100]',
+				'rules'  => 'permit_empty|alpha_numeric_punct|max_length[128]',
 				'errors' => [
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, punctuation characters, and spaces.',
-					'max_length' => 'Maximum length is 100 characters.'
+					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'term_name' => [
 				'label'  => 'Term Name',
-				'rules'  => 'permit_empty|alpha_numeric_punct|max_length[100]',
+				'rules'  => 'permit_empty|alpha_dash|max_length[128]',
 				'errors' => [
-					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, punctuation characters, and spaces.',
-					'max_length' => 'Maximum length is 100 characters.'
+					'alpha_dash' => 'The only valid characters for {field} are alphabetical characters, underscores, dashes, and numbers.',
+					'max_length' => 'Maximum length is 128 characters.'
 				]
 			]
 		]);
@@ -226,45 +225,43 @@ class Ontology extends CVUI_Controller
 			],
 			'desc' => [
 				'label'  => 'Description',
-				'rules'  => 'string|max_length[500]',
+				'rules'  => 'text_validator[Description]|max_length[65535]',
 				'errors' => [
-					'string' => '{field} must be a valid string.',
-					'max_length' => 'Maximum length is 500 characters.'
+					'max_length' => 'Maximum length for {field} is 65,535 characters.'
 				]
 			],
 			'node_key' => [
 				'label'  => 'Node Key',
-				'rules'  => 'required|alpha_space|max_length[100]',
+				'rules'  => 'required|alpha_dash|max_length[128]',
 				'errors' => [
 					'required' => '{field} is required.',
-					'alpha_space' => 'The only valid characters for {field} are alphabetical characters and spaces.',
-					'max_length' => 'Maximum length is 100 characters.'
+					'alpha_dash' => 'The only valid characters for {field} are alphabetical characters, underscores, dashes, and numbers.',
+					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'node_type' => [
 				'label'  => 'Node Type',
-				'rules'  => 'required|alpha_space|max_length[100]',
+				'rules'  => 'required|alpha_dash|max_length[128]',
 				'errors' => [
 					'required' => '{field} is required.',
-					'alpha_space' => 'The only valid characters for {field} are alphabetical characters and spaces.',
-					'max_length' => 'Maximum length is 100 characters.'
+					'alpha_dash' => 'The only valid characters for {field} are alphabetical characters, underscores, dashes, and numbers.',
+					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'key_prefix' => [
 				'label'  => 'Key Prefix',
-				'rules'  => 'required|alpha_numeric_punct|max_length[100]',
+				'rules'  => 'permit_empty|alpha_numeric_punct|max_length[128]',
 				'errors' => [
-					'required' => '{field} is required.',
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, punctuation characters, and spaces.',
-					'max_length' => 'Maximum length is 100 characters.'
+					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'term_name' => [
 				'label'  => 'Term Name',
-				'rules'  => 'permit_empty|alpha_numeric_punct|max_length[100]',
+				'rules'  => 'permit_empty|alpha_dash|max_length[128]',
 				'errors' => [
-					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, punctuation characters, and spaces.',
-					'max_length' => 'Maximum length is 100 characters.'
+					'alpha_dash' => 'The only valid characters for {field} are alphabetical characters, underscores, dashes, and numbers.',
+					'max_length' => 'Maximum length is 128 characters.'
 				]
 			]
 		]);

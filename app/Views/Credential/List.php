@@ -28,7 +28,11 @@
 	<?php foreach($credentials as $credential): ?>
 	<tr>
 		<td><?= $credential->name ?></td>
-		<td><?= $credential->hide_username ? "[Username is hidden]" : $credential->username ?></td>
+		<td>
+		<?php if (!empty($credential->username )): ?>
+			<?= $credential->hide_username ? "[Username is hidden]" : $credential->username ?>
+		<?php endif; ?>
+		</td>
 		<td>
 			<a href="<?= base_url($controllerName . '/Update/' . $credential->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Credential">
 				<i class="fa fa-edit text-warning"></i>

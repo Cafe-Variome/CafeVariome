@@ -6,6 +6,7 @@
  *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
+ * @author Farid Yavari Dizjikan
  *
  */
 
@@ -87,15 +88,17 @@ class Network extends CVUI_Controller
 	{
         $uidata = new UIData();
         $uidata->data['title'] = "Create Network";
+        $networkInterface = new NetworkInterface();
 
         // Validate form input
         $this->validation->setRules([
             'name' => [
                 'label'  => 'Network Name',
-                'rules'  => 'required|alpha_dash|is_unique[networks.name]',
+                'rules'  => 'required|alpha_numeric_space|is_unique[networks.name]',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'uniquename_check' => '{field} already exists.'
+                    'uniquename_check' => '{field} already exists.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters or spaces.'
                 ]
             ]
         ]
@@ -185,9 +188,18 @@ class Network extends CVUI_Controller
 			],
             'justification' => [
                 'label'  => 'Justification',
-                'rules'  => 'required|alpha_dash',
+                'rules'  => 'required|text_validator|max_length[65535]',
                 'errors' => [
                     'required' => '{field} is required.',
+                    'max_length' => 'Maximum length for {field} is 65,535 characters.'
+                ]
+            ],
+            'networks' => [
+                'label'  => 'networks',
+                'rules'  => 'required|integer',
+                'errors' => [
+                    'required' => '{field} is required.',
+                    'integer' => 'The only valid input for {field} is integers.'
                 ]
             ]
         ]
@@ -276,7 +288,8 @@ class Network extends CVUI_Controller
                 'rules'  => 'required|alpha_dash|is_natural',
                 'errors' => [
                     'required' => '{field} is required.',
-                    'is_natural' => '{field} must be a positive integer.'
+                    'is_natural' => '{field} must be a positive integer.',
+                    'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
             ]
         ]

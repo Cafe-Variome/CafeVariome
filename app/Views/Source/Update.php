@@ -7,18 +7,17 @@
 	</div>
 </div>
 <hr>
-<p>Please enter the source information below.</p>
-<?php if($message): ?>
+<?php if($statusMessage): ?>
 	<div class="row">
 		<div class="col">
-			<div class="alert alert-info">
-			<?php echo $message ?>
+			<div class="alert alert-<?= $statusMessageType ?>">
+				<?php echo $statusMessage ?>
 			</div>
 		</div>
 	</div>
 <?php endif; ?>
 <?php echo form_open($controllerName.'/Update/' . $id); ?>
-
+<?php echo form_hidden('id', $id); ?>
 <div class="form-group row">
 	<div class=col-6>
 		<?php echo form_label('Source Name', 'name'); ?>

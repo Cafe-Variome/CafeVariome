@@ -93,6 +93,13 @@ class OntologyPrefix extends CVUI_Controller
 					'unique_ontology_prefix' => '{field} already exists.',
 					'max_length' => 'Maximum length is 50 characters.'
 				]
+			],
+			'ontology_id' => [
+				'label'  => 'ontology_id',
+				'rules'  => 'integer',
+				'errors' => [
+					'integer' => 'The only valid input for {field} is integers.'
+				]
 			]
 		]);
 
@@ -152,6 +159,13 @@ class OntologyPrefix extends CVUI_Controller
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.',
 					'unique_ontology_prefix' => '{field} already exists.',
 					'max_length' => 'Maximum length is 50 characters.'
+				]
+			],
+			'ontology_id' => [
+				'label'  => 'ontology_id',
+				'rules'  => 'integer',
+				'errors' => [
+					'integer' => 'The only valid input for {field} is integers.'
 				]
 			]
 		]);

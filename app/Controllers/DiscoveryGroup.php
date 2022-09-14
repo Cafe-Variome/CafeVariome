@@ -94,9 +94,8 @@ class DiscoveryGroup extends CVUI_Controller
 			],
 			'description' => [
 				'label'  => 'Description',
-				'rules' => 'permit_empty|alpha_numeric_punct|max_length[512]',
+				'rules' => 'permit_empty|text_validator[Description]|max_length[512]',
 				'errors' => [
-					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetic characters, numbers, spaces, and some punctuation marks.',
 					'max_length' => 'Maximum length of {field} is 128 characters.'
 				]
 			],
@@ -286,9 +285,8 @@ class DiscoveryGroup extends CVUI_Controller
 				],
 				'description' => [
 					'label'  => 'Description',
-					'rules' => 'permit_empty|alpha_numeric_punct|max_length[512]',
+					'rules' => 'permit_empty|text_validator[Description]|max_length[512]',
 					'errors' => [
-						'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetic characters, numbers, spaces, and some punctuation marks.',
 						'max_length' => 'Maximum length of {field} is 128 characters.'
 					]
 				],

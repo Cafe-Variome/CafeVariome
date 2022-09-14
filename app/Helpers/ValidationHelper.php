@@ -6,6 +6,7 @@
  * Created: 19/08/2019
  *
  * @author Mehdi Mehtarizadeh
+ * @author Farid Yavari Dizjikan
  *
  * This class contains helper functions for form validation.
  */
@@ -334,5 +335,50 @@ class ValidationHelper
 		$attribute_id = $data[$fields];
 		$valueId = $valueModel->getValueIdByNameAndAttributeId($str, $attribute_id);
 		return !($valueId > 0);
+	}
+
+	/**
+	 * @param string $str
+	 * @param string $fields
+	 * @param array $data
+	 * @param $err
+	 * @return bool
+	 * @author Farid Yavazri Dizjikan
+	 * defined for acceptable characters for texts.
+	 */
+	public function text_validator(string $str, string $fields, array $data, & $err): bool
+	{
+		$err = null;
+
+		if (preg_match('/^[\p{L}\p{N}\p{Z},\/\().?!$£%+_-~&=:@;*%]+$/u', $str))
+		{
+			return true;
+		}
+		else
+		{
+			$err = "The only valid input for $fields are alphabetic characters, numbers, spaces, curly brackets, and some punctuation marks.";
+			return false;
+		}
+	}
+
+	/**
+	 * @param string $pwd
+	 * @param $err
+	 * @return bool
+	 * @author Farid Yavazri Dizjikan
+	 * defined for acceptable characters for passwords and considering password length.
+	 */
+	public function password_strict_check(string $pwd, & $err): bool
+	{
+		$err = null;
+
+		if ((strlen($pwd<8)) and (preg_match("#[0-9]+#", $pwd)) and (preg_match("#[a-zA-Z]+#", $pwd)) and (!preg_match("#[(.-_,%~$*+=|:&£?!)]+#", $pwd))) {
+			return true;
+		}
+		else {
+
+			$err = "The password must be at least 8 characters and include at least one letter, number or special characters as follows: (.-_,%~$*+=|:&£?!)";
+			return false;
+		}
 	}
 }
