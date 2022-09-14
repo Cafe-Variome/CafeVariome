@@ -64,11 +64,11 @@ class Page extends CVUI_Controller
         $this->validation->setRules([
             'ptitle' => [
                 'label'  => 'Page Title',
-                'rules'  => 'required|alpha_dash|max_length[50]',
+                'rules'  => 'required|alpha_dash|max_length[256]',
                 'errors' => [
                     'required' => '{field} is required.',
                     'uniquename_check' => '{field} already exists.',
-                    'max_length' => 'Maximum length is 50 characters.',
+                    'max_length' => 'Maximum length is 256 characters.',
                     'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
                 ]
                 ]
