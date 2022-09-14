@@ -60,7 +60,7 @@ class Admin extends CVUI_Controller
         $service = new ServiceInterface();
 
 		$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
-        $sourceList = $sourceAdapter->ReadAllOnline();
+        $sourceList = $sourceAdapter->ReadAll();
 
         $sc = 0;
         $maxSourcesToDisplay = 12;
