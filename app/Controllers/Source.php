@@ -135,7 +135,8 @@ class Source extends CVUI_Controller
         ]
         );
 
-        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
+        if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
             $name = $this->request->getVar('name');
             $display_name = $this->request->getVar('display_name');
             $uri = $this->request->getVar('uri');
@@ -160,10 +161,8 @@ class Source extends CVUI_Controller
 
             try
 			{
-				$source_id = $this->dbAdapter->Create($source);
-
+				$this->dbAdapter->Create($source);
                 $this->setStatusMessage("Source '$name' was created successfully.", STATUS_SUCCESS);
-
             }
 			catch (\Exception $ex)
 			{
