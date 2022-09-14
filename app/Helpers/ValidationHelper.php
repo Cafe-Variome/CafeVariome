@@ -361,7 +361,13 @@ class ValidationHelper
 		}
 	}
 
-	# password_strict_check function (validator) is defined for acceptable characters for passwords and considering password length.
+	/**
+	 * @param string $pwd
+	 * @param $err
+	 * @return bool
+	 * @author Farid Yavazri Dizjikan
+	 * defined for acceptable characters for passwords and considering password length.
+	 */
 	public function password_strict_check(string $pwd, & $err): bool
 	{
 		$err = null;
@@ -371,7 +377,7 @@ class ValidationHelper
 		}
 		else {
 
-			$err = "The password must be atleast 8 characters and include atleast one letter, number or special characters as follows: (.-_,%~$*+=|:&£?!)";
+			$err = "The password must be at least 8 characters and include at least one letter, number or special characters as follows: (.-_,%~$*+=|:&£?!)";
 			return false;
 		}
 	}
