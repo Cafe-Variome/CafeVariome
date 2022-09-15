@@ -148,6 +148,18 @@ abstract class BaseAdapter implements IAdapter
 		return $this->builder->delete();
 	}
 
+	/**
+	 * @param array $ids
+	 * @return void
+	 */
+	public function DeleteByIds(array $ids)
+	{
+		if (count($ids) > 0)
+		{
+			$this->builder->whereIn(static::$table . '.' . static::$key, $ids);
+			$this->builder->delete();
+		}
+	}
 
 	/**
 	 * @param object|null $object
