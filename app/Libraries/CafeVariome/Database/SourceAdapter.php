@@ -62,7 +62,7 @@ class SourceAdapter extends BaseAdapter
 
 	public function UpdateRecordCount(int $id, int $record_count): bool
 	{
-		$this->builder->where($this->GetKey(), $id);
+		$this->builder->where(static::$key, $id);
 		return $this->builder->update(['record_count' => $record_count]);
 	}
 
