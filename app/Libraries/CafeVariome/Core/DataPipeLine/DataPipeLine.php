@@ -63,6 +63,13 @@ class DataPipeLine
 		$this->fileMan = new FileMan($this->basePath);
 	}
 
+
+	protected function UpdateSourceSubjectCount()
+	{
+		$totalRecordCount = $this->subjectAdapter->CountBySourceId($this->sourceId);
+		$this->sourceAdapter->UpdateRecordCount($this->sourceId, $totalRecordCount);
+	}
+
 	public function DeleteExistingRecords(int $file_id)
 	{
 		$db = \Config\Database::connect();

@@ -56,12 +56,6 @@ abstract class DataInput extends DataPipeLine
 
 	abstract protected function InitializePipeline();
 
-	protected function updateSubjectCount()
-	{
-		$totalRecordCount = $this->subjectAdapter->CountBySourceId($this->sourceId);
-		$this->sourceAdapter->UpdateRecordCount($this->sourceId, $totalRecordCount);
-    }
-
 	public function Finalize(int $file_id, bool $update_subject_count = true)
 	{
 		if ($update_subject_count)
