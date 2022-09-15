@@ -158,7 +158,7 @@ abstract class AbstractSourceIndex
 
 	protected function CalculateProgressInPercent(): int
 	{
-		return intval(ceil((($this->processedRecords / $this->totalRecords)) * 100.0));
+		return $this->totalRecords == 0 ? 0 : intval(ceil((($this->processedRecords / $this->totalRecords)) * 100.0));
 	}
 
 	protected function ReportProgress(?int $progress = null, string $status = '', bool $finished = false)
