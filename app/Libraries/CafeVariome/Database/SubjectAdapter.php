@@ -29,7 +29,7 @@ class SubjectAdapter extends BaseAdapter
 		$this->builder->select(static::$key);
 		$this->builder->where('source_id', $source_id);
 
-		return $this->builder->countAll();
+		return $this->builder->countAllResults();
 	}
 
 	public function ReadIdByNameAndSourceId(string $name, int $source_id): ?int
