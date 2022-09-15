@@ -424,6 +424,7 @@ class DataFile extends CVUI_Controller
 				{
 					$dataInput = new DataPipeLine($dataFile->source_id);
 					$dataInput->DeleteExistingRecords($id);
+					$dataInput->CreateUIIndex($this->authenticator->GetUserID());
 					$this->dbAdapter->UpdateStatus($id, DATA_FILE_STATUS_UPLOADED);
 					$this->setStatusMessage("Data file records were deleted.", STATUS_SUCCESS);
 				}
