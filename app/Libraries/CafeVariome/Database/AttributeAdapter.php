@@ -106,6 +106,28 @@ class AttributeAdapter extends BaseAdapter
 		return $entities;
 	}
 
+	public function ReadBySourceIdWithNoValues(int $source_id, array $value_ids): array
+	{
+		$this->CompileSelect();
+		$this->CompileJoin();
+		$this->builder->where(static::$table . '.source_id', $source_id);
+
+		if (count($value_ids) > 0)
+		{
+			$this->builder->whereNotIn(static::$table . '.' . static::$key, $value_ids);
+		}
+
+		$results = $this->builder->get()->getResult();
+
+		$entities = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			$entities[$results[$c]->{static::$key}] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
+		}
+
+		return $entities;
+	}
+
 	public function AssociationExists(int $attribute_id, int $ontology_id, int $prefix_id, int $relationship_id): bool
 	{
 		$this->changeTable('attributes_ontology_prefixes_relationships as aop');
