@@ -39,6 +39,7 @@ abstract class DataInput extends DataPipeLine
 		$this->pipelineId = $task->pipeline_id;
 		$this->overwrite = $task->overwrite;
 		$this->taskId = $task->getID();
+		$this->userId = $task->user_id;
 		$this->continue = true;
 
         $this->db = new Database();
