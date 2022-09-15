@@ -48,6 +48,23 @@ class SubjectAdapter extends BaseAdapter
 		return null;
 	}
 
+	public function ReadAllBySourceId(int $source_id): array
+	{
+		$this->CompileSelect();
+		$this->CompileJoin();
+		$this->builder->where(static::$table . '.source_id', $source_id);
+
+		$results = $this->builder->get()->getResult();
+
+		$entities = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			$entities[$results[$c]->{static::$key}] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
+		}
+
+		return $entities;
+	}
+
 	/**
 	 * Converts general PHP objects to a Subject object.
 	 * @param object|null $object
