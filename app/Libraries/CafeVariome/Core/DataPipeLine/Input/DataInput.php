@@ -63,7 +63,7 @@ abstract class DataInput extends DataPipeLine
 	{
 		if ($update_subject_count)
 		{
-			$this->updateSubjectCount();
+			$this->UpdateSourceSubjectCount();
 		}
 
 		$this->dataFileAdapter->UpdateRecordCount($file_id, count($this->subjects));
