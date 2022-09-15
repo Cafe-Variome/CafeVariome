@@ -15,10 +15,7 @@ use App\Libraries\CafeVariome\Entities\Task;
 use App\Libraries\CafeVariome\Factory\AttributeFactory;
 use App\Libraries\CafeVariome\Factory\GroupFactory;
 use App\Libraries\CafeVariome\Factory\SubjectFactory;
-use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
-use App\Libraries\CafeVariome\Factory\TaskFactory;
 use App\Libraries\CafeVariome\Factory\ValueFactory;
-use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 use App\Models\OntologyPrefix;
 
