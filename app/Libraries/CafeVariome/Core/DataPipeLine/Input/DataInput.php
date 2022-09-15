@@ -76,8 +76,7 @@ abstract class DataInput extends DataPipeLine
 		$this->ReportProgress(100, 'Finished', true);
 
 		// (Re-)Create the UI index
-//		$uiDataIndex = new UserInterfaceSourceIndex($this->sourceId);
-//		$uiDataIndex->IndexSource();
+		$this->CreateUIIndex();
 	}
 
 	protected function ReportProgress(int $progress, string $status = '', bool $finished = false)
