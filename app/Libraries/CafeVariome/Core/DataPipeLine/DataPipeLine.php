@@ -17,6 +17,9 @@ use App\Libraries\CafeVariome\Database\PipelineAdapter;
 use App\Libraries\CafeVariome\Database\SourceAdapter;
 use App\Libraries\CafeVariome\Database\SubjectAdapter;
 use App\Libraries\CafeVariome\Database\ValueAdapter;
+use App\Libraries\CafeVariome\Entities\ViewModels\AttributeID;
+use App\Libraries\CafeVariome\Entities\ViewModels\SubjectID;
+use App\Libraries\CafeVariome\Entities\ViewModels\ValueAttributeID;
 use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
 use App\Libraries\CafeVariome\Factory\DataFileAdapterFactory;
 use App\Libraries\CafeVariome\Factory\EAVAdapterFactory;
@@ -24,7 +27,10 @@ use App\Libraries\CafeVariome\Factory\GroupAdapterFactory;
 use App\Libraries\CafeVariome\Factory\PipelineAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SubjectAdapterFactory;
+use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
+use App\Libraries\CafeVariome\Factory\TaskFactory;
 use App\Libraries\CafeVariome\Factory\ValueAdapterFactory;
+use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 
 class DataPipeLine
 {
@@ -32,6 +38,7 @@ class DataPipeLine
 	protected int $pipelineId;
 	protected int $overwrite;
 	protected int $taskId;
+	protected int $userId;
 	protected bool $continue;
 
 	protected string $basePath;
@@ -90,5 +97,71 @@ class DataPipeLine
 			unset($value_id);
 		}
 		$db->transComplete();
+
+		$this->SynchroniseAttributes();
+		$this->dataFileAdapter->UpdateRecordCount($file_id, 0);
+		$this->SynchroniseSubjectIDs();
+		$this->UpdateSourceSubjectCount();
+	}
+
+	protected function SynchroniseAttributes()
+	{
+		$db = \Config\Database::connect();
+		$db->transStart();
+		$valueAttributeIDs = $this->valueAdapter->SetModel(ValueAttributeID::class)->ReadAll();
+		$stateAttributeIDs = [];
+		foreach ($valueAttributeIDs as &$valueAttributeID)
+		{
+			array_push($stateAttributeIDs, $valueAttributeID->attribute_id);
+		}
+		$attributeIDs = array_keys($this->attributeAdapter->SetModel(AttributeID::class)->ReadBySourceIdWithNoValues($this->sourceId, $stateAttributeIDs));
+		$this->attributeAdapter->DeleteByIds($attributeIDs);
+		$db->transComplete();
+	}
+
+	protected function SynchroniseSubjectIDs()
+	{
+		$db = \Config\Database::connect();
+		$db->transStart();
+		$subjectIDs = array_keys($this->subjectAdapter->SetModel(SubjectID::class)->ReadAllBySourceId($this->sourceId));
+		$EAVSubjectIDs = $this->EAVAdapter->ReadUniqueSubjectIdsBySourceId($this->sourceId);
+		$subjectIDCount = count($subjectIDs);
+
+		for($i = 0; $i < $subjectIDCount; $i++)
+		{
+			if (in_array($subjectIDs[$i], $EAVSubjectIDs))
+			{
+				unset($subjectIDs[$i]);
+			}
+		}
+
+		$this->subjectAdapter->DeleteByIds($subjectIDs); // Subject IDs that need to be removed from the DB
+		$db->transComplete();
+	}
+
+	public function CreateUIIndex(?int $user_id = null)
+	{
+		$this->sourceAdapter->Lock($this->sourceId);
+
+		$task = (new TaskFactory())->GetInstanceFromParameters(
+			$user_id ?? $this->userId,
+			TASK_TYPE_SOURCE_INDEX_USER_INTERFACE,
+			0,
+			TASK_STATUS_CREATED,
+			-1,
+			null,
+			null,
+			null,
+			null,
+			null,
+			$this->sourceId,
+			false
+		);
+
+		$taskAdapter = (new TaskAdapterFactory())->GetInstance();
+		$taskId = $taskAdapter->Create($task);
+
+		// Start the task through CLI
+		PHPShellHelper::runAsync(getcwd() . "/index.php Task Start $taskId");
 	}
 }
