@@ -53,11 +53,11 @@ class Discover extends CVUI_Controller
 
 		$discoveryGroups = $discoveryGroupAdapter->SetModel(DiscoveryGroupList::class)->ReadByIds($discoveryGroupIds);
 
-        $instalattionNtworksResp = $networkInterface->GetNetworksByInstallationKey($this->setting->GetInstallationKey());
+        $instalationNtworksResp = $networkInterface->GetNetworksByInstallationKey($this->setting->GetInstallationKey());
 
-        if ($instalattionNtworksResp->status)
+        if ($instalationNtworksResp->status)
 		{
-            $instalattionNetworks = $instalattionNtworksResp->data;
+            $instalattionNetworks = $instalationNtworksResp->data;
         }
 
         foreach ($instalattionNetworks as $iNetwork)
