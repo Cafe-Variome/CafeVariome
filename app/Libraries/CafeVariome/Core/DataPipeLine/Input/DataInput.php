@@ -32,6 +32,8 @@ abstract class DataInput extends DataPipeLine
 	protected array $subjects;
 	protected array $groups;
 	private OntologyPrefix $ontologyPrefixModel;
+	protected int $totalRecords;
+	protected int $processedRecords;
 
 	public function __construct(Task $task, int $source_id)
     {
@@ -74,8 +76,18 @@ abstract class DataInput extends DataPipeLine
 		$this->CreateUIIndex();
 	}
 
-	protected function ReportProgress(int $progress, string $status = '', bool $finished = false)
+	protected function CalculateProgressInPercent(): int
 	{
+		return $this->totalRecords == 0 ? 0 : intval(ceil((($this->processedRecords / $this->totalRecords)) * 100.0));
+	}
+
+	protected function ReportProgress(?int $progress = null, string $status = '', bool $finished = false)
+	{
+		if (is_null($progress))
+		{
+			$progress = $this->CalculateProgressInPercent();
+		}
+
 		$response = $this->serviceInterface->ReportProgress($this->taskId, $progress, $status, $finished);
 
 		if ($response['response_received'])
