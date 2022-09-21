@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Sep 14, 2022 at 01:28 PM
+-- Generation Time: Sep 21, 2022 at 04:12 PM
 -- Server version: 5.7.38-0ubuntu0.18.04.1
 -- PHP Version: 8.0.19
 
@@ -109,7 +109,7 @@ INSERT INTO `credentials` (`id`, `name`, `username`, `password`, `hash`, `hide_u
 CREATE TABLE `data_files` (
   `id` int(11) NOT NULL,
   `name` varchar(1024) NOT NULL,
-  `disk_name` varchar(32) NOT NULL,
+  `disk_name` varchar(64) NOT NULL,
   `size` int(11) UNSIGNED NOT NULL,
   `upload_date` int(11) NOT NULL,
   `record_count` int(11) NOT NULL,
@@ -329,7 +329,7 @@ CREATE TABLE `pipelines` (
 --
 
 INSERT INTO `pipelines` (`id`, `name`, `subject_id_location`, `subject_id_attribute_name`, `subject_id_assignment_batch_size`, `subject_id_prefix`, `expansion_columns`, `expansion_policy`, `expansion_attribute_name`, `grouping`, `group_columns`, `dateformat`, `internal_delimiter`) VALUES
-(1, 'csvpipeline', 0, 'subject_id', 1, '', '', NULL, NULL, 0, '', NULL, ',');
+(1, 'default_pipeline', 0, 'subject_id', 1, '', '', NULL, NULL, 0, '', NULL, ',');
 
 -- --------------------------------------------------------
 
