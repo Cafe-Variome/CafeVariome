@@ -389,7 +389,7 @@ class ValidationHelper
 	 * @author Farid Yavazri Dizjikan
 	 * defined for acceptable characters for passwords in the password field of credentails form.
 	 */
-	public function credentail_password_check(string $pwd, & $err): bool
+	public function credential_password_check(string $pwd, & $err): bool
 	{
 		$err = null;
 

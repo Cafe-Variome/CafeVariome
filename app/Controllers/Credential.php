@@ -80,14 +80,14 @@ class Credential extends CVUI_Controller
 			],
 			'username' => [
 				'label'  => 'Username',
-				'rules'  => 'permit_empty|max_length[128]',
+				'rules'  => 'permit_empty|max_length[128]|valid_username_chars',
 				'errors' => [
 					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'password' => [
 				'label'  => 'Password',
-				'rules'  => 'permit_empty|max_length[128]',
+				'rules'  => 'permit_empty|max_length[128]|credential_password_check',
 				'errors' => [
 					'max_length' => 'Maximum length is 128 characters.'
 				]
@@ -183,14 +183,14 @@ class Credential extends CVUI_Controller
 			],
 			'username' => [
 				'label'  => 'Username',
-				'rules'  => 'permit_empty|max_length[128]',
+				'rules'  => 'permit_empty|max_length[128]|valid_username_chars',
 				'errors' => [
 					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'password' => [
 				'label'  => 'Password',
-				'rules'  => 'permit_empty|max_length[128]',
+				'rules'  => 'permit_empty|max_length[128]|credential_password_check',
 				'errors' => [
 					'max_length' => 'Maximum length is 128 characters.'
 				]
