@@ -67,6 +67,8 @@ class GroupAdapter extends BaseAdapter
 			array_push($attribute_ids, $results[$c]->attribute_id);
 		}
 
+		$this->resetTable();
+
 		return $attribute_ids;
 	}
 
