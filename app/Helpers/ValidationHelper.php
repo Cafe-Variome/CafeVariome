@@ -381,4 +381,50 @@ class ValidationHelper
 			return false;
 		}
 	}
+
+	/**
+	 * @param string $pwd
+	 * @param $err
+	 * @return bool
+	 * @author Farid Yavazri Dizjikan
+	 * defined for acceptable characters for passwords in the password field of credentails form.
+	 */
+	public function credentail_password_check(string $pwd, & $err): bool
+	{
+		$err = null;
+
+            if (preg_match('/^[\p{L}\p{N},.?!$£%+_-~&=:@*%]+$/u', $pwd))
+			{
+                return true;
+            }
+			else {
+
+				$err = "The only valid characters for credentail passwords are alphanumerics,.,-,_,%,~,$,*,+,=,:,&,£,@,! or ?.";
+				return false;
+			}
+
+	}
+
+	/**
+	 * @param string $str
+	 * @param $err
+	 * @return bool
+	 * @author Farid Yavazri Dizjikan
+	 * defined for acceptable characters for usernames.
+	 */
+	public function valid_username_chars(string $str, & $err): bool
+	{
+		$err = null;
+
+            if (preg_match('/^[\p{L}\p{N}.@]+$/u', $str))
+			{
+                return true;
+            }
+			else {
+
+				$err = "The only valid characters for usernames are alphanumerics, . or @ .";
+				return false;
+			}
+
+	}
 }
