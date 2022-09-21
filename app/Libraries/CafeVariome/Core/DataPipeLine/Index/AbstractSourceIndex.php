@@ -167,6 +167,7 @@ abstract class AbstractSourceIndex
 		{
 			$progress = $this->CalculateProgressInPercent();
 		}
+
 		$response = $this->serviceInterface->ReportProgress($this->taskId, $progress, $status, $finished);
 
 		if ($response['response_received'])
