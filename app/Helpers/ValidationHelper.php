@@ -416,13 +416,13 @@ class ValidationHelper
 	{
 		$err = null;
 
-            if (preg_match('/^[\p{L}\p{N}.@]+$/u', $str))
+            if (preg_match('/^[\p{L}\p{N}\p{Z},\/\().?!$£%+_-~&=:@;*%]+$/u', $str))
 			{
                 return true;
             }
 			else {
 
-				$err = "The only valid characters for usernames are alphanumerics, . or @ .";
+				$err = "The only valid input for usernames are alphabetic characters, numbers, spaces, curly brackets, and some punctuation marks.";
 				return false;
 			}
 
