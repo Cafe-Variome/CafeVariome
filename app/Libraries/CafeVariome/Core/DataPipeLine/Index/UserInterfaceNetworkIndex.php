@@ -205,12 +205,12 @@ class UserInterfaceNetworkIndex extends AbstractNetworkIndex
 		$networkIndex = json_decode($fileMan->Read($this->networkKey . '.json'), true);
 		if (array_key_exists('source_ids', $networkIndex)){
 			$sourcesIndexed = $networkIndex['source_ids'];
-			if (count(array_diff($sourcesIndexed, $this->sources)) > 0){
+			if (count(array_diff($sourcesIndexed, $this->sourceIds)) > 0){
 				return true;
 			}
 		}
 
-		foreach ($this->sources as $source_id){
+		foreach ($this->sourceIds as $source_id){
 			$sourceIndexName = $this->getSourceUIIndexName($source_id);
 			if ($fileMan->GetModificationTimeStamp($sourceIndexName) > $networkIndexTimeStamp ){
 				return true;
