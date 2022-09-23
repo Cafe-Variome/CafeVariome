@@ -3,68 +3,32 @@
 
 This is the repository for Cafe Variome in CodeIgniter 4. 
 
-For documentation, please go to https://www.cafevariome.org/
-  
+For an overview of Cafe Variome, please go to https://www.cafevariome.org/
 
-## Installation
+For documentation, please visit https://cafe-variome.gitbook.io/cafe-variome-docs/
+
+## Getting started
+#### Detailed instructions available [here](https://cafe-variome.gitbook.io/cafe-variome-docs/how-to-install-it/).
 ---  
-### Cloning the repositories:
+### Checklist: 
+- [ ] Satisfy [system requirements]()
+- [ ] Create database
+- [ ] Configure .env
+- [ ] Install dependencies
+- [ ] Install Cafe Variome
 
-$ `git clone https://github.com/CafeVariomeUoL/CafeVariomeCI4.git`  
+### Cloning the repository:
 
-### Changing Owner ship and renaming directories:
+$ `git clone https://github.com/Cafe-Variome/CafeVariome.git`  
 
-$ `mv CafeVariomeCI4/ your_desired_directory/`  
-$ `sudo chown $USER:$USER your_desired_directory -R`
+### Changing Ownership and renaming directories:
 
-### Creating the database:
+$ `mv CafeVariome/ your_webserver_directory/`  
+$ `sudo chown $USER:$USER your_webserver_directory -R`
 
-$ `mysql -u [username] -p`  
-$ `CREATE DATABASE cafevariome;`  
+### Editing configuration in env template:
 
-### Setting the permission for the writable folder of CodeIgniter:
-
-Set the permission within the root directory of Cafe Variome:
-Checking the corresponding user within the Linux distribution with the following command:  
-
-$ `ps aux | egrep '(apache|httpd)'`   
-
-On Ubuntu the Apache user is _www-data_.  
-
-$ `setfacl -m u:www-data:rwx -R writable/ writable/logs writable/session/ writable/cache/`
-
-### Editing configurations in App.php and Database.php
-
-The base URL needs to be set in the system using the following commands:
-
-$ `vim app/Config/App.php`  
-public $baseURL=’<URL_TO_ACCESS_CAFEVARIOME>’;
-
-Similarly, the database credentials need to be set using the following commands:  
-
-$ `vim app/Config/Database.php`
-
-> public $default = [  
->               'DSN'      => '',  
->               'hostname' => 'localhost',  
->               'username' => 'root',  
->               'password' => 'Your Password',  
->               'database' => 'cafevariome',  
->               'DBDriver' => 'MySQLi',  
->               'DBPrefix' => '',  
->               'pConnect' => false,  
->               'DBDebug'  => (ENVIRONMENT !== 'production'),  
->               'cacheOn'  => false,  
->               'cacheDir' => '',  
->               'charset'  => 'utf8',  
->               'DBCollat' => 'utf8_general_ci',  
->               'swapPre'  => '',  
->               'encrypt'  => false,  
->               'compress' => false,  
->               'strictOn' => false,  
->               'failover' => [],  
->               'port'     => 3306,  
->        ];
+Cafe Variome comes packaged with an [env](env) template. All you have to do is add server URL and database details in the relevant fields of the template as [shown here](https://cafe-variome.gitbook.io/cafe-variome-docs/how-to-install-it/installing-cafe-variome#configuring-env-template).
 
 ### Installing dependencies through Composer:  
 
@@ -74,9 +38,12 @@ $ `composer install`
 
 ### Importing Cafe Variome Database and setting permissions through Composer
 
-In the root directory of Cafe Variome where composer.json resides run the following command:
+In the root directory of Cafe Variome where composer.json resides, run the following command:
 
 $ `composer CVInstall`
 
-At this step you will be prompted to enter your installation key which has been given to you prior to installing the software. 
-Also, you will need to enter the URL to the Cafe Variome Net service you wish to use. Please note that you need to point Cafe Variome to that Cafe Variome Net instance which has issues your installation key.
+At this step you will be prompted to enter your installation key which has been given to you prior to installing the software.
+Also, you will need to enter the URL to the Cafe Variome Net server you wish to use. Please note that you need to point Cafe Variome to that Cafe Variome Net instance which has issued your installation key.
+
+### Further Steps
+Configuring the software and the process of making your data discoverable is described in detail [here](https://cafe-variome.gitbook.io/cafe-variome-docs/how-to-install-it/quick-start). 
