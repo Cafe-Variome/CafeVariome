@@ -270,13 +270,16 @@ class SpreadsheetDataInput extends DataInput
 
 			foreach ($groupArray as $attribute => $val)
 			{
-				$value = trim($row[$val]);
-				if ($value == "") continue; // Skip empty values
+				$value = $row[$val];
 
 				if (is_a($value, 'DateTime'))
 				{
 					$value = $value->format('Y-m-d H:i:s');
 				}
+
+				$value = trim($value);
+
+				if ($value == "") continue; // Skip empty values
 
 				$subject_id = $this->getSubjectIdByName($subject_id_string);
 				$attribute_id = $this->getAttributeIdByName($attribute);
