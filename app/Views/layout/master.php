@@ -61,7 +61,6 @@
                     <span>
                         Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a>
                         <!-- If user is logged in, show the privacy policy in footer. Else this modal is shown in the top nav bar to be easily accessible (i.e., when user is not logged in) -->
-                        <!-- Aware of the bug that user has to click on Cafe Variome logo in this page and then be shown privacy policy. Something to do with routing ... ex: /home/index/PrivacyPolicy.pdf does not work but /home/PrivacyPolicy.pdf works -->
                         <?php if ($loggedIn) : ?>
                             | <a class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#privacyPolicyModal">Privacy Policy</a>
                         <?php endif; ?>
