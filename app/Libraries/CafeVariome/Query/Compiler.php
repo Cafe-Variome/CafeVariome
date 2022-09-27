@@ -68,7 +68,7 @@ class Compiler
 		{
 			if (array_key_exists($discoveryGroupSourceId->discovery_group_id, $networkDiscoveryGroups))
 			{
-				if (in_array($discoveryGroupSourceId->source_id, $sourcesPolicies))
+				if (array_key_exists($discoveryGroupSourceId->source_id, $sourcesPolicies))
 				{
 					if ($sourcesPolicies[$discoveryGroupSourceId->source_id] < $networkDiscoveryGroups[$discoveryGroupSourceId->discovery_group_id]->policy)
 					{
