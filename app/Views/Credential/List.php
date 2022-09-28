@@ -29,7 +29,7 @@
 	<tr>
 		<td><?= $credential->name ?></td>
 		<td>
-		<?php if (!empty($credential->username )): ?>
+		<?php if (!is_null($credential->username )): ?>
 			<?= $credential->hide_username ? "[Username is hidden]" : $credential->username ?>
 		<?php endif; ?>
 		</td>
