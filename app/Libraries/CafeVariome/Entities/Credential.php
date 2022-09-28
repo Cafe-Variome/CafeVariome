@@ -51,7 +51,7 @@ class Credential extends Entity
 	{
 		parent::__construct($properties);
 
-		if ($this->username == null)
+		if (is_null($this->username))
 		{
 			unset($this->username);
 		}
