@@ -99,7 +99,7 @@ class Attribute extends CVUI_Controller
 		$this->validation->setRules([
 			'display_name' => [
 				'label' => 'Display Name',
-				'rules' => 'required|alpha_numeric_space',
+				'rules' => 'required|alpha_dash',
 				'errors' => [
 					'required' => '{field} is required.'
 				]
