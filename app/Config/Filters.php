@@ -3,6 +3,7 @@
 namespace Config;
 
 use App\Filters\AJAXFilter;
+use App\Filters\InputValidation;
 use App\Filters\TaskFilter;
 use CodeIgniter\Config\BaseConfig;
 use CodeIgniter\Filters\CSRF;
@@ -26,7 +27,8 @@ class Filters extends BaseConfig
         'invalidchars'  => InvalidChars::class,
         'secureheaders' => SecureHeaders::class,
 		'ajax'     => AJAXFilter::class,
-		'task'	   => TaskFilter::class
+		'task'	   => TaskFilter::class,
+		'inputvalidation' => InputValidation::class
     ];
 
     /**
@@ -84,6 +86,12 @@ class Filters extends BaseConfig
 		'task' => [
 			'before' => ['Task/*'],
 			'after' => ['Task/*']
+		],
+		'inputvalidation' =>[
+			'before' => [
+					'*/*',
+
+			]
 		]
 	];
 }

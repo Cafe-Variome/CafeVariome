@@ -74,22 +74,18 @@ class Credential extends CVUI_Controller
 				'rules'  => 'required|alpha_numeric_punct|max_length[128]',
 				'errors' => [
 					'required' => '{field} is required.',
-					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.',
-					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'username' => [
 				'label'  => 'Username',
-				'rules'  => 'permit_empty|max_length[128]',
+				'rules'  => 'permit_empty|string|max_length[128]',
 				'errors' => [
-					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'password' => [
 				'label'  => 'Password',
-				'rules'  => 'permit_empty|max_length[128]',
+				'rules'  => 'permit_empty|string|max_length[128]',
 				'errors' => [
-					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 		]);
@@ -131,7 +127,7 @@ class Credential extends CVUI_Controller
 				'id' => 'username',
 				'type' => 'text',
 				'class' => 'form-control',
-				'value' =>set_value('username'),
+				'value' =>set_value('username', '', false),
 			);
 
 			$uidata->data['password'] = array(
@@ -139,7 +135,7 @@ class Credential extends CVUI_Controller
 				'id' => 'password',
 				'type' => 'password',
 				'class' => 'form-control',
-				'value' =>set_value('password'),
+				'value' =>set_value('password', '', false),
 			);
 
 			$uidata->data['hide_username'] = array(
@@ -178,21 +174,18 @@ class Credential extends CVUI_Controller
 				'errors' => [
 					'required' => '{field} is required.',
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.',
-					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'username' => [
 				'label'  => 'Username',
-				'rules'  => 'permit_empty|max_length[128]',
+				'rules'  => 'permit_empty|string|max_length[128]',
 				'errors' => [
-					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 			'password' => [
 				'label'  => 'Password',
-				'rules'  => 'permit_empty|max_length[128]',
+				'rules'  => 'permit_empty|string|max_length[128]',
 				'errors' => [
-					'max_length' => 'Maximum length is 128 characters.'
 				]
 			],
 		]);
@@ -232,7 +225,7 @@ class Credential extends CVUI_Controller
 				'id' => 'name',
 				'type' => 'text',
 				'class' => 'form-control',
-				'value' =>set_value('name', $credential->name),
+				'value' =>set_value('name', $credential->name, $this->IsPost),
 			);
 
 			$uidata->data['username'] = array(
@@ -243,7 +236,7 @@ class Credential extends CVUI_Controller
 				'placeholder' => $credential->hide_username ? '[Username hidden]' : '',
 				'disabled' => 'disabled',
 				'onchange' => 'usernameChange()',
-				'value' =>set_value('username', $credential->hide_username ? '' : $credential->username),
+				'value' =>set_value('username', $credential->hide_username ? '' : $credential->username, false),
 			);
 
 			$uidata->data['username_changed'] = array(
@@ -261,7 +254,7 @@ class Credential extends CVUI_Controller
 				'placeholder' => '***********',
 				'disabled' => 'disabled',
 				'onchange' => 'passwordChange()',
-				'value' =>set_value('password'),
+				'value' =>set_value('password', '', false),
 			);
 
 			$uidata->data['password_changed'] = array(

@@ -20,8 +20,10 @@ use App\Libraries\CafeVariome\Net\ServiceInterface;
 class CVUI_Controller extends Controller
 {
 
-	private $isProtected = false;
-	private $isAdmin = false;
+	private bool $isProtected = false;
+	private bool $isAdmin = false;
+	protected bool $IsPost;
+
 	protected $db;
 	protected $dbAdapter;
 
@@ -93,7 +95,7 @@ class CVUI_Controller extends Controller
 
 		$this->controllerName = $this->getClassName();
 		$this->viewDirectory = $this->controllerName;
-
+		$this->IsPost = $this->IsPost();
 		$this->checkService();
 		//Load form helper
 		//Might be moved to a more suitable location
@@ -314,5 +316,10 @@ class CVUI_Controller extends Controller
 		if (!$service->ping()){
 			$service->Start();
 		}
+	}
+
+	protected function IsPost(): bool
+	{
+		return $this->request->getMethod() == 'post';
 	}
 }

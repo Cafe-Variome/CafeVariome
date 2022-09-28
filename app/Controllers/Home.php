@@ -21,7 +21,7 @@ class Home extends CVUI_Controller
 			if (!$page->isNull())
 			{
 				$uidata->title = $page->title;
-				$uidata->data['pageContent'] = $page->content;
+				$uidata->data['pageContent'] = htmlspecialchars_decode($page->content, ENT_QUOTES | ENT_SUBSTITUTE);
 			}
 			else
 			{

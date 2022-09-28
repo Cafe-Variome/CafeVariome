@@ -350,7 +350,7 @@ class ValidationHelper
 	{
 		$err = null;
 
-		if (preg_match('/^[\p{L}\p{N}\p{Z},\/\().?!$£%+_-~&=:@;*%]+$/u', $str))
+		if (preg_match('/^[\p{L}\p{N}\p{Z}\p{Pd}\p{S}\/]/u', $str))
 		{
 			return true;
 		}
@@ -380,5 +380,51 @@ class ValidationHelper
 			$err = "The password must be at least 8 characters and include at least one letter, number or special characters as follows: (.-_,%~$*+=|:&£?!)";
 			return false;
 		}
+	}
+
+	/**
+	 * @param string $pwd
+	 * @param $err
+	 * @return bool
+	 * @author Farid Yavazri Dizjikan
+	 * defined for acceptable characters for passwords in the password field of credentails form.
+	 */
+	public function credential_password_check(string $pwd, & $err): bool
+	{
+		$err = null;
+
+            if (preg_match('/^[\p{L}\p{N},.?!$£%+_-~&=:@*%]+$/u', $pwd))
+			{
+                return true;
+            }
+			else {
+
+				$err = "The only valid characters for credentail passwords are alphanumerics,.,-,_,%,~,$,*,+,=,:,&,£,@,! or ?.";
+				return false;
+			}
+
+	}
+
+	/**
+	 * @param string $str
+	 * @param $err
+	 * @return bool
+	 * @author Farid Yavazri Dizjikan
+	 * defined for acceptable characters for usernames.
+	 */
+	public function valid_username_chars(string $str, & $err): bool
+	{
+		$err = null;
+
+            if (preg_match('/^[\p{L}\p{N}\p{Z},\/\().?!$£%+_-~&=:@;*%]+$/u', $str))
+			{
+                return true;
+            }
+			else {
+
+				$err = "The only valid input for usernames are alphabetic characters, numbers, spaces, curly brackets, and some punctuation marks.";
+				return false;
+			}
+
 	}
 }
