@@ -203,13 +203,13 @@ class Page extends CVUI_Controller
                     'id' => 'ptitle',
                     'type' => 'text',
                     'class' => 'form-control',
-                    'value' => set_value('ptitle', $page->title),
+                    'value' => set_value('ptitle', $page->title, $this->IsPost),
                 );
 
                 $uidata->data['pcontent'] = array(
                     'name' => 'pcontent',
                     'id' => 'pcontent',
-                    'value' =>set_value('pcontent', $page->content, false),
+                    'value' =>set_value('pcontent', htmlspecialchars_decode($page->content, ENT_QUOTES | ENT_SUBSTITUTE), $this->IsPost),
                 );
             }
             else
