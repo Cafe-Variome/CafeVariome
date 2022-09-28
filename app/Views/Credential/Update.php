@@ -65,7 +65,7 @@
 			<i class="fa fa-save" ></i> Save Changes
 		</button>
 		<a href="<?= base_url($controllerName) . '/List';?>" class="btn btn-secondary bg-gradient-secondary" >
-			<i class="fa fa-server"></i> View Servers
+			<i class="fa fa-key"></i> View Credentials
 		</a>
 	</div>
 </div>
