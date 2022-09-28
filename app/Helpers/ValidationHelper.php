@@ -350,7 +350,7 @@ class ValidationHelper
 	{
 		$err = null;
 
-		if (preg_match('/^[\p{L}\p{N}\p{Z},\/\().?!$£%+_-~&=:@;*%]+$/u', $str))
+		if (preg_match('/^[\p{L}\p{N}\p{Z}\p{Pd}\p{S}\/]/u', $str))
 		{
 			return true;
 		}
