@@ -170,15 +170,15 @@ class Attribute extends CVUI_Controller
 				'name' => 'show_in_interface[]',
 				'id' => 'show_in_interface',
 				'class' => 'custom-control-input',
-				'value' => set_value('show_in_interface', $attribute->show_in_interface),
+				'value' => is_array($show_in_interface_val = set_value('show_in_interface[]', $attribute->show_in_interface)) ? $show_in_interface_val[0] : $attribute->show_in_interface,
 				'checked' => (bool)$attribute->show_in_interface
 			);
 
 			$uidata->data['include_in_interface_index'] = array(
-				'name' => 'include_in_interface_index[]',
+				'name' => 'include_in_interface_index',
 				'id' => 'include_in_interface_index',
 				'class' => 'custom-control-input',
-				'value' => set_value('include_in_interface_index', $attribute->include_in_interface_index),
+				'value' => is_array($include_in_interface_index_val = set_value('include_in_interface_index[]', $attribute->include_in_interface_index)) ? $include_in_interface_index_val[0] : $attribute->include_in_interface_index,
 				'checked' => (bool)$attribute->include_in_interface_index
 			);
 
