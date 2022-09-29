@@ -127,9 +127,9 @@ class CVInstaller
 	   $admin_password = readline("Please enter the password for Admin user:");
        $admin_password = trim(password_hash("$admin_password", PASSWORD_DEFAULT));
 
-	   $con->query("Update settings set value = '$installation_key' where key = 'installation_key';");
-	   $con->query("Update settings set value = '$auth_server' where key = 'auth_server';");
-	   $con->query("Update users set password = '$admin_password' where username='admin@cafevariome.org';");
+	   $con->query("Update settings set `value` = '$installation_key' where `key` = 'installation_key';");
+	   $con->query("Update settings set `value` = '$auth_server' where `key` = 'auth_server';");
+	   $con->query("Update users set `password` = '$admin_password' where `username`='admin@cafevariome.org';");
 
 	   print("Settings were updated successfully. \n");
 
