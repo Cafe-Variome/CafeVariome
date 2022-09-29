@@ -73,7 +73,7 @@ class Discover extends CVUI_Controller
 
         if (count($authorisedNetworks) == 1)
 		{
-            return redirect()->to(base_url($this->controllerName. '/QueryBuilder/' . $authorisedNetworks[0]->network_key));
+            return redirect()->to(base_url($this->controllerName. '/QueryBuilder/' . $authorisedNetworks[0]->network_id));
         }
 
         $uidata->data['networks'] = $authorisedNetworks;
