@@ -38,6 +38,11 @@
 		<ul class="navbar-nav">
 		<?php if (! $loggedIn): ?>
 			<li class="nav-item">
+					<a class="nav-link-top" data-toggle="modal" data-target="#privacyPolicyModal">Privacy Policy</a>
+			</li>
+		<?php endif; ?>
+		<?php if (! $loggedIn): ?>
+			<li class="nav-item">
 				<a href="<?= base_url("auth/login") ?>" class="nav-link-top<?= (strtolower($uriSegments->controllerName) == 'auth') ? " active": "" ?>" id="loginUser">Login</a>
 			</li>
 		<?php else: ?>
@@ -67,4 +72,26 @@
 		<?php endif; ?>
 		</ul>
     </div>
+	<div id="privacyPolicyModal" class="modal fade" style="justify-content: center;align-items:center;" tabindex="-1" role="dialog" aria-labelledby="privacyPolicyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content" style="width: 1200px;">
+            <div class="modal-header">
+                <h4 class="modal-title" id="privacyPolicyModalTitle">Our privacy policy</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" >
+				<div class="row">
+					<div class="col">
+						<embed src="<?= base_url("PrivacyPolicy.pdf");?>" frameborder="0" width="800px" height="600px">
+					</div>
+				</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 </nav>
