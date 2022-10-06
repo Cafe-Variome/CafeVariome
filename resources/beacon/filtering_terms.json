@@ -1,0 +1,110 @@
+[
+    {
+        "ftType":"alphanumeric",
+        "id":"affected",
+        "label":"Is individual affected? Values: true or false.",
+        "scope":"individuals"
+    },
+    {
+        "ftType":"numeric",
+        "id":"ageatsampling",
+        "label":"Sampling age: 0 - 99",
+        "scope":"individuals"
+    },
+    {
+        "ftType":"ontologyTerm",
+        "id":"anatomicalsite",
+        "label":"Anatomical Site",
+        "scope":"individuals"
+    },
+    {
+        "ftType":"numeric",
+        "id":"biobankid",
+        "label":"ID of Biobank, if known. (Ex: values = 44001, 77219, 87919).",
+        "scope":"individuals"
+    },
+    {
+        "ftType":"alphanumeric",
+        "id":"diagnosistype",
+        "label":"Type of diagnosis ex: clinical, hystological, molecular etc.,",
+        "scope":"individuals"
+    },
+    {
+        "ftType":"ontologyTerm",
+        "id":"disease",
+        "label":"Ontology term of a disease ex: urn:miriam:ncit:c49651, urn:miriam:orphanet:101081 etc.,",
+        "scope":"individuals"
+    },
+    {
+        "ftType":"alphanumeric",
+        "id":"genotype",
+        "label":"Is genotype information available? Values: true, false or unk.",
+        "scope":"individuals"
+    },
+    {
+        "ftType":"alphanumeric",
+        "id":"lastupdated",
+        "label":"Last update date ex: 2018-07-06",
+        "scope":"individuals"
+    },
+    {
+        "ftType":"ontologyTerm",
+        "id":"materialtypedetailed",
+        "label":"Type of material ex: urn:miriam:fma:74412",
+        "scope":"individuals"
+    },
+    {
+        "ftType":"ontologyTerm",
+        "id":"sex",
+        "label":"Sex of individual. Permitted values: urn:miriam:pato:0000383, urn:miriam:pato:0000384 or 0.",
+        "scope":"individuals"
+    },
+    {
+        "ftType":"ontologyTerm",
+        "id":"obo:NCIT_C28421",
+        "label":"Sex. Permitted values: obo:NCIT_C16576, obo:NCIT_C20197, obo:NCIT_C124294, obo:NCIT_C17998",
+        "scope":"biosamples"
+    },
+    {
+        "ftType":"ontologyTerm",
+        "id":"sio:SIO_001003",
+        "label":"Diagnosis of the rare disease",
+        "scope":"biosamples"
+    },
+    {
+        "ftType":"ontologyTerm",
+        "id":"sio:SIO_010056",
+        "label":"Phenotype",
+        "scope":"biosamples"
+    },
+    {
+        "ftType":"alphanumeric",
+        "id":"obo:NCIT_C16612",
+        "label":"Causative genes. Permitted values: any HGNC gene symbol",
+        "scope":"biosamples"
+    },
+    {
+        "ftType":"numeric",
+        "id":"obo:NCIT_C25150",
+        "label":"Age this year",
+        "scope":"biosamples"
+    },
+    {
+        "ftType":"mumeric",
+        "id":"efo:EFO_0004847",
+        "label":"Age at disease manifestation",
+        "scope":"biosamples"
+    },
+    {
+        "ftType":"numeric",
+        "id":"obo:NCIT_C156420",
+        "label":"Age at diagnosis",
+        "scope":"biosamples"
+    },
+    {
+        "ftType":"alphanumeric",
+        "id":"materials",
+        "label":"Available materials",
+        "scope":"biosamples"
+    }
+]
