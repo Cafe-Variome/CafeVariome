@@ -90,7 +90,7 @@
         "scope":"biosamples"
     },
     {
-        "ftType":"mumeric",
+        "ftType":"numeric",
         "id":"efo:EFO_0004847",
         "label":"Age at disease manifestation",
         "scope":"biosamples"
