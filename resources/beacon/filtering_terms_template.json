@@ -1,0 +1,20 @@
+[
+    {
+        "ftType":"ontologyTerm or alphanumeric or custom",
+        "id":"Name of the attribute term from Cafe Variome used for filtering within this instance",
+        "label":"Description or label for the attribute",
+        "scope":"Where thisfiltering term might come in use ex: individuals or biosamples"
+    },
+    {
+        "ftType":"",
+        "id":"",
+        "label":"",
+        "scope":""
+    },
+    {
+        "ftType":"",
+        "id":"",
+        "label":"",
+        "scope":""
+    }    
+]
