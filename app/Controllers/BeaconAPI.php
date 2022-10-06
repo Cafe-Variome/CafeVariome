@@ -58,7 +58,7 @@ class BeaconAPI extends ResourceController
         $response['meta']['returnedSchemas']['entityType'] = 'Info Endpoint';
         $response['meta']['returnedSchemas']['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/endpoints.json';
         $response['response']['id'] = Beacon::GetBeaconID();
-        $response['response']['name'] = 'Discovery Nexus Beacon';
+        $response['response']['name'] = 'Cafe Variome Beacon';
         $response['response']['apiVersion'] = Beacon::BEACON_VERSION;
         $response['response']['createDateTime'] = "2021-02-03 15:07 BST";
         $response['response']['updateDateTime'] = "2022-10-05 17:18 BST";
@@ -67,7 +67,7 @@ class BeaconAPI extends ResourceController
         $response['response']['organisation']['id'] = 'ULEIC';
         $response['response']['organisation']['name'] = 'University of Leicester';
         $response['response']['organisation']['address'] = 'University Road, Leicester, LE1 7RH';
-        $response['response']['organisation']['contactUrl'] = 'mailto:admin@cafevariome.org?subject=CafeVariomeBeacon';
+        $response['response']['organisation']['contactUrl'] = 'mailto:admin@cafevariome.org?subject=Beacon Info';
         $response['response']['organisation']['logoUrl'] = base_url('resources/images/logos/cafevariome-logo-full.png');
         $response['response']['organisation']['welcomeUrl'] = 'https://le.ac.uk/health-data-research/';
         $response['response']['welcomeUrl'] = 'https://www.cafevariome.org/';
