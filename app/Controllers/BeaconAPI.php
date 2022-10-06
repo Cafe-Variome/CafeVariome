@@ -81,13 +81,19 @@ class BeaconAPI extends ResourceController
     public function service_info()
     {
         $response['id'] = Beacon::GetBeaconID();
-        $response['name'] = 'CafeVariome beacon';
-        $response['type']['group'] = Beacon::GetBeaconID();
+        $response['name'] = 'Cafe Variome Beacon';
         $response['type']['artifact'] = 'beacon';
+        $response['type']['group'] = Beacon::GetBeaconID();
         $response['type']['version'] = Beacon::BEACON_VERSION;
         $response['organization']['name'] = 'University of Leicester';
         $response['organization']['url'] =  'https://www.le.ac.uk';
-        $response['version'] = '2.0';
+        $response['contactUrl'] = 'mailto:admin@cafevariome.org?subject=Beacon Service Info';
+        $response['createdAt'] = '2021-02-03 15:07 BST';
+        $response['updatedAt'] = '2022-10-06 11:56 BST';
+        $response['description'] = 'This service provides information about Beacon deployed by Cafe Variome Software.';
+        $response['documentationUrl'] = 'https://cafe-variome.gitbook.io/cafe-variome-docs/features/beacon/beacon-api';
+        $response['environment'] = 'dev';
+        $response['version'] = Beacon::BEACON_VERSION;
 
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
