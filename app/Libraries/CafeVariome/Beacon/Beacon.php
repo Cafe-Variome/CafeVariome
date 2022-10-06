@@ -18,7 +18,7 @@ class Beacon
 
 	public static function GetBeaconID():string
 	{
-		$beaconId = Beacon::BEACON_CONTROLLER . '/';
+		$beaconId = Beacon::BEACON_CONTROLLER . '.';
 		$baseURL = strtolower(base_url());
 		$baseURL = str_replace('https://', '', $baseURL);
 		$baseURL = str_replace('http://', '', $baseURL);
@@ -30,7 +30,7 @@ class Beacon
 
 		foreach ($urlSegments as $urlSegment)
 		{
-			$beaconId .= $urlSegment . '/';
+			$beaconId .= $urlSegment . '.';
 		}
 
 		for($i = 0; $i < count($domainSegments); $i++)
@@ -50,6 +50,11 @@ class Beacon
 	public static function GetIndividualsURL()
 	{
 		return self::GetEndpointURL('Individuals');
+	}
+	
+	public static function GetBiosamplesURL()
+	{
+		return self::GetEndpointURL('Biosamples');
 	}
 
 }
