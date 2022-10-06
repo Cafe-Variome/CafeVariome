@@ -111,14 +111,14 @@ class BeaconAPI extends ResourceController
         $response['response']['entryTypes']['Individuals']['id'] = 'Individuals';
         $response['response']['entryTypes']['Individuals']['name'] = 'Individuals';
         $response['response']['entryTypes']['Individuals']['ontologyTermForThisType']['id'] = 'NCIT:C25190';
-        $response['response']['entryTypes']['Individuals']['partOfSpecification'] = 'Beacon v2.0';
+        $response['response']['entryTypes']['Individuals']['partOfSpecification'] = Beacon::BEACON_VERSION;
         $response['response']['entryTypes']['Individuals']['defaultSchema']['id'] = 'beacon-v2-individual';
         $response['response']['entryTypes']['Individuals']['defaultSchema']['name'] = 'Default Schema for Individuals';
         $response['response']['entryTypes']['Individuals']['defaultSchema']['referenceToSchemaDefinition'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/individuals/defaultSchema.json';
         $response['response']['entryTypes']['Biosamples']['id'] = 'Biosamples';
         $response['response']['entryTypes']['Biosamples']['name'] = 'Biosamples';
         $response['response']['entryTypes']['Biosamples']['ontologyTermForThisType']['id'] = 'NCIT:C43412';
-        $response['response']['entryTypes']['Biosamples']['partOfSpecification'] = 'Beacon v2.0';
+        $response['response']['entryTypes']['Biosamples']['partOfSpecification'] = Beacon::BEACON_VERSION;
         $response['response']['entryTypes']['Biosamples']['defaultSchema']['id'] = 'beacon-v2-biosample';
         $response['response']['entryTypes']['Biosamples']['defaultSchema']['name'] = 'Default Schema for Biosamples';
         $response['response']['entryTypes']['Individuals']['defaultSchema']['referenceToSchemaDefinition'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';
@@ -134,16 +134,25 @@ class BeaconAPI extends ResourceController
 
         $response['meta']['beaconId'] =  Beacon::GetBeaconID();
         $response['meta']['apiVersion'] = Beacon::BEACON_VERSION;
-        $response['meta']['returnedSchemas'][0]['entityType'] = 'Individual';
-        $response['meta']['returnedSchemas'][0]['schema'] = 'string';
+        $response['meta']['returnedSchemas'][0]['entityType'] = 'individuals';
+        $response['meta']['returnedSchemas'][0]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/individuals/defaultSchema.json';
+        $response['meta']['returnedSchemas'][1]['entityType'] = 'biosamples';
+        $response['meta']['returnedSchemas'][1]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';$response['response']['entryTypes']['Individuals']['id'] = 'Individuals';
         $response['response']['entryTypes']['Individuals']['id'] = 'Individuals';
         $response['response']['entryTypes']['Individuals']['name'] = 'Individuals';
         $response['response']['entryTypes']['Individuals']['ontologyTermForThisType']['id'] = 'NCIT:C25190';
-        $response['response']['entryTypes']['Individuals']['partOfSpecification'] = 'Beacon v2.0-draft3';
-        $response['response']['entryTypes']['Individuals']['defaultSchema']['id'] = 'ga4gh-beacon-individual-v2.0.0-draft.4';
+        $response['response']['entryTypes']['Individuals']['partOfSpecification'] = Beacon::BEACON_VERSION;
+        $response['response']['entryTypes']['Individuals']['defaultSchema']['id'] = 'beacon-v2-individual';
         $response['response']['entryTypes']['Individuals']['defaultSchema']['name'] = 'Default Schema for Individuals';
         $response['response']['entryTypes']['Individuals']['defaultSchema']['referenceToSchemaDefinition'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2-Models/main/BEACON-V2-draft4-Model/individuals/defaultSchema.json';
-
+        $response['response']['entryTypes']['Biosamples']['id'] = 'Biosamples';
+        $response['response']['entryTypes']['Biosamples']['name'] = 'Biosamples';
+        $response['response']['entryTypes']['Biosamples']['ontologyTermForThisType']['id'] = 'NCIT:C43412';
+        $response['response']['entryTypes']['Biosamples']['partOfSpecification'] = Beacon::BEACON_VERSION;
+        $response['response']['entryTypes']['Biosamples']['defaultSchema']['id'] = 'beacon-v2-biosample';
+        $response['response']['entryTypes']['Biosamples']['defaultSchema']['name'] = 'Default Schema for Biosamples';
+        $response['response']['entryTypes']['Individuals']['defaultSchema']['referenceToSchemaDefinition'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';
+        
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
     }
