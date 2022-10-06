@@ -53,17 +53,27 @@ class BeaconAPI extends ResourceController
 
     public function info()
     {
-        $response['$schema'] = "../beaconInfoResponse.json";
         $response['meta']['beaconId'] = Beacon::GetBeaconID();
         $response['meta']['apiVersion'] = Beacon::BEACON_VERSION;
-        $response['meta']['returnedSchemas'] = 'na';
+        $response['meta']['returnedSchemas']['entityType'] = 'Info Endpoint';
+        $response['meta']['returnedSchemas']['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/endpoints.json';
         $response['response']['id'] = Beacon::GetBeaconID();
-        $response['response']['name'] = 'CafeVariome beacon';
-        $response['response']['apiVersion'] =  Beacon::BEACON_VERSION;
-        $response['response']['environment'] = 'dev';
-        $response['response']['organization']['id'] = 'University of Leicester';
-        $response['response']['organization']['name'] =  'University of Leicester';
-
+        $response['response']['name'] = 'Discovery Nexus Beacon';
+        $response['response']['apiVersion'] = Beacon::BEACON_VERSION;
+        $response['response']['createDateTime'] = "2021-02-03 15:07 BST";
+        $response['response']['updateDateTime'] = "2022-10-05 17:18 BST";
+        $response['response']['description'] = "This Beacon is based on the Beacon specification by GA4GH. Implemented by The Brookeslab @ University of Leicester, this Beacon contains all informational endpoints along with individuals and biosamples discovery.";
+        $response['response']['environment'] = "dev";
+        $response['response']['organisation']['id'] = 'ULEIC';
+        $response['response']['organisation']['name'] = 'University of Leicester';
+        $response['response']['organisation']['address'] = 'University Road, Leicester, LE1 7RH';
+        $response['response']['organisation']['contactUrl'] = 'mailto:admin@cafevariome.org?subject=CafeVariomeBeacon';
+        $response['response']['organisation']['logoUrl'] = base_url('resources/images/logos/cafevariome-logo-full.png');
+        $response['response']['organisation']['welcomeUrl'] = 'https://le.ac.uk/health-data-research/';
+        $response['response']['welcomeUrl'] = 'https://www.cafevariome.org/';
+        $response['response']['alternativeUrl'] = 'https://le.ac.uk/health-data-research/activities/';
+        $response['response']['organisation']['description'] = 'Cafe Variome is a flexible data discovery software. Cafe Variome + Beacon makes discovering genomic data easier.';
+    
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
     }
