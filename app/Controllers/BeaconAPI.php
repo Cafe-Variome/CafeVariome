@@ -184,8 +184,11 @@ class BeaconAPI extends ResourceController
         $response['meta']['returnedSchemas'][1]['entityType'] = 'biosamples';
         $response['meta']['returnedSchemas'][1]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';
         $response['response']['$schema'] = "https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/framework/json/configuration/filteringTermsSchema.json";
-        $response['response']['filteringTerms']=base_url('resources/beacon/filtering_terms.json');
-
+        $fterms = json_decode(file_get_contents(base_url('resources/beacon/filtering_terms.json')),true);
+        foreach($fterms as $key => $val)
+        {
+        $response['response']['filteringTerms'][$key] = $val;
+        }
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
     }
