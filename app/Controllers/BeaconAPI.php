@@ -131,7 +131,6 @@ class BeaconAPI extends ResourceController
 
     public function entry_types()
     {
-
         $response['meta']['beaconId'] =  Beacon::GetBeaconID();
         $response['meta']['apiVersion'] = Beacon::BEACON_VERSION;
         $response['meta']['returnedSchemas'][0]['entityType'] = 'individuals';
@@ -161,11 +160,16 @@ class BeaconAPI extends ResourceController
     {
         $response['meta']['beaconId'] = Beacon::GetBeaconID();
         $response['meta']['apiVersion'] = Beacon::BEACON_VERSION;
-        $response['meta']['returnedSchemas'][0]['entityType'] = 'Individual';
-        $response['meta']['returnedSchemas'][0]['schema'] = 'string';
-        $response['response']['$schema'] = "string";
+        $response['meta']['returnedSchemas'][0]['entityType'] = 'individuals';
+        $response['meta']['returnedSchemas'][0]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/individuals/defaultSchema.json';
+        $response['meta']['returnedSchemas'][1]['entityType'] = 'biosamples';
+        $response['meta']['returnedSchemas'][1]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';$response['response']['entryTypes']['Individuals']['id'] = 'Individuals';
+        $response['response']['$schema'] = "https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/framework/json/configuration/beaconMapSchema.json";
         $response['response']['endpointSets']['Individuals']['entryType'] = "Individuals";
         $response['response']['endpointSets']['Individuals']['rootUrl'] = Beacon::GetIndividualsURL();
+        $response['response']['endpointSets']['Biosamples']['entryType'] = 'Biosamples';
+        $response['response']['endpointSets']['Biosamples']['rootUrl'] = Beacon::GetBiosamplesURL();
+        $response['response']['endpointSets']['Biosamples']['filteringTermsUrl'] = base_url('resources/beacon/filtering_terms.json');
 
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
