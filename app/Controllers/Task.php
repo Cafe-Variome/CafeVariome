@@ -107,7 +107,6 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 						 $serviceInterface = new ServiceInterface();
 						 $serviceInterface->RegisterTask($task_id, $batch); // Register task in Demon
 
-						 $overwrite = UPLOADER_DELETE_FILE;
 						 $inputPipeLine = null;
 						 //Start task
 						 switch (strtolower($extension))
