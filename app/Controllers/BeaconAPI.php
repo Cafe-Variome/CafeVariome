@@ -53,17 +53,27 @@ class BeaconAPI extends ResourceController
 
     public function info()
     {
-        $response['$schema'] = "../beaconInfoResponse.json";
         $response['meta']['beaconId'] = Beacon::GetBeaconID();
         $response['meta']['apiVersion'] = Beacon::BEACON_VERSION;
-        $response['meta']['returnedSchemas'] = 'na';
+        $response['meta']['returnedSchemas']['entityType'] = 'Info Endpoint';
+        $response['meta']['returnedSchemas']['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/endpoints.json';
         $response['response']['id'] = Beacon::GetBeaconID();
-        $response['response']['name'] = 'CafeVariome beacon';
-        $response['response']['apiVersion'] =  Beacon::BEACON_VERSION;
-        $response['response']['environment'] = 'dev';
-        $response['response']['organization']['id'] = 'University of Leicester';
-        $response['response']['organization']['name'] =  'University of Leicester';
-
+        $response['response']['name'] = 'Cafe Variome Beacon';
+        $response['response']['apiVersion'] = Beacon::BEACON_VERSION;
+        $response['response']['createDateTime'] = "2021-02-03 15:07 BST";
+        $response['response']['updateDateTime'] = "2022-10-05 17:18 BST";
+        $response['response']['description'] = "This Beacon is based on the Beacon specification by GA4GH. Implemented by The Brookeslab @ University of Leicester, this Beacon contains all informational endpoints along with individuals and biosamples discovery.";
+        $response['response']['environment'] = "dev";
+        $response['response']['organization']['id'] = 'ULEIC';
+        $response['response']['organization']['name'] = 'University of Leicester';
+        $response['response']['organization']['address'] = 'University Road, Leicester, LE1 7RH';
+        $response['response']['organization']['contactUrl'] = 'mailto:admin@cafevariome.org?subject=Beacon Info';
+        $response['response']['organization']['logoUrl'] = base_url('resources/images/logos/cafevariome-logo-full.png');
+        $response['response']['organization']['welcomeUrl'] = 'https://le.ac.uk/health-data-research/';
+        $response['response']['welcomeUrl'] = 'https://www.cafevariome.org/';
+        $response['response']['alternativeUrl'] = 'https://le.ac.uk/health-data-research/activities/';
+        $response['response']['organization']['description'] = 'Cafe Variome is a flexible data discovery software. Cafe Variome + Beacon makes discovering genomic data easier.';
+    
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
     }
@@ -71,13 +81,19 @@ class BeaconAPI extends ResourceController
     public function service_info()
     {
         $response['id'] = Beacon::GetBeaconID();
-        $response['name'] = 'CafeVariome beacon';
-        $response['type']['group'] = Beacon::GetBeaconID();
+        $response['name'] = 'Cafe Variome Beacon';
         $response['type']['artifact'] = 'beacon';
+        $response['type']['group'] = Beacon::GetBeaconID();
         $response['type']['version'] = Beacon::BEACON_VERSION;
         $response['organization']['name'] = 'University of Leicester';
         $response['organization']['url'] =  'https://www.le.ac.uk';
-        $response['version'] = '2.0';
+        $response['contactUrl'] = 'mailto:admin@cafevariome.org?subject=Beacon Service Info';
+        $response['createdAt'] = '2021-02-03 15:07 BST';
+        $response['updatedAt'] = '2022-10-06 11:56 BST';
+        $response['description'] = 'This service provides information about Beacon deployed by Cafe Variome Software.';
+        $response['documentationUrl'] = 'https://cafe-variome.gitbook.io/cafe-variome-docs/features/beacon/beacon-api';
+        $response['environment'] = 'dev';
+        $response['version'] = Beacon::BEACON_VERSION;
 
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
@@ -85,20 +101,29 @@ class BeaconAPI extends ResourceController
 
     public function configuration()
     {
-        $response['$schema'] = "../beaconConfigurationResponse.json";
         $response['meta']['beaconId'] = Beacon::GetBeaconID();
         $response['meta']['apiVersion'] = Beacon::BEACON_VERSION;
-        $response['meta']['returnedSchemas'][0]['entityType'] = 'Individuals';
-        $response['meta']['returnedSchemas'][0]['schema'] = 'string';
-        $response['response']['$schema'] = "https://raw.githubusercontent.com/ga4gh-beacon/beacon-framework-v2/main/configuration/beaconConfigurationSchema.json";
-        $response['response']['maturityAttributes']['productionStatus'] = 'DEV';
+        $response['meta']['returnedSchemas'][0]['entityType'] = 'individuals';
+        $response['meta']['returnedSchemas'][0]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/individuals/defaultSchema.json';
+        $response['meta']['returnedSchemas'][1]['entityType'] = 'biosamples';
+        $response['meta']['returnedSchemas'][1]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';
+        $response['response']['$schema'] = "https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/framework/json/configuration/beaconConfigurationSchema.json";
         $response['response']['entryTypes']['Individuals']['id'] = 'Individuals';
         $response['response']['entryTypes']['Individuals']['name'] = 'Individuals';
         $response['response']['entryTypes']['Individuals']['ontologyTermForThisType']['id'] = 'NCIT:C25190';
-        $response['response']['entryTypes']['Individuals']['partOfSpecification'] = 'Beacon v2.0-draft3';
-        $response['response']['entryTypes']['Individuals']['defaultSchema']['id'] = 'ga4gh-beacon-individual-v2.0.0-draft.4';
+        $response['response']['entryTypes']['Individuals']['partOfSpecification'] = Beacon::BEACON_VERSION;
+        $response['response']['entryTypes']['Individuals']['defaultSchema']['id'] = 'beacon-v2-individual';
         $response['response']['entryTypes']['Individuals']['defaultSchema']['name'] = 'Default Schema for Individuals';
-        $response['response']['entryTypes']['Individuals']['defaultSchema']['referenceToSchemaDefinition'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2-Models/blob/main/BEACON-V2-draft4-Model/individuals/defaultSchema.json';
+        $response['response']['entryTypes']['Individuals']['defaultSchema']['referenceToSchemaDefinition'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/individuals/defaultSchema.json';
+        $response['response']['entryTypes']['Biosamples']['id'] = 'Biosamples';
+        $response['response']['entryTypes']['Biosamples']['name'] = 'Biosamples';
+        $response['response']['entryTypes']['Biosamples']['ontologyTermForThisType']['id'] = 'NCIT:C43412';
+        $response['response']['entryTypes']['Biosamples']['partOfSpecification'] = Beacon::BEACON_VERSION;
+        $response['response']['entryTypes']['Biosamples']['defaultSchema']['id'] = 'beacon-v2-biosample';
+        $response['response']['entryTypes']['Biosamples']['defaultSchema']['name'] = 'Default Schema for Biosamples';
+        $response['response']['entryTypes']['Biosamples']['defaultSchema']['referenceToSchemaDefinition'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';
+        $response['response']['maturityAttributes']['productionStatus'] = 'DEV';
+        $response['response']['securityAttributes']['defaultGranularity'] = 'count';
 
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
@@ -106,19 +131,27 @@ class BeaconAPI extends ResourceController
 
     public function entry_types()
     {
-
         $response['meta']['beaconId'] =  Beacon::GetBeaconID();
         $response['meta']['apiVersion'] = Beacon::BEACON_VERSION;
-        $response['meta']['returnedSchemas'][0]['entityType'] = 'Individual';
-        $response['meta']['returnedSchemas'][0]['schema'] = 'string';
+        $response['meta']['returnedSchemas'][0]['entityType'] = 'individuals';
+        $response['meta']['returnedSchemas'][0]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/individuals/defaultSchema.json';
+        $response['meta']['returnedSchemas'][1]['entityType'] = 'biosamples';
+        $response['meta']['returnedSchemas'][1]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';$response['response']['entryTypes']['Individuals']['id'] = 'Individuals';
         $response['response']['entryTypes']['Individuals']['id'] = 'Individuals';
         $response['response']['entryTypes']['Individuals']['name'] = 'Individuals';
         $response['response']['entryTypes']['Individuals']['ontologyTermForThisType']['id'] = 'NCIT:C25190';
-        $response['response']['entryTypes']['Individuals']['partOfSpecification'] = 'Beacon v2.0-draft3';
-        $response['response']['entryTypes']['Individuals']['defaultSchema']['id'] = 'ga4gh-beacon-individual-v2.0.0-draft.4';
+        $response['response']['entryTypes']['Individuals']['partOfSpecification'] = Beacon::BEACON_VERSION;
+        $response['response']['entryTypes']['Individuals']['defaultSchema']['id'] = 'beacon-v2-individual';
         $response['response']['entryTypes']['Individuals']['defaultSchema']['name'] = 'Default Schema for Individuals';
         $response['response']['entryTypes']['Individuals']['defaultSchema']['referenceToSchemaDefinition'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2-Models/main/BEACON-V2-draft4-Model/individuals/defaultSchema.json';
-
+        $response['response']['entryTypes']['Biosamples']['id'] = 'Biosamples';
+        $response['response']['entryTypes']['Biosamples']['name'] = 'Biosamples';
+        $response['response']['entryTypes']['Biosamples']['ontologyTermForThisType']['id'] = 'NCIT:C43412';
+        $response['response']['entryTypes']['Biosamples']['partOfSpecification'] = Beacon::BEACON_VERSION;
+        $response['response']['entryTypes']['Biosamples']['defaultSchema']['id'] = 'beacon-v2-biosample';
+        $response['response']['entryTypes']['Biosamples']['defaultSchema']['name'] = 'Default Schema for Biosamples';
+        $response['response']['entryTypes']['Biosamples']['defaultSchema']['referenceToSchemaDefinition'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';
+        
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
     }
@@ -127,12 +160,35 @@ class BeaconAPI extends ResourceController
     {
         $response['meta']['beaconId'] = Beacon::GetBeaconID();
         $response['meta']['apiVersion'] = Beacon::BEACON_VERSION;
-        $response['meta']['returnedSchemas'][0]['entityType'] = 'Individual';
-        $response['meta']['returnedSchemas'][0]['schema'] = 'string';
-        $response['response']['$schema'] = "string";
+        $response['meta']['returnedSchemas'][0]['entityType'] = 'individuals';
+        $response['meta']['returnedSchemas'][0]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/individuals/defaultSchema.json';
+        $response['meta']['returnedSchemas'][1]['entityType'] = 'biosamples';
+        $response['meta']['returnedSchemas'][1]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';
+        $response['response']['$schema'] = "https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/framework/json/configuration/beaconMapSchema.json";
         $response['response']['endpointSets']['Individuals']['entryType'] = "Individuals";
         $response['response']['endpointSets']['Individuals']['rootUrl'] = Beacon::GetIndividualsURL();
+        $response['response']['endpointSets']['Biosamples']['entryType'] = 'Biosamples';
+        $response['response']['endpointSets']['Biosamples']['rootUrl'] = Beacon::GetBiosamplesURL();
+        $response['response']['endpointSets']['Biosamples']['filteringTermsUrl'] = base_url('resources/beacon/filtering_terms.json');
 
+        $result = json_encode($response);
+        return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
+    }
+
+    public function filtering_terms()
+    {
+        $response['meta']['beaconId'] = Beacon::GetBeaconID();
+        $response['meta']['apiVersion'] = Beacon::BEACON_VERSION;
+        $response['meta']['returnedSchemas'][0]['entityType'] = 'individuals';
+        $response['meta']['returnedSchemas'][0]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/individuals/defaultSchema.json';
+        $response['meta']['returnedSchemas'][1]['entityType'] = 'biosamples';
+        $response['meta']['returnedSchemas'][1]['schema'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';
+        $response['response']['$schema'] = "https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/framework/json/configuration/filteringTermsSchema.json";
+        $fterms = json_decode(file_get_contents(base_url('resources/beacon/filtering_terms.json')),true);
+        foreach($fterms as $key => $val)
+        {
+        $response['response']['filteringTerms'][$key] = $val;
+        }
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
     }
