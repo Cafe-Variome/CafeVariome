@@ -13,8 +13,8 @@ use App\Libraries\CafeVariome\Net\Service\RegisterTaskMessage;
 class RegisterTaskMessageFactory
 {
 
-    public function GetInstance(int $task_id, string $status = ''): RegisterTaskMessage
+    public function GetInstance(int $task_id, string $status = '', bool $batch = false): RegisterTaskMessage
     {
-        return new RegisterTaskMessage($task_id, $status);
+        return new RegisterTaskMessage($task_id, $status, $batch);
     }
 }

@@ -44,7 +44,12 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 		 $this->dbAdapter = (new TaskAdapterFactory())->GetInstance();
 	 }
 
-	 public function Start(int $task_id)
+	 /**
+	  * @param int $task_id
+	  * @param bool $batch
+	  * @return void
+	  */
+	 public function Start(int $task_id, bool $batch = false)
 	 {
 		 $task = $this->dbAdapter->Read($task_id);
 
@@ -100,7 +105,7 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 						 $this->dbAdapter->Update($task_id, $task);
 
 						 $serviceInterface = new ServiceInterface();
-						 $serviceInterface->RegisterTask($task_id); // Register task in Demon
+						 $serviceInterface->RegisterTask($task_id, $batch); // Register task in Demon
 
 						 $overwrite = UPLOADER_DELETE_FILE;
 						 $inputPipeLine = null;
