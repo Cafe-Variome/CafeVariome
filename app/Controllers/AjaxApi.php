@@ -564,7 +564,6 @@ class AjaxApi extends Controller
 				]);
 			}
 
-			$extension = $dataFileAdapter->ReadExtensionById($fileId);
 			$pipeline = $pipelineAdapter->Read($pipelineId);
 
 			if ($pipeline->isNull())
