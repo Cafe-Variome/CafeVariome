@@ -123,9 +123,9 @@ class ServiceInterface
 		return $results;
 	}
 
-    public function RegisterTask(int $task_id, string $status = ''): bool
+    public function RegisterTask(int $task_id, bool $batch = false, string $status = ''): bool
     {
-		$message = (new RegisterTaskMessageFactory())->GetInstance($task_id, $status);
+		$message = (new RegisterTaskMessageFactory())->GetInstance($task_id, $status, $batch);
 
         try
 		{
