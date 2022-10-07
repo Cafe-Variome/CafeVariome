@@ -20,6 +20,7 @@ use App\Libraries\CafeVariome\Factory\DataFileAdapterFactory;
 use App\Libraries\CafeVariome\Factory\PipelineAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
+use App\Libraries\CafeVariome\Factory\TaskFactory;
 use App\Libraries\CafeVariome\Net\Service\Demon;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Controller;
@@ -230,133 +231,67 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 	 }
 
 	 /**
-	  * Reads phenopacket files uploaded/imported for a specific source and insert their data into mysql.
-	  * @param int $source_id - Id of the source
-	  * @param int $overwrite Whether to overwrite data of the files or not.
+	  * @param string $file_ids
+	  * @param int $pipeline_id
 	  * @return void
 	  */
-    public function phenoPacketInsertBySourceId(int $source_id, int $overwrite = UPLOADER_DELETE_NONE)
-	{
-        $uploadModel = new Upload();
-        $inputPipeLine = new PhenoPacketDataInput($source_id, $overwrite);
+	 public function CreateBatchTasksForDataFiles(string $file_ids, int $pipeline_id, int $user_id)
+	 {
+		 $fids = [];
+		 if (strpos($file_ids, ','))
+		 {
+			 $fids = explode(',', $file_ids);
+		 }
+		 else
+		 {
+			 $fids[] = intval($file_ids);
+		 }
 
-        // get a list of json files just uploaded to this source
-        $files = $uploadModel->getPhenoPacketFilesBySourceId($source_id, !$overwrite);
+		 $pipelineAdapter = (new PipelineAdapterFactory())->GetInstance();
+		 $pipeline = $pipelineAdapter->Read($pipeline_id);
 
-        for ($t=0; $t < count($files); $t++)
-		{
-            $file_id = $files[$t]['ID'];
-            try
-			{
-                $inputPipeLine->absorb($file_id);
-                $inputPipeLine->save($file_id);
-				$inputPipeLine->finalize($file_id);
-            }
-			catch (\Exception $ex)
-			{
-                error_log($ex->getMessage());
-            }
-        }
-    }
+		 if ($pipeline->isNull())
+		 {
+			 return;
+		 }
 
-	/**
-     * Reads a single phenopacket file and inserts its data into mysql.
-     * @param int $file_id - Id of the file uploaded or inserted.
-     * @param int $overwrite - Whether to overwrite data of the file or not.
-     * @return void
-     */
-    public function phenoPacketInsertByFileId(int $file_id, int $overwrite = UPLOADER_DELETE_FILE)
-	{
-        $uploadModel = new Upload();
-        $source_id = $uploadModel->getSourceIdByFileId($file_id);
-        $inputPipeLine = new PhenoPacketDataInput($source_id, $overwrite);
+		 foreach ($fids as $fileId)
+		 {
+			 $dataFileAdapter = (new DataFileAdapterFactory())->GetInstance();
+			 $dataFile = $dataFileAdapter->Read($fileId);
+			 if ($dataFile->isNull())
+			 {
+				 continue;
+			 }
 
-        try
-		{
-            $inputPipeLine->absorb($file_id);
-            $inputPipeLine->save($file_id);
-			$inputPipeLine->finalize($file_id);
-        }
-		catch (\Exception $ex)
-		{
-            error_log($ex->getMessage());
-        }
-    }
+			 if ($dataFile->status == DATA_FILE_STATUS_PROCESSING)
+			 {
+				 continue;
+			 }
 
-	 /**
-	  * Reads VCF files uploaded/imported for a specific source and insert their data into mysql.
-	  * @param int $source_id - Id of the source
-	  * @param int $overwrite Whether to overwrite data of the files or not.
-	  * @return void
-	  */
-    public function vcfInsertBySourceId(int $source_id, int $overwrite = UPLOADER_DELETE_NONE)
-    {
-        $uploadModel = new Upload();
-        $vcfFiles = $uploadModel->getVCFFilesBySourceId($source_id);
-        $inputPipeLine = new VCFDataInput($source_id, $overwrite);
+			 if ($dataFileAdapter->UpdateStatus($fileId, DATA_FILE_STATUS_PROCESSING))
+			 {
+				 // Create and a task
+				 $task = (new TaskFactory())->GetInstanceFromParameters(
+					 $user_id,
+					 TASK_TYPE_FILE_PROCESS,
+					 0,
+					 TASK_STATUS_CREATED,
+					 -1,
+					 null,
+					 null,
+					 null,
+					 $dataFile->getID(),
+					 $pipeline->getID(),
+					 $dataFile->source_id
+				 );
 
-        for ($i=0; $i < count($vcfFiles); $i++)
-		{
-            $file_id = $vcfFiles[$i]['ID'];
-            $inputPipeLine->absorb($file_id);
-            $inputPipeLine->save($file_id);
-			$inputPipeLine->finalize($file_id);
-        }
-    }
+				 $taskId = $this->dbAdapter->Create($task);
 
-	 /**
-	  * Reads a single VCF file and inserts its data into mysql.
-	  * @param int $file_id - Id of the file uploaded or inserted.
-	  * @param int $overwrite - Whether to overwrite data of the file or not.
-	  * @return void
-	  */
-    public function vcfInsertByFileId(int $file_id, int $overwrite = UPLOADER_DELETE_FILE)
-    {
-        $uploadModel = new Upload();
-        $source_id = $uploadModel->getSourceIdByFileId($file_id);
-        $inputPipeLine = new VCFDataInput($source_id, $overwrite);
-
-        try
-		{
-            $inputPipeLine->absorb($file_id);
-            $inputPipeLine->save($file_id);
-			$inputPipeLine->finalize($file_id);
-        }
-		catch (\Exception $ex)
-		{
-            error_log($ex->getMessage());
-        }
-    }
-
-	 /**
-	  * Reads a single spreadsheet file and inserts its data into mysql.
-	  * @param int $file_id - Id of the file uploaded or inserted.
-	  * @param int $overwrite - Whether to overwrite data of the file or not.
-	  * @return void
-	  */
-    public function spreadsheetInsert(int $fileId,  int $overwrite = UPLOADER_DELETE_FILE)
-	{
-        $uploadModel = new Upload();
-        $fileRec = $uploadModel->getFiles('ID, source_id', ['ID' => $fileId]);
-
-        if (count($fileRec) == 1)
-		{
-            $sourceId = $fileRec[0]['source_id'];
-            $inputPipeLine = new SpreadsheetDataInput($sourceId, $overwrite);
-            if($inputPipeLine->absorb($fileId))
-			{
-				$inputPipeLine->save($fileId);
-				$inputPipeLine->finalize($fileId);
-			}
-			else
-			{
-				error_log('There was an issue');
-			}
-        }
-        else{
-            error_log('File not found.');
-        }
-    }
+				 $this->Start($taskId, true);
+			 }
+		 }
+	 }
 
 	 /** Reads all the files uploaded/imported to a source and inserts their data into mysql.
 	  * @param int $source_id - Id of the source
