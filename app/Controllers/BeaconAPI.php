@@ -64,15 +64,15 @@ class BeaconAPI extends ResourceController
         $response['response']['updateDateTime'] = "2022-10-05 17:18 BST";
         $response['response']['description'] = "This Beacon is based on the Beacon specification by GA4GH. Implemented by The Brookeslab @ University of Leicester, this Beacon contains all informational endpoints along with individuals and biosamples discovery.";
         $response['response']['environment'] = "dev";
-        $response['response']['organisation']['id'] = 'ULEIC';
-        $response['response']['organisation']['name'] = 'University of Leicester';
-        $response['response']['organisation']['address'] = 'University Road, Leicester, LE1 7RH';
-        $response['response']['organisation']['contactUrl'] = 'mailto:admin@cafevariome.org?subject=Beacon Info';
-        $response['response']['organisation']['logoUrl'] = base_url('resources/images/logos/cafevariome-logo-full.png');
-        $response['response']['organisation']['welcomeUrl'] = 'https://le.ac.uk/health-data-research/';
+        $response['response']['organization']['id'] = 'ULEIC';
+        $response['response']['organization']['name'] = 'University of Leicester';
+        $response['response']['organization']['address'] = 'University Road, Leicester, LE1 7RH';
+        $response['response']['organization']['contactUrl'] = 'mailto:admin@cafevariome.org?subject=Beacon Info';
+        $response['response']['organization']['logoUrl'] = base_url('resources/images/logos/cafevariome-logo-full.png');
+        $response['response']['organization']['welcomeUrl'] = 'https://le.ac.uk/health-data-research/';
         $response['response']['welcomeUrl'] = 'https://www.cafevariome.org/';
         $response['response']['alternativeUrl'] = 'https://le.ac.uk/health-data-research/activities/';
-        $response['response']['organisation']['description'] = 'Cafe Variome is a flexible data discovery software. Cafe Variome + Beacon makes discovering genomic data easier.';
+        $response['response']['organization']['description'] = 'Cafe Variome is a flexible data discovery software. Cafe Variome + Beacon makes discovering genomic data easier.';
     
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
