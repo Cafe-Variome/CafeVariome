@@ -19,6 +19,7 @@
 <table class="table table-bordered table-striped table-hover" id="datafilestable">
 	<thead>
 	<tr>
+		<th></th>
 		<th>Name</th>
 		<th>Size</th>
 		<th>Upload Date</th>
@@ -31,6 +32,7 @@
 	<tbody>
 	<?php foreach($dataFiles as $dataFile): ?>
 	<tr>
+		<td><?= form_checkbox(['name' => 'file_ids[]', 'class'=> 'batch-select', 'id' => 'check-' . $dataFile->getID(), 'data-filename' => $dataFile->name, 'checked' => false], $dataFile->getID()); ?></td>
 		<td><?= $dataFile->name ?></td>
 		<td><?= \App\Libraries\CafeVariome\Helpers\UI\SourceHelper::formatSize($dataFile->size) ?></td>
 		<td><?= date("H:i:s d-m-Y T", $dataFile->upload_date) ?></td>
@@ -43,7 +45,7 @@
 		<td><?= \App\Libraries\CafeVariome\Helpers\UI\DataFileHelper::GetDataFileStatus($dataFile->status) ?></td>
 		<td id="action-<?= $dataFile->getID() ?>">
 			<?php if($dataFile->status != DATA_FILE_STATUS_PROCESSING): ?>
-				<div id="actionBtns-<?= $dataFile->getID() ?>">
+				<div id="actionBtns-<?= $dataFile->getID() ?>" class="actionBtns">
 					<a data-placement="top" title="Process Data File" data-toggle="modal" data-target="#taskModal" data-fileid="<?= $dataFile->getID() ?>" data-filename="<?= $dataFile->name ?>">
 						<i class="fa fa-play text-success"></i>
 					</a>
@@ -63,7 +65,7 @@
 	</tbody>
 </table>
 
-<div class="row">
+<div class="row mt-2">
 	<div class="col">
 		<a href="<?= base_url($controllerName.'/Upload/' . $source->getID()) ?>" class="btn btn-success bg-gradient-success">
 			<i class="fa fa-upload"></i>  Upload Data File
@@ -74,6 +76,11 @@
 		<a class="btn btn-secondary bg-gradient-secondary" href="<?= base_url('Source') ?>">
 			<i class="fa fa-database"></i> View Sources
 		</a>
+	</div>
+	<div class="col text-right">
+		<button class="btn btn-success bg-gradient-success" id="batchProcessBtn" data-toggle="modal" data-target="#taskModal" disabled>
+			<i class="fa fa-play"></i> Process Selected Files <span class="badge badge-light" id="selectedFileCounter"></span>
+		</button>
 	</div>
 </div>
 <br>
@@ -94,6 +101,9 @@
 					<div class="col-3">Pipeline</div>
 					<div class="col-5">
 						<?= form_dropdown($pipeline); ?>
+						<div class="invalid-feedback">
+							Please select a pipeline.
+						</div>
 					</div>
 					<div class="col-4">
 						<a href="<?= base_url('Pipeline') ?>" target="_blank">View Pipelines</a>

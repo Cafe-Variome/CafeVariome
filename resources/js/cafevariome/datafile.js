@@ -1,3 +1,7 @@
+var selectedFiles = [];
+var selectedFileNames = [];
+var batch = false;
+
 $(document).ready(function() {
     if ($('#datafilestable').length) {
         $('#datafilestable').DataTable();
@@ -12,9 +16,24 @@ $(document).ready(function() {
         var status = edata.status;
         var idString = id.toString();
         var fileId = edata.data_file_id;
+        var isBatch = edata.batch;
         if (progress > -1) {
             if($('#progress-' + idString).length){
+
                 $('#actionBtns-' + idString).children().hide();
+                if ($('#check-' + fileId).prop('checked'))
+                {
+                    $('#check-' + fileId).click();
+                }
+
+                $('#check-' + fileId).prop('disabled', true);
+
+                if (isBatch){
+                    $('.batch-select').prop('disabled', true);
+                    $('.actionBtns').hide();
+
+                }
+
                 if($('#progress-' + idString).html() == '')
                 {
                     $('#progress-' + idString).html("<div class='progress'><div class='progress-bar' role='progressbar' id='progressbar-" + idString + "' style='width: 0%;' aria-valuenow='0' aria-valuemin='0' aria-valuemax='100'>0%</div></div><p id='statusmessage-" + idString + "' style='font-size: 10px'></p>");
@@ -27,12 +46,16 @@ $(document).ready(function() {
                 $('#action-' + fileId).append("<div id='progress-" + idString.toString() + "'></div>");
             }
         }
+        else{
+            $('.batch-select').prop('disabled', false);
+            $('.actionBtns').show();
+        }
 
         if(progress == 100 && status.toLowerCase() == 'finished')
         {
             $('#progressbar-' + id.toString()).addClass('bg-success');
             $('#actionBtns-' + id.toString()).children().show();
-            $('.reprocess').show();
+            $('#check-' + fileId).prop('disabled', false);
         }
     };
 
@@ -64,11 +87,28 @@ $('#name').on('change',function(){
 
 $('#taskModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
-    var fileId = button.data('fileid');
-    var fileName = button.data('filename');
     var modal = $(this);
-    modal.find('#fileId').val(fileId);
-    modal.find('#fileName').text(fileName);
+
+    if (button.is('button'))
+    {
+        batch = true;
+        var fileNames = '';
+        // possibly multiple files
+        for (i = 0; i < selectedFileNames.length; i++) {
+            fileNames += "<span class='badge badge-light'>" + selectedFileNames[i] + "</span>";
+        }
+        modal.find('#fileName').html(fileNames);
+    }
+    else if (button.is('a'))
+    {
+        // single file
+        batch = false;
+        var fileId = button.data('fileid');
+        var fileName = button.data('filename');
+        modal.find('#fileId').val(fileId);
+        modal.find('#fileName').html("<span class='badge badge-light'>" + fileName + "</span>");
+    }
+
 });
 
 $('#taskModal').on('hide.bs.modal', function (event) {
@@ -76,23 +116,36 @@ $('#taskModal').on('hide.bs.modal', function (event) {
     modal.find('#fileId').val('-1');
     modal.find('#fileName').text('');
     modal.find('#pipeline').val(-1);
+    modal.find('#pipeline').removeClass('is-invalid');
     modal.find('#statusMessage').html('');
     modal.find('#statusMessage').attr('class', '');
+    batch = false;
 });
 
 $('#processBtn').on('click',function(event) {
     event.preventDefault();
     var fileId = $('#fileId').val();
+    var fileIds = selectedFiles.join(',');
     var pipelineId = $('#pipeline').val();
 
+    if (pipelineId == "-1"){
+        $('#pipeline').addClass('is-invalid');
+        return;
+    }
+    else{
+        $('#pipeline').removeClass('is-invalid');
+    }
+
+    var endpoint = batch && selectedFiles.length > 1 ? 'AjaxApi/ProcessFiles' : 'AjaxApi/ProcessFile';
+
     var csrfTokenObj = getCSRFToken('keyvaluepair');
-    var formData = {'fileId': fileId, 'pipelineId': pipelineId};
+    var formData = {'fileId': fileId, 'fileIds': fileIds, 'pipelineId': pipelineId};
     var csrfTokenName = Object.keys(csrfTokenObj)[0];
     formData[csrfTokenName] = csrfTokenObj[csrfTokenName];
 
     $.ajax({
         type: 'POST',
-        url: baseurl + 'AjaxApi/ProcessFile',
+        url: baseurl + endpoint,
         data: formData,
         dataType: 'json',
         beforeSend:  function (jqXHR, settings) {
@@ -105,14 +158,22 @@ $('#processBtn').on('click',function(event) {
                     $('#statusMessage').addClass('text-success');
                     $('#statusMessage').html(response.message);
 
-                    // Close modal
-                    $('#taskModal').modal('hide');
+                    if (!batch)
+                    {
+                        var taskId = response.task_id;
+                        $('#action-' + fileId).append("<div id='progress-" + taskId.toString() + "'></div>");
 
-                    var taskId = response.task_id;
-                    $('#action-' + fileId).append("<div id='progress-" + taskId.toString() + "'></div>");
-
-                    //hide action div
-                    $('#actionBtns-' + fileId).hide();
+                        //hide action div
+                        $('#actionBtns-' + fileId).hide();
+                        //disable checkbox
+                        $('#check-' + fileId).prop('disabled', true);
+                    }
+                    else
+                    {
+                        $('.actionBtns').hide();
+                        $('.batch-select:checked').click();
+                        $('.batch-select').prop('disabled', true);
+                    }
                     break;
                 case 1:
                     $('#statusMessage').addClass('text-danger');
@@ -127,8 +188,36 @@ $('#processBtn').on('click',function(event) {
         },
         complete: function (jqXHR, settings) {
             exitLoading();
+
+            // Close modal
+            $('#taskModal').modal('hide');
         }
     });
+});
+
+$('.batch-select').on('click',function(event){
+    if ($(event.currentTarget).prop('checked'))
+    {
+        selectedFiles.push($(event.currentTarget).val());
+        selectedFileNames.push($(event.currentTarget).data('filename'));
+    }
+    else
+    {
+        selectedFiles.splice(
+            selectedFiles.indexOf(
+                $(event.currentTarget).val()
+            ), 1
+        );
+
+        selectedFileNames.splice(
+            selectedFileNames.indexOf(
+                $(event.currentTarget).data('filename')
+            ), 1
+        );
+
+    }
+    $('#selectedFileCounter').html(selectedFiles.length);
+    $('#batchProcessBtn').prop('disabled', selectedFiles.length == 0);
 });
 
 function enterLoading() {
