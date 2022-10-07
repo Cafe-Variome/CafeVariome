@@ -366,40 +366,6 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 		}
 	}
 
-	 /**
-	  * Indexes data of the specified source to Elasticsearch
-	  * @param int $source_id - Id of the source
-	  * @param bool $append - Whether to append unindexed data or re-index all records.
-	  * @return void
-	  */
-	public function IndexDataToElasticsearch(int $source_id, bool $append)
-	{
-		 $esDataIndex = new ElasticsearchSourceIndex($source_id, $append);
-		 $esDataIndex->IndexSource();
-	}
-
-	 /**
-	  * Indexes data of the specified source to Neo4J
-	  * @param int $source_id - Id of the source
-	  * @param bool $append - Whether to append unindexed data or re-index all records.
-	  * @return void
-	  */
-	public function IndexDataToNeo4J(int $source_id, bool $append)
-	{
-		 $n4jDataIndex = new Neo4JSourceIndex($source_id, $append);
-		 $n4jDataIndex->IndexSource();
-	}
-
-	 /**
-	  * Creates the user interface index for the specified source.
-	  * @param int $source_id - Id of the source
-	  * @return void
-	  */
-	public function CreateUserInterfaceIndex(int $source_id)
-	{
-		 $uiDataIndex = new UserInterfaceSourceIndex($source_id);
-		 $uiDataIndex->IndexSource();
-	}
 
 	public function StartService()
 	{
