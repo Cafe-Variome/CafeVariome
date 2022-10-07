@@ -40,7 +40,7 @@ class ServiceApi extends ResourceController
 				foreach ($fileStatus as $taskId => $value)
 				{
 					$result .= "id: " . $taskId . "\n";
-					$result .= "data: {\"progress\": \"" . $value['progress'] . "\", \"status\": \"" . $value['status'] . "\", \"data_file_id\": \"" . $value['data_file_id'] . "\", \"source_id\": \"" . $value['source_id'] . "\"}\n\n";
+					$result .= "data: {\"progress\": \"" . $value['progress'] . "\", \"status\": \"" . $value['status'] . "\", \"data_file_id\": \"" . $value['data_file_id'] . "\", \"source_id\": \"" . $value['source_id'] . "\", \"batch\": \"" . $value['batch'] . "\"}\n\n";
 				}
 			}
 		}
@@ -54,7 +54,6 @@ class ServiceApi extends ResourceController
 
 
 		return $this->respond($result);
-
 	}
 
 	public function PollTask()
