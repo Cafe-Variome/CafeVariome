@@ -691,66 +691,26 @@ class AjaxApi extends Controller
 	}
 
 	/**
-	 * @deprecated
 	 * @return false|string|void
 	 * @throws \Exception
 	 */
-    private function processFiles()
+    public function ProcessFiles()
     {
-		if ($this->request->getMethod() == 'post') {
+		if ($this->request->getMethod() == 'post')
+		{
 			$fileIds = $this->request->getVar('fileIds');
+			$pipelineId = $this->request->getVar('pipelineId');
+			$userId = $this->authenticator->GetUserId();
+			PHPShellHelper::runAsync(getcwd() . "/index.php Task CreateBatchTasksForDataFiles $fileIds $pipelineId $userId");
 
-			$fids = [];
-			if (strpos($fileIds, ',')) {
-				$fids = explode(',', $fileIds);
-			} else {
-				$fids[] = intval($fileIds);
-			}
+			sleep(1);
 
-			foreach ($fids as $fid) {
-				$uploadModel = new Upload();
-				$extension = $uploadModel->getFileExtensionById($fid);
-
-				$overwriteFlag = UPLOADER_DELETE_FILE;
-
-				switch (strtolower($extension)) {
-					case 'csv':
-					case 'xls':
-					case 'xlsx':
-						$method = 'spreadsheetInsert';
-						break;
-					case 'phenopacket':
-					case 'json':
-						$method = 'phenoPacketInsertByFileId';
-						break;
-					case 'vcf':
-						$method = 'vcfInsertByFileId';
-						break;
-					default:
-						return json_encode(0);
-				}
-
-				$uploadModel = new Upload();
-				$uploadModel->resetFileStatus($fid);
-
-				PHPShellHelper::runAsync(getcwd() . "/index.php Task " . $method . " " . $fid . " " . $overwriteFlag);
-			}
-
-			return json_encode(1);
+			return json_encode([
+				'status' => 0,
+				'message' => 'Processing started successfully.'
+			]);
 		}
     }
-
-    public function processFilesBySourceId()
-	{
-		if ($this->request->getMethod() == 'post') {
-			$source_id = $this->request->getVar('source_id');
-			$pending = $this->request->getVar('pending');
-			$overwrite_flag = $this->request->getVar('overwrite');
-
-			PHPShellHelper::runAsync(getcwd() . "/index.php Task insertFilesBySourceId $source_id $pending $overwrite_flag");
-			return json_encode(1);
-		}
-	}
 
     public function getSourceCounts()
     {
