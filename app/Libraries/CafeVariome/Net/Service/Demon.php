@@ -34,8 +34,7 @@ class Demon
 		$this->socket->Listen();
 
 		$tasks = [];
-		$records = -1;
-		$processedRecords = 0;
+
 		while (true)
 		{
 			$this->socket->Accept();
@@ -43,9 +42,9 @@ class Demon
 			try
 			{
 				$incomingMessage = json_decode($request);
+
 				if (json_last_error() == JSON_ERROR_NONE)
 				{
-					$process = [];
 					$type = $incomingMessage->type;
 					$installation_key = $incomingMessage->installation_key;
 
@@ -68,24 +67,20 @@ class Demon
 									'source_id' => $task->source_id
 								];
 							}
-
 							break;
 						case 'reportprogressmessage':
+							$task_id = $incomingMessage->task_id;
 							if(
 								array_key_exists($installation_key, $tasks) &&
 								array_key_exists($task_id, $tasks[$installation_key])
 							)
 							{
-								$task = $tasks[$installation_key][$task_id];
-								$task['progress'] = $incomingMessage->progress;
-								$task['finished'] = $incomingMessage->finished;
-								$task['status'] = $incomingMessage->status;
+								$currentTask = $tasks[$installation_key][$task_id];
+								$currentTask['progress'] = $incomingMessage->progress;
+								$currentTask['finished'] = $incomingMessage->finished;
+								$currentTask['status'] = $incomingMessage->status;
 
-								$tasks[$installation_key][$task_id] = $task;
-
-//								$resp[$task_id]['progress'] = $tasks[$installation_key][$task_id]['progress'];
-//								$resp[$task_id]['status'] = $tasks[$installation_key][$task_id]['status'];
-//								$resp[$task_id]['finished'] = $tasks[$installation_key][$task_id]['finished'];
+								$tasks[$installation_key][$task_id] = $currentTask;
 								$resp[$task_id]['continue'] = $tasks[$installation_key][$task_id]['continue'];
 
 								$this->socket->Send($resp);
