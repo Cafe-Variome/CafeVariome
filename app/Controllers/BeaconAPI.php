@@ -73,7 +73,7 @@ class BeaconAPI extends ResourceController
         $response['response']['welcomeUrl'] = 'https://www.cafevariome.org/';
         $response['response']['alternativeUrl'] = 'https://le.ac.uk/health-data-research/activities/';
         $response['response']['organization']['description'] = 'Cafe Variome is a flexible data discovery software. Cafe Variome + Beacon makes discovering genomic data easier.';
-    
+
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
     }
@@ -151,7 +151,7 @@ class BeaconAPI extends ResourceController
         $response['response']['entryTypes']['Biosamples']['defaultSchema']['id'] = 'beacon-v2-biosample';
         $response['response']['entryTypes']['Biosamples']['defaultSchema']['name'] = 'Default Schema for Biosamples';
         $response['response']['entryTypes']['Biosamples']['defaultSchema']['referenceToSchemaDefinition'] = 'https://raw.githubusercontent.com/ga4gh-beacon/beacon-v2/main/models/json/beacon-v2-default-model/biosamples/defaultSchema.json';
-        
+
         $result = json_encode($response);
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
     }
@@ -269,10 +269,13 @@ class BeaconAPI extends ResourceController
 			$query_json = json_encode($qArr, JSON_UNESCAPED_SLASHES);
 			$localRresults = $queryCompiler->CompileAndRunQuery($query_json, $network_key, $user_id);
 
+			$networkInterface = new NetworkInterface();
+			$installationsResponse = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
+
 			$results = [$localRresults];
-			if ($response->status)
+			if ($installationsResponse->status)
 			{
-				$installations = $response->data;
+				$installations = $installationsResponse->data;
 				foreach ($installations as $installation)
 				{
 					if ($installation->installation_key != $this->setting->getInstallationKey())
@@ -302,9 +305,9 @@ class BeaconAPI extends ResourceController
 							'exists' => count($source['records']['subjects']) > 0,
 							'resultCount' => count($source['records']['subjects']),
 							'Info' => [
-								'contactPoint' => $source['details']['owner_name'],
-								'contactEmail' => $source['details']['email'],
-								'contactURL' => $source['details']['uri']
+								'contactPoint' => $source['source']['owner_name'],
+								'contactEmail' => $source['source']['owner_email'],
+								'contactURL' => $source['source']['uri']
 							]
 						];
 						$numTotalResults += count($source['records']['subjects']) ;
@@ -460,12 +463,12 @@ class BeaconAPI extends ResourceController
 
 		$networkInterface = new NetworkInterface();
 
-		$response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
+		$installationsResponse = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
 
 		$results = [$localRresults];
-		if ($response->status)
+		if ($installationsResponse->status)
 		{
-			$installations = $response->data;
+			$installations = $installationsResponse->data;
 			foreach ($installations as $installation)
 			{
 				if ($installation->installation_key != $this->setting->getInstallationKey())
@@ -504,9 +507,9 @@ class BeaconAPI extends ResourceController
 						'exists' => count($source['records']['subjects']) > 0,
 						'resultCount' => count($source['records']['subjects']),
 						'Info' => [
-							'contactPoint' => $source['details']['owner_name'],
-							'contactEmail' => $source['details']['email'],
-							'contactURL' => $source['details']['uri']
+							'contactPoint' => $source['source']['owner_name'],
+							'contactEmail' => $source['source']['owner_email'],
+							'contactURL' => $source['source']['uri']
 						]
 					];
 					$numTotalResults += count($source['records']['subjects']) ;
