@@ -7,16 +7,19 @@ class InputValidation implements \CodeIgniter\Filters\FilterInterface
 {
 	public function before(RequestInterface $request, $arguments = null)
 	{
-		$post = $request->getVar();
-		foreach ($post as $field => &$value)
+		if ($request->getMethod() != 'cli')
 		{
-			if (!is_array($value))
+			$post = $request->getVar();
+			foreach ($post as $field => &$value)
 			{
-				$value = htmlspecialchars_decode($value, ENT_QUOTES | ENT_SUBSTITUTE);
-				$value = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+				if (!is_array($value))
+				{
+					$value = htmlspecialchars_decode($value, ENT_QUOTES | ENT_SUBSTITUTE);
+					$value = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+				}
 			}
+			$request->setGlobal('request', $post);
 		}
-		$request->setGlobal('request', $post);
 	}
 
 	public function after(RequestInterface $request, ResponseInterface $response, $arguments = null)
