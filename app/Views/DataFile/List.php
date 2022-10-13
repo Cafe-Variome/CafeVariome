@@ -81,12 +81,12 @@
 	</div>
 	<div class="col-7 text-right">
 		<button class="btn btn-primary bg-gradient-primary" id="batchProcessAllBtn" data-toggle="modal" data-target="#taskModal" disabled>
-			<i class="fa fa-play"></i> Process Uploaded/Imported Files
+			<i class="fa fa-play"></i> Process Uploaded/Imported Data Files
 			<span class="badge badge-light" id="uploadedImportedCount"></span>
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="uploadedImportedSpinner"></span>
 		</button>
 		<button class="btn btn-success bg-gradient-success batch-btn" id="batchProcessBtn" data-toggle="modal" data-target="#taskModal" disabled>
-			<i class="fa fa-play"></i> Process Selected File(s) <span class="badge badge-light file-counter"></span>
+			<i class="fa fa-play"></i> Process Selected Data File(s) <span class="badge badge-light file-counter"></span>
 		</button>
 <!--		<button class="btn btn-danger bg-gradient-danger batch-btn" id="batchDeleteFilesBtn" data-toggle="modal" data-target="" disabled>-->
 <!--			<i class="fa fa-trash"></i> Delete Selected File(s) <span class="badge badge-light file-counter"></span>-->
