@@ -71,9 +71,6 @@ abstract class DataInput extends DataPipeLine
 
 		$this->sourceAdapter->Unlock($this->sourceId);
 		$this->ReportProgress(100, 'Finished', true);
-
-		// (Re-)Create the UI index
-		$this->CreateUIIndex();
 	}
 
 	protected function CalculateProgressInPercent(): int
