@@ -712,6 +712,35 @@ class AjaxApi extends Controller
 		}
     }
 
+	/**
+	 * @return false|string|void
+	 */
+	public function CountUploadedAndImportedFiles()
+	{
+		if ($this->request->getMethod() == 'post')
+		{
+			try
+			{
+				$source_id = $this->request->getVar('sourceId');
+				$dataFileAdapter = (new DataFileAdapterFactory())->GetInstance();
+				$count = $dataFileAdapter->CountUploadedAndImportedBySourceId($source_id);
+
+				return json_encode([
+					'status' => 0,
+					'count' => $count
+				]);
+			}
+			catch(\Exception $ex)
+			{
+				return json_encode([
+					'status' => 1,
+					'count' => -1,
+					'error' => $ex->getMessage()
+				]);
+			}
+		}
+	}
+
     public function getSourceCounts()
     {
 		if ($this->request->getMethod() == 'post') {
