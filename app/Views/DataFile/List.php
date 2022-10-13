@@ -19,7 +19,7 @@
 <table class="table table-bordered table-striped table-hover" id="datafilestable">
 	<thead>
 	<tr>
-		<th></th>
+		<th><input type="checkbox" id="check-master"></th>
 		<th>Name</th>
 		<th>Size</th>
 		<th>Upload Date</th>
@@ -42,7 +42,9 @@
 			<br>
 			(<?= $dataFile->user_first_name ?> <?= $dataFile->user_last_name ?>)
 		</td>
-		<td><?= \App\Libraries\CafeVariome\Helpers\UI\DataFileHelper::GetDataFileStatus($dataFile->status) ?></td>
+		<td id="status-<?= $dataFile->getID(); ?>">
+			<?= $dataFile->status_text ?>
+		</td>
 		<td id="action-<?= $dataFile->getID() ?>">
 			<?php if($dataFile->status != DATA_FILE_STATUS_PROCESSING): ?>
 				<div id="actionBtns-<?= $dataFile->getID() ?>" class="actionBtns">
@@ -66,7 +68,7 @@
 </table>
 
 <div class="row mt-2">
-	<div class="col">
+	<div class="col-5">
 		<a href="<?= base_url($controllerName.'/Upload/' . $source->getID()) ?>" class="btn btn-success bg-gradient-success">
 			<i class="fa fa-upload"></i>  Upload Data File
 		</a>
@@ -77,10 +79,18 @@
 			<i class="fa fa-database"></i> View Sources
 		</a>
 	</div>
-	<div class="col text-right">
-		<button class="btn btn-success bg-gradient-success" id="batchProcessBtn" data-toggle="modal" data-target="#taskModal" disabled>
-			<i class="fa fa-play"></i> Process Selected Files <span class="badge badge-light" id="selectedFileCounter"></span>
+	<div class="col-7 text-right">
+		<button class="btn btn-primary bg-gradient-primary" id="batchProcessAllBtn" data-toggle="modal" data-target="#taskModal" disabled>
+			<i class="fa fa-play"></i> Process Uploaded/Imported Files
+			<span class="badge badge-light" id="uploadedImportedCount"></span>
+			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="uploadedImportedSpinner"></span>
 		</button>
+		<button class="btn btn-success bg-gradient-success batch-btn" id="batchProcessBtn" data-toggle="modal" data-target="#taskModal" disabled>
+			<i class="fa fa-play"></i> Process Selected File(s) <span class="badge badge-light file-counter"></span>
+		</button>
+<!--		<button class="btn btn-danger bg-gradient-danger batch-btn" id="batchDeleteFilesBtn" data-toggle="modal" data-target="" disabled>-->
+<!--			<i class="fa fa-trash"></i> Delete Selected File(s) <span class="badge badge-light file-counter"></span>-->
+<!--		</button>-->
 	</div>
 </div>
 <br>
@@ -88,13 +98,14 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h5 class="modal-title" id="taskModalLabel">Process Data File</h5>
+				<h5 class="modal-title" id="taskModalLabel">Process Data File(s)</h5>
 			</div>
-			<?= form_open('AjaxApi/processFile', ['method' => 'post']) ?>
+			<?= form_open('AjaxApi/ProcessFile', ['method' => 'post']) ?>
 			<input type="hidden" name="fileId" id="fileId" value="-1">
+			<input type="hidden" name="sourceId" id="sourceId" value="<?= $source->getID() ?>">
 			<div class="modal-body">
 				<div class="form-group row">
-					<div class="col-3">File Name</div>
+					<div class="col-3">File(s)</div>
 					<div class="col-9" id="fileName"></div>
 				</div>
 				<div class="form-group row">

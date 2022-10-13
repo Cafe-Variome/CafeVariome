@@ -4,23 +4,35 @@ var batch = false;
 
 $(document).ready(function() {
     if ($('#datafilestable').length) {
-        $('#datafilestable').DataTable();
+        $('#datafilestable').DataTable(
+            {
+                'columnDefs': [{
+                    'targets': [0],
+                    'orderable': false
+                }]
+            }
+    );
     }
 
     let eventSource = new EventSource(baseurl + "ServiceApi/PollTasks");
 
     eventSource.onmessage = function(event) {
-        id = event.lastEventId;
+        id = event.lastEventId; // Task ID
         var edata = JSON.parse(event.data);
         var progress = edata.progress;
         var status = edata.status;
-        var idString = id.toString();
+        var idString = id.toString(); // Task ID
         var fileId = edata.data_file_id;
         var isBatch = edata.batch;
         if (progress > -1) {
             if($('#progress-' + idString).length){
 
+                $('#progress-' + idString).parent().find('span').hide();
+
+                $('#batchProcessAllBtn').prop('disabled', true);
+
                 $('#actionBtns-' + idString).children().hide();
+
                 if ($('#check-' + fileId).prop('checked'))
                 {
                     $('#check-' + fileId).click();
@@ -31,7 +43,6 @@ $(document).ready(function() {
                 if (isBatch){
                     $('.batch-select').prop('disabled', true);
                     $('.actionBtns').hide();
-
                 }
 
                 if($('#progress-' + idString).html() == '')
@@ -43,26 +54,64 @@ $(document).ready(function() {
                 $('#statusmessage-' + idString).html(status);
             }
             else{
-                $('#action-' + fileId).append("<div id='progress-" + idString.toString() + "'></div>");
+                $('#status-' + fileId).html('');
+                $('#status-' + fileId).append("<div id='progress-" + idString.toString() + "'></div>");
             }
         }
         else{
             $('.batch-select').prop('disabled', false);
+
             $('.actionBtns').show();
         }
 
         if(progress == 100 && status.toLowerCase() == 'finished')
         {
             $('#progressbar-' + id.toString()).addClass('bg-success');
-            $('#actionBtns-' + id.toString()).children().show();
+            $('#actionBtns-' + fileId).children().show();
             $('#check-' + fileId).prop('disabled', false);
+            countUploadedAndIportedFiles();
         }
     };
 
     eventSource.onerror = function(err) {
     };
 
+    countUploadedAndIportedFiles();
+
 });
+
+function countUploadedAndIportedFiles(){
+
+    var csrfTokenObj = getCSRFToken('keyvaluepair');
+    var formData = {'sourceId': $('#sourceId').val()};
+    var csrfTokenName = Object.keys(csrfTokenObj)[0];
+    formData[csrfTokenName] = csrfTokenObj[csrfTokenName];
+
+    $.ajax({
+        type: 'POST',
+        url: baseurl + 'AjaxApi/CountUploadedAndImportedFiles',
+        data: formData,
+        dataType: 'json',
+        beforeSend: function (jqXHR, settings) {
+            $('#uploadedImportedSpinner').show();
+        },
+        success: function (response) {
+            if(response.status == 0){
+                $('#uploadedImportedCount').html(response.count);
+                $('#batchProcessAllBtn').prop('disabled', response.count == 0);
+            }
+            else{
+                $('#uploadedImportedCount').html('?');
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            $('#uploadedImportedCount').html('?');
+        },
+        complete: function (jqXHR, settings) {
+            $('#uploadedImportedSpinner').hide();
+        }
+    });
+}
 
 $('#name').on('change',function(){
     var fullFileName = $(this).val();
@@ -92,12 +141,19 @@ $('#taskModal').on('show.bs.modal', function (event) {
     if (button.is('button'))
     {
         batch = true;
+
         var fileNames = '';
         // possibly multiple files
-        for (i = 0; i < selectedFileNames.length; i++) {
-            fileNames += "<span class='badge badge-light'>" + selectedFileNames[i] + "</span>";
+        if (selectedFileNames.length > 0) {
+            for (i = 0; i < selectedFileNames.length; i++) {
+                fileNames += "<span class='badge badge-light'>" + selectedFileNames[i] + "</span>";
+            }
+        }
+        else{
+            fileNames = 'All uploaded/imported files.';
         }
         modal.find('#fileName').html(fileNames);
+
     }
     else if (button.is('a'))
     {
@@ -127,6 +183,7 @@ $('#processBtn').on('click',function(event) {
     var fileId = $('#fileId').val();
     var fileIds = selectedFiles.join(',');
     var pipelineId = $('#pipeline').val();
+    var sourceId = $('#sourceId').val();
 
     if (pipelineId == "-1"){
         $('#pipeline').addClass('is-invalid');
@@ -136,10 +193,10 @@ $('#processBtn').on('click',function(event) {
         $('#pipeline').removeClass('is-invalid');
     }
 
-    var endpoint = batch && selectedFiles.length > 1 ? 'AjaxApi/ProcessFiles' : 'AjaxApi/ProcessFile';
+    var endpoint = batch ? 'AjaxApi/ProcessFiles' : 'AjaxApi/ProcessFile';
 
     var csrfTokenObj = getCSRFToken('keyvaluepair');
-    var formData = {'fileId': fileId, 'fileIds': fileIds, 'pipelineId': pipelineId};
+    var formData = {'fileId': fileId, 'fileIds': fileIds, 'pipelineId': pipelineId, 'sourceId': sourceId};
     var csrfTokenName = Object.keys(csrfTokenObj)[0];
     formData[csrfTokenName] = csrfTokenObj[csrfTokenName];
 
@@ -161,7 +218,8 @@ $('#processBtn').on('click',function(event) {
                     if (!batch)
                     {
                         var taskId = response.task_id;
-                        $('#action-' + fileId).append("<div id='progress-" + taskId.toString() + "'></div>");
+                        $('#status-' + fileId).html('');
+                        $('#status-' + fileId).append("<div id='progress-" + taskId.toString() + "'></div>");
 
                         //hide action div
                         $('#actionBtns-' + fileId).hide();
@@ -174,6 +232,8 @@ $('#processBtn').on('click',function(event) {
                         $('.batch-select:checked').click();
                         $('.batch-select').prop('disabled', true);
                     }
+
+                    $('#batchProcessAllBtn').prop('disabled', true);
                     break;
                 case 1:
                     $('#statusMessage').addClass('text-danger');
@@ -195,6 +255,18 @@ $('#processBtn').on('click',function(event) {
     });
 });
 
+$('#check-master').on('click', function (event) {
+    if($(event.currentTarget).prop('checked'))
+    {
+        $('.batch-select:checked').click();
+    }
+    else
+    {
+        $('.batch-select:not(:checked)').click();
+    }
+    $('.batch-select').click();
+});
+
 $('.batch-select').on('click',function(event){
     if ($(event.currentTarget).prop('checked'))
     {
@@ -214,10 +286,10 @@ $('.batch-select').on('click',function(event){
                 $(event.currentTarget).data('filename')
             ), 1
         );
-
     }
-    $('#selectedFileCounter').html(selectedFiles.length);
-    $('#batchProcessBtn').prop('disabled', selectedFiles.length == 0);
+    $('.file-counter').html(selectedFiles.length);
+
+    $('.batch-btn').prop('disabled', selectedFiles.length == 0);
 });
 
 function enterLoading() {
