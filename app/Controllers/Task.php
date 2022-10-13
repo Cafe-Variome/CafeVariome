@@ -50,7 +50,7 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 	  * @param bool $batch
 	  * @return void
 	  */
-	 public function Start(int $task_id, bool $batch = false)
+	 public function Start(int $task_id, bool $batch = false, $final = true)
 	 {
 		 $task = $this->dbAdapter->Read($task_id);
 
@@ -137,6 +137,12 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 								 $inputPipeLine->Absorb($task->data_file_id);
 								 $inputPipeLine->Save($task->data_file_id);
 								 $inputPipeLine->Finalize($task->data_file_id);
+
+								 if ($final)
+								 {
+									 // (Re-)Create the UI index
+									 $inputPipeLine->CreateUIIndex();
+								 }
 
 								 // Mark task as finished
 								 $task->status = TASK_STATUS_FINISHED;
@@ -255,8 +261,9 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 			 return;
 		 }
 
-		 foreach ($fids as $fileId)
+		 for($c = 0; $c < count($fids); $c++)
 		 {
+			 $fileId = $fids[$c];
 			 $dataFileAdapter = (new DataFileAdapterFactory())->GetInstance();
 			 $dataFile = $dataFileAdapter->Read($fileId);
 			 if ($dataFile->isNull())
@@ -288,7 +295,7 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 
 				 $taskId = $this->dbAdapter->Create($task);
 
-				 $this->Start($taskId, true);
+				 $this->Start($taskId, true, $c == count($fids) - 1);
 			 }
 		 }
 	 }
