@@ -73,6 +73,14 @@ class DataFileAdapter extends BaseAdapter
 		return $extension;
 	}
 
+	public function CountUploadedAndImportedBySourceId(int $source_id): int
+	{
+		$this->builder->select('id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('status', [DATA_FILE_STATUS_UPLOADED, DATA_FILE_STATUS_IMPORTED]);
+		return $this->builder->countAllResults();
+	}
+
 	public function UpdateStatus(int $id, int $status): bool
 	{
 		$this->builder->where(static::$key, $id);
