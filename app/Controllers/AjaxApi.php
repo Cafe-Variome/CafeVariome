@@ -699,6 +699,25 @@ class AjaxApi extends Controller
 		if ($this->request->getMethod() == 'post')
 		{
 			$fileIds = $this->request->getVar('fileIds');
+			$source_id = $this->request->getVar('sourceId');
+
+			if ($fileIds == '' || $fileIds == null)
+			{
+				$dataFileAdapter = (new DataFileAdapterFactory())->GetInstance();
+				$fileIds = $dataFileAdapter->ReadUploadedAndImportedIdsBySourceId($source_id);
+				if (count($fileIds) > 0)
+				{
+					$fileIds = implode(',', $fileIds);
+				}
+				else
+				{
+					return json_encode([
+						'status' => 1,
+						'message' => 'No file Ids given.'
+					]);
+				}
+			}
+
 			$pipelineId = $this->request->getVar('pipelineId');
 			$userId = $this->authenticator->GetUserId();
 			PHPShellHelper::runAsync(getcwd() . "/index.php Task CreateBatchTasksForDataFiles $fileIds $pipelineId $userId");
