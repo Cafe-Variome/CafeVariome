@@ -1,5 +1,7 @@
 <?php namespace App\Libraries\CafeVariome\Entities;
 
+use App\Libraries\CafeVariome\Helpers\UI\TaskHelper;
+
 /**
  * Task.php
  * Created 10/06/2022
@@ -72,46 +74,13 @@ class Task extends Entity
 
 	public function SetError(int $error_code, string $complementary_error_message = ''): static
 	{
-		if ($this->error_code)
-		{
-			$this->error_code = $error_code;
-		}
-		else
-		{
-			$this->error_code += $error_code;
-
-		}
+		$this->error_code = $error_code;
 		if ($error_code > 0)
 		{
-			$this->error_message = $this->GetErrorMessage() . ' ' . $complementary_error_message;
+			$this->error_message = TaskHelper::GetTaskError($error_code) . ' ' . $complementary_error_message;
 		}
 
 		return $this;
-	}
-
-	public function GetErrorMessage(): ?string
-	{
-		switch ($this->error_code)
-		{
-			case TASK_ERROR_NO_ERROR:
-				return null;
-			case TASK_ERROR_RUNTIME_ERROR:
-				return 'An error occurred while processing the task: ';
-			case TASK_ERROR_DATA_FILE_ID_NULL:
-				return 'Data File Id is null.';
-			case TASK_ERROR_PIPELINE_ID_NULL:
-				return 'Pipeline Id is null.';
-			case TASK_ERROR_SOURCE_ID_NULL:
-				return 'Source Id is null.';
-			case TASK_ERROR_DATA_FILE_NULL:
-				return 'Data File record does not exist.';
-			case TASK_ERROR_PIPELINE_NULL:
-				return 'Pipeline does not exist.';
-			case TASK_ERROR_DUPLICATE:
-				return 'Another task is running.';
-		}
-
-		return 'Undefined error.';
 	}
 
 }
