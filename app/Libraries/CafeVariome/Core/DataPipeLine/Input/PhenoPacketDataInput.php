@@ -320,7 +320,7 @@ class PhenoPacketDataInput extends DataInput
      *							   correctly add negated 0 if necessary
     * @return array $done       - See above
     */
-    private function recursiveNumeric(array $array, array $meta, string $group_id, $type, bool $one_group, array &$done)
+    private function recursiveNumeric(array $array, ?array $meta, string $group_id, $type, bool $one_group, array &$done)
 	{
         // prep for variants api call
         if ($type == "variants")
