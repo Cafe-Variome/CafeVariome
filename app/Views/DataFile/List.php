@@ -51,6 +51,9 @@
 					<a data-placement="top" title="Process Data File" data-toggle="modal" data-target="#taskModal" data-fileid="<?= $dataFile->getID() ?>" data-filename="<?= $dataFile->name ?>">
 						<i class="fa fa-play text-success"></i>
 					</a>
+					<a href="<?php echo base_url($controllerName.'/Tasks'). "/" . $dataFile->getID() ?>" data-placement="top" title="Task History" data-toggle="tooltip" data-placement="top">
+						<i class="fa fa-history text-info"></i>
+					</a>
 					<?php if($dataFile->status == DATA_FILE_STATUS_PROCESSED): ?>
 					<a href="<?php echo base_url($controllerName.'/DeleteRecords'). "/" . $dataFile->getID() ?>" data-toggle="tooltip" data-placement="top" title="Delete Records">
 						<i class="fa fa-trash-alt text-warning"></i>
