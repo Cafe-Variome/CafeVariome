@@ -24,7 +24,6 @@ use App\Libraries\CafeVariome\Factory\TaskFactory;
 use App\Libraries\CafeVariome\Net\Service\Demon;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Controller;
-use App\Models\Upload;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\SpreadsheetDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\PhenoPacketDataInput;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
@@ -134,19 +133,37 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 								 $task->status = TASK_STATUS_PROCESSING;
 								 $this->dbAdapter->Update($task_id, $task);
 
-								 $inputPipeLine->Absorb($task->data_file_id);
-								 $inputPipeLine->Save($task->data_file_id);
-								 $inputPipeLine->Finalize($task->data_file_id);
-
-								 if ($final)
+								 if($inputPipeLine->Absorb($task->data_file_id))
 								 {
-									 // (Re-)Create the UI index
-									 $inputPipeLine->CreateUIIndex();
-								 }
+									 if ($inputPipeLine->Save($task->data_file_id))
+									 {
+										 $inputPipeLine->Finalize($task->data_file_id);
 
-								 // Mark task as finished
-								 $task->status = TASK_STATUS_FINISHED;
-								 $task->ended = time();
+										 if ($final)
+										 {
+											 // (Re-)Create the UI index
+											 $inputPipeLine->CreateUIIndex();
+										 }
+
+										 // Mark task as finished
+										 $task->status = TASK_STATUS_FINISHED;
+										 $task->ended = time();
+										 $task->progress = 100;
+									 }
+									 else
+									 {
+										 // Data was not fully saved for some reason
+										 $task->status = TASK_STATUS_FAILED;
+										 $task->SetError(TASK_ERROR_DATA_FILE_NOT_SAVED, $inputPipeLine->GetErrorMessage());
+									 }
+								 }
+								 else
+								 {
+									 // File was not read for some reason
+									 $task->status = TASK_STATUS_FAILED;
+									 $task->SetError(TASK_ERROR_DATA_FILE_NOT_READ, $inputPipeLine->GetErrorMessage());
+
+								 }
 							 }
 							 catch(\Exception $ex)
 							 {

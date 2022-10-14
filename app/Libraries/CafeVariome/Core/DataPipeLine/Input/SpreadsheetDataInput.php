@@ -30,6 +30,7 @@ class SpreadsheetDataInput extends DataInput
 		$dataFile = $this->dataFileAdapter->Read($file_id);
 		if ($dataFile->isNull())
 		{
+			$this->errorMessage = 'Data file record does not exist.';
 			return false;
 		}
 		else
@@ -59,6 +60,7 @@ class SpreadsheetDataInput extends DataInput
 					)
 					{
 						//The subject_id attribute name specified didn't exist.
+						$this->errorMessage = 'Subject ID attribute name specified does not exist in data file.';
 						return false;
 					}
 					else
@@ -86,9 +88,7 @@ class SpreadsheetDataInput extends DataInput
 				}
 				else
 				{
-					$message = "File did not conform to allowed types.";
-					$error_code = 2;
-
+					$this->errorMessage = 'Data file is not a valid spreadsheet file.';
 					return false;
 				}
 
@@ -96,6 +96,8 @@ class SpreadsheetDataInput extends DataInput
 				return true;
 			}
 		}
+
+		$this->errorMessage = 'Unknown error, data file could not be read.';
 		return false; // If the control reaches this section, the file has not been absorbed successfully.
     }
 
@@ -136,7 +138,7 @@ class SpreadsheetDataInput extends DataInput
 					{
 						if (!$this->checkHeader($file_id, $row, $attgroups, $temphash))
 						{
-							break;
+							return false;
 						}
 						$this->db->begin_transaction();
 					}
@@ -155,11 +157,8 @@ class SpreadsheetDataInput extends DataInput
 						}
 						if ($subject_id == "" && $this->configuration['subject_id_location'] != SUBJECT_ID_BY_EXPANSION_ON_COLUMNS)
 						{
-							$message = "All records require a record ID, a record on line: " . $linerow . " in the import data that do not have a record ID, please add record IDs to all records and re-try the import.";
-							$error_code = 3;
-
 							$this->sourceAdapter->Unlock($this->sourceId);
-
+							$this->errorMessage = "Subject ID is missing on row $linerow of the data file.";
 							return false;
 						}
 
@@ -235,7 +234,7 @@ class SpreadsheetDataInput extends DataInput
 					$recordsProcessed++;
 
 					$progress =  intval(ceil((($recordsProcessed / $recordCount)) * 100.0));
-					$this->ReportProgress($progress);
+					$this->ReportProgress($progress, 'Importing data');
 				}
 				$linerow++;
 			}
@@ -256,6 +255,7 @@ class SpreadsheetDataInput extends DataInput
 		}
 		catch (\Exception $ex)
 		{
+			$this->errorMessage = 'An exception occurred while saving data file: ' . $ex->getMessage();
 			return false;
 		}
     }
@@ -318,10 +318,7 @@ class SpreadsheetDataInput extends DataInput
 					$error = $this->sendBatch();
 					if ($error)
 					{
-						$error_code = 0;
-						$message = "MySQL insert was unsuccessful.";
-
-						$this->sourceAdapter->Unlock($this->sourceId);
+						$this->errorMessage = "A database error occurred while inserting data.";
 					}
 				}
 			}
@@ -478,9 +475,7 @@ class SpreadsheetDataInput extends DataInput
 				{
 					if($row[$i] != $this->configuration['subject_id_attribute_name'])
 					{
-						$message = "No " . $this->configuration['subject_id_attribute_name'] . " column.";
-						$error_code = 1;
-						$this->reportError($file_id, $error_code, $message);
+						$this->errorMessage = 'No ' . $this->configuration['subject_id_attribute_name'] . ' column was found in file columns. ' .  $this->configuration['subject_id_attribute_name'] . ' must be the first column from the left.';
 						return false;
 					}
 					else

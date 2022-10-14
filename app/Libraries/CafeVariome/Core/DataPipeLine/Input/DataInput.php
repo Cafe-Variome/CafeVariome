@@ -34,6 +34,7 @@ abstract class DataInput extends DataPipeLine
 	private OntologyPrefix $ontologyPrefixModel;
 	protected int $totalRecords;
 	protected int $processedRecords;
+	protected string $errorMessage;
 
 	public function __construct(Task $task, int $source_id)
     {
@@ -52,6 +53,7 @@ abstract class DataInput extends DataPipeLine
 		$this->groups = [];
 		$this->configuration = [];
 		$this->ontologyPrefixModel = new OntologyPrefix();
+		$this->errorMessage = '';
 	}
 
     abstract public function Absorb(int $fileId): bool;
@@ -98,6 +100,11 @@ abstract class DataInput extends DataPipeLine
 				}
 			}
 		}
+	}
+
+	public function GetErrorMessage(): string
+	{
+		return $this->errorMessage;
 	}
 
 	protected function createEAV(int $group_id, int $file_id, int $subject_id, int $attribute_id, int $value_id)
