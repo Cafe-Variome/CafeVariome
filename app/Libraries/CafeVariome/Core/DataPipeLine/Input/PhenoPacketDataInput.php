@@ -167,7 +167,7 @@ class PhenoPacketDataInput extends DataInput
 	 *                               correctly add negated 0 if necessary
 	 * @return array $done       - See above
 	 */
-    private function recursivePacket(array $array, array $meta, ?string $group_id, string $type, bool $one_group, array &$done)
+    private function recursivePacket(array $array, ?array $meta, ?string $group_id, string $type, bool $one_group, array &$done)
 	{
         foreach($array as $key => $value)
 		{
