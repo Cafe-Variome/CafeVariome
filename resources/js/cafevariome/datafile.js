@@ -14,6 +14,10 @@ $(document).ready(function() {
     );
     }
 
+    if ($('#taskstable').length) {
+        $('#taskstable').DataTable();
+    }
+
     let eventSource = new EventSource(baseurl + "ServiceApi/PollTasks");
 
     eventSource.onmessage = function(event) {

@@ -10,14 +10,14 @@
  */
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\DataPipeLine;
-use App\Libraries\CafeVariome\Core\DataPipeLine\Input\SpreadsheetDataInput;
-use App\Libraries\CafeVariome\Core\IO\FileSystem\FileMan;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\UploadFileMan;
 use App\Libraries\CafeVariome\Entities\ViewModels\DataFileList;
+use App\Libraries\CafeVariome\Entities\ViewModels\TaskList;
 use App\Libraries\CafeVariome\Factory\DataFileAdapterFactory;
 use App\Libraries\CafeVariome\Factory\DataFileFactory;
 use App\Libraries\CafeVariome\Factory\PipelineAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
+use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
@@ -444,5 +444,35 @@ class DataFile extends CVUI_Controller
 		$data = $this->wrapData($uidata);
 
 		return view($this->viewDirectory . '/DeleteRecords', $data);
+	}
+
+	public function Tasks(int $id)
+	{
+		$dataFile = $this->dbAdapter->Read($id);
+		if ($dataFile->isNull())
+		{
+			$this->setStatusMessage("Data file was not found.", STATUS_ERROR);
+			return redirect()->to(base_url('Source'));
+		}
+
+		$uidata = new UIData();
+		$uidata->title = 'Tasks';
+		$uidata->data['dataFile'] = $dataFile;
+
+		$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
+		$uidata->data['source'] = $sourceAdapter->Read($dataFile->source_id);
+
+		$taskAdapter = (new TaskAdapterFactory())->GetInstance();
+		$uidata->data['tasks'] = $taskAdapter->SetModel(TaskList::class)->ReadByDataFileId($id);
+
+		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
+		$uidata->javascript = [
+			JS. 'cafevariome/datafile.js',
+			VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js'
+		];
+
+		$data = $this->wrapData($uidata);
+
+		return view($this->viewDirectory . '/Tasks', $data);
 	}
 }
