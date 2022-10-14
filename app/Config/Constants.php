@@ -222,6 +222,7 @@ define('TASK_STATUS_PROCESSING', 2);
 define('TASK_STATUS_FINISHED', 3);
 define('TASK_STATUS_FAILED', 4);
 define('TASK_STATUS_CENCELLED', 5);
+
 //Task Type
 define('TASK_TYPE_FILE_PROCESS', 0);
 define('TASK_TYPE_FILE_PROCESS_BATCH', 1);
@@ -238,6 +239,8 @@ define('TASK_ERROR_SOURCE_ID_NULL', 4);
 define('TASK_ERROR_DATA_FILE_NULL', 5);
 define('TASK_ERROR_PIPELINE_NULL', 6);
 define('TASK_ERROR_DUPLICATE', 7);
+define('TASK_ERROR_DATA_FILE_NOT_READ', 8);
+define('TASK_ERROR_DATA_FILE_NOT_SAVED', 9);
 //define('TASK_ERROR_', );
 
 //Discovery Group Policies
