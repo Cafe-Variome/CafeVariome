@@ -42,6 +42,22 @@ class TaskAdapter extends BaseAdapter
 		return null;
 	}
 
+	public function ReadByDataFileId(int $data_file_id): array
+	{
+		$this->CompileSelect();
+		$this->CompileJoin();
+		$this->builder->where(static::$table . '.data_file_id', $data_file_id);
+		$results = $this->builder->get()->getResult();
+
+		$entities = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			$entities[$results[$c]->{static::$key}] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
+		}
+
+		return $entities;
+	}
+
     /**
      * @inheritDoc
      */
