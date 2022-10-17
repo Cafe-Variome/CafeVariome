@@ -329,11 +329,17 @@
             <footer class="sticky-footer">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a> (v <?= $version ?>)
-                       
-                            | <a class="btn btn-sm btn-primary text-white" href="" data-toggle="modal" data-target="#privacyPolicyModal">Privacy Policy</a>
-                       
-                        <br> Copyright &copy; <?= date("Y") . ', University of Leicester' ?> </span>
+						<div class="row">
+							<div class="col">
+								Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a> (v. <?= $version ?>)
+								| <a href="" data-toggle="modal" data-target="#privacyPolicyModal">Privacy Policy</a>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col">Copyright &copy; <?= date("Y") . ', University of Leicester' ?></div>
+						</div>
+
+                        <br>
                     </div>
                 </div>
             </footer>

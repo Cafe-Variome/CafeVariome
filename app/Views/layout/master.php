@@ -58,17 +58,19 @@
         <div class="container">
             <div class="row">
                 <div class="col text-center">
-                    <span>
                         Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a>
                         <!-- If user is logged in, show the privacy policy in footer. Else this modal is shown in the top nav bar to be easily accessible (i.e., when user is not logged in) -->
                         <?php if ($loggedIn) : ?>
-                            | <a class="btn btn-sm btn-secondary" data-toggle="modal" data-target="#privacyPolicyModal">Privacy Policy</a>
+                            | <a href="#" data-toggle="modal" data-target="#privacyPolicyModal">Privacy Policy</a>
                         <?php endif; ?>
                         <br> By <a target="_blank" href="https://le.ac.uk/health-data-research">Bioinformatics and Health Data Science Group</a>
-                        <br> Copyright &copy; <?= date("Y") ?>, <a target="_blank" href="https://le.ac.uk">University of Leicester</a>
-                    </span>
                 </div>
             </div>
+			<div class="row">
+				<div class="col text-center">
+					Copyright &copy; <?= date("Y") ?>, <a target="_blank" href="https://le.ac.uk">University of Leicester</a>
+				</div>
+			</div>
         </div>
     </footer>
 
