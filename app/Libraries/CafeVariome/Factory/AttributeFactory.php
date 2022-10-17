@@ -10,6 +10,7 @@
 
 use App\Libraries\CafeVariome\Entities\Attribute;
 use App\Libraries\CafeVariome\Entities\IEntity;
+use App\Libraries\CafeVariome\Entities\NullEntity;
 
 class AttributeFactory extends EntityFactory
 {
