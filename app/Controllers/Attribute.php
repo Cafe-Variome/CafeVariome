@@ -175,7 +175,7 @@ class Attribute extends CVUI_Controller
 			);
 
 			$uidata->data['include_in_interface_index'] = array(
-				'name' => 'include_in_interface_index',
+				'name' => 'include_in_interface_index[]',
 				'id' => 'include_in_interface_index',
 				'class' => 'custom-control-input',
 				'value' => is_array($include_in_interface_index_val = set_value('include_in_interface_index[]', $attribute->include_in_interface_index)) ? $include_in_interface_index_val[0] : $attribute->include_in_interface_index,
