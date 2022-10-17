@@ -98,7 +98,7 @@ class Value extends CVUI_Controller
 		$this->validation->setRules([
 			'display_name' => [
 				'label'  => 'Display Name',
-				'rules'  => 'required|string',
+				'rules'  => 'required|alpha_numeric_space',
 				'errors' => [
 					'required' => '{field} is required.'
 				]
