@@ -169,6 +169,20 @@ class EAVAdapter extends BaseAdapter
 		return $ids;
 	}
 
+	public function RecordsExistBySourceId(int $source_id, array $attribute_ids, ?bool $indexed = null): bool
+	{
+		$this->builder->select('id');
+		$this->builder->where('source_id', $source_id);
+		$this->builder->whereIn('attribute_id', $attribute_ids);
+		if(!is_null($indexed))
+		{
+			$this->builder->where('indexed', $indexed);
+		}
+		$this->builder->limit(1);
+
+		return count($this->builder->get()->getResult()) == 1;
+	}
+
 	public function UpdateIndexedBySourceIdAndAttributeIds(int $source_id, array $attribute_ids): bool
 	{
 		$data = ['indexed' => 1];
