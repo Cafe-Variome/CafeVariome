@@ -28,17 +28,17 @@
 	<tbody>
 	<?php foreach ($values as $value): ?>
 		<tr>
-			<td><?= $value['name'] ?></td>
-			<td><?= $value['display_name'] ?></td>
-			<td><?= $value['frequency'] ?></td>
+			<td><?= $value->name ?></td>
+			<td><?= $value->display_name ?></td>
+			<td><?= $value->frequency ?></td>
 			<td>
-				<a href="<?= base_url($controllerName . '/Update') . '/' . $value['id']?>" data-toggle="tooltip" data-placement="top" title="Edit Value">
+				<a href="<?= base_url($controllerName . '/Update') . '/' . $value->getID();?>" data-toggle="tooltip" data-placement="top" title="Edit Value">
 					<i class="fa fa-edit text-warning"></i>
 				</a>
-				<a href="<?= base_url('ValueMapping/List') . '/' . $value['id']?>" data-toggle="tooltip" data-placement="top" title="View Mappings">
+				<a href="<?= base_url('ValueMapping/List') . '/' . $value->getID();?>" data-toggle="tooltip" data-placement="top" title="View Mappings">
 					<i class="fa fa-map-signs text-danger"></i>
 				</a>
-				<a href="<?= base_url($controllerName . '/Details') . '/' . $value['id']?>" data-toggle="tooltip" data-placement="top" title="View Value">
+				<a href="<?= base_url($controllerName . '/Details') . '/' . $value->getID();?>" data-toggle="tooltip" data-placement="top" title="View Value">
 					<i class="fa fa-eye text-info"></i>
 				</a>
 			</td>
