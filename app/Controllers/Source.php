@@ -11,6 +11,7 @@
  */
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\ElasticSearch;
+use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
 use App\Libraries\CafeVariome\Factory\EAVAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceFactory;
@@ -18,8 +19,6 @@ use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
 use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use App\Libraries\CafeVariome\Helpers\Core\Neo4JHelper;
 use App\Libraries\CafeVariome\Helpers\UI\SourceHelper;
-use App\Models\Attribute;
-use App\Models\EAV;
 use App\Models\UIData;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
 use \App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
@@ -557,25 +556,30 @@ class Source extends CVUI_Controller
 			}
 		}
 
-		$attributeModel = new Attribute();
-		$eavModel = new EAV();
+		$attributeAdapter = (new AttributeAdapterFactory())->GetInstance();
+		$EAVAdapter = (new EAVAdapterFactory())->GetInstance();
 
-		$esAttributeIds = $attributeModel->getAttributeIdsBySourceIdAndStorageLocation($id, ATTRIBUTE_STORAGE_ELASTICSEARCH);
+		$esAttributeIds = $attributeAdapter->ReadIdsBySourceIdAndStorageLocation($id, ATTRIBUTE_STORAGE_ELASTICSEARCH);
 		$dataStatus = ELASTICSEARCH_DATA_STATUS_UNKNOWN;
-		if(count($esAttributeIds) && $eavModel->recordsExistBySourceId($id, $esAttributeIds)){
-			$indexedRecordsExist = $eavModel->indexedRecordsExistBySourceId($id, $esAttributeIds);
-			$unindexedRecordsExist = $eavModel->unindexedRecordsExistBySourceId($id, $esAttributeIds);
-			if($indexedRecordsExist && !$unindexedRecordsExist){
+		if(count($esAttributeIds) && $EAVAdapter->RecordsExistBySourceId($id, $esAttributeIds))
+		{
+			$indexedRecordsExist = $EAVAdapter->RecordsExistBySourceId($id, $esAttributeIds, true);
+			$unindexedRecordsExist = $EAVAdapter->RecordsExistBySourceId($id, $esAttributeIds, false);
+			if($indexedRecordsExist && !$unindexedRecordsExist)
+			{
 				$dataStatus = ELASTICSEARCH_DATA_STATUS_FULLY_INDEXED;
 			}
-			else if($unindexedRecordsExist && !$indexedRecordsExist){
+			else if($unindexedRecordsExist && !$indexedRecordsExist)
+			{
 				$dataStatus = ELASTICSEARCH_DATA_STATUS_NOT_INDEXED;
 			}
-			else if($unindexedRecordsExist && $indexedRecordsExist){
+			else if($unindexedRecordsExist && $indexedRecordsExist)
+			{
 				$dataStatus = ELASTICSEARCH_DATA_STATUS_PARTIALLY_INDEXED;
 			}
 		}
-		else{
+		else
+		{
 			$dataStatus = ELASTICSEARCH_DATA_STATUS_EMPTY;
 		}
 
@@ -634,26 +638,30 @@ class Source extends CVUI_Controller
 			$relationshipsCount = $neo4j->countRelationshipsBySourceId($id, $source->uid);
 		}
 
-		$attributeModel = new Attribute();
-		$eavModel = new EAV();
+		$attributeAdapter = (new AttributeAdapterFactory())->GetInstance();
+		$EAVAdapter = (new EAVAdapterFactory())->GetInstance();
 
-		$n4jAttributeIds = $attributeModel->getAttributeIdsBySourceIdAndStorageLocation($id, ATTRIBUTE_STORAGE_NEO4J);
+		$n4jAttributeIds = $attributeAdapter->ReadIdsBySourceIdAndStorageLocation($id, ATTRIBUTE_STORAGE_NEO4J);
 		$dataStatus = NEO4J_DATA_STATUS_UNKNOWN;
-		if(count($n4jAttributeIds) > 0 && $eavModel->recordsExistBySourceId($id, $n4jAttributeIds))
+		if(count($n4jAttributeIds) > 0 && $EAVAdapter->RecordsExistBySourceId($id, $n4jAttributeIds))
 		{
-			$indexedRecordsExist = $eavModel->indexedRecordsExistBySourceId($id, $n4jAttributeIds);
-			$unindexedRecordsExist = $eavModel->unindexedRecordsExistBySourceId($id, $n4jAttributeIds);
-			if($indexedRecordsExist && !$unindexedRecordsExist){
+			$indexedRecordsExist = $EAVAdapter->RecordsExistBySourceId($id, $n4jAttributeIds, true);
+			$unindexedRecordsExist = $EAVAdapter->RecordsExistBySourceId($id, $n4jAttributeIds, false);
+			if($indexedRecordsExist && !$unindexedRecordsExist)
+			{
 				$dataStatus = NEO4J_DATA_STATUS_FULLY_INDEXED;
 			}
-			else if($unindexedRecordsExist && !$indexedRecordsExist){
+			else if($unindexedRecordsExist && !$indexedRecordsExist)
+			{
 				$dataStatus = NEO4J_DATA_STATUS_NOT_INDEXED;
 			}
-			else if($unindexedRecordsExist && $indexedRecordsExist){
+			else if($unindexedRecordsExist && $indexedRecordsExist)
+			{
 				$dataStatus = NEO4J_DATA_STATUS_PARTIALLY_INDEXED;
 			}
 		}
-		else{
+		else
+		{
 			$dataStatus = NEO4J_DATA_STATUS_EMPTY;
 		}
 
