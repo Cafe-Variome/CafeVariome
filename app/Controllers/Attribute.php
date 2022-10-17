@@ -8,6 +8,7 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Core\DataPipeLine\DataPipeLine;
 use App\Libraries\CafeVariome\Database\SourceAdapter;
 use App\Libraries\CafeVariome\Entities\ViewModels\AttributeAssociation;
 use App\Libraries\CafeVariome\Entities\ViewModels\AttributeDetails;
@@ -17,7 +18,6 @@ use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
 use App\Libraries\CafeVariome\Factory\AttributeFactory;
 use App\Libraries\CafeVariome\Factory\OntologyAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
-use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
@@ -133,7 +133,8 @@ class Attribute extends CVUI_Controller
 					$attribute->include_in_interface_index !== $include_in_interface_index
 				)
 				{
-					PHPShellHelper::runAsync(getcwd() . "/index.php Task CreateUserInterfaceIndex $source_id");
+					$dataPipeline = new DataPipeLine($attribute->source_id);
+					$dataPipeline->CreateUIIndex($this->authenticator->GetUserId());
 				}
 
 				$this->setStatusMessage("Attribute '$name' was updated.", STATUS_SUCCESS);
