@@ -116,7 +116,7 @@ class Value extends CVUI_Controller
 			{
 				//$id, $display_name, $show_in_interface, $include_in_interface_index
 				$this->dbAdapter->Update($id,
-					(new ValueFactory())->GetInstanceFromParameters($name, $attribute_id, $display_name, $value->frequency, $show_in_interface, $include_in_interface_index)
+					(new ValueFactory())->GetInstanceFromParameters($value->name, $attribute_id, $display_name, $value->frequency, $show_in_interface, $include_in_interface_index)
 				);
 
 				if(
