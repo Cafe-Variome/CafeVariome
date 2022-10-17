@@ -1,5 +1,9 @@
 <?php namespace App\Controllers;
 
+use App\Libraries\CafeVariome\Database\AttributeAdapter;
+use App\Libraries\CafeVariome\Database\SourceAdapter;
+use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
+use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
@@ -14,9 +18,9 @@ use CodeIgniter\Config\Services;
 
 class AttributeMapping extends CVUI_Controller
 {
-	private \App\Models\Attribute $attributeModel;
+	private AttributeAdapter $attributeAdapter;
+	private SourceAdapter $sourceAdapter;
 	private \App\Models\AttributeMapping $attributeMappingModel;
-	private \App\Models\Source $sourceModel;
 	private $validation;
 
 	/**
@@ -36,9 +40,9 @@ class AttributeMapping extends CVUI_Controller
 		parent::setIsAdmin(true);
 		parent::initController($request, $response, $logger);
 
-		$this->attributeModel = new \App\Models\Attribute();
+		$this->attributeAdapter = (new AttributeAdapterFactory())->GetInstance();
+		$this->sourceAdapter = (new SourceAdapterFactory())->GetInstance();
 		$this->attributeMappingModel = new \App\Models\AttributeMapping();
-		$this->sourceModel = new \App\Models\Source();
 		$this->validation = Services::validation();
 	}
 
@@ -49,8 +53,9 @@ class AttributeMapping extends CVUI_Controller
 
 	public function List(int $attribute_id)
 	{
-		$attribute = $this->attributeModel->getAttribute($attribute_id);
-		if ($attribute == null || $attribute_id <= 0) {
+		$attribute = $this->attributeAdapter->Read($attribute_id);
+		if ($attribute->isNull())
+		{
 			return redirect()->to(base_url('Source'));
 		}
 
@@ -62,7 +67,8 @@ class AttributeMapping extends CVUI_Controller
 		$uidata->data['attributeMappings'] = $attributeMappings;
 		$uidata->data['attributeId'] = $attribute_id;
 		$uidata->data['sourceId'] = $sourceId;
-		$uidata->data['sourceName'] = $this->sourceModel->getSourceNameByID($sourceId);
+		$source = $this->sourceAdapter->Read($sourceId);
+		$uidata->data['sourceName'] = $source->name;
 		$uidata->data['attributeName'] = $attribute['name'];
 
 		$uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
@@ -75,8 +81,9 @@ class AttributeMapping extends CVUI_Controller
 
 	public function Create(int $attribute_id)
 	{
-		$attribute = $this->attributeModel->getAttribute($attribute_id);
-		if ($attribute == null || $attribute_id <= 0) {
+		$attribute = $this->attributeAdapter->Read($attribute_id);
+		if ($attribute->isNull())
+		{
 			return redirect()->to(base_url('Source'));
 		}
 
