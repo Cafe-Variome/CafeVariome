@@ -84,7 +84,7 @@ class Attribute extends CVUI_Controller
 	public function Update(int $id)
 	{
 		$attribute = $this->dbAdapter->Read($id);
-		if ($attribute == null || $id <= 0)
+		if ($attribute->isNull())
 		{
 			return redirect()->to(base_url('Source'));
 		}
@@ -190,7 +190,7 @@ class Attribute extends CVUI_Controller
 	public function Details(int $id)
 	{
 		$attribute = $this->dbAdapter->SetModel(AttributeDetails::class)->Read($id);
-		if ($attribute == null || $id <= 0)
+		if ($attribute->isNull())
 		{
 			return redirect()->to(base_url('Source'));
 		}
@@ -206,7 +206,7 @@ class Attribute extends CVUI_Controller
 	public function OntologyAssociations(int $id)
 	{
 		$attribute = $this->dbAdapter->SetModel(AttributeAssociation::class)->Read($id);
-		if ($attribute == null || $id <= 0)
+		if ($attribute->isNull())
 		{
 			return redirect()->to(base_url('Source'));
 		}
