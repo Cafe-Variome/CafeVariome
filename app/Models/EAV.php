@@ -4,7 +4,7 @@
  * EAV.php
  *
  * Created: 09/08/2019
- *
+ * @deprecated
  * @author Mehdi Mehtarizadeh
  *
  * This class handles data operations for Entity Attribute Values in EAVs table as well as other dependant tables.
@@ -276,7 +276,7 @@ class EAV extends Model{
 
         return $final;
     }
-	
+
 	public function getLastIdByUID(string $uid): int
 	{
 		$this->builder->select('id');

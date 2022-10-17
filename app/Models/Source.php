@@ -5,7 +5,7 @@
  * @author Owen Lancaster
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
- *
+ * @deprecated
  * Source model class. This class handles operations on source entities.
  */
 
