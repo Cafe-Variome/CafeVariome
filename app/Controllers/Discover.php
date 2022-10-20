@@ -73,7 +73,7 @@ class Discover extends CVUI_Controller
 
         if (count($authorisedNetworks) == 1)
 		{
-            return redirect()->to(base_url($this->controllerName. '/QueryBuilder/' . $authorisedNetworks[0]->network_id));
+            return redirect()->to(base_url($this->controllerName. '/QueryInterface/' . $authorisedNetworks[0]->network_id));
         }
 
         $uidata->data['networks'] = $authorisedNetworks;
@@ -146,5 +146,68 @@ class Discover extends CVUI_Controller
         $data = $this->wrapData($uidata);
 
         return view($this->viewDirectory. '/QueryBuilder', $data);
+    }
+    public function QueryInterface(int $network_id)
+	{
+        $uidata = new UIData();
+        $networkInterface = new NetworkInterface();
+
+        if ($network_id)
+		{
+            $this->session->set(array('network_key' => $network_id));
+        }
+        else
+		{
+            return redirect()->to(base_url($this->controllerName. '/Select_Network'));
+        }
+
+        // Check if the user is in the master network group for this network
+
+        $user_id = $this->authenticator->getUserId();
+
+        $uidata->data['user_id'] = $user_id;
+        $uidata->data['network_key'] = $network_id;
+
+        error_log("User: " . $this->session->get('email') . " has chosen network: $network_id || " . date("Y-m-d H:i:s"));
+
+        $installations = [];
+        $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_id);
+
+        if($response->status)
+		{
+            $installations = $response->data;
+        }
+
+        $uidata->data["elasticSearchEnabled"] = true;
+        $uidata->data["message"] = null;
+
+		$elasticSearch = new ElasticSearch([$this->setting->GetElasticSearchUri()]);
+        if (!$elasticSearch->ping())
+		{
+            $uidata->data["elasticSearchEnabled"] = false;
+            $uidata->data["message"] = "The query builder interface is currently not accessible as Elasticsearch is not running. Please get an administrator to start Elasticsearch and then try again.";
+        }
+
+        $uidata->title = "Discover - Query Builder";
+        $uidata->css = array(//VENDOR.'vakata/jstree/dist/themes/default/style.css',
+                             VENDOR.'components/jqueryui/themes/base/jquery-ui.css',
+                             CSS.'query_builder.css',
+                             VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
+
+        $uidata->stickyFooter = false;
+
+        $uidata->javascript = array(//VENDOR.'vakata/jstree/dist/jstree.js',
+                                    VENDOR.'components/jqueryui/jquery-ui.js',
+                                    JS.'bootstrap-notify.js',
+                                    JS.'mustache.min.js',
+                                    JS.'query_builder_config.js',
+                                    //JS.'cafevariome/query_builder_tree.js',
+                                    JS.'cafevariome/query_interface.js',
+									VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js'
+                                );
+
+        $data = $this->wrapData($uidata);
+
+        return view($this->viewDirectory. '/QueryInterface', $data);
     }
 }
