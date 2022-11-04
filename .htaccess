@@ -80,6 +80,10 @@ IndexIgnore *
 	RewriteRule ^vendor/(.*)?$ / [F,L]
 	RewriteRule ^composer\.(lock|json)$ / [F,L]
 
+	# Disabling TRACE Method to prevent access to sensitive header information
+	RewriteCond %{REQUEST_METHOD} ^TRACE
+	RewriteRule .* - [F]
+
 </IfModule>
 
 # Extra Security Headers
