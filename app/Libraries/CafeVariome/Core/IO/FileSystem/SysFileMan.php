@@ -47,16 +47,22 @@
 					{
 						if ($dir_content[$c] == '.' || $dir_content[$c] == '..') continue;
 
-						$path_to_file = $path . DIRECTORY_SEPARATOR;
-						$this->files[] = new File(
-							$dir_content[$c],
-							$this->getSize($path_to_file),
-							$this->getFullPath() . $path_to_file,
-							$this->getMimeType($path_to_file),
-							0,
-							$this->useDiskName,
-							$this->diskNameLength
-						);
+						if(
+							count($this->extension_filter) > 0 &&
+							in_array($this->getExtension($dir_content[$c]), $this->extension_filter)
+						)
+						{
+							$path_to_file = $path . DIRECTORY_SEPARATOR;
+							$this->files[] = new File(
+								$dir_content[$c],
+								$this->getSize($path_to_file),
+								$this->getFullPath() . $path_to_file,
+								$this->getMimeType($path_to_file),
+								0,
+								$this->useDiskName,
+								$this->diskNameLength
+							);
+						}
 					}
 
                 }
