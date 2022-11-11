@@ -42,10 +42,10 @@ class FileMan implements IFileMan
         return mkdir($this->getFullPath() . $path, $permission);
     }
 
-    public function CreateDirectory(string $path, $mode = 777)
-    {
-        mkdir($this->getFullPath() . $path);
-    }
+	public function DeleteDirectory(string $path): bool
+	{
+		return rmdir($this->getFullPath() . $path);
+	}
 
     public function Delete(string $path)
     {
