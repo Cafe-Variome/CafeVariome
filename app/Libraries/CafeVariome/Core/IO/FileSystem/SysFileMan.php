@@ -108,11 +108,14 @@
 
     public function getFiles(string $path = '', bool $recursive = false, array $extension_filter = []): array
     {
-        if (count($extension_filter) > 0) {
+        if (count($extension_filter) > 0)
+		{
             $this->extension_filter = $this->toLowerCase($extension_filter);
         }
 
-        if (count($this->files) == 0 || $path != null) {
+        if ($path != null)
+		{
+			$this->files = [];
             $this->loadFiles($path, $recursive);
         }
 
