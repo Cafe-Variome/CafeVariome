@@ -64,6 +64,12 @@ class Cryptography
 		$nonce = mb_substr($decoded, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, '8bit');
 		$ciphertext = mb_substr($decoded, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, null, '8bit');
 		$decrypted_padded_message = sodium_crypto_secretbox_open($ciphertext, $nonce, $key);
+
+		if ($decrypted_padded_message === false)
+		{
+			throw new \Exception('Failed to get the decrypted padded string!');
+		}
+
 		$output = sodium_unpad($decrypted_padded_message, min($block_size, 512));
 
 		if ($output === false)
