@@ -11,6 +11,7 @@ class URLHelper
 {
 	public static function InsertPort(string $url, int $port): string
 	{
+		$hasTrailingSlash = str_ends_with($url, '/');
 		$url = rtrim($url, '/');
 		$urlPrefix = '';
 
@@ -29,25 +30,27 @@ class URLHelper
 			$urlPrefix = 'www';
 			$urlNoPrefix = str_replace(['www', 'WWW'], '', $url);
 		}
-
-		$urlAuthorizeSegments = explode('/', $urlNoPrefix);
-
-		$urlHead = '';
-		$urlTail = '/';
-		if (count($urlAuthorizeSegments) > 0)
-		{
-			$urlHead = $urlAuthorizeSegments[0]; // Base URL where port needs to be added.
-			for($c = 1; $c < count($urlAuthorizeSegments); $c++)
-			{
-				$urlTail .= $urlAuthorizeSegments[$c] . '/';
-			}
-		}
 		else
 		{
-			$urlHead = $url;
+			$urlNoPrefix = $url;
 		}
 
-		return $urlPrefix . $urlHead . ':' . $port . $urlTail;
+		$urlSegments = explode('/', $urlNoPrefix);
+
+		$urlHead = $urlNoPrefix;
+		$urlTail =  '';
+
+		if (count($urlSegments) > 1)
+		{
+			$urlHead = $urlSegments[0]; // Base URL where port needs to be added.
+			for($c = 1; $c < count($urlSegments); $c++)
+			{
+				$urlTail .= $urlSegments[$c] . '/';
+			}
+			$urlTail = rtrim($urlTail, '/');
+		}
+
+		return $urlPrefix . $urlHead . ':' . $port . ($urlTail == '' && !$hasTrailingSlash ? '' : '/') . $urlTail . ($hasTrailingSlash && $urlTail != '' ? '/' : '');
 	}
 
 	public static function ExtractPort(string $url): int
