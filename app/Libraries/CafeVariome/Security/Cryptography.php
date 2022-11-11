@@ -52,13 +52,13 @@ class Cryptography
 
 		if ($decoded === false)
 		{
-			throw new \Exception('The encoding failed');
+			throw new \Exception('The encoding failed!');
 		}
 
 		if (!defined('CRYPTO_SECRETBOX_MACBYTES')) define('CRYPTO_SECRETBOX_MACBYTES', 16);
 		if (mb_strlen($decoded, '8bit') < (SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + CRYPTO_SECRETBOX_MACBYTES))
 		{
-			throw new \Exception('The message was truncated');
+			throw new \Exception('The message was truncated!');
 		}
 
 		$nonce = mb_substr($decoded, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, '8bit');
@@ -74,7 +74,7 @@ class Cryptography
 
 		if ($output === false)
 		{
-			throw new \Exception('The message was tampered with in transit');
+			throw new \Exception('The message was tampered with in transit!');
 		}
 
 		sodium_memzero($ciphertext);
