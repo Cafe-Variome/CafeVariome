@@ -242,22 +242,22 @@ class FileMan implements IFileMan
         return bin2hex($bin);
     }
 
-    public function getExtension(string $path = ''): string
+    public function getExtension(string $path): string
 	{
         $file_name = $path;
-        if (strpos($path, DIRECTORY_SEPARATOR))
+        if (str_contains($path, DIRECTORY_SEPARATOR))
 		{
             $path_array = explode(DIRECTORY_SEPARATOR, $path);
             $file_name = $path_array[count($path_array) - 1];
         }
 
-        $extension = $file_name;
-        if (strpos($file_name, '.')) {
+        if (str_contains($file_name, '.'))
+		{
             $file_name_array = explode('.', $file_name);
-            $extension = $file_name_array[count($file_name_array) - 1];
+            return $file_name_array[count($file_name_array) - 1];
         }
 
-        return strtolower($extension);
+        return '';
     }
 
     public function getMimeType(string $path = ''): string
@@ -284,7 +284,8 @@ class FileMan implements IFileMan
 
 	public static function GetFileExtension(string $path): string
 	{
-	 	return pathinfo($path)['extension'];
+		$pathInfo = pathinfo($path);
+	 	return array_key_exists('extension', $pathInfo) ? $pathInfo['extension'] : '';
 	}
 
 	public static function GetFileSize(string $path): int
