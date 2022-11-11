@@ -203,30 +203,30 @@ class FileMan implements IFileMan
 				{
                     $this->getHandle($path, 'r', false);
                     $bytes = strtoupper($this->bin2Hex($this->Read($path, 4)));
-                    $this->destroyHandle();
                     if(in_array($bytes, $allowed))
 					{
-                        return true;
+						$this->destroyHandle();
+						return true;
                     }
                 }
 				else if (strlen($allowed[$j]) == 10)
 				{
                     $this->getHandle($path, 'r', false);
                     $bytes = strtoupper($this->bin2Hex($this->Read($path, 5)));
-                    $this->destroyHandle();
                     if(in_array($bytes, $allowed))
 					{
-                        return true;
+						$this->destroyHandle();
+						return true;
                     }
                 }
 				else if (strlen($allowed[$j]) == 16)
 				{
                     $this->getHandle($path, 'r', false);
                     $bytes = strtoupper($this->bin2Hex($this->Read($path, 8)));
-                    $this->destroyHandle();
                     if(in_array($bytes, $allowed))
 					{
-                        return true;
+						$this->destroyHandle();
+						return true;
                     }
                 }
             }
