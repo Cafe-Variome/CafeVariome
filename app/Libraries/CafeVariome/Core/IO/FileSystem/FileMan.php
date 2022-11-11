@@ -24,10 +24,22 @@ class FileMan implements IFileMan
 
     public function __construct(string $basePath)
     {
-        if ($basePath != null)
+		$this->files = [];
+		if (is_file($basePath))
 		{
-            $this->basePath = $basePath;
-        }
+			throw new \Exception('The $basePath cannot be file.');
+		}
+
+		$basePath = rtrim($basePath, '/');
+		$basePath = rtrim($basePath, '/\/');
+		$basePath = str_replace(DIRECTORY_SEPARATOR . DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR, $basePath);
+		$basePath = $basePath . DIRECTORY_SEPARATOR;
+		$this->basePath = $basePath;
+    }
+
+    public function CreateDirectory(string $path, int $permission = 0751): bool
+    {
+        return mkdir($this->getFullPath() . $path, $permission);
     }
 
     public function CreateDirectory(string $path, $mode = 777)
