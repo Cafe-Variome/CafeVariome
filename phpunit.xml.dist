@@ -1,49 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="tests/_support/_bootstrap.php"
-        backupGlobals="false"
-        colors="true"
-        convertErrorsToExceptions="true"
-        convertNoticesToExceptions="true"
-        convertWarningsToExceptions="true"
-        stopOnError="false"
-        stopOnFailure="false"
-        stopOnIncomplete="false"
-        stopOnSkipped="false">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.5/phpunit.xsd"
+         bootstrap="tests/_support/_bootstrap.php"
+         cacheResultFile=".phpunit.cache/test-results"
+         executionOrder="depends,defects"
+         forceCoversAnnotation="true"
+         beStrictAboutCoversAnnotation="true"
+         beStrictAboutOutputDuringTests="true"
+         beStrictAboutTodoAnnotatedTests="true"
+         convertDeprecationsToExceptions="true"
+         failOnRisky="true"
+         failOnWarning="true"
+         verbose="true">
     <testsuites>
-        <testsuite name="app">
-            <directory>./tests</directory>
-            <exclude>./tests/system</exclude>
+        <testsuite name="Core">
+            <directory>./tests/App/Libraries/CafeVariome/Core</directory>
         </testsuite>
-        <testsuite name="system">
-            <directory>./tests/system</directory>
-            <exclude>./tests/system/Database</exclude>
+        <testsuite name="Security">
+            <directory>./tests/App/Libraries/CafeVariome/Security</directory>
         </testsuite>
-        <testsuite name="database">
-            <directory>./tests/system/Database</directory>
+        <testsuite name="Helpers">
+            <directory>./tests/App/Libraries/CafeVariome/Helpers</directory>
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./system</directory>
-            <exclude>
-                <directory>./system/Debug/Toolbar/Views</directory>
-                <directory>./system/Pager/Views</directory>
-                <directory>./system/ThirdParty</directory>
-                <directory>./system/Validation/Views</directory>
-                <file>./system/bootstrap.php</file>
-                <file>./system/Commands/Sessions/Views/migration.tpl.php</file>
-                <file>./system/ComposerScripts.php</file>
-                <file>./system/Config/Routes.php</file>
-            </exclude>
-        </whitelist>
-    </filter>
-
-    <logging>
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
-    </logging>
-
+    <coverage cacheDirectory=".phpunit.cache/code-coverage"
+              processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">./app/Libraries/CafeVariome/Core</directory>
+            <directory suffix=".php">./app/Libraries/CafeVariome/Security</directory>
+            <directory suffix=".php">./app/Libraries/CafeVariome/Helpers</directory>
+            <directory suffix=".php">./app/Libraries/CafeVariome/Database</directory>
+            <directory suffix=".php">./app/Libraries/CafeVariome/Factory</directory>
+            <directory suffix=".php">./app/Libraries/CafeVariome/Query</directory>
+            <directory suffix=".php">./app/Libraries/CafeVariome/Beacon</directory>
+            <directory suffix=".php">./app/Libraries/CafeVariome/Entities</directory>
+        </include>
+    </coverage>
     <php>
-        <env name="app.baseURL" value="http://example.com"/>
+        <server name="app.baseURL" value="http://example.com/"/>
+        <!-- Directory containing phpunit.xml -->
+        <const name="FCPATH" value="./"/>
+        <const name="ROOTPATH" value="./"/>
+        <const name="ENVIRONMENT" value="testing"/>
+        <const name="CI_ENVIRONMENT" value="testing"/>
     </php>
 </phpunit>
