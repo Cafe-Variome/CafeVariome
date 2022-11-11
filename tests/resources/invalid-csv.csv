@@ -1,0 +1,4 @@
+subject_id,gender,<group_end>,age,<group_end>,phenotype,<group_end>
+sbj001,male,,17,,HP:0000001,
+sbj001,,,,HP:0000464,
+sbj002,female,,0,,HP:0006505
