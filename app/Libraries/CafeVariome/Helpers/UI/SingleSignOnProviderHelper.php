@@ -35,7 +35,7 @@ class SingleSignOnProviderHelper
 			case SINGLE_SIGNON_POST_AUTH_LINK_ACCOUNT:
 				return 'Link account to an existing user account';
 		}
-		return 'undefined';
+		return 'Undefined';
 	}
 
 }
