@@ -262,14 +262,15 @@ class FileMan implements IFileMan
 
     public function getMimeType(string $path = ''): string
     {
-        $mimetype = mime_content_type($this->getFullPath() . $path);
+		$mimetype = '';
+        $guessedMime = mime_content_type($this->getFullPath() . $path);
 
-        if ($mimetype != false)
+        if ($guessedMime != false)
 		{
-            return $mimetype;
+			$mimetype =  $guessedMime;
         }
 
-        return '';
+        return $mimetype;
     }
 
 	public static function IsFile(string $path):bool
@@ -296,14 +297,15 @@ class FileMan implements IFileMan
 
 	public static function GetFileMimeType(string $path): string
 	{
-		 $mimetype = mime_content_type($path);
+		$mimetype = '';
+		$guessedMime = mime_content_type($path);
 
-		 if ($mimetype != false)
-		 {
-			 return $mimetype;
-		 }
+		if ($guessedMime != false)
+		{
+			$mimetype = $guessedMime;
+		}
 
-		 return '';
+		return $mimetype;
 	}
 
 	public function GetImageSize(string $path)
