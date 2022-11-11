@@ -48,7 +48,7 @@ class Cryptography
 	public static function Decrypt(string $input, string $key, int $block_size = 1): string
 	{
 		$key = sodium_hex2bin($key);
-		$decoded = base64_decode($input);
+		$decoded = base64_decode($input, true);
 
 		if ($decoded === false)
 		{
