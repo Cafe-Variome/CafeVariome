@@ -45,7 +45,7 @@ class TaskHelper
 			case TASK_ERROR_SOURCE_ID_NULL:
 				return 'No source ID given';
 			case TASK_ERROR_DATA_FILE_NULL:
-				return 'No data file found.';
+				return 'No data file found';
 			case TASK_ERROR_PIPELINE_NULL:
 				return 'No pipeline found';
 			case TASK_ERROR_DUPLICATE:
