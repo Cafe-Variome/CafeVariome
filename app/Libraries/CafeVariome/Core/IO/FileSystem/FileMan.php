@@ -333,8 +333,6 @@ class FileMan implements IFileMan
 
 			imagealphablending($destinationImage, false);
 
-			//imagesavealpha($destinationImage, true);
-
 			imagepng($destinationImage, null, 0);
 
 			imagedestroy($destinationImage);
