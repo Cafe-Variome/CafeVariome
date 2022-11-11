@@ -97,22 +97,27 @@ class SourceHelper
 
 	public static function formatSize(int $size): string
 	{
-		if ($size < 0){
+		if ($size < 0)
+		{
 			return "Invalid size";
 		}
-		if ($size < 1024){
+		if ($size < 1024)
+		{
 			return $size . " Bytes";
 		}
-		else if($size < 1048576){
+		else if($size < 1048576)
+		{
 			return round($size/1024, 2) . " KB";
 		}
-		else if($size < 1073741824){
+		else if($size < 1073741824)
+		{
 			return round($size/1048576, 2) . " MB";
 		}
-		else {
-			return round($size/1099511627776, 2) . " GB";
+		else
+		{
+			return round($size/1073741824, 2) . " GB";
 		}
-		return "Invalid size";
 
+		return "Invalid size";
 	}
 }
