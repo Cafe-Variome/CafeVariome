@@ -112,12 +112,9 @@ class FileMan implements IFileMan
 
     protected function destroyHandle(): bool
     {
-        return fclose($this->handle);
-    }
-
-    protected function setFilePath($path)
-    {
-        $this->filePath = $path;
+		$closed = fclose($this->handle);
+		$this->handle = null;
+        return $closed;
     }
 
     public function countFiles(): int
