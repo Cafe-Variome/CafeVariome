@@ -119,11 +119,7 @@ class FileMan implements IFileMan
 
     public function countFiles(): int
     {
-        if ($this->files != null)
-		{
-            return count($this->files);
-        }
-        return 0;
+		return count($this->files);
     }
 
     protected function getFullPath(): string
