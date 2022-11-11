@@ -125,7 +125,7 @@
     public function Save(File $file, string $path = '') : bool
     {
 		$file_name_to_write = $this->useDiskName ? $file->getDiskName() : basename($file->getName());
-
+		$path = rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR;
 		return copy($file->getTempPath(), $this->getFullPath() . $path . $file_name_to_write);
     }
  }
