@@ -5,7 +5,7 @@
     "homepage": "https://cafevariome.org/",
     "license": "MIT",
     "require": {
-		"php": "^8.0",
+	"php": "^8.0",
         "ext-sockets": "*",
         "ext-curl": "*",
         "ext-mbstring": "*",
@@ -18,17 +18,17 @@
         "codeigniter4/framework": "^4.2",
         "components/font-awesome": "^5.15",
         "twbs/bootstrap": "^4.6",
-		"elasticsearch/elasticsearch": "7.13",
-        "select2/select2": "^4.0.7",
-        "datatables/datatables": "^1.10",
+	"elasticsearch/elasticsearch": "7.17",
+        "select2/select2": "^4.0.13",
+        "datatables/datatables": "^1.10.18",
         "phpoffice/phpspreadsheet": "^1.18.0",
         "box/spout": "^3.3.0",
         "components/jqueryui": "^1.12.1",
         "vakata/jstree": "^3.3.8",
-        "tinymce/tinymce": "^5.2.0",
+        "tinymce/tinymce": "^6.2.0",
         "laudis/neo4j-php-client": "^2.6",
         "psr18-adapter/guzzle": "^0.1",
-        "guzzlehttp/psr7":  "2.0.0"
+        "guzzlehttp/psr7":  "2.4.1"
     },
     "require-dev": {
 		"fakerphp/faker": "^1.9",
