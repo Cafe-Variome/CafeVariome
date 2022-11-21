@@ -9,11 +9,8 @@
  * File Manager Class
  */
 
-
 class UploadFileMan extends FileMan
 {
-    private $fileStack;
-    private $removeDuplicateFileOnUpload = true;
     protected string $basePath;
     protected array $files;
 
