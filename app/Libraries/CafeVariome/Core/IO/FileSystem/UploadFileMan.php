@@ -107,20 +107,18 @@ class UploadFileMan extends FileMan
 	public static function getMaximumAllowedUploadSize(): string
 	{
 		$max_size = -1;
-		if ($max_size < 0)
+		$post_max_size = ini_get('post_max_size');
+		if ($post_max_size > 0)
 		{
-			$post_max_size = ini_get('post_max_size');
-			if ($post_max_size > 0)
-			{
-				$max_size = $post_max_size;
-			}
-
-			$upload_max = ini_get('upload_max_filesize');
-			if ($upload_max > 0 && $upload_max < $max_size)
-			{
-				$max_size = $upload_max;
-			}
+			$max_size = $post_max_size;
 		}
+
+		$upload_max = ini_get('upload_max_filesize');
+		if ($upload_max > 0 && $upload_max < $max_size)
+		{
+			$max_size = $upload_max;
+		}
+
 		return $max_size;
 	}
 
