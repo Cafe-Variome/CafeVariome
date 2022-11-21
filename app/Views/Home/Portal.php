@@ -530,10 +530,9 @@
 			ontology terms are calculated. Therefore, you can discover <i>similar</i> patients based on phenotypes, diseases, or medicine that they use.
 
 		</p>
-
 	</div>
 	<div class="col-4">
-		<canvas id="similarity-graph" width="400" height="200"></canvas>
+		<canvas id="similarity-graph" width="350" height="200"></canvas>
 	</div>
 </div>
 <?= $this->endSection() ?>
