@@ -31,7 +31,7 @@ class UploadFileMan extends FileMan
         $this->loadFiles($_FILES);
     }
 
-    public function loadFiles()
+    private function loadFiles(array $files)
     {
         foreach ($this->fileStack as $fileSetKey => $fileSet)
 		{
