@@ -18,7 +18,7 @@ class UploadFileMan extends FileMan
 
 	private bool $useDiskName;
 
-    public function __construct(string $basePath = null, bool $useDiskName = false, $diskNameLength = 16)
+    public function __construct(?string $basePath = null, bool $useDiskName = false, $diskNameLength = 16)
 	{
         parent::__construct($basePath);
         if ($basePath == null)
