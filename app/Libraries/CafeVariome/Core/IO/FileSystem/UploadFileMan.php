@@ -20,21 +20,15 @@ class UploadFileMan extends FileMan
 
     public function __construct(?string $basePath = null, bool $useDiskName = false, $diskNameLength = 16)
 	{
-        parent::__construct($basePath);
-        if ($basePath == null)
+        if (is_null($basePath))
 		{
-            $this->basePath = UPLOAD; // As set in Constants.php
+			$basePath = UPLOAD; // As set in Constants.php
         }
-        else
-		{
-            $this->basePath = $basePath;
-        }
+		parent::__construct($basePath);
+
 		$this->useDiskName = $useDiskName;
 		$this->diskNameLength = $diskNameLength;
-        $this->fileStack = $_FILES;
-        $this->files = [];
-        $this->loadFiles();
-
+        $this->loadFiles($_FILES);
     }
 
     public function loadFiles()
