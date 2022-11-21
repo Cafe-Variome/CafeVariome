@@ -137,7 +137,7 @@ class UploadFileMan extends FileMan
 		}
 	}
 
-	public static function GetAllowedDataFileFormats(bool $array = true)
+	public static function GetAllowedDataFileFormats(bool $array = true): array | string
 	{
 		$allowedFormats = ['csv', 'xls', 'xlsx', 'phenopacket'];
 
