@@ -82,23 +82,6 @@ class UploadFileMan extends FileMan
         return move_uploaded_file($file->getTempPath(), $this->getFullPath() . $path . DIRECTORY_SEPARATOR . $file_name_to_write);
     }
 
-    public function SaveAll()
-    {
-        foreach ($this->fileStack as $tempKey => $tempFile)
-		{
-            if ($tempFile['error'] == 0)
-			{
-                $tmp_name = $tempFile['tmp_name'];
-                $name = basename($tempFile["name"]);
-                if ($this->Exists($name))
-				{
-                    $this->Delete($name);
-                }
-                move_uploaded_file($tmp_name, $this->getFullPath() . $name);
-            }
-        }
-    }
-
     public function getFiles(): array
     {
         return $this->files;
