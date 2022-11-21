@@ -99,12 +99,7 @@ class UploadFileMan extends FileMan
         }
     }
 
-    public function getFileStack()
-    {
-        return ($this->fileStack != null ? $this->fileStack : null);
-    }
-
-    public function getFiles()
+    public function getFiles(): array
     {
         return $this->files;
     }
