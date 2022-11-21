@@ -33,14 +33,14 @@ class UploadFileMan extends FileMan
 
     private function loadFiles(array $files)
     {
-        foreach ($this->fileStack as $fileSetKey => $fileSet)
+        foreach ($files as $fileSetKey => $fileSet)
 		{
             if (is_countable($fileSet['name']))
 			{
 				// We have more than one file
                 for ($i=0; $i < count($fileSet['name']); $i++)
 				{
-					if ($fileSet['error'] == UPLOAD_ERR_OK)
+					if ($fileSet['error'][$i] == UPLOAD_ERR_OK)
 					{
 						$f = new File(
 							$fileSet['name'][$i],
