@@ -63,13 +63,13 @@ class AttributeMapping extends CVUI_Controller
 		$uidata->title = 'Attribute Mappings';
 
 		$attributeMappings = $this->attributeMappingModel->getAttributeMappingsByAttributeId($attribute_id);
-		$sourceId =  $attribute['source_id'];
+		$sourceId =  $attribute->source_id;
 		$uidata->data['attributeMappings'] = $attributeMappings;
 		$uidata->data['attributeId'] = $attribute_id;
 		$uidata->data['sourceId'] = $sourceId;
 		$source = $this->sourceAdapter->Read($sourceId);
 		$uidata->data['sourceName'] = $source->name;
-		$uidata->data['attributeName'] = $attribute['name'];
+		$uidata->data['attributeName'] = $attribute->name;
 
 		$uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
 		$uidata->javascript = array(JS . 'cafevariome/attribute_mapping.js', VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
@@ -90,8 +90,8 @@ class AttributeMapping extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Create Attribute Mapping';
 
-		$attributeName = $attribute['name'];
-		$uidata->data['sourceId'] = $attribute['source_id'];
+		$attributeName = $attribute->name;
+		$uidata->data['sourceId'] = $attribute->source_id;
 		$uidata->data['attributeId'] = $attribute_id;
 		$uidata->data['attributeName'] = $attributeName;
 
@@ -109,8 +109,10 @@ class AttributeMapping extends CVUI_Controller
 			]
 		]);
 
-		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-			try {
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
+			try
+			{
 				$name = $this->request->getVar('name');
 
 				$this->attributeMappingModel->createAttributeMapping($name, $attribute_id);
@@ -125,7 +127,8 @@ class AttributeMapping extends CVUI_Controller
 
 			return redirect()->to(base_url($this->controllerName.'/List/' . $attribute_id));
 		}
-		else{
+		else
+		{
 			$uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
 			$uidata->data['name'] = array(
