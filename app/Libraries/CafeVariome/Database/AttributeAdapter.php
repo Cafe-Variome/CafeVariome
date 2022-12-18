@@ -39,6 +39,21 @@ class AttributeAdapter extends BaseAdapter
 		return null;
 	}
 
+	public function ReadByNameAndSourceId(string $name, int $source_id): IEntity
+	{
+		$this->builder->where('name', $name);
+		$this->builder->where('source_id', $source_id);
+		$results = $this->builder->get()->getResult();
+
+		$record = null;
+		if (count($results) == 1)
+		{
+			$record = $results[0];
+		}
+
+		return $this->binding != null ? $this->BindTo($record) : $this->toEntity($record);
+	}
+
 	public function ReadType(int $id): ?int
 	{
 		$this->builder->select('type');
