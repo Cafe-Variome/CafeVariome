@@ -784,9 +784,7 @@ class AjaxApi extends Controller
 	public function getOntologyPrefixesAndRelationships()
 	{
 		$ontology_id = $this->request->getVar('ontology_id');
-		$attribute_id = $this->request->getVar('attribute_id');
 
-		$attributeModel = new \App\Models\Attribute();
 		$prefixModel = new \App\Models\OntologyPrefix();
 		$relationshipModel = new \App\Models\OntologyRelationship();
 
