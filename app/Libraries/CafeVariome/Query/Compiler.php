@@ -13,11 +13,10 @@
  */
 
 use App\Libraries\CafeVariome\Entities\Source;
+use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
 use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
-use App\Models\Attribute;
-use App\Models\Elastic;
 
 class Compiler
 {
@@ -31,7 +30,7 @@ class Compiler
 
 	public function CompileAndRunQuery(string $query, int $network_id, int $user_id): string
 	{
-		$attributeModel = new Attribute();
+		$attributeAdapter = (new AttributeAdapterFactory())->GetInstance();
 		$discoveryGroupAdapter = (new DiscoveryGroupAdapterFactory())->GetInstance();
 		$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
 
@@ -165,29 +164,33 @@ class Compiler
 					$records['subjects'] = $ids;
 					$records['attributes'] = [];
 
-					foreach ($attributes as $attribute)
+					foreach ($attributes as $attributeName)
 					{
-						if (count($ids) > 0) {
-							$attributeId = $attributeModel->getAttributeIdByNameAndSourceId($attribute, $source_id);
-							$attributeObject = $attributeModel->getAttribute($attributeId);
+						if (count($ids) > 0)
+						{
+							$attribute = $attributeAdapter->ReadByNameAndSourceId($attributeName, $source_id);
 
-							if ($attributeObject != null) {
-								switch ($attributeObject['storage_location']) {
+							if (!$attribute->isNull())
+							{
+								switch ($attribute->storage_location)
+								{
 									case ATTRIBUTE_STORAGE_ELASTICSEARCH:
 										$elasticResult = new ElasticsearchResult();
-										$records['attributes'][$attribute] = $elasticResult->extract($ids, $attribute, $source_id);
+										$records['attributes'][$attributeName] = $elasticResult->extract($ids, $attributeName, $source_id);
 										break;
 									case ATTRIBUTE_STORAGE_NEO4J:
-										if ($attributeObject['type'] == ATTRIBUTE_TYPE_ONTOLOGY_TERM) {
+										if ($attribute->type == ATTRIBUTE_TYPE_ONTOLOGY_TERM)
+										{
 											$neo4jOntologyResult = new Neo4JOntologyResult();
-											$records['attributes'][$attribute] = $neo4jOntologyResult->extract($ids, $attribute, $source_id);
+											$records['attributes'][$attributeName] = $neo4jOntologyResult->extract($ids, $attributeName, $source_id);
 										}
 										break;
 								}
 							}
 						}
-						else{
-							$records['attributes'][$attribute] = [];
+						else
+						{
+							$records['attributes'][$attributeName] = [];
 						}
 					}
 
@@ -199,9 +202,6 @@ class Compiler
 					];
 					break;
 			}
-
-
-
 		}
 
 		return json_encode($results);
