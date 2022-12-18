@@ -143,6 +143,23 @@ class AttributeAdapter extends BaseAdapter
 		return $entities;
 	}
 
+	public function ReadByMappingNameAndSourceId(string $mapping_name, int $source_id): IEntity
+	{
+		$this->builder->select(static::$table . '.*');
+		$this->builder->where(AttributeMappingAdapter::GetTable() . '.name', $mapping_name);
+		$this->builder->join(AttributeMappingAdapter::GetTable(),  static::$table . '.' . static::$key . ' = ' . AttributeMappingAdapter::GetTable() . '.attribute_id');
+		$this->builder->where(static::$table . '.source_id', $source_id);
+		$results = $this->builder->get()->getResult();
+
+		$record = null;
+		if (count($results) == 1)
+		{
+			$record = $results[0];
+		}
+
+		return $this->binding != null ? $this->BindTo($record) : $this->toEntity($record);
+	}
+
 	public function AssociationExists(int $attribute_id, int $ontology_id, int $prefix_id, int $relationship_id): bool
 	{
 		$this->changeTable('attributes_ontology_prefixes_relationships as aop');
