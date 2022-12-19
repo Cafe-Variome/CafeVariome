@@ -35,15 +35,15 @@ class EAVQuery extends AbstractQuery
 
 		$attributeObj = $this->getAttribute($attribute, $source_id);
 
-		if ($attributeObj == null)
+		if ($attributeObj->isNull())
 		{
 			// No attribute or mapping for the incoming attribute in the source exists. No need to query ES.
 			return [];
 		}
 		else
 		{
-			$attribute = $attributeObj['name'];
-			$attributeId = $attributeObj['id'];
+			$attribute = $attributeObj->name;
+			$attributeId = $attributeObj->getID();
 
 			$value = $clause['value'];
 
