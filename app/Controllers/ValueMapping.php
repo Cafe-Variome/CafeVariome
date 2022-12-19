@@ -1,5 +1,7 @@
 <?php namespace App\Controllers;
 
+use App\Libraries\CafeVariome\Database\AttributeAdapter;
+use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
@@ -13,7 +15,7 @@ use CodeIgniter\Config\Services;
 
 class ValueMapping extends CVUI_Controller
 {
-	private $attributeModel;
+	private AttributeAdapter $attributeAdapter;
 	private $valueModel;
 	private $valueMappingModel;
 	private $validation;
@@ -35,7 +37,7 @@ class ValueMapping extends CVUI_Controller
 		parent::setIsAdmin(true);
 		parent::initController($request, $response, $logger);
 
-		$this->attributeModel = new \App\Models\Attribute();
+		$this->attributeAdapter = (new AttributeAdapterFactory())->GetInstance();
 		$this->valueModel = new \App\Models\Value();
 		$this->valueMappingModel = new \App\Models\ValueMapping();
 		$this->validation = Services::validation();
@@ -60,14 +62,14 @@ class ValueMapping extends CVUI_Controller
 		$uidata->javascript = array(JS . 'cafevariome/value_mapping.js', VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
 
 		$valueMappings = $this->valueMappingModel->getValueMappingsByValueId($value_id);
-
 		$attributeId = $value['attribute_id'];
+		$attribute = $this->attributeAdapter->Read($attributeId);
+
 		$uidata->data['valueMappings'] = $valueMappings;
 		$uidata->data['valueId'] = $value_id;
 		$uidata->data['valueName'] = $value['name'];
 		$uidata->data['attributeId'] = $attributeId;
-		$attributeName = $this->attributeModel->getAttributeNameById($attributeId);
-		$uidata->data['attributeName'] = $attributeName;
+		$uidata->data['attributeName'] = $attribute->name;
 
 		$data = $this->wrapData($uidata);
 
