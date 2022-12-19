@@ -66,6 +66,8 @@ class BeaconQueryInterface extends AbstractNetworkInterface
 			$responseObj->status = false;
 		}
 
+		$responseObj->status = true;
+
 		return $responseObj;
 	}
 }
