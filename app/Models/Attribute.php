@@ -3,7 +3,7 @@
 /**
  * Name Attribute.php
  * @author Mehdi Mehtarizadeh
- *
+ * @deprecated
  * Model class for Attribute entities.
  */
 

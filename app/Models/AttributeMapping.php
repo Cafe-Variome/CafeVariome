@@ -3,7 +3,7 @@
 /**
  * Name AttributeMapping.php
  * @author Mehdi Mehtarizadeh
- *
+ * @deprecated
  * Model class for AttributeMapping entities.
  */
 
