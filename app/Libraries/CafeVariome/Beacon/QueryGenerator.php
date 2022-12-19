@@ -38,8 +38,8 @@ class QueryGenerator
 						case 'sim':
 							$filters[] = $this->newOntologyFilter($clause['ids'][0]);
 							break;
-						case 'orpha':
-
+						case 'ordo':
+							$filters[] = $this->newOntologyFilter($clause['id'][0]);
 							break;
 					}
 				}
