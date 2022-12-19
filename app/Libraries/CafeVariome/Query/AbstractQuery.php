@@ -11,9 +11,8 @@
 use App\Libraries\CafeVariome\CafeVariome;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
 use App\Libraries\CafeVariome\Entities\Source;
+use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
 use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
-use App\Models\Attribute;
-use App\Models\AttributeMapping;
 use App\Models\Value;
 use App\Models\ValueMapping;
 use Elasticsearch\ClientBuilder;
@@ -49,15 +48,15 @@ abstract class AbstractQuery
 	protected function getAttribute(string $attribute, int $source_id)
 	{
 		// If attribute exists, return it.
-		$attributeModel = new Attribute();
-		$attributeObj = $attributeModel->getAttributeByNameAndSourceId($attribute, $source_id);
-		if ($attributeObj != null) {
-			return $attributeObj;
+		$attributeAdapter = (new AttributeAdapterFactory())->GetInstance();
+		$attribute = $attributeAdapter->ReadByNameAndSourceId($attribute, $source_id);
+		if (!$attribute->isNull())
+		{
+			return $attribute;
 		}
 
 		// If attribute mapping exists, return the corresponding attribute.
-		$attributeMappingModel = new AttributeMapping();
-		return $attributeMappingModel->getAttributeByMappingNameAndSourceId($attribute, $source_id);
+		return $attributeAdapter->ReadByMappingNameAndSourceId($attribute, $source_id);
 	}
 
 	protected function getValue(string $value, int $attribute_id)
