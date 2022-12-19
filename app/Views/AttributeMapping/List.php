@@ -25,9 +25,9 @@
 	<tbody>
 	<?php foreach ($attributeMappings as $attributeMapping): ?>
 		<tr>
-			<td><?= $attributeMapping['name']; ?></td>
+			<td><?= $attributeMapping->name; ?></td>
 			<td>
-				<a href="<?= base_url($controllerName. '/Delete'). "/" . $attributeMapping['id']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Attribute Mapping">
+				<a href="<?= base_url($controllerName. '/Delete'). "/" . $attributeMapping->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Delete Attribute Mapping">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 			</td>
