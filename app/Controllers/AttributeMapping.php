@@ -3,6 +3,8 @@
 use App\Libraries\CafeVariome\Database\AttributeAdapter;
 use App\Libraries\CafeVariome\Database\SourceAdapter;
 use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
+use App\Libraries\CafeVariome\Factory\AttributeMappingAdapterFactory;
+use App\Libraries\CafeVariome\Factory\AttributeMappingFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
@@ -20,7 +22,6 @@ class AttributeMapping extends CVUI_Controller
 {
 	private AttributeAdapter $attributeAdapter;
 	private SourceAdapter $sourceAdapter;
-	private \App\Models\AttributeMapping $attributeMappingModel;
 	private $validation;
 
 	/**
@@ -40,9 +41,9 @@ class AttributeMapping extends CVUI_Controller
 		parent::setIsAdmin(true);
 		parent::initController($request, $response, $logger);
 
+		$this->dbAdapter = (new AttributeMappingAdapterFactory())->GetInstance();
 		$this->attributeAdapter = (new AttributeAdapterFactory())->GetInstance();
 		$this->sourceAdapter = (new SourceAdapterFactory())->GetInstance();
-		$this->attributeMappingModel = new \App\Models\AttributeMapping();
 		$this->validation = Services::validation();
 	}
 
@@ -62,9 +63,8 @@ class AttributeMapping extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Attribute Mappings';
 
-		$attributeMappings = $this->attributeMappingModel->getAttributeMappingsByAttributeId($attribute_id);
 		$sourceId =  $attribute->source_id;
-		$uidata->data['attributeMappings'] = $attributeMappings;
+		$uidata->data['attributeMappings'] = $this->dbAdapter->ReadByAttributeId($attribute_id);;
 		$uidata->data['attributeId'] = $attribute_id;
 		$uidata->data['sourceId'] = $sourceId;
 		$source = $this->sourceAdapter->Read($sourceId);
@@ -98,13 +98,12 @@ class AttributeMapping extends CVUI_Controller
 		$this->validation->setRules([
 			'name' => [
 				'label'  => 'Name',
-				'rules'  => 'required|alpha_numeric_punct|duplicate_attribute_and_mapping[source_id]|unique_attribute_mapping[source_id]|max_length[100]',
+				'rules'  => 'required|alpha_numeric_punct|duplicate_attribute_and_mapping[source_id]|unique_attribute_mapping[source_id]|max_length[256]',
 				'errors' => [
 					'required' => '{field} is required.',
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and spaces.',
 					'duplicate_attribute_and_mapping' => 'The mapping name already exists as an attribute within the source.',
 					'unique_attribute_mapping' => '{field} has already been mapped to an attribute.',
-					'max_length' => 'Maximum length is 100 characters.'
 				]
 			]
 		]);
@@ -115,10 +114,9 @@ class AttributeMapping extends CVUI_Controller
 			{
 				$name = $this->request->getVar('name');
 
-				$this->attributeMappingModel->createAttributeMapping($name, $attribute_id);
+				$this->dbAdapter->Create((new AttributeMappingFactory())->GetInstanceFromParameters($name, $attribute_id));
 
 				$this->setStatusMessage("Attribute mapping '$name' was created for '$attributeName'.", STATUS_SUCCESS);
-
 			}
 			catch (\Exception $ex)
 			{
@@ -147,18 +145,19 @@ class AttributeMapping extends CVUI_Controller
 
 	public function Delete(int $id)
 	{
-		$attributeMapping = $this->attributeMappingModel->getAttributeMapping($id);
-		if ($attributeMapping == null || $id <= 0) {
+		$attributeMapping = $this->dbAdapter->Read($id);
+		if ($attributeMapping->isNull())
+		{
 			return redirect()->to(base_url('Source'));
 		}
 
 		$uidata = new UIData();
 		$uidata->title = 'Delete Attribute Mapping';
 
-		$attributeId = $attributeMapping['attribute_id'];
+		$attributeId = $attributeMapping->attribute_id;
 		$uidata->data['attributeId'] = $attributeId;
-		$uidata->data['attributeMappingId'] = $attributeMapping['id'];
-		$uidata->data['attributeMappingName'] = $attributeMapping['name'];
+		$uidata->data['attributeMappingId'] = $attributeMapping->getID();
+		$uidata->data['attributeMappingName'] = $attributeMapping->name;
 
 		$this->validation->setRules([
 			'confirm' => [
@@ -167,42 +166,30 @@ class AttributeMapping extends CVUI_Controller
 				'errors' => [
 					'required' => '{field} is required.'
 				]
-			],
-
-			'attribute_mapping_id' => [
-				'label'  => 'Attribute Mapping Id',
-				'rules'  => 'required|numeric',
-				'errors' => [
-					'required' => '{field} is required.',
-					'numeric' => '{field} must only contain numeric characters.'
-				]
 			]
 		]);
 
-		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-			$attributeMappingId = $this->request->getVar('attribute_mapping_id');
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
 			$confirm = $this->request->getVar('confirm');
-			if ($confirm == 'yes') {
-				try {
-					$attributeMapping = $this->attributeMappingModel->getAttributeMapping($attributeMappingId);
-					if ($attributeMapping)  {
-						$attributeMappingName = $attributeMapping['name'];
-						$this->attributeMappingModel->deleteAttributeMapping($attributeMappingId);
-
-						$this->setStatusMessage("Attribute mapping '$attributeMappingName' was deleted.", STATUS_SUCCESS);
-					}
-					else{
-						$this->setStatusMessage("Attribute mapping does not exist.", STATUS_ERROR);
-					}
-				} catch (\Exception $ex) {
+			if ($confirm == 'yes')
+			{
+				try
+				{
+					$attributeMappingName = $attributeMapping->name;
+					$this->dbAdapter->Delete($id);
+					$this->setStatusMessage("Attribute mapping '$attributeMappingName' was deleted.", STATUS_SUCCESS);
+				}
+				catch (\Exception $ex)
+				{
 					$this->setStatusMessage("There was a problem deleting the attribute mapping.", STATUS_ERROR);
 				}
 			}
 			return redirect()->to(base_url($this->controllerName.'/List/' . $attributeId));
 		}
-		else {
+		else
+		{
 			$data = $this->wrapData($uidata);
-
 			return view($this->viewDirectory.'/Delete', $data);
 		}
 	}
