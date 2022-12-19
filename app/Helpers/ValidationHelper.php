@@ -12,11 +12,11 @@
  */
 
 
+use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
+use App\Libraries\CafeVariome\Factory\AttributeMappingAdapterFactory;
 use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
 use App\Libraries\CafeVariome\Factory\OntologyPrefixAdapterFactory;
 use App\Libraries\CafeVariome\Factory\OntologyRelationshipAdapterFactory;
-use App\Models\Attribute;
-use App\Models\AttributeMapping;
 use App\Models\Value;
 use App\Models\ValueMapping;
 
@@ -309,17 +309,17 @@ class ValidationHelper
 
 	public function duplicate_attribute_and_mapping(string $str, string $fields, array $data, & $err): bool
 	{
-		$attributeModel = new Attribute();
+		$attributeAdapter = (new AttributeAdapterFactory())->GetInstance();
 		$source_id = $data[$fields];
-		$attributeId = $attributeModel->getAttributeIdByNameAndSourceId($str, $source_id);
-		return !($attributeId > 0);
+		$attribute = $attributeAdapter->ReadByNameAndSourceId($str, $source_id);
+		return $attribute->isNull();
 	}
 
 	public function unique_attribute_mapping(string $str, string $fields, array $data, & $err): bool
 	{
-		$attributeMappingModel = new AttributeMapping();
+		$attributeMappingAdapter = (new AttributeMappingAdapterFactory())->GetInstance();
 		$source_id = $data[$fields];
-		return !$attributeMappingModel->attributeMappingExists($str, $source_id);
+		return !$attributeMappingAdapter->ExistsWithinSource($str, $source_id);
 	}
 
 	public function unique_value_mapping(string $str, string $fields, array $data, & $err): bool
