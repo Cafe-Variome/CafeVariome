@@ -30,7 +30,6 @@ use CodeIgniter\Controller;
 use Config\Database;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
-use App\Models\Upload;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 
