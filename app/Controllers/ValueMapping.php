@@ -1,23 +1,26 @@
 <?php namespace App\Controllers;
 
-use App\Libraries\CafeVariome\Database\AttributeAdapter;
-use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
-use App\Models\UIData;
-use CodeIgniter\Config\Services;
-
 /**
  * ValueMapping.php
  * Created 08/11/2021
- *
+ * @deprecated
  * This class offers CRUD operation for ValueMappings.
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Database\AttributeAdapter;
+use App\Libraries\CafeVariome\Database\ValueAdapter;
+use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
+use App\Libraries\CafeVariome\Factory\ValueAdapterFactory;
+use App\Libraries\CafeVariome\Factory\ValueMappingAdapterFactory;
+use App\Libraries\CafeVariome\Factory\ValueMappingFactory;
+use App\Models\UIData;
+use CodeIgniter\Config\Services;
+
 class ValueMapping extends CVUI_Controller
 {
 	private AttributeAdapter $attributeAdapter;
-	private $valueModel;
-	private $valueMappingModel;
+	private ValueAdapter $valueAdapter;
 	private $validation;
 
 	/**
@@ -38,8 +41,8 @@ class ValueMapping extends CVUI_Controller
 		parent::initController($request, $response, $logger);
 
 		$this->attributeAdapter = (new AttributeAdapterFactory())->GetInstance();
-		$this->valueModel = new \App\Models\Value();
-		$this->valueMappingModel = new \App\Models\ValueMapping();
+		$this->valueAdapter = (new ValueAdapterFactory())->GetInstance();
+		$this->dbAdapter = (new ValueMappingAdapterFactory())->GetInstance();
 		$this->validation = Services::validation();
 	}
 
@@ -50,8 +53,9 @@ class ValueMapping extends CVUI_Controller
 
 	public function List(int $value_id)
 	{
-		$value = $this->valueModel->getValue($value_id);
-		if ($value == null || $value_id <= 0) {
+		$value = $this->valueAdapter->Read($value_id);
+		if ($value->isNull())
+		{
 			return redirect()->to(base_url('Source'));
 		}
 
@@ -61,13 +65,13 @@ class ValueMapping extends CVUI_Controller
 		$uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
 		$uidata->javascript = array(JS . 'cafevariome/value_mapping.js', VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
 
-		$valueMappings = $this->valueMappingModel->getValueMappingsByValueId($value_id);
-		$attributeId = $value['attribute_id'];
+		$valueMappings = $this->dbAdapter->ReadByValueId($value_id);
+		$attributeId = $value->attribute_id;
 		$attribute = $this->attributeAdapter->Read($attributeId);
 
 		$uidata->data['valueMappings'] = $valueMappings;
 		$uidata->data['valueId'] = $value_id;
-		$uidata->data['valueName'] = $value['name'];
+		$uidata->data['valueName'] = $value->name;
 		$uidata->data['attributeId'] = $attributeId;
 		$uidata->data['attributeName'] = $attribute->name;
 
@@ -78,16 +82,17 @@ class ValueMapping extends CVUI_Controller
 
 	public function Create(int $value_id)
 	{
-		$value = $this->valueModel->getValue($value_id);
-		if ($value == null || $value_id <= 0) {
+		$value = $this->valueAdapter->Read($value_id);
+		if ($value->isNull())
+		{
 			return redirect()->to(base_url('Source'));
 		}
 
 		$uidata = new UIData();
 		$uidata->title = 'Create Value Mapping';
 
-		$valueName = $value['name'];
-		$uidata->data['attributeId'] = $value['attribute_id'];
+		$valueName = $value->name;
+		$uidata->data['attributeId'] = $value->attribute_id;
 		$uidata->data['valueId'] = $value_id;
 		$uidata->data['valueName'] = $valueName;
 
@@ -105,20 +110,25 @@ class ValueMapping extends CVUI_Controller
 			]
 		]);
 
-		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-			try {
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
+			try
+			{
 				$name = $this->request->getVar('name');
-				$this->valueMappingModel->createValueMapping($name, $value_id);
+				$this->dbAdapter->Create(
+					(new ValueMappingFactory())->GetInstanceFromParameters($name, $value_id)
+				);
 				$this->setStatusMessage("Value mapping '$name' was created for '$valueName'.", STATUS_SUCCESS);
 			}
 			catch (\Exception $ex)
 			{
-				$this->setStatusMessage("There was a problem creating ' '."  . $ex->getMessage(), STATUS_ERROR);
+				$this->setStatusMessage("There was a problem creating value mapping: "  . $ex->getMessage(), STATUS_ERROR);
 			}
 
 			return redirect()->to(base_url($this->controllerName.'/List/' . $value_id));
 		}
-		else{
+		else
+		{
 			$uidata->data['statusMessage'] = $this->validation->getErrors() ? $this->validation->listErrors($this->validationListTemplate) : $this->session->getFlashdata('message');
 
 			$uidata->data['name'] = array(
@@ -137,18 +147,19 @@ class ValueMapping extends CVUI_Controller
 
 	public function Delete(int $id)
 	{
-		$valueMapping = $this->valueMappingModel->getValueMapping($id);
-		if ($valueMapping == null || $id <= 0) {
+		$valueMapping = $this->dbAdapter->Read($id);
+		if ($valueMapping->isNull())
+		{
 			return redirect()->to(base_url('Source'));
 		}
 
 		$uidata = new UIData();
 		$uidata->title = 'Delete Value Mapping';
 
-		$valueId = $valueMapping['value_id'];
+		$valueId = $valueMapping->value_id;
 		$uidata->data['valueId'] = $valueId;
-		$uidata->data['valueMappingId'] = $valueMapping['id'];
-		$uidata->data['valueMappingName'] = $valueMapping['name'];
+		$uidata->data['valueMappingId'] = $valueMapping->getID();
+		$uidata->data['valueMappingName'] = $valueMapping->name;
 
 		$this->validation->setRules([
 			'confirm' => [
@@ -169,32 +180,27 @@ class ValueMapping extends CVUI_Controller
 			]
 		]);
 
-		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run()) {
-			$valueMappingId = $this->request->getVar('value_mapping_id');
+		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
+		{
 			$confirm = $this->request->getVar('confirm');
-			if ($confirm == 'yes') {
-				try {
-					$valueMapping = $this->valueMappingModel->getValueMapping($valueMappingId);
-					if ($valueMapping)  {
-						$valueMappingName = $valueMapping['name'];
-						$this->valueMappingModel->deleteValueMapping($valueMappingId);
-
-						$this->setStatusMessage("Value mapping '$valueMappingName' was deleted.", STATUS_SUCCESS);
-					}
-					else{
-						$this->setStatusMessage("Value mapping does not exist.", STATUS_ERROR);
-					}
-				} catch (\Exception $ex) {
+			if ($confirm == 'yes')
+			{
+				try
+				{
+					$valueMappingName = $valueMapping->name;
+					$this->dbAdapter->Delete($id);
+					$this->setStatusMessage("Value mapping '$valueMappingName' was deleted.", STATUS_SUCCESS);
+				} catch (\Exception $ex)
+				{
 					$this->setStatusMessage("There was a problem deleting the value mapping.", STATUS_ERROR);
 				}
 			}
 			return redirect()->to(base_url($this->controllerName.'/List/' . $valueId));
 		}
-		else {
+		else
+		{
 			$data = $this->wrapData($uidata);
-
 			return view($this->viewDirectory.'/Delete', $data);
 		}
 	}
-
 }

@@ -25,9 +25,9 @@
 	<tbody>
 	<?php foreach ($valueMappings as $valueMapping): ?>
 		<tr>
-			<td><?= $valueMapping['name']; ?></td>
+			<td><?= $valueMapping->name; ?></td>
 			<td>
-				<a href="<?= base_url($controllerName. '/Delete'). "/" . $valueMapping['id']; ?>" data-toggle="tooltip" data-placement="top" title="Delete Value Mapping">
+				<a href="<?= base_url($controllerName. '/Delete'). "/" . $valueMapping->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Delete Value Mapping">
 					<i class="fa fa-trash text-danger"></i>
 				</a>
 			</td>
