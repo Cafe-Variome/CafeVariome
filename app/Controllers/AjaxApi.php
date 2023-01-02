@@ -20,6 +20,8 @@ use App\Libraries\CafeVariome\Core\IO\FileSystem\File;
 use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
 use App\Libraries\CafeVariome\Factory\DataFileAdapterFactory;
 use App\Libraries\CafeVariome\Factory\DataFileFactory;
+use App\Libraries\CafeVariome\Factory\OntologyPrefixAdapterFactory;
+use App\Libraries\CafeVariome\Factory\OntologyRelationshipAdapterFactory;
 use App\Libraries\CafeVariome\Factory\PipelineAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
@@ -784,21 +786,23 @@ class AjaxApi extends Controller
 	{
 		$ontology_id = $this->request->getVar('ontology_id');
 
-		$prefixModel = new \App\Models\OntologyPrefix();
-		$relationshipModel = new \App\Models\OntologyRelationship();
+		$ontologyPrefixAdapter = (new OntologyPrefixAdapterFactory())->GetInstance();
+		$ontologyRelationshipAdapter = (new OntologyRelationshipAdapterFactory())->GetInstance();
 
-		$prefixList = $prefixModel->getOntologyPrefixes($ontology_id);
-		$relationshipList = $relationshipModel->getOntologyRelationships($ontology_id);
+		$prefixList = $ontologyPrefixAdapter->ReadByOntologyId($ontology_id);
+		$relationshipList = $ontologyRelationshipAdapter->ReadByOntologyId($ontology_id);
 
 		$prefixes = [];
 		$relationships = [];
 
-		foreach ($prefixList as $prefix){
-			$prefixes[$prefix['id']] = $prefix['name'];
+		foreach ($prefixList as $prefix)
+		{
+			$prefixes[$prefix->getID()] = $prefix->name;
 		}
 
-		foreach ($relationshipList as $relationship) {
-			$relationships[$relationship['id']] = $relationship['name'];
+		foreach ($relationshipList as $relationship)
+		{
+			$relationships[$relationship->getID()] = $relationship->name;
 		}
 
 		return json_encode([
@@ -806,5 +810,4 @@ class AjaxApi extends Controller
 			'relationships' => $relationships
 		]);
 	}
-
  }
