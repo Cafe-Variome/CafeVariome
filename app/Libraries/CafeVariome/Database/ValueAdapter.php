@@ -48,6 +48,23 @@ class ValueAdapter extends BaseAdapter
 		return null;
 	}
 
+	public function ReadByMappingNameAndAttributeId(string $mapping_name, int $attribute_id): IEntity
+	{
+		$this->builder->select(static::$table . '.*');
+		$this->builder->where(ValueMappingAdapter::GetTable() . '.name', $mapping_name);
+		$this->builder->join(ValueMappingAdapter::GetTable(),  static::$table . '.' . static::$key . ' = ' . ValueMappingAdapter::GetTable() . '.value_id');
+		$this->builder->where(static::$table . '.attribute_id', $attribute_id);
+		$results = $this->builder->get()->getResult();
+
+		$record = null;
+		if (count($results) == 1)
+		{
+			$record = $results[0];
+		}
+
+		return $this->binding != null ? $this->BindTo($record) : $this->toEntity($record);
+	}
+
 	public function ReadByAttributeId(int $attribute_id, ?bool $include_in_interface_index = null): array
 	{
 		$this->CompileSelect();
