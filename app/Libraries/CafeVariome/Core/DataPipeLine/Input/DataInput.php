@@ -11,13 +11,14 @@
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Database;
 use App\Libraries\CafeVariome\Core\DataPipeLine\DataPipeLine;
+use App\Libraries\CafeVariome\Database\OntologyPrefixAdapter;
 use App\Libraries\CafeVariome\Entities\Task;
 use App\Libraries\CafeVariome\Factory\AttributeFactory;
 use App\Libraries\CafeVariome\Factory\GroupFactory;
+use App\Libraries\CafeVariome\Factory\OntologyPrefixAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SubjectFactory;
 use App\Libraries\CafeVariome\Factory\ValueFactory;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
-use App\Models\OntologyPrefix;
 
 abstract class DataInput extends DataPipeLine
 {
@@ -31,7 +32,7 @@ abstract class DataInput extends DataPipeLine
 	protected array $attributes;
 	protected array $subjects;
 	protected array $groups;
-	private OntologyPrefix $ontologyPrefixModel;
+	private OntologyPrefixAdapter $ontologyPrefixAdapter;
 	protected int $totalRecords;
 	protected int $processedRecords;
 	protected string $errorMessage;
@@ -52,7 +53,7 @@ abstract class DataInput extends DataPipeLine
 		$this->subjects = [];
 		$this->groups = [];
 		$this->configuration = [];
-		$this->ontologyPrefixModel = new OntologyPrefix();
+		$this->ontologyPrefixAdapter = (new OntologyPrefixAdapterFactory())->GetInstance();
 		$this->errorMessage = '';
 	}
 
@@ -333,7 +334,7 @@ abstract class DataInput extends DataPipeLine
 	{
 		$db = \Config\Database::connect();
 
-		$ontologyPrefixes = $this->ontologyPrefixModel->getDistinctOntologyPrefixes();
+		$ontologyPrefixes = $this->ontologyPrefixAdapter->ReadAllDistinct();
 
 		$db->transStart();
 		foreach ($this->attributes as $attribute => $attribute_details)
@@ -434,9 +435,9 @@ abstract class DataInput extends DataPipeLine
 
 	private function valueStartsWithOntologyPrefix(string $value, array $prefixes): bool
 	{
-		for ($i = 0; $i < count($prefixes); $i++)
+		foreach ($prefixes as $prefix)
 		{
-			if (str_starts_with($value, $prefixes[$i]))
+			if (str_starts_with($value, $prefix->name))
 			{
 				return true;
 			}
