@@ -9,6 +9,7 @@
  */
 
 use App\Libraries\CafeVariome\Entities\IEntity;
+use App\Libraries\CafeVariome\Entities\NullEntity;
 use App\Libraries\CafeVariome\Entities\Value;
 
 class ValueFactory extends EntityFactory
