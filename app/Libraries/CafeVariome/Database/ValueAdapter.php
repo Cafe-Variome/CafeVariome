@@ -86,6 +86,21 @@ class ValueAdapter extends BaseAdapter
 		return $entities;
 	}
 
+	public function ReadByNameAndAttributeId(string $name, int $attribute_id): IEntity
+	{
+		$this->builder->where('name', $name);
+		$this->builder->where('attribute_id', $attribute_id);
+		$results = $this->builder->get()->getResult();
+
+		$record = null;
+		if (count($results) == 1)
+		{
+			$record = $results[0];
+		}
+
+		return $this->binding != null ? $this->BindTo($record) : $this->toEntity($record);
+	}
+
 	public function ReadFrequency(int $id): ?float
 	{
 		$this->builder->select('frequency');
