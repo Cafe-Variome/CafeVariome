@@ -50,7 +50,7 @@ class EAVQuery extends AbstractQuery
 			$valueObj = $this->getValue($value, $attributeId);
 			if (
 				($operator == 'is' || $operator == 'is not' || $operator == '=' || $operator == '!=') && // Take this path only if the query is an exact match.
-				$valueObj == null
+				$valueObj->isNull()
 			)
 			{
 				// No value or mapping for the incoming value in the source exists. No need to query ES.
@@ -58,9 +58,9 @@ class EAVQuery extends AbstractQuery
 			}
 			else
 			{
-				if ($valueObj != null)
+				if (!$valueObj->isNull())
 				{
-					$value = $valueObj['name'];
+					$value = $valueObj->name;
 				}
 
 				//Query ES
