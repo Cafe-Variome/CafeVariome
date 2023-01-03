@@ -39,6 +39,22 @@ class OntologyPrefixAdapter extends BaseAdapter
 		return $entities;
 	}
 
+	public function ReadAllDistinct(): array
+	{
+		$this->CompileSelect();
+		$this->CompileJoin();
+		$this->builder->distinct();
+		$results = $this->builder->get()->getResult();
+
+		$entities = [];
+		for($c = 0; $c < count($results); $c++)
+		{
+			$entities[$results[$c]->{static::$key}] = $this->binding != null ? $this->BindTo($results[$c]) : $this->toEntity($results[$c]);
+		}
+
+		return $entities;
+	}
+
 	public function ReadByNameAndOntologyId(string $name, int $ontology_id): IEntity
 	{
 		$this->CompileSelect();

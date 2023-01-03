@@ -3,7 +3,7 @@
 /**
  * Name Value.php
  * @author Mehdi Mehtarizadeh
- *
+ * @deprecated
  * Model class for Value entities.
  */
 

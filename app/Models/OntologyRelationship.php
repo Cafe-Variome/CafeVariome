@@ -3,7 +3,7 @@
 /**
  * Name OntologyRelationship.php
  * @author Mehdi Mehtarizadeh
- *
+ * @deprecated
  * Model class for OntologyRelationship entities.
  */
 
