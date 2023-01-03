@@ -3,7 +3,7 @@
 /**
  * Name ValueMapping.php
  * @author Mehdi Mehtarizadeh
- *
+ * @deprecated
  * Model class for ValueMapping entities.
  */
 
