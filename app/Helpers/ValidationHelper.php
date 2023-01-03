@@ -17,8 +17,8 @@ use App\Libraries\CafeVariome\Factory\AttributeMappingAdapterFactory;
 use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
 use App\Libraries\CafeVariome\Factory\OntologyPrefixAdapterFactory;
 use App\Libraries\CafeVariome\Factory\OntologyRelationshipAdapterFactory;
-use App\Models\Value;
-use App\Models\ValueMapping;
+use App\Libraries\CafeVariome\Factory\ValueAdapterFactory;
+use App\Libraries\CafeVariome\Factory\ValueMappingAdapterFactory;
 
 class ValidationHelper
 {
@@ -324,17 +324,19 @@ class ValidationHelper
 
 	public function unique_value_mapping(string $str, string $fields, array $data, & $err): bool
 	{
-		$valueMappingModel = new ValueMapping();
+		$valueMappingAdapter = (new ValueMappingAdapterFactory())->GetInstance();
 		$attribute_id = $data[$fields];
-		return !$valueMappingModel->valueMappingExists($str, $attribute_id);
+		$valueMapping = $valueMappingAdapter->ReadByMappingNameAndAttributeId($str, $attribute_id);
+		return $valueMapping->isNull();
 	}
 
 	public function duplicate_value_and_mapping(string $str, string $fields, array $data, & $err): bool
 	{
-		$valueModel = new Value();
+		$valueAdapter = (new ValueAdapterFactory())->GetInstance();
 		$attribute_id = $data[$fields];
-		$valueId = $valueModel->getValueIdByNameAndAttributeId($str, $attribute_id);
-		return !($valueId > 0);
+		$valueObj = $valueAdapter->ReadByNameAndAttributeId($str, $attribute_id);
+
+		return $valueObj->isNull();
 	}
 
 	/**
