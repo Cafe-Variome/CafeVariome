@@ -20,6 +20,7 @@ use App\Libraries\CafeVariome\Query\Compiler;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
+use Config\Services;
 use Psr\Log\LoggerInterface;
 use App\Libraries\CafeVariome\Beacon\Beacon;
 
@@ -36,12 +37,22 @@ class BeaconAPI extends ResourceController
 
     public function _remap($function)
 	{
-        if($function == "service-info"){
-            return $this->service_info();
-        }
-        else{
-            return $this->$function();
-        }
+		if ((int)$function > 0)
+		{
+			//$function is the network key
+			$path = $this->request->getPath();
+			$method = explode('/', $path)[2];
+			if($method == "service-info")
+			{
+				return $this->service_info();
+			}
+			return $this->$method((int)$function);
+		}
+		else
+		{
+			//Bad Request, drop it with 400
+			return Services::response()->setStatusCode(400, 'Bad request');
+		}
     }
 
     public function Index()
