@@ -278,7 +278,7 @@ class BeaconAPI extends ResourceController
 			$localRresults = $queryCompiler->CompileAndRunQuery($query_json, $network_key, $user_id);
 
 			$networkInterface = new NetworkInterface();
-			$installationsResponse = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
+			$installationsResponse = $networkInterface->GetInstallationsByNetworkKey($network_key); // Get other installations within this network
 
 			$results = [$localRresults];
 			if ($installationsResponse->status)
@@ -335,7 +335,7 @@ class BeaconAPI extends ResourceController
 			!in_array('meta',array_map('strtolower',array_keys($json)))
 		)
 		{
-            $result = "incorrect query";
+            $result = "Incorrect query";
             return $this->response->setStatusCode(400)->setBody($result);
         }
 
@@ -347,143 +347,226 @@ class BeaconAPI extends ResourceController
         }
         if (count($ets)>0)
 		{
-            $result = "query contains entry types not supported by this beacon for this endpoint " . json_encode($ets);
+            $result = "Query contains entry types not supported by this beacon for this endpoint " . json_encode($ets);
             return $this->response->setStatusCode(400)->setBody($result);
         }
 
-        // check if each element supported and then package in a way to create a standard CV query
-        foreach ($json['query'] as $qe => $qel)
+
+		$beaconInput = $this->request->getJSON();
+
+		$query = $beaconInput->query;
+		$filters = $query->filters;
+		$filterTerms = $filters;
+
+		$qArr = [];
+		$eavQueries = [];
+		$eavCounter = 0;
+		$ordoQueries = [];
+		$ordoCounter = 0;
+		$demographyQueries = [];
+		$demographyCounter=0;
+		$hpoSimQueries = [];
+		$hpoSimCounter=0;
+		$i=0;
+		$showInfo = false;
+		$unsupFilters = [];
+		$unsupFilterValues = [];
+
+		foreach($filterTerms as $ft)
 		{
-            if ($qe == 'requestParameters')
+			if(
+				$ft->type != "NCIT_C25150" &&
+				$ft->type != "SIO_001003" &&
+				$ft->type != "NCIT_C28421" &&
+				$ft->type != "SIO_010056"
+			)
 			{
-                foreach ($json['query']['requestParameters'] as $et => $par )
+				$showInfo = true;
+				array_push($unsupFilters,$ft->type);
+			}
+			else
+			{
+				$showInfo = false;
+				if(property_exists($ft, 'operator'))
 				{
-                    if ($et == 'individuals')
+					if(str_starts_with($ft->type, "SIO_001003"))
 					{
-                        foreach($par as $qel => $val)
+						// ORPHA
+						if(str_contains($ft->id, "_"))
 						{
-                            if ($qel == 'sex')
-							{
-                                array_push($eavQueries, ['attribute' => 'gender','operator' => 'eq', 'value' => $val['id']]);
-                            }
-							elseif ($qel == 'diseases')
-							{
-                                foreach ($val as $dis)
-								{
-                                    //check other keys if not diseaseCode then fail
-                                    $unsupInd = [];
-                                    foreach ($dis as $del => $dval)
-									{
-                                        if ($del == 'diseaseCode')
-										{
-                                            array_push($diseaseCodes, $dval['id']);
-                                        }
-										else
-										{
-                                            // add an array to collect unsupported elements and single reply of all problems
-                                            array_push($unsupInd, $del);
-                                        }
-                                    }
-                                    if (!empty($unsupInd))
-									{
-                                        $result = "query contains parameters not supported by this beacon for the Individuals/diseases endpoint " . json_encode($unsupInd);
-                                        return $this->response->setStatusCode(400)->setBody($result);
-                                    }
-                                }
-                            }
-							elseif ($qel == 'phenotypicFeatures')
-							{
-                                //get ids and excluded or not
-                            }
-							else
-							{
-                                $result = "query contains parameters not supported by this beacon for the Individuals endpoint " . json_encode($qel);
-                                return $this->response->setStatusCode(400)->setBody($result);
-                            }
-                        }
-                    }
-					elseif ($et == 'g_variants')
+							$term = explode("_", $ft->id);
+							$id = 'ORPHA' . ':' . $term[1];
+						}
+						else if (str_contains($ft->id, ":"))
+						{
+							$id = $ft->id;
+						}
+						else
+						{
+							$term = explode("ORPHA", $ft->id);
+							$error = "Please provide ORPHA term in the right format, i.e., ORPHA" . "_" . $term[1];
+							return $this->response->setStatusCode(400)->setBody($error);
+						}
+						array_push($ordoQueries, [
+							'id' => [$id],
+							'r' => 1,
+							's' => 100,
+							'HPO' => true
+						]);
+						$ordoCounter++;
+					}
+
+					if(str_starts_with($ft->type, "NCIT_C28421"))
 					{
+						// Gender
+						if($ft->id == 'NCIT_C16576')
+						{
+							$genValue = "female";
+						}
+						elseif($ft->id == 'NCIT_C20197')
+						{
+							$genValue = "male";
+						}
+						elseif($ft->id == 'NCIT_C124294')
+						{
+							$genValue = "undetermined";
+						}
+						elseif($ft->id == 'NCIT_C17998')
+						{
+							$genValue = "unknown";
+						}
+						elseif($ft->id == '')
+						{ // gender string is not sent from VP
+							$genValue = "";
+						}
+						else
+						{
+							$showInfo = true;
+							array_push($unsupFilterValues,$ft->id);
+						}
 
-                    }
-					elseif ($et == 'biosamples')
+						array_push($demographyQueries,[
+							'gender' => [$genValue]
+						]);
+						$demographyCounter++;
+					}
+
+					if(str_starts_with($ft->type, "SIO_010056"))
 					{
+						// Phenotype
+						array_push($hpoSimQueries,[
+							'r' => 1,
+							's' => $hpoSimCounter,
+							'ORPHA' => false,
+							'ids'=> [$ft->id]
+						]);
+						$hpoSimCounter++;
+					}
 
-                    }
-					else
+					if(str_starts_with($ft->type, "NCIT_C25150")) // Age
 					{
-                        $result = "query contains entry types not supported by this beacon for this endpoint " . json_encode($et);
-                        return $this->response->setStatusCode(400)->setBody($result);
-                    }
-                }
-            }
-        }
+						if($ft->operator == '=')
+						{
+							// Age = Something QUERY
+							array_push($demographyQueries,[
+								'minAge' => [$ft->id],
+								'maxAge' => [$ft->id],
+							]);
+						}
+						elseif($ft->operator == '>=')
+						{
+							array_push($demographyQueries,[
+								'minAge' => [$ft->id],
+								'maxAge' => [99],
+							]);
+						}
+						elseif($ft->operator == '<=')
+						{
+							array_push($demographyQueries,[
+								'minAge' => [0],
+								'maxAge' => [$ft->id],
+							]);
+						}
+						elseif($ft->operator == '>')
+						{
+							array_push($demographyQueries,[
+								'minAge' => [$ft->id + 1],
+								'maxAge' => [99],
+							]);
+						}
+						elseif($ft->operator == '<')
+						{
+							array_push($demographyQueries,[
+								'minAge' => [0],
+								'maxAge' => [$ft->id - 1],
+							]);
+						}
+						$demographyCounter++;
+					}
+				}
+				if(property_exists($ft, 'operator'))
+				{
+					if(
+						!(str_starts_with($ft->type, "NCIT_C25150")) && // Not age
+						!(str_starts_with($ft->type, "SIO_001003")) && // Not diagnosis
+						!(str_starts_with($ft->type, "NCIT_C28421")) && // Not gender
+						!(str_starts_with($ft->type, "SIO_010056")) && // Not phenotype
+						!(str_starts_with($ft->type, "NCIT_C16612")) // Not causative gene
+					) // EAV queries
+					{
+						array_push($eavQueries, [
+							'attribute' => strtolower($ft->type),
+							'operator' => $ft->operator,
+							'value' => strtolower($ft->id)
+						]);
+						$eavCounter++;
+					}
+				}
+			}
+			$i++;
+		}
 
-        $beaconInput = $this->request->getJSON();
+		for ($j = 0; $j < $eavCounter; $j++)
+		{
+			$qArr['logic']['-AND'][] = "/query/components/eav/" . $j;
+		}
+		for ($j = 0; $j < $ordoCounter; $j++)
+		{
+			$qArr['logic']['-AND'][] = "/query/components/ordo/" . $j;
+		}
+		for ($j = 0; $j < $demographyCounter; $j++)
+		{
+			$qArr['logic']['-AND'][] = "/query/components/demography/0/".$j; // single demography query
+		}
+		for ($j = 0; $j < $hpoSimCounter; $j++)
+		{
+			$qArr['logic']['-AND'][] = "/query/components/sim/" . $j; // multiple hpo queries
+		}
 
-        $query = $beaconInput->query;
-        $filters = $query->filters;
-        $filterTerms = $filters;
+		$qArr['query']['components']['eav'] = $eavQueries;
+		$qArr['query']['components']['ordo'] = $ordoQueries;
+		$qArr['query']['components']['demography'][0]= $demographyQueries;
+		$qArr['query']['components']['sim']= $hpoSimQueries;
+		$qArr['requires']['response']['components'] = [];
 
-        $qArr = [];
-        $eavQueries = [];
-        $eavCounter = 0;
-        $ordoQueries = [];
-        $ordoCounter = 0;
-        $i=0;
-
-        foreach($filterTerms as $ft){
-            if(property_exists($ft, 'operator')){
-                	array_push($eavQueries, [
-                    	'attribute' => strtolower($ft->id),
-                    	'operator' => $ft->operator,
-                    	'value' => strtolower($ft->value)
-                	]);
-                $eavCounter++;
-            }
-			elseif(str_starts_with($ft->id, "ORPHA")){
-                array_push($ordoQueries, [
-                    'id' => [$ft->id],
-                    'r' => 1,
-                    's' => 100,
-                    'HPO' => true
-                ]);
-                $ordoCounter++;
-            }
-            $i++;
-        }
-
-        for ($j=0; $j < $eavCounter; $j++) {
-            $qArr['logic']['-AND'][] = "/query/components/eav/" . $j;
-        }
-        for ($j=0; $j < $ordoCounter; $j++) {
-            $qArr['logic']['-AND'][] = "/query/components/ordo/" . $j;
-        }
-        $qArr['query']['components']['eav'] = $eavQueries;
-        $qArr['query']['components']['ordo'] = $ordoQueries;
-
-        $qArr['requires']['response']['components'] = [];
-
-		// Run Query locally
-        $query_json = json_encode($qArr, JSON_UNESCAPED_SLASHES);
+		$query_json = json_encode($qArr, JSON_UNESCAPED_SLASHES);
 
 		$localRresults = $queryCompiler->CompileAndRunQuery($query_json, $network_key, $user_id);
 
 		$networkInterface = new NetworkInterface();
-
-		$installationsResponse = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
-
+		$response = $networkInterface->GetInstallationsByNetworkKey($network_key); // Get other installations within this network
 		$results = [$localRresults];
-		if ($installationsResponse->status)
+
+		if ($response->status)
 		{
-			$installations = $installationsResponse->data;
+			$installations = $response->data;
 			foreach ($installations as $installation)
 			{
 				if ($installation->installation_key != $this->setting->getInstallationKey())
 				{
 					// Send the query
 					$queryNetInterface = new QueryNetworkInterface($installation->base_url);
-					$queryResponse = $queryNetInterface->query($query_json, (int) $network_key, $token);
+					$queryResponse = $queryNetInterface->query($query_json, $network_key, $token);
 					if ($queryResponse->status)
 					{
 						array_push($results, json_encode($queryResponse->data));
@@ -495,11 +578,11 @@ class BeaconAPI extends ResourceController
 		$response = [];
 		$response['meta']['beaconId'] = Beacon::GetBeaconID();
 		$response['meta']['apiVersion'] = Beacon::BEACON_VERSION;
-        $response['meta']['receivedRequest'] = $json;
-        $response['meta']['returnedSchemas'][]['entityType'] = "Individuals";
-        $response['meta']['returnedSchemas'][]['schema'] = "ga4gh-beacon-individual-v2.0.0-draft.4";
-        $response['meta']['returnedGranularity'] = 'count';
-        $response['resultSets'] = [];
+		$response['meta']['receivedRequestSummary'] = $json;
+		$response['meta']['returnedSchemas'][]['entityType'] = "Individuals";
+		$response['meta']['returnedSchemas'][]['schema'] = "ga4gh-beacon-individual-v2.0.0-draft.4";
+		$response['meta']['returnedGranularity'] = 'count';
+		$response['resultSets'] = [];
 
 		$numTotalResults = 0;
 		foreach ($results as $sourceJsonString)
@@ -512,25 +595,43 @@ class BeaconAPI extends ResourceController
 					$response['resultSets'][] = [
 						'id' => $source_name,
 						'type' => 'dataset',
-						'exists' => count($source['records']['subjects']) > 0,
-						'resultCount' => count($source['records']['subjects']),
+						'exists' => ($source['payload']) > 0,
+						'resultCount' => ($source['payload']),
 						'Info' => [
 							'contactPoint' => $source['source']['owner_name'],
 							'contactEmail' => $source['source']['owner_email'],
 							'contactURL' => $source['source']['uri']
 						]
 					];
-					$numTotalResults += count($source['records']['subjects']) ;
+					$numTotalResults += $source['payload'] ;
 				}
 			}
 		}
 
-		$response['responseSummary']['numTotalResults'] = $numTotalResults;
-		$response['responseSummary']['exists'] = $numTotalResults > 0;
+		if($showInfo)
+		{
+			$response['responseSummary']['numTotalResults'] = $numTotalResults;
+			$response['responseSummary']['exists'] = $numTotalResults > 0;
+			$response['info']['warnings']['unsupportedFilters'] = $unsupFilters;
+			// foreach($filterTerms as $ft)
+			// {
+			// $response['info']['warnings']['unsupportedFilterValues'] = ($ft->id == 'NCIT_C16576' || $ft->id == 'NCIT_C20197' || $ft->id == 'NCIT_C124294' || $ft->id == 'NCIT_C17998') ? $unsupFilterValues: "None";
+			// }
+			if(count($unsupFilterValues)>0)
+			{
+				$response['info']['warnings']['unsupportedFilterValues'] = $unsupFilterValues;
+			}
+		}
+		else
+		{
+			$response['responseSummary']['numTotalResults'] = $numTotalResults;
+			$response['responseSummary']['exists'] = $numTotalResults > 0;
+		}
 
-        $result = json_encode($response);
+		$result = json_encode($response);
 
-        return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
+		return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
+
     }
 
 
