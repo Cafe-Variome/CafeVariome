@@ -202,10 +202,9 @@ class BeaconAPI extends ResourceController
         return $this->response->setHeader("Content-Type", "application/json")->setBody($result);
     }
 
-    public function individuals()
+    public function individuals(int $network_key)
     {
 		$token = $this->request->header('auth-token')?->getValue();
-		$network_key = $this->request->header('network-key')?->getValue();
 		$providerURL = $this->request->header('authentication-url')?->getValue();
 
 		if (
