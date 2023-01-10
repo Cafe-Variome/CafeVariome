@@ -1,6 +1,7 @@
 <?php namespace App\Libraries\CafeVariome\Core\DataPipeLine\Index;
 
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
+use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 
@@ -91,7 +92,7 @@ class UserInterfaceNetworkIndex extends AbstractNetworkIndex
 	public function IndexNetworkInstallations()
 	{
 		$basePath = FCPATH . USER_INTERFACE_INDEX_DIR;
-
+		$discoveryGroupAdapter = (new DiscoveryGroupAdapterFactory())->GetInstance();
 		$fileMan = new SysFileMan($basePath);
 		$networkInterface = new NetworkInterface();
 		$response = $networkInterface->GetInstallationsByNetworkKey($this->networkKey);
@@ -108,12 +109,45 @@ class UserInterfaceNetworkIndex extends AbstractNetworkIndex
 			'values_display_names' => [],
 		];
 
-		if(!$fileMan->Exists($this->networkKey . '.json'))
+		$networkIndexed = $fileMan->Exists($this->networkKey . '.json');
+		if(!$networkIndexed)
 		{
 			$this->IndexNetwork();
 		}
 
 		$localNetworkData = json_decode($fileMan->Read($this->networkKey . '.json'), true);
+
+
+		if ($networkIndexed)
+		{
+			$discoveryGroups = $discoveryGroupAdapter->ReadByNetworkId($this->networkKey);
+			$discoveryGroupIds = [];
+			foreach ($discoveryGroups as $discoveryGroup)
+			{
+				$discoveryGroupIds[] = $discoveryGroup->getID();
+			}
+
+			$sourceIds = $discoveryGroupAdapter->ReadAssociatedSourceIds($discoveryGroupIds);
+			$indexedSourceIds = $localNetworkData['source_ids'];
+			if (count($sourceIds) > 0 && is_array($indexedSourceIds))
+			{
+				$sourceIdsUpdated = false;
+				for ($i = 0; $i < count($sourceIds); $i++)
+				{
+					if (!in_array($sourceIds[$i], $indexedSourceIds))
+					{
+						// Need to update network index as some sources within the discovery group have been modified or removed
+						$sourceIdsUpdated = true;
+						break;
+					}
+				}
+
+				if ($sourceIdsUpdated)
+				{
+					$this->IndexNetwork();
+				}
+			}
+		}
 
 		$UIData['attributes_values'] = $localNetworkData['attributes_values'];
 		$UIData['attributes_display_names'] = $localNetworkData['attributes_display_names'];
