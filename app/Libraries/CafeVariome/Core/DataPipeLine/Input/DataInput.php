@@ -19,6 +19,7 @@ use App\Libraries\CafeVariome\Factory\OntologyPrefixAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SubjectFactory;
 use App\Libraries\CafeVariome\Factory\ValueFactory;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
+use DateTime;
 
 abstract class DataInput extends DataPipeLine
 {
@@ -32,6 +33,7 @@ abstract class DataInput extends DataPipeLine
 	protected array $attributes;
 	protected array $subjects;
 	protected array $groups;
+	protected array $dateFormats;
 	private OntologyPrefixAdapter $ontologyPrefixAdapter;
 	protected int $totalRecords;
 	protected int $processedRecords;
@@ -178,6 +180,12 @@ abstract class DataInput extends DataPipeLine
 		{
 			unset($malicious_chars[3]); // Remove / (slash) from $malicious_chars not to damage the URL
 		}
+
+		if (str_contains($dirty_string, '/') && $this->IsDate($dirty_string, $this->dateFormats))
+		{
+			unset($malicious_chars[3]); // Remove / (slash) from $malicious_chars not to damage the Date structure
+		}
+
 		return htmlentities(str_replace($malicious_chars, $soap, $dirty_string));
 	}
 
@@ -392,6 +400,10 @@ abstract class DataInput extends DataPipeLine
 					{
 						$assumed_type = ATTRIBUTE_TYPE_ONTOLOGY_TERM;
 					}
+					else if($this->IsDate($value, $this->dateFormats))
+					{
+						$assumed_type = ATTRIBUTE_TYPE_DATETIME;
+					}
 					else
 					{
 						$assumed_type = ATTRIBUTE_TYPE_STRING;
@@ -467,5 +479,25 @@ abstract class DataInput extends DataPipeLine
 			}
 		}
 		return $final_delimiter;
+	}
+
+	protected function IsDate(string $input, array $formats): bool
+	{
+		for ($i = 0; $i < count($formats); $i++)
+		{
+			$d = DateTime::createFromFormat($formats[$i], $input);
+			if ($d && $d->format($formats[$i]) === $input)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private function getDateFormats(): array
+	{
+		return [
+			'Y-m-d', 'd-m-Y', 'Y-m', 'm-Y', 'Y/m/d', 'd/m/Y', 'm/Y', 'Y/m', 'm-d-Y', 'Y-d-m', 'Y-m-d H:i:s', 'Y/m/d H:i:s'
+		];
 	}
 }
