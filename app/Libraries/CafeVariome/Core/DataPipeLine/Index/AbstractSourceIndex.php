@@ -21,6 +21,7 @@ use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SubjectAdapterFactory;
 use App\Libraries\CafeVariome\Factory\ValueAdapterFactory;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
+use DateTime;
 
 abstract class AbstractSourceIndex
 {
@@ -181,6 +182,26 @@ abstract class AbstractSourceIndex
 				}
 			}
 		}
+	}
+
+	protected function ParseDate(string $input, array $formats, string $reformat): string | false
+	{
+		for ($i = 0; $i < count($formats); $i++)
+		{
+			$d = DateTime::createFromFormat($formats[$i], $input);
+			if ($d && $d->format($formats[$i]) === $input)
+			{
+				return $d->format($reformat);
+			}
+		}
+		return false;
+	}
+
+	protected function getDateFormats(): array
+	{
+		return [
+			'Y-m-d', 'd-m-Y', 'Y-m', 'm-Y', 'Y/m/d', 'd/m/Y', 'm/Y', 'Y/m', 'm-d-Y', 'Y-d-m', 'Y-m-d H:i:s', 'Y/m/d H:i:s'
+		];
 	}
 
 }
