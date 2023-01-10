@@ -141,6 +141,7 @@ class ElasticsearchSourceIndex extends AbstractSourceIndex
 		$offset = 0;
 		$currId = 0;
 		$batchSize = EAV_BATCH_SIZE;
+		$dateFormats = $this->getDateFormats();
 
 		while ($offset < $this->totalEAVsCount)
 		{
@@ -159,8 +160,15 @@ class ElasticsearchSourceIndex extends AbstractSourceIndex
 				$subject_id = $eavdata[$i]->subject_id;
 				$group_id = $eavdata[$i]->group_id;
 				$subject_name = $this->getSubjectById($subject_id);
-				$attribute_name = $this->getAttributeNameById($attribute_id);
+				$attribute = $this->getAttributeById($attribute_id);
+				$attribute_name = $attribute['name'];
+				$attribute_type = $attribute['type'];
 				$value_name = $this->getValueNameByIdAndAttributeId($value_id, $attribute_id);
+
+				if($attribute_type == ATTRIBUTE_TYPE_DATETIME)
+				{
+					$value_name = $this->ParseDate($value_name, $dateFormats, 'Y-m-d');
+				}
 
 				$bulk['routing'] = $subject_id . '_' . $group_id;
 				$bulk['body'][] = [
@@ -225,7 +233,7 @@ class ElasticsearchSourceIndex extends AbstractSourceIndex
                                 {
 									"raw":{"type": "keyword"},
 									"d":{"type": "double", "ignore_malformed": "true"},
-									"dt":{"type": "date", "ignore_malformed": "true", "format": "dateOptionalTime"}
+									"dt":{"type": "date", "ignore_malformed": "true", "format": "date"}
 								}
                         }
                     }
