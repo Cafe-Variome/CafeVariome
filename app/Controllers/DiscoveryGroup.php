@@ -371,7 +371,7 @@ class DiscoveryGroup extends CVUI_Controller
 				$userList[$user->getID()] = $user->first_name . ' ' . $user->last_name . ' (' . $user->email . ')';
 			}
 
-			$selectedUsers = $this->dbAdapter->ReadAssociatedSourceIds([$id]);
+			$selectedUsers = $this->dbAdapter->ReadAssociatedUserIds([$id]);
 
 			$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
 			$sources = $sourceAdapter->SetModel(SourceDropDown::class)->ReadAll();
