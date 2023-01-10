@@ -42,6 +42,7 @@ abstract class DataInput extends DataPipeLine
 	public function __construct(Task $task, int $source_id)
     {
 		parent::__construct($source_id);
+		$this->dateFormats = $this->getDateFormats();
 		$this->pipelineId = $task->pipeline_id;
 		$this->overwrite = $task->overwrite;
 		$this->taskId = $task->getID();
@@ -178,7 +179,7 @@ abstract class DataInput extends DataPipeLine
 			str_starts_with($dirty_string, 'ntp://')
 		)
 		{
-			unset($malicious_chars[3]); // Remove / (slash) from $malicious_chars not to damage the URL
+			unset($malicious_chars[3]); // Remove / (slash) from $malicious_chars not to damage the URL structure
 		}
 
 		if (str_contains($dirty_string, '/') && $this->IsDate($dirty_string, $this->dateFormats))
@@ -454,7 +455,6 @@ abstract class DataInput extends DataPipeLine
 				return true;
 			}
 		}
-
 		return false;
 	}
 
