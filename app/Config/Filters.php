@@ -17,10 +17,8 @@ class Filters extends BaseConfig
     /**
      * Configures aliases for Filter classes to
      * make reading things nicer and simpler.
-     *
-     * @var array
      */
-    public $aliases = [
+    public array $aliases = [
         'csrf'          => CSRF::class,
         'toolbar'       => DebugToolbar::class,
         'honeypot'      => Honeypot::class,
@@ -34,10 +32,8 @@ class Filters extends BaseConfig
     /**
      * List of filter aliases that are always
      * applied before and after every request.
-     *
-     * @var array
      */
-	public $globals = [
+	public array $globals = [
 		'before' => [
 			// 'honeypot',
 			'csrf' => [
@@ -64,10 +60,8 @@ class Filters extends BaseConfig
      * If you use this, you should disable auto-routing because auto-routing
      * permits any HTTP method to access a controller. Accessing the controller
      * with a method you don’t expect could bypass the filter.
-     *
-     * @var array
      */
-    public $methods = [];
+    public array $methods = [];
 
     /**
      * List of filter aliases that should run on any
@@ -75,10 +69,8 @@ class Filters extends BaseConfig
      *
      * Example:
      * 'isLoggedIn' => ['before' => ['account/*', 'profiles/*']]
-     *
-     * @var array
      */
-	public $filters = [
+	public array $filters = [
 		'ajax' => [
 			'before' => ['AjaxApi/*'],
 			'after' => ['AjaxApi/*']
