@@ -26,6 +26,8 @@ class AttributeHelper
 				return 'Natural Number';
 			case ATTRIBUTE_TYPE_ONTOLOGY_TERM:
 				return 'Ontology Term';
+			case ATTRIBUTE_TYPE_DATETIME:
+				return 'Date Time';
 		}
 		return 'Undefined';
 	}
