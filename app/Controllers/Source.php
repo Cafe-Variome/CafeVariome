@@ -473,13 +473,36 @@ class Source extends CVUI_Controller
                     $error_flag = true;
                 }
 
+				//delete user interface index files
+				try
+				{
+					$uiIndexPath = FCPATH . USER_INTERFACE_INDEX_DIR;
+					$fileMan = new SysFileMan($uiIndexPath);
+					$uiIndexFileName = $id . '_' . $source->uid . '.json';
+					if ($fileMan->Exists($uiIndexFileName))
+					{
+						$fileMan->Delete($uiIndexFileName);
+					}
+				}
+				catch (\Exception $ex)
+				{
+					$this->setStatusMessage("There was an error in deleting user interface index.", STATUS_ERROR, true);
+					$error_flag = true;
+				}
+
                 //delete files on system
                 try
 				{
                     $dirPath = FCPATH . UPLOAD . UPLOAD_DATA . $id;
-                    if (file_exists($dirPath))
+					$fileMan = new SysFileMan($dirPath);
+                    if ($fileMan->Exists($dirPath))
 					{
-                        delete_files($dirPath, true);
+						$files = $fileMan->getFiles();
+						foreach ($files as $file)
+						{
+							$fileMan->Delete($file->getName());
+						}
+                        $fileMan->DeleteDirectory();
                     }
                 }
 				catch (\Exception $ex)
