@@ -52,5 +52,5 @@
     "support": {
         "source": "https://github.com/Cafe-Variome/CafeVariome"
     },
-    "minimum-stability": "dev"
+    "minimum-stability": "stable"
 }
