@@ -188,7 +188,7 @@ class Network extends CVUI_Controller
 			],
             'justification' => [
                 'label'  => 'Justification',
-                'rules'  => 'required|text_validator|max_length[65535]',
+                'rules'  => 'required|text_validator[Justification]|max_length[65535]',
                 'errors' => [
                     'required' => '{field} is required.',
                     'max_length' => 'Maximum length for {field} is 65,535 characters.'
