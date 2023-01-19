@@ -193,14 +193,6 @@ class Network extends CVUI_Controller
                     'required' => '{field} is required.',
                     'max_length' => 'Maximum length for {field} is 65,535 characters.'
                 ]
-            ],
-            'networks' => [
-                'label'  => 'networks',
-                'rules'  => 'required|integer',
-                'errors' => [
-                    'required' => '{field} is required.',
-                    'integer' => 'The only valid input for {field} is integers.'
-                ]
             ]
         ]
         );
