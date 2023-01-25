@@ -78,7 +78,7 @@ class PhenoPacketDataInput extends DataInput
 				}
 				else if($this->configuration['subject_id_location'] == SUBJECT_ID_IN_FILE_NAME)
 				{
-					preg_match("/(.*)\./", $this->fileName, $matches);
+					preg_match("/(.*)\./", $dataFile->name, $matches);
 					$this->subject_id_string = $matches[1];
 				}
 				return true;
