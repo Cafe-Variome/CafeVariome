@@ -44,7 +44,7 @@
 				<i class="fa fa-plus"></i> Create Ontology Relationship
 			</button>
 			<a href="<?= base_url($controllerName) . '/List/' . $ontology->getID();?>" class="btn btn-secondary bg-gradient-secondary" >
-				<i class="fa fa-project-diagram"></i> View Ontology Prefixes of <?= $ontology->name ?>
+				<i class="fa fa-project-diagram"></i> View Ontology Relationships of <?= $ontology->name ?>
 			</a>
 		</div>
 	</div>
