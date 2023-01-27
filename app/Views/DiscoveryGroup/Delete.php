@@ -33,7 +33,7 @@
 
 <div class="form-group row">
     <div class="col">
-        <button type="submit" name="submit" class="btn btn-danger bg-gradient-danger"><i class="fa fa-trash"></i>  Delete Network Group</button>
+        <button type="submit" name="submit" class="btn btn-danger bg-gradient-danger"><i class="fa fa-trash"></i>  Delete Discovery Group</button>
 		<a href="<?= base_url($controllerName);?>" class="btn btn-secondary bg-gradient-secondary">
 			Cancel
 		</a>
