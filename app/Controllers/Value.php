@@ -188,7 +188,7 @@ class Value extends CVUI_Controller
 		}
 
 		$uidata = new UIData();
-		$uidata->title = 'Attribute Details';
+		$uidata->title = 'Value Details';
 		$uidata->data['value'] = $value;
 
 		$data = $this->wrapData($uidata);
