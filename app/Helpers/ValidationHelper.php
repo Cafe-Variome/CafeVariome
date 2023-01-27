@@ -324,9 +324,9 @@ class ValidationHelper
 
 	public function unique_value_mapping(string $str, string $fields, array $data, & $err): bool
 	{
-		$valueMappingAdapter = (new ValueMappingAdapterFactory())->GetInstance();
+		$valueAdapter = (new ValueAdapterFactory())->GetInstance();
 		$attribute_id = $data[$fields];
-		$valueMapping = $valueMappingAdapter->ReadByMappingNameAndAttributeId($str, $attribute_id);
+		$valueMapping = $valueAdapter->ReadByMappingNameAndAttributeId($str, $attribute_id);
 		return $valueMapping->isNull();
 	}
 
