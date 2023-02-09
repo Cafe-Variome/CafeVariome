@@ -73,7 +73,7 @@ class NetworkRequest extends CVUI_Controller
         return redirect()->to(base_url($this->controllerName.'/List'));
     }
 
-    public function denyrequest(int $id)
+    public function Reject(int $id)
     {
 		$networkRequest = $this->dbAdapter->Read($id);
 
