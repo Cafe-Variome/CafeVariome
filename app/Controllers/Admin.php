@@ -9,12 +9,12 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Factory\NetworkRequestAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Factory\UserAdapterFactory;
 use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use App\Models\UIData;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
-use App\Models\NetworkRequest;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Config\Services;
@@ -54,7 +54,7 @@ class Admin extends CVUI_Controller
         $uidata->javascript = [JS.'dashboard/chartjs/Chart.min.js', JS . 'cafevariome/admin.js'];
 
         $networkInterface = new NetworkInterface();
-        $networkRequestModel = new NetworkRequest();
+		$networkRequestAdapter = (new NetworkRequestAdapterFactory())->GetInstance();
 
         $neo4j = new Neo4J();
         $service = new ServiceInterface();
@@ -102,7 +102,7 @@ class Admin extends CVUI_Controller
         }
 
         $uidata->data['usersCount'] = count((new UserAdapterFactory())->GetInstance()->ReadAll());
-        $uidata->data['networkRequestCount'] = count($networkRequestModel->getNetworkRequests('id', ['status' => -1]));
+        $uidata->data['networkRequestCount'] = $networkRequestAdapter->CountAllPending();
 
         $elasticStatus = ElasticsearchHelper::ping();
         $uidata->data['elasticStatus'] = $elasticStatus;
