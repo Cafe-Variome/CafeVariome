@@ -16,7 +16,7 @@ class CafeVariome
 	/**
 	 * @var string $version of Cafe Variome Software
 	 */
-	private static string $version = '2.3.1';
+	private static string $version = '2.3.2';
 
 	/**
 	 * Boot - Initialises constants from .env file
