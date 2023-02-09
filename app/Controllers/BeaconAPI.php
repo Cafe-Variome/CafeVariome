@@ -307,18 +307,27 @@ class BeaconAPI extends ResourceController
 				{
 					foreach ($sourceArray as $source_name => $source)
 					{
+						$currentCount = 0;
+						if ($source['type'] == 'count')
+						{
+							$currentCount = $source['payload'];
+						}
+						else if ($source['type'] == 'list')
+						{
+							$currentCount = $source['count'];
+						}
 						$response['resultSets'][] = [
 							'id' => $source_name,
 							'type' => 'dataset',
-							'exists' => count($source['records']['subjects']) > 0,
-							'resultCount' => count($source['records']['subjects']),
+							'exists' => $currentCount > 0,
+							'resultCount' => $currentCount,
 							'Info' => [
 								'contactPoint' => $source['source']['owner_name'],
 								'contactEmail' => $source['source']['owner_email'],
 								'contactURL' => $source['source']['uri']
 							]
 						];
-						$numTotalResults += count($source['records']['subjects']) ;
+						$numTotalResults += $currentCount;
 					}
 				}
 			}
@@ -592,18 +601,27 @@ class BeaconAPI extends ResourceController
 			{
 				foreach ($sourceArray as $source_name => $source)
 				{
+					$currentCount = 0;
+					if ($source['type'] == 'count')
+					{
+						$currentCount = $source['payload'];
+					}
+					else if ($source['type'] == 'list')
+					{
+						$currentCount = $source['count'];
+					}
 					$response['resultSets'][] = [
 						'id' => $source_name,
 						'type' => 'dataset',
-						'exists' => ($source['payload']) > 0,
-						'resultCount' => ($source['payload']),
+						'exists' => $currentCount > 0,
+						'resultCount' => $currentCount,
 						'Info' => [
 							'contactPoint' => $source['source']['owner_name'],
 							'contactEmail' => $source['source']['owner_email'],
 							'contactURL' => $source['source']['uri']
 						]
 					];
-					$numTotalResults += $source['payload'] ;
+					$numTotalResults += $currentCount;
 				}
 			}
 		}
@@ -613,10 +631,7 @@ class BeaconAPI extends ResourceController
 			$response['responseSummary']['numTotalResults'] = $numTotalResults;
 			$response['responseSummary']['exists'] = $numTotalResults > 0;
 			$response['info']['warnings']['unsupportedFilters'] = $unsupFilters;
-			// foreach($filterTerms as $ft)
-			// {
-			// $response['info']['warnings']['unsupportedFilterValues'] = ($ft->id == 'NCIT_C16576' || $ft->id == 'NCIT_C20197' || $ft->id == 'NCIT_C124294' || $ft->id == 'NCIT_C17998') ? $unsupFilterValues: "None";
-			// }
+
 			if(count($unsupFilterValues)>0)
 			{
 				$response['info']['warnings']['unsupportedFilterValues'] = $unsupFilterValues;
