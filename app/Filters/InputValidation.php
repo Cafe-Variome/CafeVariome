@@ -12,7 +12,7 @@ class InputValidation implements \CodeIgniter\Filters\FilterInterface
 			$post = $request->getVar();
 			foreach ($post as $field => &$value)
 			{
-				if (!is_array($value))
+				if (is_string($value))
 				{
 					$value = htmlspecialchars_decode($value, ENT_QUOTES | ENT_SUBSTITUTE);
 					$value = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
