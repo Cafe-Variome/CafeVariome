@@ -36,7 +36,7 @@ class QueryGenerator
 							$filters[] = $this->newAlphaNumericFilter($clause['attribute'], $clause['operator'], $clause['value']);
 							break;
 						case 'sim':
-							$filters[] = $this->newOntologyFilter($clause['ids'][0]);
+							$filters[] = $this->newOntologyFilter(str_replace(':', '_', $clause['ids'][0]));
 							break;
 						case 'ordo':
 							$filters[] = $this->newOntologyFilter($clause['id'][0]);
