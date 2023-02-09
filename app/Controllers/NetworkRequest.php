@@ -46,7 +46,7 @@ class NetworkRequest extends CVUI_Controller
         return view($this->viewDirectory . '/List', $data);
     }
 
-    public function acceptrequest(int $id)
+    public function Accept(int $id)
     {
 		$networkRequest = $this->dbAdapter->Read($id);
 
