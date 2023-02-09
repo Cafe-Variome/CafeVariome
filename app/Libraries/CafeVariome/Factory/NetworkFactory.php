@@ -32,7 +32,7 @@ class NetworkFactory extends EntityFactory
 			$properties[$var] = $value;
 		}
 
-		return new Group($properties);
+		return new Network($properties);
 	}
 
 	public function GetInstanceFromParameters(int $key, string $name): IEntity
