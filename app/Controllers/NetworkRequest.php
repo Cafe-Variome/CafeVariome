@@ -2,34 +2,33 @@
 
 /**
  * NetworkRequest.php
- * 
+ *
  * Created: 20/12/2019
- * 
+ *
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Factory\NetworkRequestAdapterFactory;
 use App\Models\UIData;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 
 
-class NetworkRequest extends CVUI_Controller 
+class NetworkRequest extends CVUI_Controller
 {
-
-    private $networkRequestModel;
-
     /**
 	 * Constructor
 	 *
 	 */
-    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger){
+    public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+	{
         parent::setProtected(true);
         parent::setIsAdmin(true);
         parent::initController($request, $response, $logger);
+		$this->dbAdapter = (new NetworkRequestAdapterFactory())->GetInstance();
+	}
 
-        $this->networkRequestModel = new \App\Models\NetworkRequest();
-    }
-
-    public function Index(){
+    public function Index()
+	{
         return redirect()->to(base_url($this->controllerName . '/List'));
     }
 
@@ -38,8 +37,7 @@ class NetworkRequest extends CVUI_Controller
         $uidata = new UIData();
         $uidata->data['title'] = "Network Requests";
 
-        $networkRequests = $this->networkRequestModel->getNetworkRequests();
-        $uidata->data['networkRequests'] = $networkRequests;
+        $uidata->data['networkRequests'] = $this->dbAdapter->ReadAll();
 
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
         $uidata->javascript = array(VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js', JS.'cafevariome/components/datatable.js',JS. 'cafevariome/networkrequest.js');
@@ -50,43 +48,54 @@ class NetworkRequest extends CVUI_Controller
 
     public function acceptrequest(int $id)
     {
-        $networkRequest = $this->networkRequestModel->getNetworkRequests(null, ['id' => $id]);
+		$networkRequest = $this->dbAdapter->Read($id);
 
-        if (count($networkRequest) == 1) {
-            $networkInterface = new NetworkInterface();
+		if ($networkRequest->isNull())
+		{
+			$this->setStatusMessage("Network request was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
 
-            $response = $networkInterface->AcceptRequest($networkRequest[0]['token']);
+		$networkInterface = new NetworkInterface();
 
-            if ($response->status) {
-                $data = ['status' =>  1]; // Status 1 indicates an accepted request.
-                $this->networkRequestModel->updateNetworkRequests($data ,['id' => $id]);// Update status in local database.
-            }
-            else {
-                
-            }
-        }
+		$response = $networkInterface->AcceptRequest($networkRequest->token);
+
+		if ($response->status)
+		{
+			$networkRequest->status = NETWORKREQUEST_ACCEPTED;
+			$this->dbAdapter->Update($id, $networkRequest);
+		}
+		else
+		{
+			$this->setStatusMessage("There was a problem in accepting network request.", STATUS_ERROR);
+		}
 
         return redirect()->to(base_url($this->controllerName.'/List'));
-
     }
 
     public function denyrequest(int $id)
     {
-        $networkRequest = $this->networkRequestModel->getNetworkRequests(null, ['id' => $id]);
+		$networkRequest = $this->dbAdapter->Read($id);
 
-        if (count($networkRequest) == 1) {
-            $networkInterface = new NetworkInterface();
+		if ($networkRequest->isNull())
+		{
+			$this->setStatusMessage("Network request was not found.", STATUS_ERROR);
+			return redirect()->to(base_url($this->controllerName . '/List'));
+		}
 
-            $response = $networkInterface->DenyRequest($networkRequest[0]['token']);
+		$networkInterface = new NetworkInterface();
 
-            if ($response->status) {
-                $data = ['status' =>  0]; // Status 0 indicates denied request.
-                $this->networkRequestModel->updateNetworkRequests($data ,['id' => $id]);// Update status in local database.
-            }
-            else {
-                
-            } 
-        }
+		$response = $networkInterface->DenyRequest($networkRequest[0]['token']);
+
+		if ($response->status)
+		{
+			$networkRequest->status = NETWORKREQUEST_REJECTED;
+			$this->dbAdapter->Update($id, $networkRequest);
+		}
+		else
+		{
+			$this->setStatusMessage("There was a problem in rejecting network request.", STATUS_ERROR);
+		}
 
         return redirect()->to(base_url($this->controllerName.'/List'));
     }

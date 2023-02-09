@@ -12,14 +12,12 @@
  * Most methods are ported from netauth.php in the previous version.
  */
 
+use App\Libraries\CafeVariome\Factory\NetworkRequestAdapterFactory;
+use App\Libraries\CafeVariome\Factory\NetworkRequestFactory;
 use CodeIgniter\RESTful\ResourceController;
-use CodeIgniter\API\ResponseTrait;
-use CodeIgniter\Controller;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
-
-use App\Models\NetworkRequest;
 use App\Libraries\CafeVariome\Core\APIResponseBundle;
 
 class NetworkApi extends ResourceController{
@@ -27,13 +25,13 @@ class NetworkApi extends ResourceController{
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
- 
+
         $this->validateRequest();
     }
 
     private function validateRequest()
     {
-        
+
     }
 
     public function requestToJoinNetwork()
@@ -46,31 +44,23 @@ class NetworkApi extends ResourceController{
         $token =  $this->request->getVar('token');
         $url =  $this->request->getVar('url');
 
-        $networkRequest = [
-            'network_key' => $network_key,
-            'installation_key' => $installation_key,
-            'email' => $email,
-            'justification' => $justification,
-            'ip' => $ip,
-            'token' => $token,
-            'url' => $url,
-            'status' => -1 // Indicates a pending request
-        ];
-
         $apiResponseBundle = new APIResponseBundle();
-        $networkRequestModel = new NetworkRequest();
+		$networkRequestAdapter = (new NetworkRequestAdapterFactory())->GetInstance();
+		$networkRequest = (new NetworkRequestFactory())->GetInstanceFromParameters(
+			$network_key, $installation_key, $url, $justification, $email, $ip, $token, NETWORKREQUEST_PENDING
+		);
 
-        try {
-            $networkRequestModel->createNetworkRequest($networkRequest);
-            $apiResponseBundle->initiateResponse(1);
-            
-        } catch (\Exception $ex) {
-            error_log($ex->getMessage());
+        try
+		{
+			$networkRequestAdapter->Create($networkRequest);
+			$apiResponseBundle->initiateResponse(1);
+        }
+		catch (\Exception $ex)
+		{
             $apiResponseBundle->initiateResponse(0);
             $apiResponseBundle->setResponseMessage($ex->getMessage());
         }
-        
+
         return $this->respond($apiResponseBundle->getResponseJSON());
     }
-
 }
