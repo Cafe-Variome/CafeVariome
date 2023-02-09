@@ -3,7 +3,7 @@
 /**
  * Name: NetworkRequest.php
  * Created: 2/12/2019
- *
+ * @deprecated
  * @author Mehdi Mehtarizadeh
  *
  *
