@@ -72,6 +72,19 @@ class Network extends CVUI_Controller
             $uidata->data['message'] = 'There was a problem retrieving networks: ' . $ex->getMessage();
         }
 
+		$localNetworks = $this->dbAdapter->ReadAll();
+		if (count($localNetworks) < count($networks))
+		{
+			// Synchronise local networks
+			for($i = 0; $i < count($networks); $i++)
+			{
+				if(!array_key_exists($networks[$i]->network_key, $localNetworks))
+				{
+					$this->dbAdapter->Create((new NetworkFactory())->GetInstanceFromParameters((int)$networks[$i]->network_key, $networks[$i]->network_name));
+				}
+			}
+		}
+
         $uidata->data['networks'] = $networks;
 
         $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
