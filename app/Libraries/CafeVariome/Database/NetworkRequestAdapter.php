@@ -23,6 +23,13 @@ class NetworkRequestAdapter extends BaseAdapter
 	 */
 	protected static string $key = 'id';
 
+	public function CountAllPending(): int
+	{
+		$this->builder->select('id');
+		$this->builder->where('status', NETWORKREQUEST_PENDING);
+		return $this->builder->countAllResults();
+	}
+
     /**
      * @inheritDoc
      */
