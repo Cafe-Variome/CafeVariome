@@ -53,7 +53,7 @@ class BeaconQueryInterface extends AbstractNetworkInterface
 	{
 		$this->networkAdapter->setOption(CURLOPT_URL, $this->serverURI . $uriTail);
 		$this->networkAdapter->setOption(CURLOPT_POST, true);
-		$this->networkAdapter->setOption(CURLOPT_POSTFIELDS, $data);
+		$this->networkAdapter->setOption(CURLOPT_POSTFIELDS, $data[0]);
 	}
 
 	protected function processResponse($response)
