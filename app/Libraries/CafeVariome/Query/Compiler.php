@@ -60,8 +60,12 @@ class Compiler
 		}
 
 		$sourcesPolicies = [];
+		$discoveryGroupsSourceIds = [];
 
-		$discoveryGroupsSourceIds = $discoveryGroupAdapter->ReadAssociatedIdsAndSourceIds(array_keys($networkDiscoveryGroups));
+		if (count($networkDiscoveryGroups) > 0)
+		{
+			$discoveryGroupsSourceIds = $discoveryGroupAdapter->ReadAssociatedIdsAndSourceIds(array_keys($networkDiscoveryGroups));
+		}
 
 		foreach ($discoveryGroupsSourceIds as $discoveryGroupSourceId)
 		{
