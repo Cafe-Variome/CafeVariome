@@ -290,7 +290,7 @@ class BeaconAPI extends ResourceController
 					{
 						// Send the query
 						$queryNetInterface = new QueryNetworkInterface($installation->base_url);
-						$queryResponse = $queryNetInterface->query($query_json, (int) $network_key, $token);
+						$queryResponse = $queryNetInterface->query($query_json, $network_key, $providerURL, $token);
 						if ($queryResponse->status)
 						{
 							array_push($results, json_encode($queryResponse->data));
