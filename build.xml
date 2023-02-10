@@ -51,7 +51,15 @@
         </composer>
     </target>
 
-    <target name="main" depends="fetchdependencies" description="archive the build to a zip file">
+    <!-- ============================================  -->
+    <!-- Target: Run tests using PHPUNIT               -->
+    <!-- ============================================  -->
+    <target name="runtests" depends="fetchdependencies" description="run tests">
+        <phpunit configuration="phpunit.xml" pharlocation="./vendor/bin/phpunit" printsummary="true">
+        </phpunit>
+    </target>
+
+    <target name="main" depends="runtests" description="archive the build to a zip file">
         <zip destfile="cafevariome.zip">
             <fileset dir="${builddir}">
                 <include name="**/**" />
