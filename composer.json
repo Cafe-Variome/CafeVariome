@@ -28,13 +28,12 @@
         "tinymce/tinymce": "^5.2.0",
         "laudis/neo4j-php-client": "^2.8",
         "psr18-adapter/guzzle": "^0.1",
-        "guzzlehttp/psr7":  "^2.4",
-        "phpunit/phpunit": "^9.x"
+        "guzzlehttp/psr7":  "^2.4"
     },
     "require-dev": {
 		"fakerphp/faker": "^1.9",
 		"mikey179/vfsstream": "^1.6",
-		"phpunit/phpunit": "^9.1"
+		"phpunit/phpunit": "9.x"
     },
     "autoload": {
         "psr-4": {
