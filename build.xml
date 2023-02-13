@@ -40,7 +40,7 @@
     <!-- Target: Get Dependencies                      -->
     <!-- ============================================  -->
     <target name="fetchdependencies" depends="copyfiles" description="get dependencies using composer">
-        <composer command="install" composer="/usr/bin/composer">
+        <composer command="install" composer="/opt/php8/bin/composer">
             <arg value="-d"/>
             <arg path="${builddir}" />
         </composer>
