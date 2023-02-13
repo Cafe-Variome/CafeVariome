@@ -71,31 +71,31 @@ class FileManTest extends TestCase
 		$files = [
 			[
 				$fileNamePrefix . uniqid(),
-				random_bytes($length = random_int(0, 1024)),
+				random_bytes($length = random_int(1, 1024)),
 				$length,
 				''
 			],
 			[
 				$fileNamePrefix . uniqid() . '.',
-				random_bytes($length = random_int(0, 1024)),
+				random_bytes($length = random_int(1, 1024)),
 				$length,
 				''
 			],
 			[
 				'.' . ($extension = $fileNamePrefix . uniqid()),
-				random_bytes($length = random_int(0, 1024)),
+				random_bytes($length = random_int(1, 1024)),
 				$length,
 				$extension
 			],
 			[
 				$fileNamePrefix . uniqid() . '.' . ($extension = $fileFormatPrefix . uniqid()),
-				random_bytes($length = random_int(0, 1024)),
+				random_bytes($length = random_int(1, 1024)),
 				$length,
 				$extension
 			],
 			[
 				$fileNamePrefix . uniqid() . '.' . uniqid() . '.' . ($extension = $fileFormatPrefix . uniqid()),
-				random_bytes($length = random_int(0, 1024)),
+				random_bytes($length = random_int(1, 1024)),
 				$length,
 				$extension
 			]
@@ -274,7 +274,7 @@ class FileManTest extends TestCase
 		$fileName = uniqid();
 		$fileMan = new FileMan($this->testPath);
 		$time = time();
-		$fileMan->Write($fileName,  random_bytes(random_int(0, 1024)));
+		$fileMan->Write($fileName,  random_bytes(random_int(1, 1024)));
 		$this->assertEquals($fileMan->GetModificationTimeStamp($fileName), $time);
 		$fileMan->Delete($fileName);
 		return $files;
