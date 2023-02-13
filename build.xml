@@ -2,11 +2,10 @@
 
 <project name="cafevariome" basedir="." default="main">
     <property file="./build.properties" />
-
-    <property name="package"  value="${phing.project.name}" override="true" />
+    <property name="package" value="${phing.project.name}" override="true" />
     <property name="builddir" value="./build/cafevariome" override="true" />
     <property name="dependencydir" value="${builddir}/vendor" override="true" />
-    <property name="srcdir"   value="${project.basedir}" override="true" />
+    <property name="srcdir" value="${project.basedir}" override="true" />
 
     <!-- Fileset for all files -->
     <fileset dir="." id="allfiles">
@@ -14,10 +13,6 @@
         <include name="Install/**" />
         <include name="resources/**" />
         <include name="tests/**" />
-        <include name="upload/pairings/index.html" />
-        <include name="upload/settings/index.html" />
-        <include name="upload/UploadData/index.html" />
-        <include name="upload/.htaccess" />
         <include name="writable/cache/index.html" />
         <include name="writable/debugbar/" />
         <include name="writable/logs/" />
@@ -45,7 +40,7 @@
     <!-- Target: Get Dependencies                      -->
     <!-- ============================================  -->
     <target name="fetchdependencies" depends="copyfiles" description="get dependencies using composer">
-        <composer command="install" composer="/opt/php8/bin/composer">
+        <composer command="install" composer="/usr/bin/composer">
             <arg value="-d"/>
             <arg path="${builddir}" />
         </composer>
@@ -55,7 +50,7 @@
     <!-- Target: Run tests using PHPUNIT               -->
     <!-- ============================================  -->
     <target name="runtests" depends="fetchdependencies" description="run tests">
-        <phpunit configuration="phpunit.xml" pharlocation="./vendor/bin/phpunit" printsummary="true">
+        <phpunit configuration="phpunit.xml" pharlocation="${builddir}/vendor/bin/phpunit" printsummary="true">
         </phpunit>
     </target>
 
