@@ -17,6 +17,7 @@ a.nav-link-top{
   padding: 10px;
   background-color: #e7e7ea;
   border-radius: 5px;
+  text-decoration: none;
 }
 
 a:hover.nav-link-top{ 
