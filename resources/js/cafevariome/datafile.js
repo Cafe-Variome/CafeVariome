@@ -150,7 +150,7 @@ $('#taskModal').on('show.bs.modal', function (event) {
         // possibly multiple files
         if (selectedFileNames.length > 0) {
             for (i = 0; i < selectedFileNames.length; i++) {
-                fileNames += "<span class='badge badge-light'>" + selectedFileNames[i] + "</span>";
+                fileNames += "<span class='badge bg-secondary'>" + selectedFileNames[i] + "</span>";
             }
         }
         else{
@@ -166,7 +166,7 @@ $('#taskModal').on('show.bs.modal', function (event) {
         var fileId = button.data('fileid');
         var fileName = button.data('filename');
         modal.find('#fileId').val(fileId);
-        modal.find('#fileName').html("<span class='badge badge-light'>" + fileName + "</span>");
+        modal.find('#fileName').html("<span class='badge bg-secondary'>" + fileName + "</span>");
     }
 
 });
