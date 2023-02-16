@@ -1,11 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-    <div class="col">
-        <h2><?= $title ?></h2>
-    </div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if ($statusMessage) : ?>
     <div class="row">
@@ -43,7 +40,7 @@
 				<a class="btn btn-info bg-gradient-info font-weight-bold" href="<?= base_url('Attribute/List/' . $source->getID()) ?>">
 					<i class="fa fa-database"></i> Data Attributes and Values
 				</a>
-				<button class="btn btn-success bg-gradient-success font-weight-bold" data-toggle="modal" data-target="#indicesModal" data-id="<?= $source->getID() ?>">
+				<button class="btn btn-success bg-gradient-success font-weight-bold" data-bs-toggle="modal" data-bs-target="#indicesModal" data-id="<?= $source->getID() ?>">
 					<i class="fa fa-search"></i> Indices
 				</button>
 				<a class="btn btn-warning bg-gradient-warning font-weight-bold" href="<?= base_url($controllerName . '/Update/' . $source->getID()) ?>">
@@ -72,9 +69,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title" id="indicesModalTitle">View Indices</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
 				<div class="row">
@@ -96,8 +91,8 @@
 				</div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
         </div>
     </div>
 </div>

@@ -1,15 +1,12 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-    <div class="col">
-        <h2><?= $title ?></h2>
-    </div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
-<div class="row">
-    <div class="col">
-        <table class="table table-bordered table-striped table-hover" id="userdetailstable" style="width:40%;">
+<div class="row justify-content-center">
+    <div class="col-auto">
+        <table class="table table-bordered table-striped table-hover">
             <tr>
                 <th>ID</th>
                 <td><?php echo $user->getID(); ?></td>
@@ -26,10 +23,6 @@
 				<th>Company</th>
 				<td><?php echo $user->company; ?></td>
             </tr>
-<!--			<tr>-->
-<!--				<th>Phone</th>-->
-<!--				<td>--><?php //echo $user->phone; ?><!--</td>-->
-<!--            </tr>-->
 			<tr>
             <th>Remote</th>
 				<td><?= $user->remote ? 'Remote User' : 'Local User' ?></td>

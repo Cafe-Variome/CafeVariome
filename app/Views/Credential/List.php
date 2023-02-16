@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if ($statusMessage): ?>
 	<div class="row">
@@ -34,15 +32,15 @@
 		<?php endif; ?>
 		</td>
 		<td>
-			<a href="<?= base_url($controllerName . '/Update/' . $credential->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Edit Credential">
-				<i class="fa fa-edit text-warning"></i>
+			<a class="btn btn-sm btn-warning bg-gradient-warning" href="<?= base_url($controllerName . '/Update/' . $credential->getID()) ?>">
+				<i class="fa fa-edit"></i> Edit Credential
 			</a>
-			<a href="<?php echo base_url($controllerName. '/Details'). "/" . $credential->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Credential">
-				<i class="fa fa-eye text-info"></i>
+			<a class="btn btn-sm btn-info bg-gradient-info" href="<?php echo base_url($controllerName. '/Details'). "/" . $credential->getID(); ?>">
+				<i class="fa fa-eye"></i> View Credential
 			</a>
-			<?php if ($credential->removable): ?>
-				<a href="<?= base_url($controllerName . '/Delete/' . $credential->getID()) ?>" data-toggle="tooltip" data-placement="top" title="Delete Credential">
-					<i class="fa fa-trash text-danger"></i>
+			<?php if($credential->removable): ?>
+				<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?= base_url($controllerName . '/Delete/' . $credential->getID()) ?>">
+					<i class="fa fa-trash"></i> Delete Credential
 				</a>
 			<?php endif; ?>
 		</td>

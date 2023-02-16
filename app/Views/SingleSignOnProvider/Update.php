@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if ($statusMessage): ?>
 	<div class="row">
@@ -44,56 +42,55 @@
 
 <?php echo form_open_multipart($controllerName.'/Update/' . $id); ?>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Name', 'name'); ?>
+		<?php echo form_label('Name', 'name', ['class' => 'form-label']); ?>
 		<?php echo form_input($name); ?>
 	</div>
 	<div class="col-6">
-		<?php echo form_label('Display Name', 'display_name'); ?>
+		<?php echo form_label('Display Name', 'display_name', ['class' => 'form-label']); ?>
 		<?php echo form_input($display_name); ?>
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Server', 'server_id'); ?>
+		<?php echo form_label('Server', 'server_id', ['class' => 'form-label']); ?>
 		<?php echo form_dropdown($server_id); ?>
 	</div>
 	<div class="col-6">
-		<?php echo form_label('Port', 'port'); ?>
+		<?php echo form_label('Port', 'port', ['class' => 'form-label']); ?>
 		<?php echo form_input($port); ?>
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Credential', 'credential_id'); ?>
+		<?php echo form_label('Credential', 'credential_id', ['class' => 'form-label']); ?>
 		<?php echo form_dropdown($credential_id); ?>
 	</div>
 	<div class="col-6">
-		<?php echo form_label('Proxy Server', 'proxy_server_id'); ?>
+		<?php echo form_label('Proxy Server', 'proxy_server_id', ['class' => 'form-label']); ?>
 		<?php echo form_dropdown($proxy_server_id); ?>
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Type', 'type'); ?>
+		<?php echo form_label('Type', 'type', ['class' => 'form-label']); ?>
 		<?php echo form_dropdown($type); ?>
 	</div>
 	<div class="col-6">
-		<?php echo form_label('Post Authentication Policy', 'authentication_policy'); ?>
+		<?php echo form_label('Post Authentication Policy', 'authentication_policy', ['class' => 'form-label']); ?>
 		<?php echo form_dropdown($authentication_policy); ?>
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Icon', 'icon'); ?>
-		<div class="custom-file">
+		<?php echo form_label('Icon', 'icon', ['class' => 'form-label']); ?>
+		<div class="input-group">
 			<?php echo form_upload($icon) ?>
-			<?php echo form_label('Choose icon file...', 'icon', ['class' => 'custom-file-label']); ?>
 		</div>
 	</div>
 	<div class="col-6 pt-4">
@@ -102,20 +99,20 @@
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-3">
-		<?php echo form_label('User Login', 'user_login'); ?>
+		<?php echo form_label('User Login', 'user_login', ['class' => 'form-check-label']); ?>
 		<?php echo form_checkbox($user_login); ?>
 	</div>
 	<div class="col-3">
-		<?php echo form_label('Query', 'query'); ?>
+		<?php echo form_label('Query', 'query', ['class' => 'form-check-label']); ?>
 		<?php echo form_checkbox($query); ?>
 	</div>
 	<div class="col-6 text-center pt-3">
 		<img src="<?= base_url('ContentAPI/SingleSignOnIcon/' . $id) ?>">
 	</div>
 </div>
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col">
 		<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
 			<i class="fa fa-save" ></i> Save Changes

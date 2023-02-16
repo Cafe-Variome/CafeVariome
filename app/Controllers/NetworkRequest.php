@@ -39,9 +39,9 @@ class NetworkRequest extends CVUI_Controller
 
         $uidata->data['networkRequests'] = $this->dbAdapter->ReadAll();
 
-        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-        $uidata->javascript = array(VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js', JS.'cafevariome/components/datatable.js',JS. 'cafevariome/networkrequest.js');
-        
+        $uidata->IncludeJavaScript(JS. 'cafevariome/networkrequest.js');
+		$uidata->IncludeDataTables();
+
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/List', $data);
     }

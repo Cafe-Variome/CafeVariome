@@ -11,7 +11,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="keywords" content="<?php echo $meta_keywords ?>" />
         <meta name="author" content="<?php echo $meta_author ?>" />
         <meta name="description" content="<?php echo $meta_description ?>" />
@@ -38,380 +38,346 @@
         <script src="<?php echo base_url(JS."jquery-3.6.0.min.js");?>"></script>
     </head>
 
-    <body id="page-top">
+    <body>
+		<div id="layoutSidenav">
+			<div id="layoutSidenav_nav">
+				<nav class="sb-sidenav accordion bg-gradient-secondary" id="sidenavAccordion">
+					<div class="sb-sidenav-menu">
+						<div class="nav">
+							<a class="navbar-brand d-flex align-items-center" href="<?= base_url('Home/Index') ?>">
+								<div class="rotate-n-15">
+									<img src="<?= base_url(IMAGES . "cafevariome/cafevariome_icon.png") ?>" />
+								</div>
+								<div class="navbar-heading">
+									<?= $site_title ?>
+								</div>
+							</a>
 
-    <!-- Page Wrapper -->
-    <div id="wrapper">
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-secondary sidebar sidebar-dark accordion" id="accordionSidebar">
+							<hr class="sidebar-divider">
 
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="<?= base_url('Home/Index') ?>">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <img src="<?= base_url(IMAGES . "cafevariome/cafevariome_icon.png") ?>" />
-                </div>
-                <div class="sidebar-brand-text mx-2 text-gray-900"><?= $site_title ?></div>
-            </a>
+							<a class="nav-link <?= $uriSegments->methodName == 'index' ? 'active' : ''?>" href="<?= base_url('Admin/Index') ?>">
+								<div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+								Dashboard
+							</a>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
+							<hr class="sidebar-divider">
 
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item  <?= $uriSegments->methodName == 'index' ? 'active' : ''?>">
-                <a class="nav-link" href="<?= base_url('Admin/Index') ?>">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Dashboard</span></a>
-            </li>
+							<div class="sidebar-heading">Discovery</div>
+							<a class="nav-link active" href="<?= base_url('Discover/Index') ?>">
+								<div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+								Discover
+							</a>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Discovery
-            </div>
+							<hr class="sidebar-divider">
 
-            <li class="nav-item">
-                <a class="nav-link" href="<?= base_url('Discover/Index') ?>">
-                <i class="fas fa-fw fa-chart-area"></i>
-                <span>Discover</span></a>
-            </li>
+							<div class="sidebar-heading">Data</div>
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Data
-            </div>
+							<a class="<?= $controllerName == 'Pipeline' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePipelines" aria-expanded="<?= $controllerName == 'Pipeline' ? 'true' : 'false'?>" aria-controls="collapsePipelines">
+								<div class="sb-nav-link-icon"> <i class="fas fa-grip-lines-vertical"></i></div>
+								Pipelines
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'Pipeline' ? 'show' : ''?>" id="collapsePipelines" aria-labelledby="headingPipelines" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('Pipeline/Create') ?>">Create a Pipeline</a>
+										<a class="nav-link-item" href="<?= base_url('Pipeline/List') ?>">View Pipelines</a>
+									</nav>
+								</div>
 
-            <li class="nav-item <?= $controllerName == 'Pipeline' ? 'active' : ''?>">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePipeline" aria-expanded="true" aria-controls="collapsePipeline">
-                <i class="fas fa-fw fa-grip-lines-vertical"></i>
-                <span>Pipelines</span>
-                </a>
-                <div id="collapsePipeline" class="collapse <?= $controllerName == 'Pipeline' ? 'show' : ''?>" aria-labelledby="headingPipeline" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="<?= base_url('Pipeline/Create') ?>">Create a Pipeline</a>
-                        <a class="collapse-item" href="<?= base_url('Pipeline/List') ?>">View Pipelines</a>
-                    </div>
-                </div>
-            </li>
+							</div>
 
-            <li class="nav-item <?= $controllerName == 'Source' ? 'active' : ''?>">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSource" aria-expanded="true" aria-controls="collapseSource">
-                <i class="fas fa-fw fa-database"></i>
-                <span>Sources</span>
-                </a>
-                <div id="collapseSource" class="collapse <?= $controllerName == 'Source' ? 'show' : ''?>" aria-labelledby="headingSource" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="<?= base_url('Source/Create') ?>">Create a Source</a>
-                        <a class="collapse-item" href="<?= base_url('Source/List') ?>">View Sources</a>
-                    </div>
-                </div>
-            </li>
+							<a class="<?= $controllerName == 'Source' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapseSources" aria-expanded="false" aria-controls="collapseSources">
+								<div class="sb-nav-link-icon"><i class="fas fa-database"></i></div>
+								Sources
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'Source' ? 'show' : ''?>" id="collapseSources" aria-labelledby="headingSources" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('Source/Create') ?>">Create a Source</a>
+										<a class="nav-link-item" href="<?= base_url('Source/List') ?>">View Sources</a>
+									</nav>
+								</div>
+							</div>
 
-			<li class="nav-item <?= $controllerName == 'Ontology' ? 'active' : ''?>">
-				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOntology" aria-expanded="true" aria-controls="collapseOntology">
-					<i class="fas fa-fw fa-project-diagram"></i>
-					<span>Ontologies</span>
-				</a>
-				<div id="collapseOntology" class="collapse <?= $controllerName == 'Ontology' ? 'show' : ''?>" aria-labelledby="headingOntology" data-parent="#accordionSidebar">
-					<div class="bg-white py-2 collapse-inner rounded">
-						<a class="collapse-item" href="<?= base_url('Ontology/Create') ?>">Create an Ontology</a>
-						<a class="collapse-item" href="<?= base_url('Ontology/List') ?>">View Ontologies</a>
-					</div>
-				</div>
-			</li>
+							<a class="<?= $controllerName == 'Ontology' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapseOntologies" aria-expanded="false" aria-controls="collapseOntologies">
+								<div class="sb-nav-link-icon"><i class="fas fa-project-diagram"></i></div>
+								Ontologies
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'Ontology' ? 'show' : ''?>" id="collapseOntologies" aria-labelledby="headingOntologies" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('Ontology/Create') ?>">Create an Ontology</a>
+										<a class="nav-link-item" href="<?= base_url('Ontology/List') ?>">View Ontologies</a>
+									</nav>
+								</div>
+							</div>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider">
+							<hr class="sidebar-divider">
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Network
-            </div>
+							<div class="sidebar-heading">Network</div>
 
-            <li class="nav-item <?= $controllerName == 'Network' ? 'active' : ''?>">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseNet" aria-expanded="true" aria-controls="collapseNet">
-                <i class="fas fa-fw fa-network-wired"></i>
-                    <span>Networks</span>
-                </a>
-                <div id="collapseNet" class="collapse <?= $controllerName == 'Network' ? 'show' : ''?>" aria-labelledby="headingNet" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="<?= base_url('Network/Create') ?>">Create a Network</a>
-                        <a class="collapse-item" href="<?= base_url('Network/Join') ?>">Join a Network</a>
-                        <a class="collapse-item" href="<?= base_url('Network/List') ?>">View Networks</a>
-                        <a class="collapse-item" href="<?= base_url('NetworkRequest/List') ?>">View Network Requests</a>
-                    </div>
-                </div>
-            </li>
+							<a class="<?= $controllerName == 'Network' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapseNetworks" aria-expanded="false" aria-controls="collapseNetworks">
+								<div class="sb-nav-link-icon"><i class="fas fa-network-wired"></i></div>
+								Networks
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'Network' ? 'show' : ''?>" id="collapseNetworks" aria-labelledby="headingNetworks" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('Network/Create') ?>">Create a Network</a>
+										<a class="nav-link-item" href="<?= base_url('Network/Join') ?>">Join a Network</a>
+										<a class="nav-link-item" href="<?= base_url('Network/List') ?>">View Networks</a>
+										<a class="nav-link-item" href="<?= base_url('NetworkRequest/List') ?>">View Network Requests</a>
+									</nav>
+								</div>
+							</div>
 
-            <li class="nav-item <?= $controllerName == 'NetworkGroup' ? 'active' : ''?>">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseNetGroup" aria-expanded="true" aria-controls="collapseNetGroup">
-                <i class="fas fa-fw fa-user-friends"></i>
-                    <span>Discovery Groups</span>
-                </a>
-                <div id="collapseNetGroup" class="collapse <?= $controllerName == 'DiscoveryGroup' ? 'show' : ''?>" aria-labelledby="headingNetGroup" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="<?= base_url('DiscoveryGroup/Create') ?>">Create a Discovery Group</a>
-                        <a class="collapse-item" href="<?= base_url('DiscoveryGroup/List') ?>">View Discovery Groups</a>
-                    </div>
-                </div>
-            </li>
+							<a class="<?= $controllerName == 'DiscoveryGroup' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapseDiscoveryGroups" aria-expanded="false" aria-controls="collapseDiscoveryGroups">
+								<div class="sb-nav-link-icon"><i class="fas fa-user-friends"></i></div>
+								Discovery Groups
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'DiscoveryGroup' ? 'show' : ''?>" id="collapseDiscoveryGroups" aria-labelledby="headingDiscoveryGroups" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('DiscoveryGroup/Create') ?>">Create a Discovery Group</a>
+										<a class="nav-link-item" href="<?= base_url('DiscoveryGroup/List') ?>">View Discovery Groups</a>
+									</nav>
+								</div>
+							</div>
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Access Control
-            </div>
+							<hr class="sidebar-divider">
 
-            <li class="nav-item <?= $controllerName == 'User' ? 'active' : ''?>">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUser" aria-expanded="true" aria-controls="collapseUser">
-                <i class="fas fa-fw fa-user"></i>
-                    <span>Users</span>
-                </a>
-                <div id="collapseUser" class="collapse <?= $controllerName == 'User' ? 'show' : ''?>" aria-labelledby="headingUser" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="<?= base_url('User/Create') ?>">Create a User</a>
-                        <a class="collapse-item" href="<?= base_url('User/List') ?>">View Users</a>
-                    </div>
-                </div>
-            </li>
+							<div class="sidebar-heading">Access Control</div>
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Content
-            </div>
+							<a class="<?= $controllerName == 'User' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUsers" aria-expanded="false" aria-controls="collapseUsers">
+								<div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+								Users
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'User' ? 'show' : ''?>" id="collapseUsers" aria-labelledby="headingUsers" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('User/Create') ?>">Create a User</a>
+										<a class="nav-link-item" href="<?= base_url('User/List') ?>">View Users</a>
+									</nav>
+								</div>
+							</div>
 
-            <li class="nav-item <?= $controllerName == 'Page' ? 'active' : ''?>">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePage" aria-expanded="true" aria-controls="collapsePage">
-                <i class="fas fa-fw fa-file"></i>
-                    <span>Pages</span>
-                </a>
-                <div id="collapsePage" class="collapse <?= $controllerName == 'Page' ? 'show' : ''?>" aria-labelledby="headingPage" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="<?= base_url('Page/Create') ?>">Create a Page</a>
-                        <a class="collapse-item" href="<?= base_url('Page/List') ?>">View Pages</a>
-                    </div>
-                </div>
-            </li>
+							<hr class="sidebar-divider">
 
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                System
-            </div>
+							<div class="sidebar-heading">Content</div>
 
-			<li class="nav-item <?= $controllerName == 'Server' ? 'active' : ''?>">
-				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseServ" aria-expanded="true" aria-controls="collapseServ">
-					<i class="fas fa-fw fa-server"></i>
-					<span>Servers</span>
-				</a>
-				<div id="collapseServ" class="collapse <?= $controllerName == 'Server' ? 'show' : ''?>" aria-labelledby="headingServ" data-parent="#accordionSidebar">
-					<div class="bg-white py-2 collapse-inner rounded">
-						<a class="collapse-item" href="<?= base_url('Server/Create') ?>">Create a Server</a>
-						<a class="collapse-item" href="<?= base_url('Server/List') ?>">View Servers</a>
-					</div>
-				</div>
-			</li>
+							<a class="<?= $controllerName == 'Page' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
+								<div class="sb-nav-link-icon"><i class="fas fa-file"></i></div>
+								Pages
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'Page' ? 'show' : ''?>" id="collapsePages" aria-labelledby="headingPages" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('Page/Create') ?>">Create a Page</a>
+										<a class="nav-link-item" href="<?= base_url('Page/List') ?>">View Pages</a>
+									</nav>
+								</div>
+							</div>
 
-			<li class="nav-item <?= $controllerName == 'ProxyServer' ? 'active' : ''?>">
-				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseProxyServ" aria-expanded="true" aria-controls="collapseProxyServ">
-					<i class="fas fa-fw fa-ethernet"></i>
-					<span>Proxy Servers</span>
-				</a>
-				<div id="collapseProxyServ" class="collapse <?= $controllerName == 'ProxyServer' ? 'show' : ''?>" aria-labelledby="headingProxyServ" data-parent="#accordionSidebar">
-					<div class="bg-white py-2 collapse-inner rounded">
-						<a class="collapse-item" href="<?= base_url('ProxyServer/Create') ?>">Create a Proxy Server</a>
-						<a class="collapse-item" href="<?= base_url('ProxyServer/List') ?>">View Proxy Servers</a>
-					</div>
-				</div>
-			</li>
+							<hr class="sidebar-divider">
 
-			<li class="nav-item <?= $controllerName == 'SingleSignOnProvider' ? 'active' : ''?>">
-				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSSO" aria-expanded="true" aria-controls="collapseSSO">
-					<i class="fas fa-sign-in-alt"></i>
-					<span>Single Sign-on Providers</span>
-				</a>
-				<div id="collapseSSO" class="collapse <?= $controllerName == 'SingleSignOnProvider' ? 'show' : ''?>" aria-labelledby="headingSSO" data-parent="#accordionSidebar">
-					<div class="bg-white py-2 collapse-inner rounded">
-						<a class="collapse-item" href="<?= base_url('SingleSignOnProvider/Create') ?>">Create a Provider</a>
-						<a class="collapse-item" href="<?= base_url('SingleSignOnProvider/List') ?>">View Providers</a>
-					</div>
-				</div>
-			</li>
+							<div class="sidebar-heading">System</div>
 
-			<li class="nav-item <?= $controllerName == 'Credential' ? 'active' : ''?>">
-				<a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCred" aria-expanded="true" aria-controls="collapseCred">
-					<i class="fas fa-fw fa-key"></i>
-					<span>Credentials</span>
-				</a>
-				<div id="collapseCred" class="collapse <?= $controllerName == 'Credential' ? 'show' : ''?>" aria-labelledby="headingCred" data-parent="#accordionSidebar">
-					<div class="bg-white py-2 collapse-inner rounded">
-						<a class="collapse-item" href="<?= base_url('Credential/Create') ?>">Create a Credential</a>
-						<a class="collapse-item" href="<?= base_url('Credential/List') ?>">View Credentials</a>
-					</div>
-				</div>
-			</li>
+							<a class="<?= $controllerName == 'Server' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapseServers" aria-expanded="false" aria-controls="collapseServers">
+								<div class="sb-nav-link-icon"><i class="fas fa-server"></i></div>
+								Servers
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'Server' ? 'show' : ''?>" id="collapseServers" aria-labelledby="headingServers" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('Server/Create') ?>">Create a Server</a>
+										<a class="nav-link-item" href="<?= base_url('Server/List') ?>">View Servers</a>
+									</nav>
+								</div>
+							</div>
 
-            <li class="nav-item <?= $controllerName == 'Setting' ? 'active' : ''?>">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSet" aria-expanded="true" aria-controls="collapseSet">
-                <i class="fas fa-fw fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-                <div id="collapseSet" class="collapse <?= $controllerName == 'Setting' ? 'show' : ''?>" aria-labelledby="headingSet" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                    <a class="collapse-item" href="<?= base_url('Setting/Main') ?>">System Settings</a>
-                    <a class="collapse-item" href="<?= base_url('Setting/Elasticsearch') ?>">Elastic Search Settings</a>
-                    <a class="collapse-item" href="<?= base_url('Setting/Neo4J') ?>">Neo4J Settings</a>
-                    <a class="collapse-item" href="<?= base_url('Setting/Discovery') ?>">Discovery Settings</a>
-                    <a class="collapse-item" href="<?= base_url('Setting/Endpoint') ?>">Endpoint Settings</a>
-                    </div>
-                </div>
-            </li>
+							<a class="<?= $controllerName == 'ProxyServer' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapseProxyServers" aria-expanded="false" aria-controls="collapseProxyServers">
+								<div class="sb-nav-link-icon"><i class="fas fa-ethernet"></i></div>
+								Proxy Servers
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'ProxyServer' ? 'show' : ''?>" id="collapseProxyServers" aria-labelledby="headingProxyServers" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('ProxyServer/Create') ?>">Create a Proxy Server</a>
+										<a class="nav-link-item" href="<?= base_url('ProxyServer/List') ?>">View Proxy Servers</a>
+									</nav>
+								</div>
+							</div>
 
-            <!-- Divider -->
-            <hr class="sidebar-divider d-none d-md-block">
+							<a class="<?= $controllerName == 'SingleSignOnProvider' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapseSingleSignOnProviders" aria-expanded="false" aria-controls="collapseSingleSignOnProviders">
+								<div class="sb-nav-link-icon"><i class="fas fa-sign-in-alt"></i></div>
+								Single Sign on Providers
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'SingleSignOnProvider' ? 'show' : ''?>" id="collapseSingleSignOnProviders" aria-labelledby="headingSingleSignOnProviders" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('SingleSignOnProvider/Create') ?>">Create a Provider</a>
+										<a class="nav-link-item" href="<?= base_url('SingleSignOnProvider/List') ?>">View Providers</a>
+									</nav>
+								</div>
+							</div>
 
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
+							<a class="<?= $controllerName == 'Credential' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapseCredentials" aria-expanded="false" aria-controls="collapseCredentials">
+								<div class="sb-nav-link-icon"><i class="fas fa-key"></i></div>
+								Credentials
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'Credential' ? 'show' : ''?>" id="collapseCredentials" aria-labelledby="headingCredentials" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('Credential/Create') ?>">Create a Credential</a>
+										<a class="nav-link-item" href="<?= base_url('Credential/List') ?>">View Credentials</a>
+									</nav>
+								</div>
+							</div>
 
-        </ul>
-        <!-- End of Sidebar -->
-
-        <!-- Content Wrapper -->
-        <div id="content-wrapper" class="d-flex flex-column">
-            <!-- Main Content -->
-            <div id="content">
-
-                <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-                    <!-- Sidebar Toggle (Topbar) -->
-                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
-                        <i class="fa fa-bars"></i>
-                    </button>
-
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small"><?= $userName ?></span>
-                            <img class="img-profile rounded-circle" src="<?= base_url(IMAGES. '/cafevariome/dashboard/user-icon.png') ?>" width="32" height="32">
-                        </a>
-                        <!-- Dropdown - User Information -->
-                        <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="<?= $profileURL ?>">
-                            <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Profile
-                            </a>
-                            <div class="dropdown-divider"></div>
-                            <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                            <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                            Logout
-                            </a>
-                        </div>
-                        </li>
-                    </ul>
-
-                </nav>
-                <!-- End of Topbar -->
-
-                <!-- Begin Page Content -->
-                <div class="container-fluid">
-                    <div class="content">
-                        <?= $this->renderSection('content') ?>
-                    </div>
-                </div>
-                <!-- /.container-fluid -->
-
-            </div>
-            <!-- End of Main Content -->
-
-            <!-- Footer -->
-            <footer class="sticky-footer">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-						<div class="row">
-							<div class="col">
-								Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a> (v. <?= $version ?>)
-								| <a href="" data-toggle="modal" data-target="#privacyPolicyModal">Privacy Policy</a>
+							<a class="<?= $controllerName == 'Setting' ? 'nav-link active' : 'nav-link collapsed'?>" href="#" data-bs-toggle="collapse" data-bs-target="#collapseSettings" aria-expanded="false" aria-controls="collapseSettings">
+								<div class="sb-nav-link-icon"><i class="fas fa-cog"></i></div>
+								Settings
+								<div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+							</a>
+							<div class="collapse <?= $controllerName == 'Setting' ? 'show' : ''?>" id="collapseSettings" aria-labelledby="headingSettings" data-bs-parent="#sidenavAccordion">
+								<div class="collapse-inner">
+									<nav class="sb-sidenav-menu-nested nav">
+										<a class="nav-link-item" href="<?= base_url('Setting/Main') ?>">System Settings</a>
+										<a class="nav-link-item" href="<?= base_url('Setting/Elasticsearch') ?>">Elastic Search Settings</a>
+										<a class="nav-link-item" href="<?= base_url('Setting/Neo4J') ?>">Neo4J Settings</a>
+										<a class="nav-link-item" href="<?= base_url('Setting/Discovery') ?>">Discovery Settings</a>
+										<a class="nav-link-item" href="<?= base_url('Setting/Endpoint') ?>">Endpoint Settings</a>
+									</nav>
+								</div>
 							</div>
 						</div>
-						<div class="row">
-							<div class="col">Copyright &copy; <?= date("Y") . ', University of Leicester' ?></div>
+					</div>
+					<div class="sb-sidenav-footer">
+						<div class="small">Logged in as:</div>
+						<?= $userName ?>
+					</div>
+				</nav>
+			</div>
+			<div id="layoutSidenav_content">
+				<nav class="sb-topnav navbar navbar-expand shadow">
+					<button class="btn btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+					<ul class="navbar-nav ms-auto me-md-0 me-3 me-lg-0">
+						<li class="nav-item dropdown ms-auto me-2">
+							<a class="top-nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								<i class="fas fa-user fa-fw"></i>
+							</a>
+							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+								<li>
+									<a class="dropdown-item" href="<?= $profileURL ?>">
+										<i class="fas fa-user ms-3"></i>  Profile
+									</a>
+								</li>
+								<li><hr class="dropdown-divider"></li>
+								<li>
+									<a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal">
+										<i class="fas fa-sign-out-alt  ms-3"></i>  Logout
+									</a>
+								</li>
+							</ul>
+						</li>
+					</ul>
+				</nav>
+				<main>
+					<div class="container-fluid px-4">
+					<?= $this->renderSection('content') ?>
+					</div>
+				</main>
+				<footer class="py-4 bg-light mt-auto">
+					<div class="container-fluid px-4">
+						<div class="text-center justify-content-between small">
+							<div class="row">
+								<div class="col">
+									Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a> (v. <?= $version ?>)
+									| <a href="" data-toggle="modal" data-target="#privacyPolicyModal">Privacy Policy</a>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col">Copyright &copy; <?= date("Y") . ', University of Leicester' ?></div>
+							</div>
 						</div>
+					</div>
+				</footer>
+			</div>
+		</div>
+		<script src="<?= base_url(JS."dashboard/sbadmin/sb-admin-2.js")?>"></script>
+		<!-- Bootstrap core JavaScript-->
+		<script src="<?php echo base_url(VENDOR."twbs/bootstrap/dist/js/bootstrap.bundle.js");?>"></script>
+		<script src="<?php echo base_url(VENDOR."select2/select2/dist/js/select2.js");?>"></script>
 
-                        <br>
-                    </div>
-                </div>
-            </footer>
-            <!-- End of Footer -->
-        </div>
-        <!-- End of Content Wrapper -->
-    </div>
-    <!-- End of Page Wrapper -->
+		<!-- extra Java Script-->
+		<?php foreach($javascript as $js):?>
+			<script src="<?php echo base_url($js)?>"></script>
+		<?php endforeach;?>
 
-    <!-- Scroll to Top Button-->
-    <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
-    </a>
-
-    <!-- Logout Modal-->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary bg-gradient-secondary" type="button" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-warning bg-gradient-warning" href="<?= base_url('Auth/Logout') ?>">
-                    <i class="fas fa-sign-out-alt fa-sm fa-fw"></i> Logout
-                </a>
-            </div>
-        </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap core JavaScript-->
-    <script src="<?php echo base_url(VENDOR."twbs/bootstrap/dist/js/bootstrap.bundle.js");?>"></script>
-    <script src="<?php echo base_url(VENDOR."select2/select2/dist/js/select2.js");?>"></script>
-
-    <!-- extra Java Script-->
-    <?php foreach($javascript as $js):?>
-    <script src="<?php echo base_url($js)?>"></script>
-    <?php endforeach;?>
-
-    <script type="text/javascript">
-        $('[data-toggle="tooltip"]').tooltip();
-    </script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="<?= base_url(JS."dashboard/sbadmin/sb-admin-2.min.js")?>"></script>
-
-    </body>
-    <div id="privacyPolicyModal" class="modal fade" style="justify-content: center;align-items:center;" tabindex="-1" role="dialog" aria-labelledby="privacyPolicyModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <div class="modal-content" style="width: 1200px;">
-            <div class="modal-header">
-                <h4 class="modal-title" id="privacyPolicyModalTitle">Our privacy policy</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body" >
-				<div class="row">
-					<div class="col">
-						<embed src="<?= base_url("PrivacyPolicy.pdf");?>" frameborder="0" width="800px" height="600px">
+		<script type="text/javascript">
+			const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+			const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+		</script>
+		<!-- Logout Modal-->
+		<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+			<div class="modal-dialog" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
+					<div class="modal-footer">
+						<button class="btn btn-secondary bg-gradient-secondary" type="button" data-dismiss="modal">Cancel</button>
+						<a class="btn btn-warning bg-gradient-warning" href="<?= base_url('Auth/Logout') ?>">
+							<i class="fas fa-sign-out-alt fa-sm fa-fw"></i> Logout
+						</a>
 					</div>
 				</div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+			</div>
+		</div>
+		<div id="privacyPolicyModal" class="modal fade" style="justify-content: center;align-items:center;" tabindex="-1" role="dialog" aria-labelledby="privacyPolicyModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+				<div class="modal-content" style="width: 1200px;">
+					<div class="modal-header">
+						<h4 class="modal-title" id="privacyPolicyModalTitle">Our privacy policy</h4>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body" >
+						<div class="row">
+							<div class="col">
+								<embed src="<?= base_url("PrivacyPolicy.pdf");?>" frameborder="0" width="800px" height="600px">
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
+
+
+
+
+
+
+
+
+
+

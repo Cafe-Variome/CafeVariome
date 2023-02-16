@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if ($statusMessage): ?>
 	<div class="row">
@@ -17,22 +15,34 @@
 <?php endif; ?>
 
 <?= form_open($controllerName."/DeleteRecords/" . $dataFile->getID()); ?>
-<div class="form-group">
-	<span class="text-danger">Warning: Are you sure you want to delete records of '<?= $dataFile->name; ?>'?</span>
-	<span class="text-danger">This action removes all associated records from the server database.</span>
-</div>
-<div class="form-group">
-	<div class="form-check form-check-inline">
-		<input class="form-check-input" type="radio" name="confirm" value="yes">
-		<label class="form-check-label" for="confirm">Yes</label>
+<div class="row mb-3">
+	<div class="col">
+		<div class="alert alert-danger">
+			<p class="text-lg-left bol">
+				<strong>
+					Do you wish to delete records of '<?= $dataFile->name; ?>'?
+					<br>
+					This action deletes all associated data file records from the database.
+					However, the file will remain on the server and data can be imported later.
+				</strong>
+			</p>
+		</div>
 	</div>
-	<div class="form-check form-check-inline">
-		<input class="form-check-input" type="radio" name="confirm" value="no" checked>
-		<label class="form-check-label" for="confirm">No</label>
+</div>
+<div class="row mb-3">
+	<div class="col">
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="confirm" id="confirm_yes" value="yes">
+			<label class="form-check-label" for="confirm_yes">Yes</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="confirm" id="confirm_no" value="no" checked>
+			<label class="form-check-label" for="confirm_no">No</label>
+		</div>
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3 row">
 	<div class="col">
 		<button type="submit" name="submit" class="btn btn-warning bg-gradient-warning">
 			<i class="fa fa-trash-alt"></i>  Delete Data File Records

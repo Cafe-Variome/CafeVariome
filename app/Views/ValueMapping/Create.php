@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?> for '<?= $valueName ?>'</h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?> for '<?= $valueName ?>'
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -19,16 +17,16 @@
 <?php echo form_hidden(['attribute_id' => $attributeId]); ?>
 <?php echo form_hidden(['value_id' => $valueId]); ?>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Name', 'name'); ?>
+		<?php echo form_label('Name', 'name', ['class' => 'form-label']); ?>
 		<?php echo form_input($name); ?>
 	</div>
 	<div class="col-6">
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col">
 		<button type="submit" name="submit" class="btn btn-success bg-gradient-success">
 			<i class="fa fa-plus"></i> Create Value Mapping

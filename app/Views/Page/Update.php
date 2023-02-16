@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -18,9 +16,9 @@
 
 <?php echo form_open($controllerName.'/Update/'. $page_id); ?>
 
-<div class="form-group row">
+<div class="row mb-3">
     <div class="col-8">
-        <?php echo form_label('Page Title', 'title'); ?>
+        <?php echo form_label('Page Title', 'title', ['class' => 'form-label']); ?>
         <?php echo form_input($ptitle); ?>
     </div>
     <div class="col-4">
@@ -30,16 +28,16 @@
     </div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
     <div class="col-8">
-        <?php echo form_label('Page Content', 'pcontent'); ?>
+        <?php echo form_label('Page Content', 'pcontent', ['class' => 'form-label']); ?>
         <?php echo form_textarea($pcontent); ?>
     </div>
     <div class="col-4">
     </div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col">
         <button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
             <i class="fa fa-save"></i>  Save Changes

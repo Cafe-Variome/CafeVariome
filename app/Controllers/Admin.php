@@ -50,8 +50,9 @@ class Admin extends CVUI_Controller
         $uidata = new UIData();
         $uidata->title = "Administrator Dashboard";
         $uidata->stickyFooter = false;
-        $uidata->css = [CSS.'dashboard/chartjs/Chart.min.css'];
-        $uidata->javascript = [JS.'dashboard/chartjs/Chart.min.js', JS . 'cafevariome/admin.js'];
+        $uidata->IncludeCSS(CSS.'dashboard/chartjs/Chart.min.css');
+        $uidata->IncludeJavaScript(JS.'dashboard/chartjs/Chart.min.js');
+		$uidata->IncludeJavaScript(JS . 'cafevariome/admin.js');
 
         $networkInterface = new NetworkInterface();
 		$networkRequestAdapter = (new NetworkRequestAdapterFactory())->GetInstance();

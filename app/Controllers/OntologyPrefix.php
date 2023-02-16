@@ -60,8 +60,8 @@ class OntologyPrefix extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Ontology Prefixes';
 
-		$uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-		$uidata->javascript = array(JS.'cafevariome/ontologyprefix.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+		$uidata->IncludeJavaScript(JS.'cafevariome/ontologyprefix.js');
+		$uidata->IncludeDataTables();
 
 		$uidata->data['prefixes'] = $this->dbAdapter->ReadByOntologyId($ontology_id);
 		$uidata->data['ontology'] = $ontology;

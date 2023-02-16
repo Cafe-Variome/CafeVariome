@@ -71,8 +71,8 @@ class AttributeMapping extends CVUI_Controller
 		$uidata->data['sourceName'] = $source->name;
 		$uidata->data['attributeName'] = $attribute->name;
 
-		$uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
-		$uidata->javascript = array(JS . 'cafevariome/attribute_mapping.js', VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
+		$uidata->IncludeJavaScript(JS . 'cafevariome/attribute_mapping.js');
+		$uidata->IncludeDataTables();
 
 		$data = $this->wrapData($uidata);
 

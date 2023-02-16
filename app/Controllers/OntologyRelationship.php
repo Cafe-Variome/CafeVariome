@@ -60,9 +60,8 @@ class OntologyRelationship extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Ontology Relationships';
 
-
-		$uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-		$uidata->javascript = array(JS.'cafevariome/ontologyrelationship.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+		$uidata->IncludeJavaScript(JS.'cafevariome/ontologyrelationship.js');
+		$uidata->IncludeDataTables();
 
 		$uidata->data['relationships'] = $this->dbAdapter->ReadByOntologyId($ontology_id);
 		$uidata->data['ontology'] = $ontology;

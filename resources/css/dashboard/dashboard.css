@@ -2,6 +2,152 @@
     margin-left: 15px;
     margin-right: 10px;
 }
+
+.sb-topnav {
+    height: 4.73rem;
+}
+
+.navbar-brand{
+    height: 4.73rem;
+    color: #3a3b45;
+    font-weight: bold;
+    margin: auto;
+}
+
+.navbar-heading{
+    padding-left: 5px;
+}
+
+.rotate-15 {
+    transform: rotate(15deg);
+}
+
+.rotate-n-15 {
+    transform: rotate(-15deg);
+}
+
+.bg-gradient-primary {
+    background-color: #4e73df;
+    background-image: linear-gradient(180deg, #4e73df 10%, #224abe 100%);
+    background-size: cover;
+}
+
+.bg-gradient-secondary {
+    background-color: #858796;
+    background-image: linear-gradient(180deg, #858796 10%, #60616f 100%);
+    background-size: cover;
+}
+
+.bg-gradient-success {
+    background-color: #1cc88a;
+    background-image: linear-gradient(180deg, #1cc88a 10%, #13855c 100%);
+    background-size: cover;
+}
+
+.bg-gradient-info {
+    background-color: #36b9cc;
+    background-image: linear-gradient(180deg, #36b9cc 10%, #258391 100%);
+    background-size: cover;
+}
+
+.bg-gradient-warning {
+    background-color: #f6c23e;
+    background-image: linear-gradient(180deg, #f6c23e 10%, #dda20a 100%);
+    background-size: cover;
+}
+
+.bg-gradient-danger {
+    background-color: #e74a3b;
+    background-image: linear-gradient(180deg, #e74a3b 10%, #be2617 100%);
+    background-size: cover;
+}
+
+.bg-gradient-light {
+    background-color: #f8f9fc;
+    background-image: linear-gradient(180deg, #f8f9fc 10%, #c2cbe5 100%);
+    background-size: cover;
+}
+
+.bg-gradient-dark {
+    background-color: #5a5c69;
+    background-image: linear-gradient(180deg, #5a5c69 10%, #373840 100%);
+    background-size: cover;
+}
+
+nav .nav-link {
+    color: rgba(220, 220, 220, 0.8);
+    display: block;
+    text-align: left;
+    padding: 1rem;
+    font-size: 0.9rem;
+    font-weight:bold;
+}
+
+nav .top-nav-link {
+    color: rgba(145, 144, 144, 0.8);
+    display: block;
+    padding: 1rem;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+nav .top-nav-link:hover {
+    color: rgba(203, 202, 202, 0.8);
+    text-decoration: none;
+}
+
+nav .nav-link-item {
+    color: #3a3b45;
+    font-size: 0.9rem;
+    border-radius: 3px;
+    padding: 0.4rem;
+    margin-bottom: 0.5rem;
+    text-decoration: none;
+}
+
+nav .nav-link-item:hover{
+    color: #626265;
+    background-color: #eaecf4;
+    border-radius: 3px;
+    text-decoration: none;
+}
+
+.nav-link:hover, .nav-link:focus {
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.collapse-inner {
+    margin-left: 0.8rem;
+    margin-right: 0.8rem;
+    padding: 0.5rem;
+    background-color: #f2f2f2;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+    border-radius: 0.35rem;
+    width: 90%;
+}
+
+.sb-sidenav .sb-sidenav-menu .nav .sb-sidenav-menu-nested {
+    margin-left: 0.2rem;
+    flex-direction: column;
+}
+
+hr.sidebar-divider {
+    box-sizing: content-box;
+    height: 0;
+    overflow: visible;
+    color: rgba(255, 255, 255, 0.15);
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+    margin: 0 1rem 1rem;
+}
+
+.sidebar-heading {
+    color: rgba(255, 255, 255, 0.4);
+    padding: 0 1rem;
+    font-weight: 800;
+    font-size: 0.65rem;
+}
+
 form .form-group{
 
     color:#000
@@ -19,9 +165,18 @@ table thead th{
 footer{
     height: 80px;
     background-color: #cacaca;
-    color: rgb(83, 83, 83)
+    color: rgb(176, 174, 174)
     
 }
 footer .copyright span{
     font-size:15px;
+}
+
+footer a{
+    color: #87a1be;
+    text-decoration: none;
+}
+
+footer a:hover{
+    color: #4b7398;
 }

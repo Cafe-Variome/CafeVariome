@@ -1,11 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?> of '<?= $source_name ?>'</h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?> of '<?= $source_name ?>'
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -34,22 +31,22 @@
 			<td><?= $attribute->type_text ?></td>
 			<td><?= $attribute->storage_location ?></td>
 			<td>
-				<a href="<?= base_url('Value/List') . '/' . $attribute->getID() ?>" data-toggle="tooltip" data-placement="top" title="View Values">
-					<i class="fa fa-list text-success"></i>
+				<a class="btn btn-sm btn-success bg-gradient-success" href="<?= base_url('Value/List') . '/' . $attribute->getID() ?>">
+					<i class="fa fa-list"></i> View Values
 				</a>
-				<a href="<?= base_url($controllerName . '/Update') . '/' . $attribute->getID() ?>" data-toggle="tooltip" data-placement="top" title="Edit Attribute">
-					<i class="fa fa-edit text-warning"></i>
+				<a class="btn btn-sm btn-warning bg-gradient-warning" href="<?= base_url($controllerName . '/Update') . '/' . $attribute->getID() ?>">
+					<i class="fa fa-edit"></i> Edit Attribute
 				</a>
-				<a href="<?= base_url('AttributeMapping/List') . '/' . $attribute->getID() ?>" data-toggle="tooltip" data-placement="top" title="View Mappings">
-					<i class="fa fa-map-signs text-danger"></i>
+				<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?= base_url('AttributeMapping/List') . '/' . $attribute->getID() ?>">
+					<i class="fa fa-map-signs"></i> View Mappings
 				</a>
 				<?php if($attribute->type == ATTRIBUTE_TYPE_ONTOLOGY_TERM): ?>
-				<a href="<?= base_url($controllerName . '/OntologyAssociations') . '/' . $attribute->getID() ?>" data-toggle="tooltip" data-placement="top" title="View Related Ontologies">
-					<i class="fa fa-project-diagram text-secondary"></i>
+				<a class="btn btn-sm btn-secondary bg-gradient-secondary" href="<?= base_url($controllerName . '/OntologyAssociations') . '/' . $attribute->getID() ?>">
+					<i class="fa fa-project-diagram"></i> View Ontology Associations
 				</a>
 				<?php endif; ?>
-				<a href="<?= base_url($controllerName . '/Details') . '/' . $attribute->getID() ?>" data-toggle="tooltip" data-placement="top" title="View Attribute">
-					<i class="fa fa-eye text-info"></i>
+				<a class="btn btn-sm btn-info bg-gradient-info" href="<?= base_url($controllerName . '/Details') . '/' . $attribute->getID() ?>">
+					<i class="fa fa-eye"></i> View Attribute
 				</a>
 			</td>
 		</tr>

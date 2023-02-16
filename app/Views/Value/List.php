@@ -1,11 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?> of '<?= $attribute_name ?>'</h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?> for '<?= $attribute_name ?>'
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 <div class="row">
@@ -32,14 +29,14 @@
 			<td><?= $value->display_name ?></td>
 			<td><?= $value->frequency ?></td>
 			<td>
-				<a href="<?= base_url($controllerName . '/Update') . '/' . $value->getID();?>" data-toggle="tooltip" data-placement="top" title="Edit Value">
-					<i class="fa fa-edit text-warning"></i>
+				<a class="btn btn-sm btn-warning bg-gradient-warning" href="<?= base_url($controllerName . '/Update') . '/' . $value->getID();?>">
+					<i class="fa fa-edit"></i> Edit Value
 				</a>
-				<a href="<?= base_url('ValueMapping/List') . '/' . $value->getID();?>" data-toggle="tooltip" data-placement="top" title="View Mappings">
-					<i class="fa fa-map-signs text-danger"></i>
+				<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?= base_url('ValueMapping/List') . '/' . $value->getID();?>">
+					<i class="fa fa-map-signs"></i> View Mappings
 				</a>
-				<a href="<?= base_url($controllerName . '/Details') . '/' . $value->getID();?>" data-toggle="tooltip" data-placement="top" title="View Value">
-					<i class="fa fa-eye text-info"></i>
+				<a class="btn btn-sm btn-info bg-gradient-info" href="<?= base_url($controllerName . '/Details') . '/' . $value->getID();?>">
+					<i class="fa fa-eye"></i> View Value
 				</a>
 			</td>
 		</tr>

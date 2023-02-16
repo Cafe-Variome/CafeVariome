@@ -87,10 +87,10 @@ class Network extends CVUI_Controller
 
         $uidata->data['networks'] = $networks;
 
-        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-        $uidata->javascript = array(JS.'cafevariome/network.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+        $uidata->IncludeJavaScript(JS.'cafevariome/network.js');
+		$uidata->IncludeDataTables();
 
-        $data = $this->wrapData($uidata);
+		$data = $this->wrapData($uidata);
         return view($this->viewDirectory."/List", $data);
     }
 
@@ -210,7 +210,7 @@ class Network extends CVUI_Controller
         ]
         );
 
-        $uidata->javascript = array(JS.'cafevariome/network.js');
+        $uidata->IncludeJavaScript(JS.'cafevariome/network.js');
 
         $networkInterface = new NetworkInterface();
 
@@ -254,7 +254,7 @@ class Network extends CVUI_Controller
 				'name' => 'network',
 				'type' => 'dropdown',
 				'options' => $networks,
-				'class' => 'form-control'
+				'class' => 'form-select'
 			];
 
             $uidata->data['justification'] = array(
@@ -331,7 +331,7 @@ class Network extends CVUI_Controller
 
         $uidata->data['network_key'] = $network_key;
 
-        $uidata->javascript = array(JS."/cafevariome/network.js");
+        $uidata->IncludeJavaScript(JS."/cafevariome/network.js");
         $data = $this->wrapData($uidata);
 
         return view($this->viewDirectory.'/Update_Threshold', $data);

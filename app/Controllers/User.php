@@ -157,24 +157,15 @@ class User extends CVUI_Controller
             $uidata->data['is_admin'] = array(
                 'name'  => 'is_admin[]',
                 'id'    => 'is_admin',
-                'class' => 'custom-control-input',
+                'class' => 'form-check-input',
                 'value' => 1,
             );
             $uidata->data['remote'] = array(
                 'name'  => 'remote[]',
                 'id'    => 'remote',
-                'class' => 'custom-control-input',
+                'class' => 'form-check-input',
                 'value' => 1,
             );
-            // Uncomment in order to add orcid field
-            /*
-            $uidata->data['orcid'] = array(
-                    'name' => 'orcid',
-                    'id' => 'orcid',
-                    'type' => 'text',
-                    'value' => set_value('orcid'),
-            );
-            */
         }
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Create', $data);
@@ -188,10 +179,9 @@ class User extends CVUI_Controller
 
         $uidata->data['users'] = $this->dbAdapter->ReadAll();
 
-
-        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-
-        $uidata->javascript = array(JS."cafevariome/components/datatable.js", JS."cafevariome/user.js", VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+		$uidata->IncludeJavaScript(JS.'cafevariome/components/datatable.js');
+		$uidata->IncludeJavaScript(JS.'cafevariome/user.js');
+		$uidata->IncludeDataTables();
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/List', $data);
@@ -309,21 +299,21 @@ class User extends CVUI_Controller
 			$uidata->data['is_admin'] = array(
 				'name'  => 'is_admin[]',
 				'id'    => 'is_admin',
-				'class' => 'custom-control-input',
+				'class' => 'form-check-input',
 				'value' => set_value('is_admin', $user->is_admin),
 				'checked' => (bool)$user->is_admin
 			);
 			$uidata->data['remote'] = array(
 				'name'  => 'remote[]',
 				'id'    => 'remote',
-				'class' => 'custom-control-input',
+				'class' => 'form-check-input',
 				'value' => set_value('remote', $user->remote),
 				'checked' => (bool)$user->remote
 			);
 			$uidata->data['active'] = array(
 				'name'  => 'active[]',
 				'id'    => 'active',
-				'class' => 'custom-control-input',
+				'class' => 'form-check-input',
 				'value' => set_value('active', $user->active),
 				'checked' => (bool)$user->active
 			);
@@ -397,9 +387,9 @@ class User extends CVUI_Controller
 
         $uidata->data['user'] = $user;
 
-        $uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
-
-        $uidata->javascript = array(JS . "cafevariome/components/datatable.js", JS . "cafevariome/user.js", VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
+		$uidata->IncludeJavaScript(JS.'cafevariome/components/datatable.js');
+		$uidata->IncludeJavaScript(JS.'cafevariome/user.js');
+		$uidata->IncludeDataTables();
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/Details', $data);

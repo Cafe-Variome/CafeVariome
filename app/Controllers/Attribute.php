@@ -73,8 +73,8 @@ class Attribute extends CVUI_Controller
 		$uidata->data['source_name'] = $source->name;
 		$uidata->data['attributes'] = $attributes;
 
-		$uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
-		$uidata->javascript = array(JS . 'cafevariome/attribute.js', VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
+		$uidata->IncludeJavaScript(JS . 'cafevariome/attribute.js');
+		$uidata->IncludeDataTables();
 
 		$data = $this->wrapData($uidata);
 
@@ -170,7 +170,7 @@ class Attribute extends CVUI_Controller
 			$uidata->data['show_in_interface'] = array(
 				'name' => 'show_in_interface[]',
 				'id' => 'show_in_interface',
-				'class' => 'custom-control-input',
+				'class' => 'form-check-input',
 				'value' => is_array($show_in_interface_val = set_value('show_in_interface[]', $attribute->show_in_interface)) ? $show_in_interface_val[0] : $attribute->show_in_interface,
 				'checked' => (bool)$attribute->show_in_interface
 			);
@@ -178,7 +178,7 @@ class Attribute extends CVUI_Controller
 			$uidata->data['include_in_interface_index'] = array(
 				'name' => 'include_in_interface_index[]',
 				'id' => 'include_in_interface_index',
-				'class' => 'custom-control-input',
+				'class' => 'form-check-input',
 				'value' => is_array($include_in_interface_index_val = set_value('include_in_interface_index[]', $attribute->include_in_interface_index)) ? $include_in_interface_index_val[0] : $attribute->include_in_interface_index,
 				'checked' => (bool)$attribute->include_in_interface_index
 			);
@@ -216,9 +216,8 @@ class Attribute extends CVUI_Controller
 		$uidata->title = 'Ontology Associations';
 		$uidata->data['attribute'] = $attribute;
 
-
-		$uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
-		$uidata->javascript = array(JS . 'cafevariome/attribute.js', VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
+		$uidata->IncludeJavaScript(JS . 'cafevariome/attribute.js');
+		$uidata->IncludeDataTables();
 
 		if ($this->request->getPost())
 		{
@@ -268,7 +267,7 @@ class Attribute extends CVUI_Controller
 			'name' => 'ontology',
 			'type' => 'dropdown',
 			'options' => $ontology_data,
-			'class' => 'form-control'
+			'class' => 'form-select'
 		];
 
 		$uidata->data['relationship'] = [
@@ -276,7 +275,7 @@ class Attribute extends CVUI_Controller
 			'name' => 'relationship',
 			'type' => 'dropdown',
 			'options' => $relationship_data,
-			'class' => 'form-control'
+			'class' => 'form-select'
 		];
 
 		$uidata->data['prefix'] = [
@@ -284,7 +283,7 @@ class Attribute extends CVUI_Controller
 			'name' => 'prefix',
 			'type' => 'dropdown',
 			'options' => $prefix_data,
-			'class' => 'form-control'
+			'class' => 'form-select'
 		];
 
 
@@ -318,25 +317,16 @@ class Attribute extends CVUI_Controller
 				'errors' => [
 					'required' => '{field} is required.'
 				]
-			],
-
-			'association_id' => [
-				'label'  => 'Association Id',
-				'rules'  => 'required|alpha_dash',
-				'errors' => [
-					'required' => '{field} is required.',
-					'alpha_dash' => '{field} must only contain alpha-numeric characters, underscores, or dashes.'
-				]
 			]
 		]);
 
 		if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 		{
-			$association_id = $this->request->getVar('association_id');
 			$confirm = $this->request->getVar('confirm');
 			if ($confirm == 'yes')
 			{
-				try {
+				try
+				{
 					$association = $ontologyAdapter->ReadAttributeOntologyAssociation($association_id);
 					if ($association)
 					{
@@ -357,7 +347,6 @@ class Attribute extends CVUI_Controller
 			}
 			return redirect()->to(base_url('Source'));
 		}
-
 
 		$data = $this->wrapData($uidata);
 

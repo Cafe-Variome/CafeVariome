@@ -1,11 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -32,14 +29,14 @@
             <td><?php echo $discoveryGroup->network_name; ?></td>
             <td><?php echo $discoveryGroup->policy; ?></td>
             <td>
-				<a data-toggle="tooltip" data-placement="top" title="Edit Discovery Group" href="<?= base_url($controllerName . '/Update'). "/" . $discoveryGroup->getID(); ?>" >
-					<i class="fa fa-edit text-warning"></i>
+				<a class="btn btn-sm btn-warning bg-gradient-warning" href="<?= base_url($controllerName . '/Update'). "/" . $discoveryGroup->getID(); ?>" >
+					<i class="fa fa-edit"></i> Edit Discovery Group
 				</a>
-				<a data-toggle="tooltip" data-placement="top" title="View Discovery Group" href="<?= base_url($controllerName . '/Details'). "/" . $discoveryGroup->getID(); ?>" >
-					<i class="fa fa-eye text-info"></i>
+				<a class="btn btn-sm btn-info bg-gradient-info" href="<?= base_url($controllerName . '/Details'). "/" . $discoveryGroup->getID(); ?>" >
+					<i class="fa fa-eye"></i> View Discovery Group
 				</a>
-                <a data-toggle="tooltip" data-placement="top" title="Remove network group" href="<?= base_url($controllerName.'/Delete'). "/" . $discoveryGroup->getID(); ?>" >
-                    <i class="fa fa-trash text-danger"></i>
+                <a class="btn btn-sm btn-danger bg-gradient-danger" href="<?= base_url($controllerName.'/Delete'). "/" . $discoveryGroup->getID(); ?>" >
+                    <i class="fa fa-trash"></i> Delete Discovery group
                 </a>
             </td>
         </tr>

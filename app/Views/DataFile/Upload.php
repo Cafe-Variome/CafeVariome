@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if ($statusMessage): ?>
 	<div class="row">
@@ -48,12 +46,11 @@
 
 <?php echo form_open_multipart($controllerName.'/Upload/' . $source->getID()); ?>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Data File', 'name'); ?>
-		<div class="custom-file">
+		<?php echo form_label('Data File', 'name', ['class' => 'form-label']); ?>
+		<div class="input-group">
 			<?php echo form_upload($name) ?>
-			<?php echo form_label('Choose data file...', 'name', ['class' => 'custom-file-label']); ?>
 		</div>
 	</div>
 	<div class="col-6 pt-4">
@@ -62,7 +59,7 @@
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col">
 		<button type="submit" name="submit" id="uploadBtn" class="btn btn-success bg-gradient-success">
 			<i class="fa fa-upload"></i> Upload Data File

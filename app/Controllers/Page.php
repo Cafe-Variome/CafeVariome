@@ -46,10 +46,10 @@ class Page extends CVUI_Controller
 
         $uidata->data['pages'] = $this->dbAdapter->SetModel(PageList::class)->ReadAll();
 
-        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-        $uidata->javascript = array(JS.'cafevariome/page.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+        $uidata->IncludeJavaScript(JS.'cafevariome/page.js');
+		$uidata->IncludeDataTables();
 
-        $data = $this->wrapData($uidata);
+		$data = $this->wrapData($uidata);
         return view($this->viewDirectory . '/List.php', $data);
     }
 
@@ -58,7 +58,8 @@ class Page extends CVUI_Controller
         $uidata = new UIData();
         $uidata->title = "Create Page";
 
-        $uidata->javascript = [VENDOR.'tinymce/tinymce/tinymce.min.js', JS.'cafevariome/page.js'];
+        $uidata->IncludeJavaScript(VENDOR.'tinymce/tinymce/tinymce.min.js');
+		$uidata->IncludeJavaScript(JS.'cafevariome/page.js');
 
         // Validate form input
         $this->validation->setRules([
@@ -145,7 +146,8 @@ class Page extends CVUI_Controller
         $uidata->title = "Edit Page";
 		$uidata->data['id'] = $page->getID();
 
-        $uidata->javascript = [VENDOR.'tinymce/tinymce/tinymce.min.js', JS.'cafevariome/page.js'];
+        $uidata->IncludeJavaScript(VENDOR.'tinymce/tinymce/tinymce.min.js');
+        $uidata->IncludeJavaScript(JS.'cafevariome/page.js');
 
         // Validate form input
         $this->validation->setRules([

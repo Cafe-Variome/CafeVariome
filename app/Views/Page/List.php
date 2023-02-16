@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -32,24 +30,24 @@
 			<td><?= $page->content ?></td>
 			<td><?= $page->user_first_name ?> <?= $page->user_last_name ?></td>
 			<td>
-				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $page->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Edit Page">
-					<i class="fa fa-edit text-warning"></i>
+				<a class="btn btn-sm btn-warning bg-gradient-warning" href="<?php echo base_url($controllerName. '/Update'). "/" . $page->getID(); ?>">
+					<i class="fa fa-edit"></i> Edit Page
 				</a>
-				<a target="_blank" href="<?php echo base_url('Home/Index'). "/" . $page->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Open Page">
-					<i class="fa fa-file text-primary"></i>
+				<a class="btn btn-sm btn-primary bg-gradient-primary" target="_blank" href="<?php echo base_url('Home/Index'). "/" . $page->getID(); ?>">
+					<i class="fa fa-file"></i> Open Page
 				</a>
 				<?php if($page->removable): ?>
 					<?php if($page->active): ?>
-					<a href="<?php echo base_url($controllerName.'/Deactivate'). "/" . $page->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Deactivate Page">
-						<i class="fa fa-eye-slash text-info"></i>
-					</a>
+						<a class="btn btn-sm btn-secondary bg-gradient-secondary" href="<?php echo base_url($controllerName.'/Deactivate'). "/" . $page->getID(); ?>">
+							<i class="fa fa-eye-slash"></i> Deactivate Page
+						</a>
 					<?php else: ?>
-						<a href="<?php echo base_url($controllerName.'/Activate'). "/" . $page->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Activate Page">
-						<i class="fa fa-eye text-success"></i>
+						<a class="btn btn-sm btn-info bg-gradient-info" href="<?php echo base_url($controllerName.'/Activate'). "/" . $page->getID(); ?>">
+						<i class="fa fa-eye"></i> Activate Page
 					</a>
 					<?php endif ?>
-				<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $page->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Delete Page">
-					<i class="fa fa-trash text-danger"></i>
+				<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?php echo base_url($controllerName.'/Delete'). "/" . $page->getID(); ?>">
+					<i class="fa fa-trash"></i> Delete Page
 				</a>
 				<?php endif ?>
 			</td>

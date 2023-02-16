@@ -45,8 +45,8 @@ class Pipeline extends CVUI_Controller
         $uidata = new UIData();
         $uidata->title = "Data Pipelines";
 
-        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-        $uidata->javascript = array(JS.'cafevariome/pipeline.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+        $uidata->IncludeDataTables();
+        $uidata->IncludeJavaScript(JS.'cafevariome/pipeline.js');
 
         $pipelines = $this->dbAdapter->SetModel(PipelineList::class)->ReadAll();
 
@@ -111,7 +111,7 @@ class Pipeline extends CVUI_Controller
     {
         $uidata = new UIData();
         $uidata->title = "Create Data Pipeline";
-        $uidata->javascript = array(JS.'cafevariome/pipeline.js');
+        $uidata->IncludeJavaScript(JS.'cafevariome/pipeline.js');
 
         $this->validation->setRules([
             'name' => [
@@ -261,8 +261,8 @@ class Pipeline extends CVUI_Controller
             $uidata->data['subject_id_location'] = array(
                 'name' => 'subject_id_location',
                 'id' => 'subject_id_location',
-                'type' => 'subject_id_location',
-                'class' => 'form-control',
+                'type' => 'dropdown',
+                'class' => 'form-select',
                 'value' =>set_value('subject_id_location'),
                 'options' => [
 					SUBJECT_ID_WITHIN_FILE => PipelineHelper::GetSubjectIDLocation(SUBJECT_ID_WITHIN_FILE),
@@ -301,7 +301,7 @@ class Pipeline extends CVUI_Controller
 				'name' => 'subject_id_expansion_policy',
 				'id' => 'subject_id_expansion_policy',
 				'type' => 'subject_id_expansion_policy',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' =>set_value('subject_id_expansion_policy'),
 				'options' => [
 					SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL => PipelineHelper::GetExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL),
@@ -330,7 +330,7 @@ class Pipeline extends CVUI_Controller
                 'name' => 'grouping',
                 'id' => 'grouping',
                 'type' => 'dropdown',
-                'class' => 'form-control',
+                'class' => 'form-select',
                 'value' =>set_value('grouping'),
                 'options' => [
 					GROUPING_COLUMNS_ALL => PipelineHelper::GetGrouping(GROUPING_COLUMNS_ALL),
@@ -392,7 +392,7 @@ class Pipeline extends CVUI_Controller
 
         $uidata = new UIData();
         $uidata->title = "Edit Data Pipeline";
-        $uidata->javascript = array(JS.'cafevariome/pipeline.js');
+        $uidata->IncludeJavaScript(JS.'cafevariome/pipeline.js');
 
         $this->validation->setRules([
             'name' => [
@@ -542,8 +542,8 @@ class Pipeline extends CVUI_Controller
             $uidata->data['subject_id_location'] = array(
                 'name' => 'subject_id_location',
                 'id' => 'subject_id_location',
-                'type' => 'subject_id_location',
-                'class' => 'form-control',
+                'type' => 'dropdown',
+                'class' => 'form-select',
 				'options' => [
 					SUBJECT_ID_WITHIN_FILE => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_WITHIN_FILE),
 					SUBJECT_ID_IN_FILE_NAME => PipelineHelper::getSubjectIDLocation(SUBJECT_ID_IN_FILE_NAME),
@@ -582,8 +582,8 @@ class Pipeline extends CVUI_Controller
 			$uidata->data['subject_id_expansion_policy'] = array(
 				'name' => 'subject_id_expansion_policy',
 				'id' => 'subject_id_expansion_policy',
-				'type' => 'subject_id_expansion_policy',
-				'class' => 'form-control',
+				'type' => 'dropdown',
+				'class' => 'form-select',
 				'options' => [
 					SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL => PipelineHelper::getExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_INDIVIDUAL),
 					SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM => PipelineHelper::getExpansionPolicy(SUBJECT_ID_EXPANDSION_POLICY_MAXIMUM),
@@ -613,7 +613,7 @@ class Pipeline extends CVUI_Controller
                 'name' => 'grouping',
                 'id' => 'grouping',
                 'type' => 'dropdown',
-                'class' => 'form-control',
+                'class' => 'form-select',
 				'options' => [
 					GROUPING_COLUMNS_ALL => PipelineHelper::getGrouping(GROUPING_COLUMNS_ALL),
 					GROUPING_COLUMNS_CUSTOM => PipelineHelper::getGrouping(GROUPING_COLUMNS_CUSTOM)

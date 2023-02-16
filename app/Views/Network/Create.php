@@ -1,11 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-    </div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <div class="row">
 	<div class="col">
@@ -22,9 +19,9 @@
 	</div>
 <?php endif; ?>
 <?php echo form_open($controllerName.'/Create', ['name' => 'createNetwork']); ?>
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-	<?php echo form_label('Network Name', 'name'); ?>
+	<?php echo form_label('Network Name', 'name', ['class' => 'form-label']); ?>
 	<?php echo form_input($name); ?>
 	</div>
 	<div class="col-6 pt-4">
@@ -33,7 +30,7 @@
 		</small>
 	</div>
 </div>
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col">
 	<button type="submit" name="submit" class="btn btn-success bg-gradient-success">
 		<i class="fa fa-plus"></i>  Create Network

@@ -53,11 +53,8 @@ class Credential extends CVUI_Controller
 		$credentials = $this->dbAdapter->ReadAll();
 
 		$uidata->data['credentials'] = $credentials;
-		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
-		$uidata->javascript = [
-			JS. 'cafevariome/credential.js',
-			VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js'
-		];
+		$uidata->IncludeJavaScript(JS. 'cafevariome/credential.js');
+		$uidata->IncludeDataTables();
 
 		$data = $this->wrapData($uidata);
 		return view($this->controllerName . '/List', $data);
@@ -165,7 +162,7 @@ class Credential extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Edit Credential';
 		$uidata->data['id'] = $credential->getID();
-		$uidata->javascript = [JS. 'cafevariome/credential.js'];
+		$uidata->IncludeJavaScript(JS. 'cafevariome/credential.js');
 
 		$this->validation->setRules([
 			'name' => [
@@ -317,15 +314,6 @@ class Credential extends CVUI_Controller
 				'rules'  => 'required',
 				'errors' => [
 					'required' => '{field} is required.'
-				]
-			],
-
-			'id' => [
-				'label'  => 'Id',
-				'rules'  => 'required|integer',
-				'errors' => [
-					'required' => '{field} is required.',
-					'integer' => '{field} must be a positive and non-zero integer.'
 				]
 			]
 		]);

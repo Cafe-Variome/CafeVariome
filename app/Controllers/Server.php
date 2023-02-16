@@ -53,11 +53,9 @@ class Server extends CVUI_Controller
 		$servers = $this->dbAdapter->ReadAll();
 
 		$uidata->data['servers'] = $servers;
-		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
-		$uidata->javascript = [
-			JS. 'cafevariome/server.js',
-			VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js'
-		];
+
+		$uidata->IncludeJavaScript(JS. 'cafevariome/server.js');
+		$uidata->IncludeDataTables();
 
 		$data = $this->wrapData($uidata);
 		return view($this->controllerName . '/List', $data);

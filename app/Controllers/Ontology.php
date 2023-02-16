@@ -188,9 +188,8 @@ class Ontology extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Ontologies';
 
-		$uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-		$uidata->javascript = array(JS.'cafevariome/ontology.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
-
+		$uidata->IncludeJavaScript(JS.'cafevariome/ontology.js');
+		$uidata->IncludeDataTables();
 
 		$uidata->data['ontologies'] = $this->dbAdapter->ReadAll();
 

@@ -1,11 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-    </div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -45,8 +42,8 @@
 			</td>
 			<td><?php echo $network->installations_count; ?></td>
 			<td>
-				<a href="<?php echo base_url($controllerName.'/Leave' . '/' . $network->network_key); ?>" data-toggle="tooltip" data-placement="top" title="Leave Network">
-					<i class="fa fa-door-open text-danger"></i>
+				<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?php echo base_url($controllerName.'/Leave' . '/' . $network->network_key); ?>">
+					<i class="fa fa-door-open"></i> Leave Network
 				</a>
 			</td>
 		</tr>

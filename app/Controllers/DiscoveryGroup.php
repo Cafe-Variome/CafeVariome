@@ -60,11 +60,8 @@ class DiscoveryGroup extends CVUI_Controller
 
 		$uidata->data["discoveryGroups"] = $this->dbAdapter->SetModel(DiscoveryGroupList::class)->ReadAll();
 
-        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-        $uidata->javascript = array(
-			VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js',
-			JS.'cafevariome/components/datatable.js',
-			JS. 'cafevariome/discoverygroup.js');
+        $uidata->IncludeJavaScript(JS. 'cafevariome/discoverygroup.js');
+		$uidata->IncludeDataTables();
 
 		$data = $this->wrapData($uidata);
 
@@ -76,8 +73,7 @@ class DiscoveryGroup extends CVUI_Controller
         $uidata = new UIData();
 		$uidata->title = "Create Discovery Group";
 
-		$uidata->javascript = array(JS. 'cafevariome/discoverygroup.js');
-
+		$uidata->IncludeJavaScript(JS. 'cafevariome/discoverygroup.js');
 
 		$networkInterface = new NetworkInterface();
 
@@ -210,7 +206,7 @@ class DiscoveryGroup extends CVUI_Controller
 				'name'  => 'network',
 				'id'    => 'network',
 				'type'  => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'options' => $networks,
 				'value' => set_value('network')
 			);
@@ -237,7 +233,7 @@ class DiscoveryGroup extends CVUI_Controller
 				'name'  => 'policy',
 				'id'    => 'policy',
 				'type'  => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'options' => [
 					0 => 'Please select a policy',
 					DISCOVERY_GROUP_POLICY_EXISTENCE => DiscoveryGroupHelper::GetPolicy(DISCOVERY_GROUP_POLICY_EXISTENCE),
@@ -268,7 +264,7 @@ class DiscoveryGroup extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = "Create Discovery Group";
 		$uidata->data['discovery_group_id'] = $discoveryGroup->getID();
-		$uidata->javascript = array(JS. 'cafevariome/discoverygroup.js');
+		$uidata->IncludeJavaScript(JS. 'cafevariome/discoverygroup.js');
 
 		$networkInterface = new NetworkInterface();
 
@@ -406,7 +402,7 @@ class DiscoveryGroup extends CVUI_Controller
 				'name'  => 'network',
 				'id'    => 'network',
 				'type'  => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'options' => $networks,
 				'selected' => $discoveryGroup->network_id,
 				'value' => set_value('network')
@@ -434,7 +430,7 @@ class DiscoveryGroup extends CVUI_Controller
 				'name'  => 'policy',
 				'id'    => 'policy',
 				'type'  => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'options' => [
 					0 => 'Please select a policy',
 					DISCOVERY_GROUP_POLICY_EXISTENCE => DiscoveryGroupHelper::GetPolicy(DISCOVERY_GROUP_POLICY_EXISTENCE),

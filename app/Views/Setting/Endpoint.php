@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -19,16 +17,16 @@
 <?php echo form_open($controllerName."/Endpoint"); ?>
 
 <?php foreach ($settings as $s): ?>
-<div class="form-group row">
+<div class="row mb-3">
     <div class="col-3">
         <?= $s->name ?>
     </div>
     <?php if($s->value == 'on' || $s->value == 'off'): ?>
     <div class="col-3">
-        <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input" name="<?= $s->key ?>" id ="<?= $s->key ?>" <?= $s->value == 'on' ? 'checked' : '' ?>>
-            <label class="custom-control-label" for="<?= $s->key ?>">Check</label>
-            </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" name="<?= $s->key ?>" id ="<?= $s->key ?>" <?= $s->value == 'on' ? 'checked' : '' ?>>
+            <label class="form-check-label" for="<?= $s->key ?>"></label>
+		</div>
     </div>
     <?php else: ?>
     <div class="col-6">
@@ -37,7 +35,7 @@
     <?php endif; ?>
     <div class="col-3">
         <?php if($s->info != null): ?>
-        <button type="button" class="btn btn-info" data-toggle="tooltip" data-placement="right" title="<?= $s->info ?>">
+		<button type="button" class="btn btn-info" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title="<?= $s->info ?>">
             <i class="fa fa-question-circle"></i>
         </button>
         <?php endif ?>
@@ -45,7 +43,7 @@
 </div>
 <?php endforeach; ?>
 
-<div class="form-group row">
+<div class="row mb-3">
     <div class="col">
 		<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
 			<i class="fa fa-save"></i>  Save Settings

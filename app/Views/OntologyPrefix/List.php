@@ -1,11 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?> of '<?= $ontology->name ?>'</h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?> of '<?= $ontology->name ?>'
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 <div class="row">
@@ -28,11 +25,11 @@
 		<tr>
 			<td><?= $prefix->name ?></td>
 			<td>
-				<a href="<?= base_url($controllerName. '/Update'). "/" . $prefix->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Edit Ontology Prefix">
-					<i class="fa fa-edit text-warning"></i>
+				<a class="btn btn-sm btn-warning bg-gradient-warning" href="<?= base_url($controllerName. '/Update'). "/" . $prefix->getID(); ?>">
+					<i class="fa fa-edit"></i> Edit Ontology Prefix
 				</a>
-				<a href="<?= base_url($controllerName. '/Delete'). "/" . $prefix->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Delete Ontology Prefix">
-					<i class="fa fa-trash text-danger"></i>
+				<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?= base_url($controllerName. '/Delete'). "/" . $prefix->getID(); ?>">
+					<i class="fa fa-trash"></i> Delete Ontology Prefix
 				</a>
 			</td>
 		</tr>

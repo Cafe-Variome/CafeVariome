@@ -54,11 +54,8 @@ class ProxyServer extends CVUI_Controller
 
 		$proxyServers = $this->dbAdapter->ReadAll();
 		$uidata->data['proxyServers'] = $proxyServers;
-		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
-		$uidata->javascript = [
-			JS. 'cafevariome/proxyserver.js',
-			VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js'
-		];
+		$uidata->IncludeJavaScript(JS. 'cafevariome/proxyserver.js');
+		$uidata->IncludeDataTables();
 
 		$data = $this->wrapData($uidata);
 
@@ -89,7 +86,7 @@ class ProxyServer extends CVUI_Controller
 			{
 				$credentialsList[$credential->getID()] = $credential->name . ($credential->hide_username ? ' [Username is hidden]' : ' [' . $credential->username . ']');
 			}
-			
+
 		}
 
 		$this->validation->setRules([
@@ -170,7 +167,7 @@ class ProxyServer extends CVUI_Controller
 				'name' => 'server_id',
 				'id' => 'server_id',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' => set_value('server_id'),
 				'options' => $serversList
 			);
@@ -187,7 +184,7 @@ class ProxyServer extends CVUI_Controller
 				'name' => 'credential_id',
 				'id' => 'credential_id',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' => set_value('credential_id'),
 				'options' => $credentialsList
 			);
@@ -308,7 +305,7 @@ class ProxyServer extends CVUI_Controller
 				'name' => 'server_id',
 				'id' => 'server_id',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' => set_value('server_id', $proxyServer->server_id),
 				'options' => $serversList,
 				'selected' => $proxyServer->server_id
@@ -326,7 +323,7 @@ class ProxyServer extends CVUI_Controller
 				'name' => 'credential_id',
 				'id' => 'credential_id',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' => set_value('credential_id', $proxyServer->credential_id),
 				'options' => $credentialsList,
 				'selected' => $proxyServer->credential_id
@@ -380,15 +377,6 @@ class ProxyServer extends CVUI_Controller
 				'errors' => [
 					'required' => '{field} is required.'
 				]
-			],
-
-			'id' => [
-				'label'  => 'Id',
-				'rules'  => 'required|integer',
-				'errors' => [
-					'required' => '{field} is required.',
-					'integer' => '{field} must be a positive and non-zero integer.'
-				]
 			]
 		]);
 
@@ -402,7 +390,6 @@ class ProxyServer extends CVUI_Controller
 					$this->dbAdapter->Delete($id);
 					$this->setStatusMessage("Proxy server was deleted.", STATUS_SUCCESS);
 				}
-
 			}
 			catch (\Exception $ex)
 			{

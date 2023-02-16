@@ -1,11 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?> for '<?= $sourceName ?>'</h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?> for '<?= $sourceName ?>'
+</h2>
 <hr>
 <input type="hidden" id="csrf_token" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
 <input type="hidden" id="lastTaskId" value="<?= $lastTaskId ?>" />

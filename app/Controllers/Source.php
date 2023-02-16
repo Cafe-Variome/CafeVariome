@@ -61,10 +61,10 @@ class Source extends CVUI_Controller
         $sources = $this->dbAdapter->ReadAll();
         $uidata->data['sources'] = $sources;
 
-        $uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-        $uidata->javascript = array(JS.'cafevariome/source.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+        $uidata->IncludeJavaScript(JS.'cafevariome/source.js');
+		$uidata->IncludeDataTables();
 
-        $data = $this->wrapData($uidata);
+		$data = $this->wrapData($uidata);
 
         return view($this->viewDirectory.'/List', $data);
     }
@@ -219,7 +219,7 @@ class Source extends CVUI_Controller
 			$uidata->data['status'] = array(
 				'name' => 'status',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' =>set_value('status'),
 				'options' => [
 					SOURCE_STATUS_ONLINE => SourceHelper::getSourceStatus(SOURCE_STATUS_ONLINE),
@@ -230,7 +230,7 @@ class Source extends CVUI_Controller
             $uidata->data['selected_source_display'] = $this->request->getVar('source_display') ? $this->request->getVar('source_display') :[];
             $uidata->data['selected_count_display'] = $this->request->getVar('count_display') ? $this->request->getVar('count_display') :[];
 
-            $uidata->javascript = array(JS.'cafevariome/components/transferbox.js', JS.'cafevariome/source.js');
+			$uidata->IncludeJavaScript(JS.'cafevariome/source.js');
 
             $data = $this->wrapData($uidata);
             return view($this->viewDirectory.'/Create', $data);
@@ -402,7 +402,7 @@ class Source extends CVUI_Controller
 			$uidata->data['status'] = array(
 				'name' => 'status',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' =>set_value('status'),
 				'options' => [
 					SOURCE_STATUS_ONLINE => SourceHelper::getSourceStatus(SOURCE_STATUS_ONLINE),
@@ -411,7 +411,7 @@ class Source extends CVUI_Controller
 				'selected' => (int)$source->status,
 			);
 
-			$uidata->javascript = array(JS.'cafevariome/components/transferbox.js',JS.'cafevariome/source.js');
+			$uidata->IncludeJavaScript(JS.'cafevariome/source.js');
 
 			$data = $this->wrapData($uidata);
 
@@ -620,7 +620,7 @@ class Source extends CVUI_Controller
 		$uidata->data['indexDocDeleted'] = $indexDocDeleted;
 		$uidata->data['lastTaskId'] = (new TaskAdapterFactory())->GetInstance()->ReadLastProcessingTaskIdBySourceIdAndType($source->getID(), TASK_TYPE_SOURCE_INDEX_ELASTICSEARCH);
 
-		$uidata->javascript = [JS."cafevariome/elasticsearch.js"];
+		$uidata->IncludeJavaScript(JS.'cafevariome/elasticsearch.js');
 
 		$data = $this->wrapData($uidata);
 
@@ -698,7 +698,7 @@ class Source extends CVUI_Controller
 		$uidata->data['relationshipsCount'] = $relationshipsCount;
 		$uidata->data['lastTaskId'] = (new TaskAdapterFactory())->GetInstance()->ReadLastProcessingTaskIdBySourceIdAndType($source->getID(), TASK_TYPE_SOURCE_INDEX_NEO4J);
 
-		$uidata->javascript = [JS."cafevariome/neo4j.js"];
+		$uidata->IncludeJavaScript(JS.'cafevariome/neo4j.js');
 
 		$data = $this->wrapData($uidata);
 
@@ -744,7 +744,7 @@ class Source extends CVUI_Controller
 		$uidata->data['indexStatusText'] = SourceHelper::getUserInterfaceIndexStatus($indexStatus);
 		$uidata->data['lastTaskId'] = (new TaskAdapterFactory())->GetInstance()->ReadLastProcessingTaskIdBySourceIdAndType($source->getID(), TASK_TYPE_SOURCE_INDEX_ELASTICSEARCH);
 
-		$uidata->javascript = [JS."cafevariome/userinterfaceindex.js"];
+		$uidata->IncludeJavaScript(JS.'cafevariome/userinterfaceindex.js');
 
 		$data = $this->wrapData($uidata);
 

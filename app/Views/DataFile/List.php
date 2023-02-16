@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?> of '<?= $source->name ?>'</h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?> of '<?= $source->name ?>'
+</h2>
 <hr>
 <?php if ($statusMessage): ?>
 	<div class="row">
@@ -48,19 +46,19 @@
 		<td id="action-<?= $dataFile->getID() ?>">
 			<?php if($dataFile->status != DATA_FILE_STATUS_PROCESSING): ?>
 				<div id="actionBtns-<?= $dataFile->getID() ?>" class="actionBtns">
-					<a data-placement="top" title="Process Data File" data-toggle="modal" data-target="#taskModal" data-fileid="<?= $dataFile->getID() ?>" data-filename="<?= $dataFile->name ?>">
-						<i class="fa fa-play text-success"></i>
+					<a class="btn btn-sm btn-success bg-gradient-success" data-bs-toggle="modal" data-bs-target="#taskModal" data-fileid="<?= $dataFile->getID() ?>" data-filename="<?= $dataFile->name ?>">
+						<i class="fa fa-play"></i> Process Data File
 					</a>
-					<a href="<?php echo base_url($controllerName.'/Tasks'). "/" . $dataFile->getID() ?>" data-placement="top" title="Task History" data-toggle="tooltip" data-placement="top">
-						<i class="fa fa-history text-info"></i>
+					<a class="btn btn-sm btn-info bg-gradient-info" href="<?php echo base_url($controllerName.'/Tasks'). "/" . $dataFile->getID() ?>">
+						<i class="fa fa-history"></i> Task History
 					</a>
 					<?php if($dataFile->status == DATA_FILE_STATUS_PROCESSED): ?>
-					<a href="<?php echo base_url($controllerName.'/DeleteRecords'). "/" . $dataFile->getID() ?>" data-toggle="tooltip" data-placement="top" title="Delete Records">
-						<i class="fa fa-trash-alt text-warning"></i>
+					<a class="btn btn-sm btn-warning bg-gradient-warning" href="<?php echo base_url($controllerName.'/DeleteRecords'). "/" . $dataFile->getID() ?>" >
+						<i class="fa fa-trash-alt"></i> Delete Records
 					</a>
 					<?php endif; ?>
-					<a href="<?php echo base_url($controllerName.'/Delete'). "/" . $dataFile->getID() ?>" data-toggle="tooltip" data-placement="top" title="Delete Data File">
-						<i class="fa fa-trash text-danger"></i>
+					<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?php echo base_url($controllerName.'/Delete'). "/" . $dataFile->getID() ?>">
+						<i class="fa fa-trash"></i> Delete Data File
 					</a>
 				</div>
 			<?php endif; ?>
@@ -70,7 +68,7 @@
 	</tbody>
 </table>
 
-<div class="row mt-2">
+<div class="row justify-content-between mt-2">
 	<div class="col-5">
 		<a href="<?= base_url($controllerName.'/Upload/' . $source->getID()) ?>" class="btn btn-success bg-gradient-success">
 			<i class="fa fa-upload"></i>  Upload Data File
@@ -82,14 +80,14 @@
 			<i class="fa fa-database"></i> View Sources
 		</a>
 	</div>
-	<div class="col-7 text-right">
+	<div class="col-5">
 		<button class="btn btn-primary bg-gradient-primary" id="batchProcessAllBtn" data-toggle="modal" data-target="#taskModal" disabled>
 			<i class="fa fa-play"></i> Process Uploaded/Imported Data Files
-			<span class="badge badge-light" id="uploadedImportedCount"></span>
+			<span class="badge bg-secondary" id="uploadedImportedCount"></span>
 			<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" id="uploadedImportedSpinner"></span>
 		</button>
 		<button class="btn btn-success bg-gradient-success batch-btn" id="batchProcessBtn" data-toggle="modal" data-target="#taskModal" disabled>
-			<i class="fa fa-play"></i> Process Selected Data File(s) <span class="badge badge-light file-counter"></span>
+			<i class="fa fa-play"></i> Process Selected Data File(s) <span class="badge bg-secondary file-counter">0</span>
 		</button>
 <!--		<button class="btn btn-danger bg-gradient-danger batch-btn" id="batchDeleteFilesBtn" data-toggle="modal" data-target="" disabled>-->
 <!--			<i class="fa fa-trash"></i> Delete Selected File(s) <span class="badge badge-light file-counter"></span>-->
@@ -107,11 +105,11 @@
 			<input type="hidden" name="fileId" id="fileId" value="-1">
 			<input type="hidden" name="sourceId" id="sourceId" value="<?= $source->getID() ?>">
 			<div class="modal-body">
-				<div class="form-group row">
+				<div class="row mb-3">
 					<div class="col-3">File(s)</div>
 					<div class="col-9" id="fileName"></div>
 				</div>
-				<div class="form-group row">
+				<div class="row mb-3">
 					<div class="col-3">Pipeline</div>
 					<div class="col-5">
 						<?= form_dropdown($pipeline); ?>
@@ -123,7 +121,7 @@
 						<a href="<?= base_url('Pipeline') ?>" target="_blank">View Pipelines</a>
 					</div>
 				</div>
-				<div class="form-group row">
+				<div class="row mb-3">
 					<div class="col-3"></div>
 					<div class="col-9">
 						<span id="statusMessage"></span>
@@ -135,9 +133,8 @@
 				<button type="button" id="processBtn" class="btn bg-gradient-primary btn-primary">
 					<i class="fa fa-play"></i> Start Processing
 				</button>
-				<button type="button"  id="cancelBtn" class="btn bg-gradient-secondary btn-secondary" data-dismiss="modal">
-					<i class="fa fa-times"></i> Cancel
-				</button>
+				<button type="button" class="btn btn-secondary bg-gradient-secondary" data-bs-dismiss="modal">Cancel</button>
+
 			</div>
 			<?= form_close(); ?>
 		</div>

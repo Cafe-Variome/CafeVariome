@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?> of '<?= $ontology->name ?>'</h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?> of '<?= $ontology->name ?>'
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -27,11 +25,11 @@
 		<tr>
 			<td><?= $relationship->name ?></td>
 			<td>
-				<a href="<?= base_url($controllerName. '/Update'). "/" . $relationship->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Edit Ontology Relationship">
-					<i class="fa fa-edit text-warning"></i>
+				<a class="btn btn-sm btn-warning bg-gradient-warning" href="<?= base_url($controllerName. '/Update'). "/" . $relationship->getID(); ?>">
+					<i class="fa fa-edit"></i> Edit Ontology Relationship
 				</a>
-				<a href="<?= base_url($controllerName. '/Delete'). "/" . $relationship->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Delete Ontology Relationship">
-					<i class="fa fa-trash text-danger"></i>
+				<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?= base_url($controllerName. '/Delete'). "/" . $relationship->getID(); ?>">
+					<i class="fa fa-trash"></i> Delete Ontology Relationship
 				</a>
 			</td>
 		</tr>

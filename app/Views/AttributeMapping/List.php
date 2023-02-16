@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?> of '<?= $attributeName ?>'</h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?> of '<?= $attributeName ?>'
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -27,8 +25,8 @@
 		<tr>
 			<td><?= $attributeMapping->name; ?></td>
 			<td>
-				<a href="<?= base_url($controllerName. '/Delete'). "/" . $attributeMapping->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Delete Attribute Mapping">
-					<i class="fa fa-trash text-danger"></i>
+				<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?= base_url($controllerName. '/Delete'). "/" . $attributeMapping->getID(); ?>">
+					<i class="fa fa-trash"></i> Delete Attribute Mapping
 				</a>
 			</td>
 		</tr>

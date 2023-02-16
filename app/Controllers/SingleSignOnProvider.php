@@ -58,11 +58,8 @@ class SingleSignOnProvider extends CVUI_Controller
 
 		$uidata->data['singleSignOnProviders'] = $this->dbAdapter->ReadAll();
 
-		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
-		$uidata->javascript = [
-			JS. 'cafevariome/singlesignonprovider.js',
-			VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js'
-		];
+		$uidata->IncludeJavaScript(JS. 'cafevariome/singlesignonprovider.js');
+		$uidata->IncludeDataTables();
 
 		$data = $this->wrapData($uidata);
 		return view($this->controllerName . '/List', $data);
@@ -75,7 +72,7 @@ class SingleSignOnProvider extends CVUI_Controller
 		$maximumAllowedUploadSize = '512K';
 		$uidata->data['maxUploadSize'] = UploadFileMan::parseSizeToByte($maximumAllowedUploadSize);
 		$uidata->data['maxUploadSizeH'] = $maximumAllowedUploadSize;
-		$uidata->javascript = [JS. 'cafevariome/singlesignonprovider.js'];
+		$uidata->IncludeJavaScript(JS. 'cafevariome/singlesignonprovider.js');
 
 		$serverAdapterFactory = new ServerAdapterFactory();
 		$servers = $serverAdapterFactory->GetInstance()->ReadAll();
@@ -254,8 +251,8 @@ class SingleSignOnProvider extends CVUI_Controller
 			$uidata->data['icon'] = array(
 				'name' => 'icon',
 				'id' => 'icon',
-				'type' => 'text',
-				'class' => 'custom-file-input',
+				'type' => 'file',
+				'class' => 'form-control',
 				'aria-describedby' => 'icon',
 				'value' =>set_value('icon'),
 			);
@@ -264,7 +261,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'type',
 				'id' => 'type',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' =>set_value('type'),
 				'options' => [
 					SINGLE_SIGNON_OIDC2 => SingleSignOnProviderHelper::getType(SINGLE_SIGNON_OIDC2),
@@ -276,7 +273,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'server_id',
 				'id' => 'server_id',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' => set_value('server_id'),
 				'options' => $serversList
 			);
@@ -293,7 +290,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'credential_id',
 				'id' => 'credential_id',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' => set_value('credential_id'),
 				'options' => $credentialsList
 			);
@@ -302,7 +299,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'proxy_server_id',
 				'id' => 'proxy_server_id',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' =>set_value('proxy_server_id'),
 				'options' => $proxyServerList
 			);
@@ -311,6 +308,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'user_login[]',
 				'id' => 'user_login',
 				'type' => 'checkbox',
+				'class' => 'form-check-input',
 				'checked' => false,
 				'value' =>set_value('user_login'),
 			);
@@ -319,6 +317,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'query[]',
 				'id' => 'query',
 				'type' => 'checkbox',
+				'class' => 'form-check-input',
 				'checked' => false,
 				'value' =>set_value('query'),
 			);
@@ -326,7 +325,7 @@ class SingleSignOnProvider extends CVUI_Controller
 			$uidata->data['authentication_policy'] = array(
 				'name' => 'authentication_policy',
 				'id' => 'authentication_policy',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'type' => 'dropdown',
 				'value' =>set_value('authentication_policy'),
 				'options' => [
@@ -359,7 +358,7 @@ class SingleSignOnProvider extends CVUI_Controller
 		$maximumAllowedUploadSize = '512K';
 		$uidata->data['maxUploadSize'] = UploadFileMan::parseSizeToByte($maximumAllowedUploadSize);
 		$uidata->data['maxUploadSizeH'] = $maximumAllowedUploadSize;
-		$uidata->javascript = [JS. 'cafevariome/singlesignonprovider.js'];
+		$uidata->IncludeJavaScript(JS. 'cafevariome/singlesignonprovider.js');
 
 		$serverAdapterFactory = new ServerAdapterFactory();
 		$servers = $serverAdapterFactory->GetInstance()->ReadAll();
@@ -545,8 +544,8 @@ class SingleSignOnProvider extends CVUI_Controller
 			$uidata->data['icon'] = array(
 				'name' => 'icon',
 				'id' => 'icon',
-				'type' => 'text',
-				'class' => 'custom-file-input',
+				'type' => 'file',
+				'class' => 'form-control',
 				'aria-describedby' => 'icon',
 				'value' =>set_value('icon'),
 			);
@@ -555,7 +554,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'type',
 				'id' => 'type',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' =>set_value('type'),
 				'options' => [
 					SINGLE_SIGNON_OIDC2 => SingleSignOnProviderHelper::getType(SINGLE_SIGNON_OIDC2),
@@ -568,7 +567,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'server_id',
 				'id' => 'server_id',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' => set_value('server_id'),
 				'options' => $serversList,
 				'selected' => $singleSignOnProvider->server_id
@@ -586,7 +585,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'credential_id',
 				'id' => 'credential_id',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' => set_value('credential_id'),
 				'options' => $credentialsList,
 				'selected' => $singleSignOnProvider->credential_id
@@ -596,7 +595,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'proxy_server_id',
 				'id' => 'proxy_server_id',
 				'type' => 'dropdown',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'value' =>set_value('proxy_server_id'),
 				'options' => $proxyServerList,
 				'selected' => $singleSignOnProvider->proxy_server_id
@@ -606,6 +605,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'user_login[]',
 				'id' => 'user_login',
 				'type' => 'checkbox',
+				'class' => 'form-check-input',
 				'checked' => $singleSignOnProvider->user_login,
 				'value' =>set_value('user_login'),
 			);
@@ -614,6 +614,7 @@ class SingleSignOnProvider extends CVUI_Controller
 				'name' => 'query[]',
 				'id' => 'query',
 				'type' => 'checkbox',
+				'class' => 'form-check-input',
 				'checked' => $singleSignOnProvider->query,
 				'value' =>set_value('query'),
 			);
@@ -621,7 +622,7 @@ class SingleSignOnProvider extends CVUI_Controller
 			$uidata->data['authentication_policy'] = array(
 				'name' => 'authentication_policy',
 				'id' => 'authentication_policy',
-				'class' => 'form-control',
+				'class' => 'form-select',
 				'type' => 'dropdown',
 				'value' =>set_value('authentication_policy'),
 				'options' => [
@@ -690,15 +691,6 @@ class SingleSignOnProvider extends CVUI_Controller
 				'rules'  => 'required',
 				'errors' => [
 					'required' => '{field} is required.'
-				]
-			],
-
-			'id' => [
-				'label'  => 'Id',
-				'rules'  => 'required|integer',
-				'errors' => [
-					'required' => '{field} is required.',
-					'integer' => '{field} must be a positive and non-zero integer.'
 				]
 			]
 		]);

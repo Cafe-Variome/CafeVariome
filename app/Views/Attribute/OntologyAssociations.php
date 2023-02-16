@@ -1,11 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?> of '<?= $attribute->name ?>'</h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?> of '<?= $attribute->name ?>'
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -21,7 +18,7 @@
 <input type="hidden" name="attribute_id" id="attribute_id" value="<?= $attribute->getID() ?>" />
 <input type="hidden" id="csrf_token" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-3">
 		<?= form_label('Ontology', 'ontology'); ?>
 		<?= form_dropdown($ontology); ?>
@@ -64,8 +61,8 @@
 			<td><?= $association->prefix_name ?></td>
 			<td><?= $association->relationship_name ?></td>
 			<td>
-				<a href="<?= base_url($controllerName. '/DeleteAssociation'). "/" . $association->id ; ?>" data-toggle="tooltip" data-placement="top" title="Delete Association">
-					<i class="fa fa-trash text-danger"></i>
+				<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?= base_url($controllerName. '/DeleteAssociation'). "/" . $association->id ; ?>">
+					<i class="fa fa-trash"></i> Delete Association
 				</a>
 			</td>
 		</tr>

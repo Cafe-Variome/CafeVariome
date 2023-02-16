@@ -72,8 +72,8 @@ class Value extends CVUI_Controller
 		$uidata->data['attribute_name'] = $attribute->name;
 		$uidata->data['values'] = $values;
 
-		$uidata->css = array(VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
-		$uidata->javascript = array(JS.'cafevariome/attribute.js', VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js');
+		$uidata->IncludeJavaScript(JS.'cafevariome/attribute.js');
+		$uidata->IncludeDataTables();
 
 		$data = $this->wrapData($uidata);
 
@@ -161,7 +161,7 @@ class Value extends CVUI_Controller
 			$uidata->data['show_in_interface'] = array(
 				'name' => 'show_in_interface[]',
 				'id' => 'show_in_interface',
-				'class' => 'custom-control-input',
+				'class' => 'form-check-input',
 				'value' => set_value('show_in_interface', $value->show_in_interface),
 				'checked' => $value->show_in_interface ? true : false
 			);
@@ -169,7 +169,7 @@ class Value extends CVUI_Controller
 			$uidata->data['include_in_interface_index'] = array(
 				'name' => 'include_in_interface_index[]',
 				'id' => 'include_in_interface_index',
-				'class' => 'custom-control-input',
+				'class' => 'form-check-input',
 				'value' => set_value('include_in_interface_index', $value->include_in_interface_index),
 				'checked' => $value->include_in_interface_index ? true : false
 			);

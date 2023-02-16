@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -34,14 +32,14 @@
 			<td><?= $pipeline->subject_id_attribute_name ?></td>
 			<td><?= $pipeline->grouping?></td>
 			<td>
-				<a href="<?php echo base_url($controllerName. '/Update'). "/" . $pipeline->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Edit Pipeline">
-					<i class="fa fa-edit text-warning"></i>
+				<a class="btn btn-sm btn-warning bg-gradient-warning" href="<?php echo base_url($controllerName. '/Update'). "/" . $pipeline->getID(); ?>">
+					<i class="fa fa-edit"></i> Edit Pipeline
 				</a>
-				<a href="<?php echo base_url($controllerName. '/Details'). "/" . $pipeline->getID(); ?>" data-toggle="tooltip" data-placement="top" title="View Pipeline">
-					<i class="fa fa-eye text-info"></i>
+				<a class="btn btn-sm btn-info bg-gradient-info" href="<?php echo base_url($controllerName. '/Details'). "/" . $pipeline->getID(); ?>">
+					<i class="fa fa-eye"></i> View Pipeline
 				</a>
-				<a href="<?php echo base_url($controllerName. '/Delete'). "/" . $pipeline->getID(); ?>" data-toggle="tooltip" data-placement="top" title="Delete Pipeline">
-					<i class="fa fa-trash text-danger"></i>
+				<a class="btn btn-sm btn-danger bg-gradient-danger" href="<?php echo base_url($controllerName. '/Delete'). "/" . $pipeline->getID(); ?>">
+					<i class="fa fa-trash"></i> Delete Pipeline
 				</a>
 			</td>
 		</tr>

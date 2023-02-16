@@ -1,12 +1,9 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
 <input type="hidden" id="csrf_token" name="<?= csrf_token() ?>" value="<?= csrf_hash() ?>" />
-
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if($networkMsg): ?>
 <div class="row">
@@ -55,79 +52,95 @@
 
 <div class="row">
 	<div class="col-xl-3 col-md-6 mb-4">
-		<div class="card border-left-primary shadow h-100 py-2">
+		<div class="card bg-primary text-white shadow h-100 py-2">
 			<div class="card-body">
-			<div class="row no-gutters align-items-center">
-				<div class="col mr-2">
-				<div class="text-s font-weight-bold text-primary text-uppercase mb-1">
-					<a href="<?= base_url('Source/List') ?>">Sources</a>
-				</div>
-				<div class="h4 mb-0 font-weight-bold text-gray-800"><?= $sourceCount ?></div>
-				</div>
-				<div class="col-auto">
-				<i class="fas fa-database fa-2x"></i>
-				</div>
-			</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="col-xl-3 col-md-6 mb-4">
-		<div class="card border-left-success shadow h-100 py-2">
-			<div class="card-body">
-			<div class="row no-gutters align-items-center">
-				<div class="col mr-2">
-				<div class="text-s font-weight-bold text-success text-uppercase mb-1">
-					<a class="text-success" href="<?= base_url('Network/List') ?>">Networks You Are In</a>
-				</div>
-				<div class="h4 mb-0 font-weight-bold text-gray-800"><?= $networksCount ?></div>
-				</div>
-				<div class="col-auto">
-				<i class="fas fa-network-wired fa-2x"></i>
-				</div>
-			</div>
-			</div>
-		</div>
-	</div>
-
-	<div class="col-xl-3 col-md-6 mb-4">
-		<div class="card border-left-info shadow h-100 py-2">
-			<div class="card-body">
-			<div class="row no-gutters align-items-center">
-				<div class="col mr-2">
-				<div class="text-s font-weight-bold text-info text-uppercase mb-1">
-				<a class="text-info" href="<?= base_url('User/List') ?>">Users</a>
-				</div>
 				<div class="row no-gutters align-items-center">
+					<div class="col me-2">
+						<div class="font-weight-bold text-uppercase mb-1">
+							<a class="text-white text-decoration-none" href="<?= base_url('Source/List') ?>">Sources</a>
+						</div>
+						<div class="h4 mb-0 font-weight-bold"><?= $sourceCount ?></div>
+					</div>
 					<div class="col-auto">
-					<div class="h4 mb-0 mr-3 font-weight-bold text-gray-800"><?= $usersCount ?></div>
+						<i class="fas fa-database fa-2x"></i>
 					</div>
-					<div class="col">
-					</div>
-				</div>
-				</div>
-				<div class="col-auto">
-					<i class="fas fa-users fa-2x"></i>
 				</div>
 			</div>
+			<div class="card-footer d-flex align-items-center justify-content-between">
+				<a class="small text-white stretched-link" href="<?= base_url('Source/List') ?>">View Sources</a>
+				<div class="small text-white"><i class="fas fa-angle-right"></i></div>
 			</div>
 		</div>
 	</div>
 
 	<div class="col-xl-3 col-md-6 mb-4">
-		<div class="card border-left-warning shadow h-100 py-2">
+		<div class="card bg-success text-white shadow h-100 py-2">
 			<div class="card-body">
-			<div class="row no-gutters align-items-center">
-				<div class="col mr-2">
-				<div class="text-s font-weight-bold text-warning text-uppercase mb-1">
-					<a class="text-warning" href="<?= base_url('NetworkRequest/List') ?>">Pending Network Requests</a>
-				</div>
-				<div class="h4 mb-0 font-weight-bold text-gray-800"><?= $networkRequestCount?></div>
-				</div>
-				<div class="col-auto">
-				<i class="fas fa-comments fa-2x"></i>
+				<div class="row no-gutters align-items-center">
+					<div class="col me-2">
+						<div class="font-weight-bold text-uppercase mb-1">
+							<a class="text-white text-decoration-none" href="<?= base_url('Network/List') ?>">Networks You Are In</a>
+						</div>
+						<div class="h4 mb-0 font-weight-bold text-gray-800"><?= $networksCount ?></div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-network-wired fa-2x"></i>
+					</div>
 				</div>
 			</div>
+			<div class="card-footer d-flex align-items-center justify-content-between">
+				<a class="small text-white stretched-link" href="<?= base_url('Network/List') ?>">View Networks</a>
+				<div class="small text-white"><i class="fas fa-angle-right"></i></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card bg-info text-white shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col me-2">
+						<div class="font-weight-bold text-uppercase mb-1">
+							<a class="text-white text-decoration-none" href="<?= base_url('User/List') ?>">Users</a>
+						</div>
+						<div class="row no-gutters align-items-center">
+							<div class="col-auto">
+								<div class="h4 mb-0 me-3 font-weight-bold text-gray-800"><?= $usersCount ?></div>
+							</div>
+							<div class="col">
+							</div>
+						</div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-users fa-2x"></i>
+					</div>
+				</div>
+			</div>
+			<div class="card-footer d-flex align-items-center justify-content-between">
+				<a class="small text-white stretched-link" href="<?= base_url('User/List') ?>">View Users</a>
+				<div class="small text-white"><i class="fas fa-angle-right"></i></div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-xl-3 col-md-6 mb-4">
+		<div class="card bg-warning text-white shadow h-100 py-2">
+			<div class="card-body">
+				<div class="row no-gutters align-items-center">
+					<div class="col me-2">
+						<div class="font-weight-bold text-warning text-uppercase mb-1">
+							<a class="text-white text-decoration-none" href="<?= base_url('NetworkRequest/List') ?>">Pending Network Requests</a>
+						</div>
+						<div class="h4 mb-0 font-weight-bold text-gray-800"><?= $networkRequestCount?></div>
+					</div>
+					<div class="col-auto">
+						<i class="fas fa-comments fa-2x"></i>
+					</div>
+				</div>
+			</div>
+			<div class="card-footer d-flex align-items-center justify-content-between">
+				<a class="small text-white stretched-link" href="<?= base_url('NetworkRequest/List') ?>">View Pending Network Requests</a>
+				<div class="small text-white"><i class="fas fa-angle-right"></i></div>
 			</div>
 		</div>
 	</div>
@@ -138,7 +151,7 @@
 	<div class="col-xl-8 col-lg-7">
 		<div class="card shadow mb-4">
 			<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-			<h6 class="m-0 font-weight-bold text-primary">Record Count per Source </h6>
+			<h6 class="m-0 font-weight-bold">Record Count per Source </h6>
 			</div>
 			<div class="card-body">
 				<div class="chart-container text-center">
@@ -155,10 +168,10 @@
 	<div class="col-xl-4 col-lg-5">
 		<div class="row">
 			<div class="col">
-				<div class="card shadow mb-1">
+				<div class="card shadow mb-4">
 					<!-- Card Header - Dropdown -->
 					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-						<h6 class="m-0 font-weight-bold text-primary">Disk Space Usage</h6>
+						<h6 class="m-0 font-weight-bold">Disk Space Usage</h6>
 					</div>
 					<!-- Card Body -->
 					<div class="card-body">
@@ -174,7 +187,7 @@
 				<div class="card shadow">
 					<!-- Card Header - Dropdown -->
 					<div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-					<h6 class="m-0 font-weight-bold text-primary">Service Status</h6>
+					<h6 class="m-0 font-weight-bold">Service Status</h6>
 					</div>
 					<!-- Card Body -->
 					<div class="card-body">

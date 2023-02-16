@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if ($statusMessage): ?>
 	<div class="row">
@@ -49,7 +47,7 @@
 
 <?php echo form_open($controllerName.'/Import/' . $source->getID(), ['id' => 'importFiles']); ?>
 <input type="hidden" id="source_id" name="source_id" value="<?= $source->getID() ?>">
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
 		<?php echo form_input($path) ?>
 		<div class="invalid-feedback">
@@ -67,7 +65,7 @@
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col">
 		<button type="submit" name="submit" id="importBtn" class="btn btn-primary bg-gradient-primary" onClick="importDir()" disabled>
 			<i class="fa fa-file-import"></i> Import Data File(s)

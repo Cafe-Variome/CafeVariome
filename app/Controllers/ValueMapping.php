@@ -62,8 +62,8 @@ class ValueMapping extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Value Mappings';
 
-		$uidata->css = array(VENDOR . 'datatables/datatables/media/css/jquery.dataTables.min.css');
-		$uidata->javascript = array(JS . 'cafevariome/value_mapping.js', VENDOR . 'datatables/datatables/media/js/jquery.dataTables.min.js');
+		$uidata->IncludeJavaScript(JS.'cafevariome/value_mapping.js');
+		$uidata->IncludeDataTables();
 
 		$valueMappings = $this->dbAdapter->ReadByValueId($value_id);
 		$attributeId = $value->attribute_id;

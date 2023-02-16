@@ -1,11 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if($statusMessage): ?>
 	<div class="row">
@@ -19,46 +16,46 @@
 
 <?php echo form_open($controllerName. '/Create'); ?>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Name', 'name'); ?>
+		<?php echo form_label('Name', 'name', ['class' => 'form-label']); ?>
 		<?php echo form_input($name); ?>
 	</div>
 	<div class="col-6">
-		<?php echo form_label('Network', 'network'); ?>
+		<?php echo form_label('Network', 'network', ['class' => 'form-label']); ?>
 		<?= form_dropdown($network) ?>
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Policy', 'policy'); ?>
+		<?php echo form_label('Policy', 'policy', ['class' => 'form-label']); ?>
 		<?= form_dropdown($policy) ?>
 	</div>
 	<div class="col-6">
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Users', 'users'); ?>
+		<?php echo form_label('Users', 'users', ['class' => 'form-label']); ?>
 		<?= form_multiselect($users) ?>
 	</div>
 	<div class="col-6">
-		<?php echo form_label('Sources', 'sources'); ?>
+		<?php echo form_label('Sources', 'sources', ['class' => 'form-label']); ?>
 		<?= form_multiselect($sources) ?>
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-12">
-		<?php echo form_label('Description', 'description'); ?>
+		<?php echo form_label('Description', 'description', ['class' => 'form-label']); ?>
 		<?php echo form_textarea($description); ?>
 	</div>
 
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col">
 	<button type="submit" name="submit" class="btn btn-success bg-gradient-success">
 		<i class="fa fa-plus"></i> Create Discovery Group

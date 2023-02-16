@@ -82,16 +82,14 @@ class DataFile extends CVUI_Controller
 			'name' => 'pipeline',
 			'id' => 'pipeline',
 			'type' => 'dropdown',
-			'class' => 'form-control',
+			'class' => 'form-select',
 			'value' => set_value('pipeline'),
 			'options' => $pipelineNames
 		);
 
-		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
-		$uidata->javascript = [
-			JS. 'cafevariome/datafile.js',
-			VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js'
-		];
+
+		$uidata->IncludeJavaScript(JS. 'cafevariome/datafile.js');
+		$uidata->IncludeDataTables();
 
 		$data = $this->wrapData($uidata);
 		return view($this->controllerName . '/List', $data);
@@ -110,12 +108,8 @@ class DataFile extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = "Upload Data File";
 
-		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
-		$uidata->javascript = [
-			VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',
-			JS. 'bootstrap-notify.js',
-			JS.'cafevariome/datafile.js'
-		];
+		$uidata->IncludeJavaScript(JS.'cafevariome/datafile.js');
+		$uidata->IncludeDataTables();
 
 		$maximumAllowedUploadSize = UploadFileMan::getMaximumAllowedUploadSize();
 		$uidata->data['maxUploadSize'] = UploadFileMan::parseSizeToByte($maximumAllowedUploadSize);
@@ -200,9 +194,10 @@ class DataFile extends CVUI_Controller
 			$uidata->data['name'] = array(
 				'name' => 'name',
 				'id' => 'name',
-				'type' => 'text',
-				'class' => 'custom-file-input',
+				'type' => 'file',
+				'class' => 'form-control',
 				'aria-describedby' => 'name',
+				'aria-label' => 'Upload',
 				'value' =>set_value('name'),
 			);
 		}
@@ -224,12 +219,8 @@ class DataFile extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = "Import Data File(s)";
 
-		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
-		$uidata->javascript = [
-			VENDOR.'datatables/datatables/media/js/jquery.dataTables.js',
-			JS. 'bootstrap-notify.js',
-			JS.'cafevariome/datafile.js'
-		];
+		$uidata->IncludeJavaScript(JS.'cafevariome/datafile.js');
+		$uidata->IncludeDataTables();
 
 		$maximumAllowedUploadSize = UploadFileMan::getMaximumAllowedUploadSize();
 		$uidata->data['maxUploadSize'] = UploadFileMan::parseSizeToByte($maximumAllowedUploadSize);
@@ -396,11 +387,8 @@ class DataFile extends CVUI_Controller
 		$taskAdapter = (new TaskAdapterFactory())->GetInstance();
 		$uidata->data['tasks'] = $taskAdapter->SetModel(TaskList::class)->ReadByDataFileId($id);
 
-		$uidata->css = [VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css'];
-		$uidata->javascript = [
-			JS. 'cafevariome/datafile.js',
-			VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js'
-		];
+		$uidata->IncludeJavaScript(JS.'cafevariome/datafile.js');
+		$uidata->IncludeDataTables();
 
 		$data = $this->wrapData($uidata);
 

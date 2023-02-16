@@ -78,7 +78,7 @@ class Discover extends CVUI_Controller
 
         $uidata->data['networks'] = $authorisedNetworks;
 
-        $uidata->javascript = array(JS."cafevariome/discover.js");
+        $uidata->IncludeJavaScript(JS."cafevariome/discover.js");
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory.'/SelectNetwork', $data);
@@ -126,22 +126,22 @@ class Discover extends CVUI_Controller
         }
 
         $uidata->title = "Discover - Query Builder";
-        $uidata->css = array(//VENDOR.'vakata/jstree/dist/themes/default/style.css',
-                             VENDOR.'components/jqueryui/themes/base/jquery-ui.css',
-                             CSS.'query_builder.css',
-                             VENDOR.'datatables/datatables/media/css/jquery.dataTables.min.css');
+
+		$uidata->IncludeCSS(VENDOR.'components/jqueryui/themes/base/jquery-ui.css');
+		$uidata->IncludeCSS(CSS.'query_builder.css');
+		//$uidata->IncludeCSS(VENDOR.'vakata/jstree/dist/themes/default/style.css');
 
         $uidata->stickyFooter = false;
 
-        $uidata->javascript = array(//VENDOR.'vakata/jstree/dist/jstree.js',
-                                    VENDOR.'components/jqueryui/jquery-ui.js',
-                                    JS.'bootstrap-notify.js',
-                                    JS.'mustache.min.js',
-                                    JS.'query_builder_config.js',
-                                    //JS.'cafevariome/query_builder_tree.js',
-                                    JS.'cafevariome/query_builder.js',
-									VENDOR.'datatables/datatables/media/js/jquery.dataTables.min.js'
-                                );
+		$uidata->IncludeJavaScript(VENDOR.'components/jqueryui/jquery-ui.js');
+		$uidata->IncludeJavaScript(JS.'bootstrap-notify.js');
+		$uidata->IncludeJavaScript(JS.'mustache.min.js');
+		$uidata->IncludeJavaScript(JS.'query_builder_config.js');
+		$uidata->IncludeJavaScript(JS.'cafevariome/query_builder.js');
+		//$uidata->IncludeJavaScript(VENDOR.'vakata/jstree/dist/jstree.js');
+		//$uidata->IncludeJavaScript(JS.'cafevariome/query_builder_tree.js');
+
+		$uidata->IncludeDataTables();
 
         $data = $this->wrapData($uidata);
 

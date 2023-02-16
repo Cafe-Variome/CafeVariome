@@ -1,10 +1,8 @@
 <?= $this->extend('layout/dashboard') ?>
 <?= $this->section('content') ?>
-<div class="row">
-	<div class="col">
-		<h2><?= $title ?></h2>
-	</div>
-</div>
+<h2 class="mt-4">
+	<?= $title ?>
+</h2>
 <hr>
 <?php if ($statusMessage): ?>
 	<div class="row">
@@ -18,29 +16,29 @@
 
 <?php echo form_open($controllerName.'/Update/' . $id); ?>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Name', 'name'); ?>
+		<?php echo form_label('Name', 'name', ['class' => 'form-label']); ?>
 		<?php echo form_input($name); ?>
 	</div>
 	<div class="col-6">
-		<?php echo form_label('Server', 'server_id'); ?>
+		<?php echo form_label('Server', 'server_id', ['class' => 'form-label']); ?>
 		<?php echo form_dropdown($server_id); ?>
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col-6">
-		<?php echo form_label('Port', 'port'); ?>
+		<?php echo form_label('Port', 'port', ['class' => 'form-label']); ?>
 		<?php echo form_input($port); ?>
 	</div>
 	<div class="col-6">
-		<?php echo form_label('Credential', 'credential_id'); ?>
+		<?php echo form_label('Credential', 'credential_id', ['class' => 'form-label']); ?>
 		<?php echo form_dropdown($credential_id); ?>
 	</div>
 </div>
 
-<div class="form-group row">
+<div class="row mb-3">
 	<div class="col">
 		<button type="submit" name="submit" class="btn btn-primary bg-gradient-primary">
 			<i class="fa fa-save" ></i> Save Changes
