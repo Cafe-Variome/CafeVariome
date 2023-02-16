@@ -17,7 +17,7 @@ use App\Models\UIData;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use CodeIgniter\Config\Services;
 
-class Network extends CVUI_Controller
+class Network extends CVUIController
 {
 
     /**

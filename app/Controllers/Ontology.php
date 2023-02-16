@@ -13,7 +13,7 @@ use CodeIgniter\Config\Services;
  * @author Mehdi Mehtarizadeh
  */
 
-class Ontology extends CVUI_Controller
+class Ontology extends CVUIController
 {
 	private $validation;
 

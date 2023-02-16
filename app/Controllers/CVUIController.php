@@ -10,24 +10,25 @@
 
 use App\Libraries\CafeVariome\Auth\LocalAuthenticator;
 use App\Libraries\CafeVariome\CafeVariome;
+use App\Libraries\CafeVariome\Database\IAdapter;
 use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
 use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use CodeIgniter\Controller;
 use App\Models\UIData;
 use App\Models\URISegment;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
+use CodeIgniter\Session\Session;
 
-class CVUI_Controller extends Controller
+class CVUIController extends Controller
 {
 
 	private bool $isProtected = false;
 	private bool $isAdmin = false;
 	protected bool $IsPost;
 
-	protected $db;
-	protected $dbAdapter;
+	protected IAdapter $dbAdapter;
 
-	protected $session;
+	protected Session $session;
 	protected $authenticator;
 	protected $setting;
 
@@ -105,13 +106,10 @@ class CVUI_Controller extends Controller
 
 
 	/**
-	 * Wraps UIData object into an array. The array is then passed to the view.
-	 *
-	 * @param array     $uidata
-	 *
+	 * @param UIData $uidata
 	 * @return array
+	 * Wraps UIData object into an array. The array is then passed to the view.
 	 */
-
 	protected function wrapData(UIData $uidata): array
 	{
 		$config = new \Config\App();
@@ -142,14 +140,14 @@ class CVUI_Controller extends Controller
 		$data["meta_description"] = $uidata->description;
 		$data["meta_keywords"] = $uidata->keywords;
 		$data["meta_author"] = $uidata->author;
-		$data["javascript"] = $uidata->javascript;
-		$data["css"] = $uidata->css;
+		$data["javascript"] = $uidata->GetJavaScript();
+		$data["css"] = $uidata->GetCSS();
 		$data["stickyFooter"] = $uidata->stickyFooter;
 		$data['statusMessage'] = $this->getStatusMessage();
 		$data['statusMessageType'] = $this->getStatusMessageTypeAlertEquivalent();
 		$data["uriSegments"] = $this->getURISegments();
 		$data['headerImage'] = $headerImage;
-		$data['version'] = $uidata->cv_version;
+		$data['version'] = CafeVariome::GetVersion();
 
 		//Include additional data attributes specific to each view
 		foreach ($uidata->data as $dataKey => $dataValue)
@@ -230,7 +228,7 @@ class CVUI_Controller extends Controller
 		}
 	}
 
-	protected function getURISegments(bool $lowercase = true)
+	protected function getURISegments(bool $lowercase = true): URISegment
 	{
 		$uri = \uri_string();
 		$lowercase ? $uri = strtolower($uri) : $uri;

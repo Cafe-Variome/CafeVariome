@@ -17,7 +17,7 @@ use App\Libraries\CafeVariome\Factory\ValueMappingFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class ValueMapping extends CVUI_Controller
+class ValueMapping extends CVUIController
 {
 	private AttributeAdapter $attributeAdapter;
 	private ValueAdapter $valueAdapter;

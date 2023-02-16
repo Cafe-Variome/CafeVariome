@@ -16,7 +16,7 @@ use App\Libraries\CafeVariome\Factory\OntologyRelationshipFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class OntologyRelationship extends CVUI_Controller
+class OntologyRelationship extends CVUIController
 {
 
 	private $ontologyAdapter;

@@ -21,7 +21,7 @@ use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class Attribute extends CVUI_Controller
+class Attribute extends CVUIController
 {
 	private $validation;
 

@@ -18,7 +18,7 @@ use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
 use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use App\Models\UIData;
 
-class Auth extends CVUI_Controller
+class Auth extends CVUIController
 {
 	public $provider;
 

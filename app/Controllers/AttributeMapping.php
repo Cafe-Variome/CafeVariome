@@ -18,7 +18,7 @@ use CodeIgniter\Config\Services;
  */
 
 
-class AttributeMapping extends CVUI_Controller
+class AttributeMapping extends CVUIController
 {
 	private AttributeAdapter $attributeAdapter;
 	private SourceAdapter $sourceAdapter;

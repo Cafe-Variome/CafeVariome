@@ -15,7 +15,7 @@ use App\Libraries\CafeVariome\Factory\PageFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class Page extends CVUI_Controller
+class Page extends CVUIController
 {
     private $validation;
     protected $validationListTemplate = 'list';

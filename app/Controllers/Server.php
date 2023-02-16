@@ -13,7 +13,7 @@ use App\Libraries\CafeVariome\Factory\ServerFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class Server extends CVUI_Controller
+class Server extends CVUIController
 {
 
 	private $validation;

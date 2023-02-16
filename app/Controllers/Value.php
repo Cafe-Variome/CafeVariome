@@ -19,7 +19,7 @@ use CodeIgniter\Config\Services;
  * @author Mehdi Mehtarizadeh
  */
 
-class Value extends CVUI_Controller
+class Value extends CVUIController
 {
 	private $validation;
 

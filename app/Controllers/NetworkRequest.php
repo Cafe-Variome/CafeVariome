@@ -13,7 +13,7 @@ use App\Models\UIData;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 
 
-class NetworkRequest extends CVUI_Controller
+class NetworkRequest extends CVUIController
 {
     /**
 	 * Constructor

@@ -13,7 +13,7 @@ use App\Libraries\CafeVariome\Factory\CredentialFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class Credential extends CVUI_Controller
+class Credential extends CVUIController
 {
 
 	private $validation;

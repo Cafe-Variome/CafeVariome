@@ -19,7 +19,7 @@ use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Config\Services;
 
-class Admin extends CVUI_Controller
+class Admin extends CVUIController
 {
 
     /**

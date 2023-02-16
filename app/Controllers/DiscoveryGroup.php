@@ -22,7 +22,7 @@ use App\Models\UIData;
 use CodeIgniter\Config\Services;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 
-class DiscoveryGroup extends CVUI_Controller
+class DiscoveryGroup extends CVUIController
 {
 
 	/**

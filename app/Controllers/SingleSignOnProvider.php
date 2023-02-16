@@ -20,7 +20,7 @@ use App\Libraries\CafeVariome\Helpers\UI\SingleSignOnProviderHelper;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class SingleSignOnProvider extends CVUI_Controller
+class SingleSignOnProvider extends CVUIController
 {
 
 	private $validation;

@@ -13,7 +13,7 @@ use App\Libraries\CafeVariome\Factory\SettingFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class Setting extends CVUI_Controller
+class Setting extends CVUIController
 {
 
     /**

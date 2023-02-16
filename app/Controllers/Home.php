@@ -3,7 +3,7 @@
 use App\Libraries\CafeVariome\Factory\PageAdapterFactory;
 use App\Models\UIData;
 
-class Home extends CVUI_Controller
+class Home extends CVUIController
 {
 
 	public function Index(int $page_id = 0)

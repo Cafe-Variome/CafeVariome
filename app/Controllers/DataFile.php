@@ -21,7 +21,7 @@ use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class DataFile extends CVUI_Controller
+class DataFile extends CVUIController
 {
 
 	private $validation;

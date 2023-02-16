@@ -14,7 +14,7 @@ use App\Libraries\CafeVariome\Factory\UserFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class User extends CVUI_Controller
+class User extends CVUIController
 {
 
     /**

@@ -16,7 +16,7 @@ use CodeIgniter\Config\Services;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
 
-class Discover extends CVUI_Controller
+class Discover extends CVUIController
 {
     /**
 	 * Constructor

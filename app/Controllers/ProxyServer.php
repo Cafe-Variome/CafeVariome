@@ -15,7 +15,7 @@ use App\Libraries\CafeVariome\Factory\ServerAdapterFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-class ProxyServer extends CVUI_Controller
+class ProxyServer extends CVUIController
 {
 
 	private $validation;

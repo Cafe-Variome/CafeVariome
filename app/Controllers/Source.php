@@ -24,7 +24,7 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
 use \App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use CodeIgniter\Config\Services;
 
-class Source extends CVUI_Controller
+class Source extends CVUIController
 {
     /**
 	 * Validation list template.

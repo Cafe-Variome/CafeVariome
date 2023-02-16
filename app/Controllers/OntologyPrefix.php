@@ -16,7 +16,7 @@ use CodeIgniter\Config\Services;
  * @author Mehdi Mehtarizadeh
  */
 
-class OntologyPrefix extends CVUI_Controller
+class OntologyPrefix extends CVUIController
 {
 	private $validation;
 
