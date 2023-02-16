@@ -20,7 +20,6 @@
         "twbs/bootstrap": "5.2.x",
 		"elasticsearch/elasticsearch": "7.17.x",
         "select2/select2": "^4.0",
-        "datatables/datatables": "^1.10",
         "phpoffice/phpspreadsheet": "^1.26",
         "box/spout": "^3.3.0",
         "components/jqueryui": "^1.12",
