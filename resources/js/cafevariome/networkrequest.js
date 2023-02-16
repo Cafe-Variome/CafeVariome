@@ -5,9 +5,8 @@
  * 
  * @author Mehdi Mehtarizadeh
  */
-
 $(document).ready(function() {
-
-    //Initiate datatable for networkgroups table
-    datatableInit('networkrequests_table');
-} );
+    if ($('#networkrequests_table').length) {
+        $('#networkrequests_table').DataTable();
+    }
+});
