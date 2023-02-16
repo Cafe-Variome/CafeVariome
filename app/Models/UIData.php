@@ -72,5 +72,30 @@ class UIData
 		$this->stickyFooter = true;
     }
 
+	public function IncludeJavaScript(string $path): void
+	{
+		$this->javascript[] = $path;
+	}
+
+	public function IncludeCSS(string $path): void
+	{
+		$this->css[] = $path;
+	}
+
+	public function GetCSS(): array
+	{
+		return $this->css;
+	}
+
+	public function GetJavaScript(): array
+	{
+		return $this->javascript;
+	}
+	public function IncludeDataTables(): void
+	{
+		$this->css[] = CSS.'DataTables/datatables.min.css';
+		$this->javascript[] =  JS.'DataTables/datatables.min.js';
+	}
+
 }
 
