@@ -13,26 +13,54 @@ use App\Libraries\CafeVariome\CafeVariome;
 
 class UIData
 {
-    protected $helpers = [ ];
+	/*
+	 * @var array
+	 * associative array that will pass extra values to views
+	 * array keys can be used inside views as variables
+	 */
+    public array $data;
 
-    //Page info
-    public $data = Array();
-    public $pageName = FALSE;
+	/**
+	 * @var array
+	 * list of javascript files to be loaded in a view
+	 */
+    private array $javascript;
 
-    //Page contents
-    public $javascript = array();
-    public $css = array();
-    public $fonts = array();
+	/**
+	 * @var array
+	 * list of css files to be loaded in a view
+	 */
+    private array $css;
 
-    //Page Meta
-    public $title = FALSE;
-    public $description = FALSE;
-    public $keywords = FALSE;
-    public $author = FALSE;
+	/**
+	 * @var string
+	 * page title as it appears on the browser
+	 */
+    public string $title;
 
-    public $stickyFooter = true;
+	/**
+	 * @var string
+	 * page meta description
+	 */
+    public string $description;
 
-	public $cv_version = "";
+	/**
+	 * @var string
+	 * page meta keywords
+	 */
+    public string $keywords;
+
+	/**
+	 * @var string
+	 * page author
+	 */
+    public string $author;
+
+	/**
+	 * @var bool
+	 * flag to make footer sticky or not in templates that need it
+	 */
+    public bool $stickyFooter;
 
     public function __construct()
     {
