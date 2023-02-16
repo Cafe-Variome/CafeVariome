@@ -17,7 +17,7 @@
         "ext-gd": "*",
         "codeigniter4/framework": "4.3.x",
         "components/font-awesome": "5.15.x",
-        "twbs/bootstrap": "4.6.x",
+        "twbs/bootstrap": "5.2.x",
 		"elasticsearch/elasticsearch": "7.17.x",
         "select2/select2": "^4.0",
         "datatables/datatables": "^1.10",
