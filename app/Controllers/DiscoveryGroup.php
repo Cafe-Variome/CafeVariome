@@ -262,7 +262,7 @@ class DiscoveryGroup extends CVUI_Controller
 		}
 
 		$uidata = new UIData();
-		$uidata->title = "Create Discovery Group";
+		$uidata->title = "Edit Discovery Group";
 		$uidata->data['discovery_group_id'] = $discoveryGroup->getID();
 		$uidata->IncludeJavaScript(JS. 'cafevariome/discoverygroup.js');
 
