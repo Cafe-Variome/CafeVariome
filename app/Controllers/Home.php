@@ -38,7 +38,7 @@ class Home extends CVUI_Controller
 		$uidata = new UIData();
 		$uidata->title = 'Portal';
 		$uidata->stickyFooter = false;
-		$uidata->javascript = [JS . 'cafevariome/portal.js'];
+		$uidata->IncludeJavaScript(JS . 'cafevariome/portal.js');
 
 		$data = $this->wrapData($uidata);
 		return view($this->viewDirectory. '/Portal', $data);
