@@ -1,7 +1,5 @@
 <?php namespace App\Models;
 
-use App\Libraries\CafeVariome\CafeVariome;
-
 /**
  * Class UIData
  * @author: Mehdi Mehtarizadeh
@@ -64,7 +62,14 @@ class UIData
 
     public function __construct()
     {
-		$this->cv_version = CafeVariome::GetVersion();
+		$this->data = [];
+		$this->javascript = [];
+		$this->css = [];
+		$this->author = '';
+		$this->title = '';
+		$this->description = '';
+		$this->keywords = '';
+		$this->stickyFooter = true;
     }
 
 }
