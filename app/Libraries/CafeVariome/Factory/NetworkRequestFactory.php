@@ -1,4 +1,4 @@
-<?php namespace APP\Libraries\CafeVariome\Factory;
+<?php namespace App\Libraries\CafeVariome\Factory;
 
 /**
  * NetworkRequestFactory.php
