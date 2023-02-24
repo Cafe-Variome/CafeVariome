@@ -55,6 +55,6 @@ class CafeVariome
 
 	public static function Settings(): Database\IAdapter
 	{
-		return (new SettingAdapterFactory())->GetInstance();
+		return (new SettingAdapterFactory())->GetInstance()->Load();
 	}
 }

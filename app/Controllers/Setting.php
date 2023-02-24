@@ -26,7 +26,7 @@ class Setting extends CVUIController
         parent::initController($request, $response, $logger);
 
 		$this->session = Services::session();
-		$this->dbAdapter = (new SettingAdapterFactory())->GetInstance();
+		$this->dbAdapter = (new SettingAdapterFactory())->GetInstance()->Load();
 	}
 
     public function Discovery()

@@ -30,8 +30,12 @@ class SettingAdapter extends BaseAdapter
 	private function __construct()
 	{
 		parent::__construct();
-		$this->settings = $this->ReadAll();
+	}
 
+	public function Load()
+	{
+		$this->settings = $this->ReadAll();
+		return $this;
 	}
 
 	/**
