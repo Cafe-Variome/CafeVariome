@@ -101,7 +101,7 @@ class User extends CVUIController
             try
 			{
 				$this->dbAdapter->Create(
-					(new UserFactory())->getInstanceFromParameters(
+					(new UserFactory())->GetInstanceFromParameters(
 						$email,
 						$email,
 						$first_name,
@@ -241,7 +241,7 @@ class User extends CVUIController
 
 			try
 			{
-				$this->dbAdapter->Update($id, (new UserFactory)->getInstanceFromParameters(
+				$this->dbAdapter->Update($id, (new UserFactory)->GetInstanceFromParameters(
 					$email,
 					$email,
 					$first_name,

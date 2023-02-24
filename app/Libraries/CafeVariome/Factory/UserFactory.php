@@ -35,7 +35,7 @@ class UserFactory extends EntityFactory
 		return new User($properties);
 	}
 
-	public function getInstanceFromParameters(
+	public function GetInstanceFromParameters(
 		string $email,
 		string $username,
 		string $first_name,
