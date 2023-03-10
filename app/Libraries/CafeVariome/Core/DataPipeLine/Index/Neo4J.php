@@ -114,7 +114,7 @@ class Neo4J
 	public function InsertSubject(string $subject_id, int $source_id, int $file_id, string $uid)
 	{
 		$this->transactionStack = $this->transactionStack ?? $this->neo4jClient->beginTransaction();
-		$this->transactionStack->runStatement(Statement::create("MERGE (c:Subject {subjectid: '" . $subject_id . "'}) ON CREATE SET c.source_id = '" . $source_id . "',c.file_id = '" . $file_id . "', c.uid = '" . $uid . "' ON MATCH SET c.source_id = '" . $source_id . "',c.file_id = '" . $file_id . "', c.uid = '" . $uid . "' RETURN count(*)"));
+		$this->transactionStack->runStatement(Statement::create("MERGE (c:Subject {subjectid: '" . $subject_id . "', source_id: '" . $source_id . "'}) ON CREATE SET c.file_id = '" . $file_id . "', c.uid = '" . $uid . "' ON MATCH SET c.file_id = '" . $file_id . "', c.uid = '" . $uid . "' RETURN count(*)"));
 	}
 
 	public function ConnectSubject(string $subject_id, string $node_type, string $node_key, string $node_id, string $relationship_label)
