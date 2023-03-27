@@ -22,6 +22,7 @@
         <include name=".htaccess" />
         <include name="index.php" />
         <include name="composer.json" />
+        <include name="phpunit.xml" />
         <include name="phpunit.xml.dist" />
         <include name="composer.json" />
     </fileset>
