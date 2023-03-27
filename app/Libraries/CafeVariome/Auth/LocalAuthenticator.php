@@ -1,9 +1,18 @@
 <?php namespace App\Libraries\CafeVariome\Auth;
 
+/**
+ * Name: LocalAuthenticator.php
+ * Created: 31/05/2020
+ * @author Mehdi Mehtarizadeh
+ *
+ */
+
 use App\Libraries\CafeVariome\Database\UserAdapter;
 use App\Libraries\CafeVariome\Entities\IEntity;
 use App\Libraries\CafeVariome\Entities\User;
 use App\Libraries\CafeVariome\Factory\UserAdapterFactory;
+use CodeIgniter\Session\Session;
+use Config\Services;
 
 /**
  * Name: LocalAuthenticator.php
