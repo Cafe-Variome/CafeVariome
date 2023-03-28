@@ -28,22 +28,12 @@
     </fileset>
 
     <!-- ============================================  -->
-    <!-- Target: Copy Files                            -->
-    <!-- ============================================  -->
-    <target name="copyfiles" description="copy project source files">
-        <mkdir dir="${builddir}" />
-        <copy todir="${builddir}">
-            <fileset refid="allfiles" />
-        </copy>
-    </target>
-
-    <!-- ============================================  -->
     <!-- Target: Get Dependencies                      -->
     <!-- ============================================  -->
-    <target name="fetchdependencies" depends="copyfiles" description="get dependencies using composer">
+    <target name="fetchdependencies" description="get dependencies using composer">
         <composer command="install" composer="/opt/php8/bin/composer">
             <arg value="-d"/>
-            <arg path="${builddir}" />
+            <arg path="${srcdir}" />
         </composer>
     </target>
 
@@ -55,7 +45,17 @@
         </phpunit>
     </target>
 
-    <target name="main" depends="runtests" description="archive the build to a zip file">
+    <!-- ============================================  -->
+    <!-- Target: Copy Files                            -->
+    <!-- ============================================  -->
+    <target name="copyfiles" depends="runtests" description="copy project source files">
+        <mkdir dir="${builddir}" />
+        <copy todir="${builddir}">
+            <fileset refid="allfiles" />
+        </copy>
+    </target>
+
+    <target name="main" depends="copyfiles" description="archive the build to a zip file">
         <zip destfile="cafevariome.zip">
             <fileset dir="${builddir}">
                 <include name="**/**" />
