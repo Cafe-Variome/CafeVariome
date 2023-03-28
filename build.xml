@@ -41,7 +41,7 @@
     <!-- Target: Run tests using PHPUNIT               -->
     <!-- ============================================  -->
     <target name="runtests" depends="fetchdependencies" description="run tests">
-        <phpunit configuration="${builddir}/phpunit.xml" pharlocation="${builddir}/vendor/bin/phpunit" printsummary="true">
+        <phpunit configuration="phpunit.xml" pharlocation="vendor/bin/phpunit" printsummary="true">
         </phpunit>
     </target>
 
