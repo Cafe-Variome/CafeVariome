@@ -8,19 +8,21 @@
  */
 
 use App\Libraries\CafeVariome\CafeVariome;
+use App\Libraries\CafeVariome\Database\SettingAdapter;
 
 abstract class AbstractMessage implements IMessage
 {
 	protected string $installation_key;
 
-	public function __construct()
-	{
-		$this->installation_key = CafeVariome::Settings()->GetInstallationKey();
-	}
-
 	public function ToJson(): string
 	{
 		return json_encode(get_object_vars($this));
+	}
+
+	public function SetInstallationKey($installation_key)
+	{
+		$this->installation_key = $installation_key;
+		return $this;
 	}
 
 	protected function SetType(bool $full = false)
