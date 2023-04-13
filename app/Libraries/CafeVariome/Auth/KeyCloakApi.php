@@ -6,7 +6,7 @@
  * Created : 11/09/2019
  * 
  * This file contains class and functions to communicate with the KeyCloak api.
- * 
+ * @deprecated
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
  */
