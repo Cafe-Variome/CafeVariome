@@ -4,7 +4,7 @@
  * @author Mehdi Mehtarizadeh
  */
 
-use APP\Libraries\CafeVariome\Database\ValueMappingAdapter;
+use App\Libraries\CafeVariome\Database\ValueMappingAdapter;
 use PHPUnit\Framework\TestCase;
 
 /**
