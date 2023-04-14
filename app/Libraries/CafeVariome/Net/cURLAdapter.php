@@ -54,7 +54,7 @@
         return curl_exec($this->adapterInstance);
     }
 
-    public function getInfo(int $opt = null)
+    public function GetInfo(int $opt = null)
     {
         return curl_getinfo($this->adapterInstance, $opt);
     }
