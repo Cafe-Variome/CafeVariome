@@ -9,6 +9,7 @@
 
 use App\Libraries\CafeVariome\Database\UserAdapter;
 use App\Libraries\CafeVariome\Entities\IEntity;
+use App\Libraries\CafeVariome\Entities\User;
 use App\Libraries\CafeVariome\Factory\CredentialAdapterFactory;
 use App\Libraries\CafeVariome\Factory\ProxyServerAdapterFactory;
 use App\Libraries\CafeVariome\Factory\ServerAdapterFactory;
@@ -19,31 +20,87 @@ use App\Libraries\CafeVariome\Net\OpenIDNetworkInterface;
 use App\Libraries\CafeVariome\Security\Cryptography;
 use App\Libraries\CafeVariome\Net\cURLAdapter;
 use App\Libraries\CafeVariome\Entities\SingleSignOnProvider;
+use CodeIgniter\Session\Session;
 
-class OpenIDAuthenticator
+class OpenIDAuthenticator implements IAuthenticator
 {
+	/**
+	 * @var SingleSignOnProvider
+	 * Provider object that handles authentication
+	 */
     protected SingleSignOnProvider $provider;
 
+	/**
+	 * @var array
+	 * Associative array of $provider attributes
+	 */
     protected array $options;
 
+	/**
+	 * @var string
+	 * Stores state token of OIDC provider.
+	 */
 	protected string $state;
 
+	/**
+	 * @var array|string[]
+	 * Stores scopes used in authentication.
+	 */
 	protected array $scopes;
 
+	/**
+	 * @var array
+	 * Associative array that stores ProxyServer attributes of the $provider in case one exists.
+	 */
 	protected array $proxyOptions;
 
+	/**
+	 * @var UserAdapter
+	 * Adapter instance to communicate with the database
+	 */
 	protected UserAdapter $userAdapter;
 
+	/**
+	 * @var string|null
+	 * Last error in communication with the OIDC provider
+	 */
 	protected ?string $lastError;
 
+	/**
+	 * @var string
+	 * Base URL of the OIDC provider including realm name
+	 */
 	protected string $baseURL;
 
-	protected $session;
+	/**
+	 * @var Session
+	 * Code Igniter Session object
+	 */
+	protected Session $session;
 
+	/**
+	 * Session name for authenticator ID
+	 */
 	protected const AUTHENTICATOR_SESSION = AUTHENTICATOR_SESSION_NAME;
+
+	/**
+	 * Session name for random state
+	 */
 	protected const SSO_RANDOM_STATE_SESSION = SSO_RANDOM_STATE_SESSION_NAME;
+
+	/**
+	 * Session name for bearer token
+	 */
 	protected const SSO_TOKEN_SESSION = SSO_TOKEN_SESSION_NAME;
+
+	/**
+	 * Session name for refresh token
+	 */
 	protected const SSO_REFRESH_TOKEN_SESSION = SSO_REFRESH_TOKEN_SESSION_NAME;
+
+	/**
+	 * Session name for post authentication redirect URL
+	 */
 	protected const POST_AUTHENTICATION_REDIRECT_URL_SESSION = POST_AUTHENTICATION_REDIRECT_URL_SESSION_NAME;
 
     public function __construct(SingleSignOnProvider $provider)
@@ -221,7 +278,7 @@ class OpenIDAuthenticator
 			{
 				// Create account
 				return	$this->userAdapter->Create(
-						(new UserFactory())->getInstanceFromParameters(
+						(new UserFactory())->GetInstanceFromParameters(
 							$email, $email, $first_name, $last_name, $ip_address, null
 					));
 			}
@@ -313,7 +370,7 @@ class OpenIDAuthenticator
 		return $this->lastError;
 	}
 
-	public function GetProfileEndpoint()
+	public function GetProfileEndpoint(): string
 	{
 		return rtrim($this->baseURL, '/') . '/account/';
 	}
@@ -347,7 +404,7 @@ class OpenIDAuthenticator
 		return -1;
 	}
 
-    public function RecordSession(\App\Libraries\CafeVariome\Entities\User $user)
+    public function RecordSession(User $user): void
 	{
 		$session_data = array(
 			'user_id'                   => $user->getID(),
@@ -416,7 +473,7 @@ class OpenIDAuthenticator
 		}
 
         $cURLAdapter->Send();
-        $httpStatus = $cURLAdapter->getInfo(CURLINFO_HTTP_CODE);
+        $httpStatus = $cURLAdapter->GetInfo(CURLINFO_HTTP_CODE);
 
         return $httpStatus == 200;
     }
