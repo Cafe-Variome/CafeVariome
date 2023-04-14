@@ -16,7 +16,7 @@ class ValueAdapterFactory extends AdapterFactory
     /**
      * @inheritDoc
      */
-    public function GetInstance(): IAdapter
+    public function GetInstance(): ValueAdapter
     {
         return new ValueAdapter();
     }
