@@ -64,9 +64,13 @@ class BeaconQueryInterface extends AbstractNetworkInterface
 		{
 			$responseObj = new \StdClass();
 			$responseObj->status = false;
+			$responseObj->adapter_error = $this->networkAdapter->GetError();
+		}
+		else
+		{
+			$responseObj->status = true;
 		}
 
-		$responseObj->status = true;
 
 		return $responseObj;
 	}
