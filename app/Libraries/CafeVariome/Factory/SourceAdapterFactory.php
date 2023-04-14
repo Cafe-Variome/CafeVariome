@@ -13,7 +13,7 @@ use App\Libraries\CafeVariome\Database\SourceAdapter;
 class SourceAdapterFactory extends AdapterFactory
 {
 
-	public function GetInstance(): IAdapter
+	public function GetInstance(): SourceAdapter
 	{
 		return new SourceAdapter();
 	}
