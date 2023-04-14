@@ -6,6 +6,7 @@
  * Created 01/10/2021
  * @author Mehdi Mehtarizadeh
  *
+ *  This abstract class defines the structure for indexing an individual source.
  */
 
 use App\Libraries\CafeVariome\Database\AttributeAdapter;
@@ -25,8 +26,19 @@ use DateTime;
 
 abstract class AbstractSourceIndex
 {
+	/**
+	 * @var bool whether the process should continue or stop.
+	 */
 	protected bool $continue;
+
+	/**
+	 * @var int Task ID associated with process
+	 */
 	protected int $taskId;
+
+	/**
+	 * @var AttributeAdapter|\App\Libraries\CafeVariome\Database\IAdapter
+	 */
 	protected AttributeAdapter $attributeAdapter;
 	protected ValueAdapter $valueAdapter;
 	protected bool $overwrite;
