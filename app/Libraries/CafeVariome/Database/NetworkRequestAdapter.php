@@ -1,4 +1,4 @@
-<?php namespace APP\Libraries\CafeVariome\Database;
+<?php namespace App\Libraries\CafeVariome\Database;
 
 /**
  * NetworkRequestAdapter.php
