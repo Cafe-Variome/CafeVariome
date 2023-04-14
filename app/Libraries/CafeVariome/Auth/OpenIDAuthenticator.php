@@ -477,4 +477,9 @@ class OpenIDAuthenticator implements IAuthenticator
 
         return $httpStatus == 200;
     }
+
+	public function GetUserIdByEmail(string $email): ?int
+	{
+		return $this->userAdapter->ReadIdByEmail($email);
+	}
 }
