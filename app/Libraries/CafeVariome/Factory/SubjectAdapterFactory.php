@@ -15,7 +15,7 @@ class SubjectAdapterFactory extends AdapterFactory
     /**
      * @inheritDoc
      */
-    public function GetInstance(): IAdapter
+    public function GetInstance(): SubjectAdapter
     {
         return new SubjectAdapter();
     }
