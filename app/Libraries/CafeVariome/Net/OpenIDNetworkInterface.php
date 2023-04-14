@@ -104,6 +104,7 @@ class OpenIDNetworkInterface extends AbstractNetworkInterface
 		{
 			$responseObj = new \StdClass();
 			$responseObj->status = false;
+			$responseObj->adapter_error = $this->networkAdapter->GetError();
 		}
 
 		return $responseObj;
