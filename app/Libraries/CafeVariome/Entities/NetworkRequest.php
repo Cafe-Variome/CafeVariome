@@ -1,4 +1,4 @@
-<?php namespace APP\Libraries\CafeVariome\Entities;
+<?php namespace App\Libraries\CafeVariome\Entities;
 
 /**
  * NetworkRequest.php
