@@ -16,7 +16,7 @@ class DiscoveryGroupAdapterFactory extends AdapterFactory
     /**
      * @inheritDoc
      */
-    public function GetInstance(): IAdapter
+    public function GetInstance(): DiscoveryGroupAdapter
     {
         return new DiscoveryGroupAdapter();
     }
