@@ -59,6 +59,11 @@
         return curl_getinfo($this->adapterInstance, $opt);
     }
 
+	public function GetError(): string
+	{
+		return curl_error($this->adapterInstance);
+	}
+
     private function curlEnabled(): bool
     {
         return function_exists('curl_version');
