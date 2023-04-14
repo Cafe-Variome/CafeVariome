@@ -12,12 +12,26 @@ use App\Libraries\CafeVariome\Net\Service\IMessage;
 
 class SocketAdapter
 {
-    private $address;
-    private $port;
-    private $socket;
+	/**
+	 * @var string the address that the socket needs to be bound to
+	 */
+    private string $address;
+
+	/**
+	 * @var int the port that the socket needs to be bound to
+	 */
+    private int $port;
+
+	/**
+	 * @var \Socket socket resource
+	 */
+    private \Socket $socket;
+
 	private $reserveSocket;
-    private $defaultConfig;
+
+    private array $defaultConfig;
     private bool $connected;
+
 	private bool $locked; // Boolean flag to show if a request is being served.
 
     public function __construct(string $address, int $port)
