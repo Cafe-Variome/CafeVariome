@@ -5,18 +5,27 @@
  * Created: 10/02/2022
  * @author Mehdi Mehtarizadeh
  *
- * This class handles incoming Beacon queries.
+ * This class handles some operations necessary to implement a Beacon service.
  * @see https://beacon-project.io/
  *
  */
 
 class Beacon
 {
+	/**
+	 * Beacon version implemented
+	 */
 	public CONST BEACON_VERSION = 'v2.0';
 
+	/**
+	 * Beacon Controller class name
+	 */
 	private CONST BEACON_CONTROLLER = 'BeaconAPI';
 
-	public static function GetBeaconID():string
+	/**
+	 * @return string generates the reverse URL of Beacon endpoint as ID
+	 */
+	public static function GetBeaconID() : string
 	{
 		$beaconId = Beacon::BEACON_CONTROLLER . '.';
 		$baseURL = strtolower(base_url());
@@ -42,19 +51,28 @@ class Beacon
 		return $beaconId;
 	}
 
+	/**
+	 * @param string $endpoint
+	 * @return string Absolute URL of endpoint
+	 */
 	private static function GetEndpointURL(string $endpoint)
 	{
 		return base_url(self::BEACON_CONTROLLER . '/' . $endpoint);
 	}
 
-	public static function GetIndividualsURL()
+	/**
+	 * @return string
+	 */
+	public static function GetIndividualsURL(): string
 	{
 		return self::GetEndpointURL('Individuals');
 	}
-	
-	public static function GetBiosamplesURL()
+
+	/**
+	 * @return string
+	 */
+	public static function GetBiosamplesURL(): string
 	{
 		return self::GetEndpointURL('Biosamples');
 	}
-
 }
