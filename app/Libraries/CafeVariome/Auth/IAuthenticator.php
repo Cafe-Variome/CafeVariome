@@ -1,4 +1,4 @@
-<?php namespace APP\Libraries\CafeVariome\Auth;
+<?php namespace App\Libraries\CafeVariome\Auth;
 
 /**
  * IAuthenticator.php
