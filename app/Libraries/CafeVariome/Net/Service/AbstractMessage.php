@@ -19,13 +19,13 @@ abstract class AbstractMessage implements IMessage
 		return json_encode(get_object_vars($this));
 	}
 
-	public function SetInstallationKey($installation_key)
+	public function SetInstallationKey(string $installation_key): static
 	{
 		$this->installation_key = $installation_key;
 		return $this;
 	}
 
-	protected function SetType(bool $full = false)
+	protected function SetType(bool $full = false): void
 	{
 		$className = get_class($this);
 
