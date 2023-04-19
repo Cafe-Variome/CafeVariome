@@ -35,26 +35,6 @@ class BeaconAPI extends ResourceController
 		$this->setting = CafeVariome::Settings();
     }
 
-    public function _remap($function)
-	{
-		if ((int)$function > 0)
-		{
-			//$function is the network key
-			$path = $this->request->getPath();
-			$method = explode('/', $path)[2];
-			if($method == "service-info")
-			{
-				return $this->service_info();
-			}
-			return $this->$method((int)$function);
-		}
-		else
-		{
-			//Bad Request, drop it with 400
-			return Services::response()->setStatusCode(400, 'Bad request');
-		}
-    }
-
     public function Index()
 	{
         return redirect()->to(base_url('BeaconAPI/info'));
