@@ -25,7 +25,7 @@ class SocketAdapter
 	/**
 	 * @var \Socket socket resource
 	 */
-    private \Socket $socket;
+    private \Socket|false $socket;
 
 	private $reserveSocket;
 
@@ -41,6 +41,7 @@ class SocketAdapter
         $this->defaultConfig = ['domain' => AF_INET, 'type' => SOCK_STREAM, 'protocol' => SOL_TCP];
         $this->connected = false;
 		$this->locked = false;
+		$this->socket = false;
     }
 
     /**
@@ -151,7 +152,8 @@ class SocketAdapter
 
     public function __destruct()
 	{
-        if($this->socket && $this->connected){
+        if($this->socket && $this->connected)
+		{
             socket_close($this->socket);
         }
     }
