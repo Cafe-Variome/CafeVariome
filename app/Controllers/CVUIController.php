@@ -23,26 +23,85 @@ use CodeIgniter\Session\Session;
 
 class CVUIController extends Controller
 {
-
+	/**
+	 * @var bool if the controller is protected by authentication layer
+	 */
 	private bool $isProtected = false;
+
+	/**
+	 * @var bool if controller requires admin privileges
+	 */
 	private bool $isAdmin = false;
+
+	/**
+	 * @var bool if request is a POST
+	 */
 	protected bool $IsPost;
 
+	/**
+	 * @var IAdapter data adapter layer instance
+	 */
 	protected IAdapter $dbAdapter;
 
+	/**
+	 * @var Session session instance
+	 */
 	protected Session $session;
-	protected $authenticator;
-	protected $setting;
 
-	protected $controllerName;
+	/**
+	 * @var IAuthenticator authenticator instance
+	 */
+	protected IAuthenticator $authenticator;
 
-	protected $viewDirectory;
+	/**
+	 * @var IAdapter Setting adapter instance
+	 */
+	protected IAdapter $setting;
 
+	/**
+	 * @var string controller class name
+	 */
+	protected string $controllerName;
+
+	/**
+	 * @var string view directory name
+	 */
+	protected string $viewDirectory;
+
+	/**
+	 * @var ServiceInterface Service Interface object to interact with the demon
+	 */
+	protected ServiceInterface $serviceInterface;
+
+	/**
+	 * boolean value that determines whether internal authentication is enabled or not
+	 * If set to false, OAuth will be used
+	 */
 	protected const LOCAL_AUTHENTICATION = ALLOW_LOCAL_AUTHENTICATION;
+
+	/**
+	 * Name of session object holding reference to authenticator object
+	 */
 	protected const AUTHENTICATOR_SESSION = AUTHENTICATOR_SESSION_NAME;
+
+	/**
+	 * Name of session object holding OIDC random state value
+	 */
 	protected const SSO_RANDOM_STATE_SESSION = SSO_RANDOM_STATE_SESSION_NAME;
+
+	/**
+	 * Name of session object holding OIDC token value
+	 */
 	protected const SSO_TOKEN_SESSION = SSO_TOKEN_SESSION_NAME;
+
+	/**
+	 * Name of session object holding OIDC refresh token value
+	 */
 	protected const SSO_REFRESH_TOKEN_SESSION = SSO_REFRESH_TOKEN_SESSION_NAME;
+
+	/**
+	 * Name of session object holding post authentication URL value
+	 */
 	protected const POST_AUTHENTICATION_REDIRECT_URL_SESSION = POST_AUTHENTICATION_REDIRECT_URL_SESSION_NAME;
 
 	/**
@@ -292,7 +351,7 @@ class CVUIController extends Controller
 		return $this->session->getFlashData('StatusMessageType');
 	}
 
-	protected function getStatusMessageTypeAlertEquivalent()
+	protected function getStatusMessageTypeAlertEquivalent(): string
 	{
 		$msgtype = $this->getStatusMessageType();
 
