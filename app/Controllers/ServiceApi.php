@@ -23,16 +23,16 @@ class ServiceApi extends ResourceController
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
-
+		$this->setting =  CafeVariome::Settings();
+		$this->serviceInterface = new ServiceInterface($this->setting->GetInstallationKey());
     }
 
 	public function PollTasks()
 	{
-		$si = new ServiceInterface();
 		$result = "retry: 3000\nid: 0\ndata: {\"progress\": \"-1\", \"status\": \"\"}\n\n";
 		try
 		{
-			$fileStatus = json_decode($si->PollTasks(), true);
+			$fileStatus = json_decode($this->serviceInterface->PollTasks(), true);
 
 			if (json_last_error() == JSON_ERROR_NONE && count($fileStatus) > 0)
 			{
@@ -61,12 +61,12 @@ class ServiceApi extends ResourceController
 		if ($this->request->getMethod() == 'post')
 		{
 			$task_id = $this->request->getVar('task_id');
-			$si = new ServiceInterface();
+
 			$result = "retry: 3000\nid: 0\ndata: {\"progress\": \"-1\", \"status\": \"\"}\n\n";
 
 			try
 			{
-				$fileStatus = json_decode($si->PollTasks(), true);
+				$fileStatus = json_decode($this->serviceInterface->PollTasks(), true);
 
 				if (json_last_error() == JSON_ERROR_NONE && count($fileStatus) > 0)
 				{
