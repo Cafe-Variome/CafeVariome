@@ -37,8 +37,9 @@ class ServiceInterface
     public function __construct(string $installation_key)
 	{
         $this->config = config('BackgroundService');
-        $this->socket = new SocketAdapter($this->config->address, $this->config->port);
-    }
+        $this->socket =	new SocketAdapter($this->config->address, $this->config->port);
+		$this->installation_key = $installation_key;
+	}
 
     public function ping(): bool
     {
@@ -52,7 +53,7 @@ class ServiceInterface
 
 	public function PollTasks()
 	{
-		$message = (new PollProgressMessageFactory())->GetInstance();
+		$message = (new PollProgressMessageFactory())->GetInstance()->SetInstallationKey($this->installation_key);
 
 		$results = "";
 		$this->socket->Create()->Connect()->Write($message);
@@ -66,7 +67,7 @@ class ServiceInterface
 
 	public function Shutdown()
 	{
-		$message = (new ShutdownMessageFactory())->GetInstance();
+		$message = (new ShutdownMessageFactory())->GetInstance()->SetInstallationKey($this->installation_key);
 
 		$results = "";
 		$this->socket->Create()->Connect()->Write($message);
@@ -100,7 +101,7 @@ class ServiceInterface
 
     public function ReportProgress(int $task_id, int $progress, string $status = '', bool $finished = false): array
     {
-        $message = (new ReportProgressMessageFactory())->GetInstance($task_id, $progress, $finished, $status);
+        $message = (new ReportProgressMessageFactory())->GetInstance($task_id, $progress, $finished, $status)->SetInstallationKey($this->installation_key);
 
         try
 		{
