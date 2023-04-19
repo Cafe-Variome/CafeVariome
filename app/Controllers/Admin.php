@@ -16,7 +16,6 @@ use App\Libraries\CafeVariome\Helpers\Core\ElasticsearchHelper;
 use App\Models\UIData;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4J;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
-use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Config\Services;
 
 class Admin extends CVUIController
@@ -58,7 +57,6 @@ class Admin extends CVUIController
 		$networkRequestAdapter = (new NetworkRequestAdapterFactory())->GetInstance();
 
         $neo4j = new Neo4J();
-        $service = new ServiceInterface();
 
 		$sourceAdapter = (new SourceAdapterFactory())->GetInstance();
         $sourceList = $sourceAdapter->ReadAll();
@@ -122,7 +120,7 @@ class Admin extends CVUIController
         }
 
         $uidata->data['openIDStatus'] = $this->authenticator->Ping();
-        $uidata->data['serviceStatus'] = $service->ping();
+        $uidata->data['serviceStatus'] = $this->serviceInterface->ping();
 
         $data = $this->wrapData($uidata);
         return view($this->viewDirectory. '/Index', $data);
