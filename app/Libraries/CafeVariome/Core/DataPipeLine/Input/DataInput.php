@@ -12,9 +12,11 @@
  *
  */
 
+use App\Libraries\CafeVariome\CafeVariome;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Database;
 use App\Libraries\CafeVariome\Core\DataPipeLine\DataPipeLine;
-use App\Libraries\CafeVariome\Database\OntologyPrefixAdapter;
+use App\Libraries\CafeVariome\Core\IO\FileSystem\IFileMan;
+use App\Libraries\CafeVariome\Database\IAdapter;
 use App\Libraries\CafeVariome\Entities\Task;
 use App\Libraries\CafeVariome\Factory\AttributeFactory;
 use App\Libraries\CafeVariome\Factory\GroupFactory;
@@ -115,7 +117,8 @@ abstract class DataInput extends DataPipeLine
 
         $this->db = new Database();
 
-		$this->serviceInterface = new ServiceInterface();
+		$settingAdapter = CafeVariome::Settings();
+		$this->serviceInterface = new ServiceInterface($settingAdapter->GetInstallationKey());
 		$this->attributes = [];
 		$this->subjects = [];
 		$this->groups = [];
