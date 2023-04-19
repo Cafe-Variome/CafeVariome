@@ -35,7 +35,7 @@ class SettingFactory extends EntityFactory
 		return new Setting($properties);
 	}
 
-	public function GetInstanceFromParameters(string $key, string $name, string $value, string $group, string $info)
+	public function GetInstanceFromParameters(string $key, string $name, string $value, string $group, string $info): IEntity
 	{
 		return new Setting(
 			[
