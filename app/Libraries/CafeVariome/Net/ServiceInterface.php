@@ -19,10 +19,22 @@ use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 
 class ServiceInterface
 {
-    private $socket;
-    private $config;
+	/**
+	 * @var SocketAdapter socket adapter object used to communicate with the demon
+	 */
+    private SocketAdapter $socket;
 
-    public function __construct()
+	/**
+	 * @var object|null config object retrieved from CI to initiate socket
+	 */
+    private object $config;
+
+	/**
+	 * @var string installation key of instance transferred to message object
+	 */
+	private string $installation_key;
+
+    public function __construct(string $installation_key)
 	{
         $this->config = config('BackgroundService');
         $this->socket = new SocketAdapter($this->config->address, $this->config->port);
