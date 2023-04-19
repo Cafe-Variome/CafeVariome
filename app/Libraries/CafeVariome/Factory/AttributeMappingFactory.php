@@ -30,7 +30,7 @@ class AttributeMappingFactory extends EntityFactory
 		return new AttributeMapping($properties);
 	}
 
-	public function GetInstanceFromParameters(string $name, int $attribute_id)
+	public function GetInstanceFromParameters(string $name, int $attribute_id): IEntity
 	{
 		return new AttributeMapping([
 			'name' => $name,
