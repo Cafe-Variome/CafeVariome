@@ -82,7 +82,7 @@ class ServiceInterface
 
     public function RegisterTask(int $task_id, bool $batch = false, string $status = ''): bool
     {
-		$message = (new RegisterTaskMessageFactory())->GetInstance($task_id, $status, $batch);
+		$message = (new RegisterTaskMessageFactory())->GetInstance($task_id, $status, $batch)->SetInstallationKey($this->installation_key);
 
         try
 		{
