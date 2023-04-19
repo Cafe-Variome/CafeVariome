@@ -13,10 +13,13 @@
  * Code must be more secure. Some of the methods here must be moved to back-end layers for security reasons.
  */
 
+use App\Libraries\CafeVariome\Auth\IAuthenticator;
 use App\Libraries\CafeVariome\Auth\LocalAuthenticator;
+use App\Libraries\CafeVariome\Auth\NullAuthenticator;
 use App\Libraries\CafeVariome\CafeVariome;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceNetworkIndex;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\File;
+use App\Libraries\CafeVariome\Database\IAdapter;
 use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
 use App\Libraries\CafeVariome\Factory\DataFileAdapterFactory;
 use App\Libraries\CafeVariome\Factory\DataFileFactory;
@@ -29,7 +32,6 @@ use App\Libraries\CafeVariome\Factory\TaskAdapterFactory;
 use App\Libraries\CafeVariome\Factory\TaskFactory;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 use CodeIgniter\Controller;
-use Config\Database;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
 use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
@@ -37,11 +39,20 @@ use App\Libraries\CafeVariome\Helpers\Shell\PHPShellHelper;
 
 class AjaxApi extends Controller
 {
-	protected $db;
+	/**
+	 * @var IAuthenticator authenticator instance
+	 */
+	protected IAuthenticator $authenticator;
 
-    protected $setting;
+	/**
+	 * @var IAdapter Setting adapter instance
+	 */
+	protected IAdapter $setting;
 
-	protected $authenticator;
+	/**
+	 * @var ServiceInterface Service Interface object to interact with the demon
+	 */
+	protected ServiceInterface $serviceInterface;
 
 	protected const LOCAL_AUTHENTICATION = ALLOW_LOCAL_AUTHENTICATION;
 	protected const AUTHENTICATOR_SESSION = AUTHENTICATOR_SESSION_NAME;
@@ -58,10 +69,10 @@ class AjaxApi extends Controller
 	{
 		parent::initController($request, $response, $logger);
 
-		$this->db = Database::connect();
         $this->setting =  CafeVariome::Settings();
-
 		$this->session = \Config\Services::session();
+		$this->serviceInterface = new ServiceInterface($this->setting->GetInstallationKey());
+		$this->authenticator = new NullAuthenticator();
 
 		if ($this->session->has(self::AUTHENTICATOR_SESSION))
 		{
@@ -616,23 +627,20 @@ class AjaxApi extends Controller
 	{
 		if ($this->request->getMethod() == 'post')
 		{
-			$serviceInterface = new ServiceInterface();
-
-			if(!$serviceInterface->ping())
+			if(!$this->serviceInterface->ping())
 			{
 				// Service not running
 				return json_encode([
-				'status' => 1,
-				'message' => 'Service is not running.'
-			]);
-
+					'status' => 1,
+					'message' => 'Service is not running.'
+				]);
 			}
 
-			$serviceInterface->Shutdown();
+			$this->serviceInterface->Shutdown();
 
 			sleep(5);
 
-			if(!$serviceInterface->ping())
+			if(!$this->serviceInterface->ping())
 			{
 				// Shutdown was successful;
 				return json_encode([
@@ -655,9 +663,7 @@ class AjaxApi extends Controller
 	{
 		if ($this->request->getMethod() == 'post')
 		{
-			$serviceInterface = new ServiceInterface();
-
-			if($serviceInterface->ping())
+			if($this->serviceInterface->ping())
 			{
 				// Service is running
 				return json_encode([
@@ -667,11 +673,11 @@ class AjaxApi extends Controller
 
 			}
 
-			$serviceInterface->Start();
+			$this->serviceInterface->Start();
 
 			sleep(5);
 
-			if($serviceInterface->ping())
+			if($this->serviceInterface->ping())
 			{
 				// Shutdown was successful;
 				return json_encode([
