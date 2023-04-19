@@ -6,6 +6,7 @@
  * @author Mehdi Mehtarizadeh
  *
  * This class handles generating beacon queries from internal Cafe Variome queries.
+ * It is incomplete and needs significant development.
  * @see https://beacon-project.io/
  * @see https://github.com/rini21/vp-api-specs-beaconised
  *
