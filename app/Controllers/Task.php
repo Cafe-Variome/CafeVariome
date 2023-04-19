@@ -13,9 +13,11 @@
  *
  */
 
+use App\Libraries\CafeVariome\CafeVariome;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\ElasticsearchSourceIndex;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\Neo4JSourceIndex;
 use App\Libraries\CafeVariome\Core\DataPipeLine\Index\UserInterfaceSourceIndex;
+use App\Libraries\CafeVariome\Database\IAdapter;
 use App\Libraries\CafeVariome\Factory\DataFileAdapterFactory;
 use App\Libraries\CafeVariome\Factory\PipelineAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
@@ -48,8 +50,8 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 	 public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
 	 {
 		 parent::initController($request, $response, $logger);
-
 		 $this->dbAdapter = (new TaskAdapterFactory())->GetInstance();
+		 $this->setting =  CafeVariome::Settings();
 	 }
 
 	 /**
@@ -112,7 +114,7 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 						 $task->status = TASK_STATUS_STARTED;
 						 $this->dbAdapter->Update($task_id, $task);
 
-						 $serviceInterface = new ServiceInterface();
+						 $serviceInterface = new ServiceInterface($this->setting->GetInstallationKey());
 						 $serviceInterface->RegisterTask($task_id, $batch); // Register task in Demon
 
 						 $inputPipeLine = null;
@@ -212,7 +214,7 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 							 $this->dbAdapter->Update($task_id, $task);
 
 
-							 $serviceInterface = new ServiceInterface();
+							 $serviceInterface = new ServiceInterface($this->setting->GetInstallationKey());
 							 $serviceInterface->RegisterTask($task_id); // Register task in Demon
 							 try
 							 {
