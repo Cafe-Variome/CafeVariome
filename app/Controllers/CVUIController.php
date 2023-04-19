@@ -8,7 +8,9 @@
  *
  */
 
+use App\Libraries\CafeVariome\Auth\IAuthenticator;
 use App\Libraries\CafeVariome\Auth\LocalAuthenticator;
+use App\Libraries\CafeVariome\Auth\NullAuthenticator;
 use App\Libraries\CafeVariome\CafeVariome;
 use App\Libraries\CafeVariome\Database\IAdapter;
 use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
@@ -59,7 +61,8 @@ class CVUIController extends Controller
 		$this->session = \Config\Services::session();
 		$this->db = \Config\Database::connect();
         $this->setting =  CafeVariome::Settings();
-
+		$this->serviceInterface = new ServiceInterface($this->setting->GetInstallationKey());
+		$this->authenticator = new NullAuthenticator();
 
 		if ($this->session->has(self::AUTHENTICATOR_SESSION))
 		{
@@ -310,9 +313,9 @@ class CVUIController extends Controller
 
 	private function checkService()
 	{
-		$service = new ServiceInterface();
-		if (!$service->ping()){
-			$service->Start();
+		if (!$this->serviceInterface->ping())
+		{
+			$this->serviceInterface->Start();
 		}
 	}
 
