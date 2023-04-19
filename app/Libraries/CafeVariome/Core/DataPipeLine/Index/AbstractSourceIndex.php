@@ -9,11 +9,9 @@
  *  This abstract class defines the structure for indexing an individual source.
  */
 
-use App\Libraries\CafeVariome\Database\AttributeAdapter;
-use App\Libraries\CafeVariome\Database\EAVAdapter;
-use App\Libraries\CafeVariome\Database\SourceAdapter;
-use App\Libraries\CafeVariome\Database\SubjectAdapter;
-use App\Libraries\CafeVariome\Database\ValueAdapter;
+use App\Libraries\CafeVariome\CafeVariome;
+use App\Libraries\CafeVariome\Database\IAdapter;
+use App\Libraries\CafeVariome\Entities\Source;
 use App\Libraries\CafeVariome\Entities\ViewModels\AttributeNameType;
 use App\Libraries\CafeVariome\Entities\ViewModels\ValueName;
 use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
@@ -118,9 +116,10 @@ abstract class AbstractSourceIndex
 		$this->attributeAdapter = (new AttributeAdapterFactory())->GetInstance();
 		$this->valueAdapter = (new ValueAdapterFactory())->GetInstance();
 		$this->EAVAdapter = (new EAVAdapterFactory())->GetInstance();
-		$this->serviceInterface = new ServiceInterface();
 		$this->sourceAdapter = (new SourceAdapterFactory())->GetInstance();
 		$this->subjectAdapter = (new SubjectAdapterFactory())->GetInstance();
+		$settings = CafeVariome::Settings();
+		$this->serviceInterface = new ServiceInterface($settings->GetInstallationKey());
 		$this->attributes = [];
 		$this->subjects = [];
 		$this->initiateSource();
