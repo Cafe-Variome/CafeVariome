@@ -37,25 +37,79 @@ abstract class AbstractSourceIndex
 	protected int $taskId;
 
 	/**
-	 * @var AttributeAdapter|\App\Libraries\CafeVariome\Database\IAdapter
+	 * @var bool flag that determines whether the index needs to be overwritten or not.
 	 */
-	protected AttributeAdapter $attributeAdapter;
-	protected ValueAdapter $valueAdapter;
 	protected bool $overwrite;
 	protected $dbInstance;
-	protected string $jobName;
+	/**
+	 * @var int Id of the source to be indexed
+	 */
 	protected int $sourceId;
-	protected string $sourceName;
-	protected string $sourceUID;
-	protected EAVAdapter $EAVAdapter;
 
+	/**
+	 * @var string name od source as saved in database
+	 */
+	protected string $sourceName;
+
+	/**
+	 * @var string UID of source
+	 * @see Source definition
+	 */
+	protected string $sourceUID;
+
+	/**
+	 * @var IAdapter
+	 */
+	protected IAdapter $attributeAdapter;
+
+	/**
+	 * @var IAdapter
+	 */
+	protected IAdapter $valueAdapter;
+
+	/**
+	 * @var IAdapter
+	 */
+	protected IAdapter $EAVAdapter;
+
+	/**
+	 * @var IAdapter
+	 */
+	protected IAdapter $sourceAdapter;
+
+	/**
+	 * @var IAdapter
+	 */
+	protected IAdapter $subjectAdapter;
+
+	/**
+	 * @var ServiceInterface Service Interface object to interact with the demon
+	 */
 	protected ServiceInterface $serviceInterface;
-	protected SourceAdapter $sourceAdapter;
-	protected SubjectAdapter $subjectAdapter;
+
+	/**
+	 * @var array of source attributes
+	 */
 	protected array $attributes;
+
+	/**
+	 * @var array of subject Ids
+	 */
 	protected array $subjects;
+
+	/**
+	 * @var int count of total EAV records
+	 */
 	protected int $totalEAVsCount;
+
+	/**
+	 * @var int count of all records
+	 */
 	protected int $totalRecords;
+
+	/**
+	 * @var int number of indexed records
+	 */
 	protected int $processedRecords;
 
 	public function __construct(int $source_id)
