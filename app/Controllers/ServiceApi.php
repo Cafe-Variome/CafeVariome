@@ -8,18 +8,26 @@
  * @author Mehdi Mehtarizadeh
 */
 
+use App\Libraries\CafeVariome\CafeVariome;
+use App\Libraries\CafeVariome\Database\IAdapter;
 use CodeIgniter\RESTful\ResourceController;
-use CodeIgniter\API\ResponseTrait;
-use CodeIgniter\Controller;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
-use App\Libraries\CafeVariome\Core\APIResponseBundle;
-use CodeIgniter\Config\Services;
 
 class ServiceApi extends ResourceController
 {
+	/**
+	 * @var IAdapter Setting adapter instance
+	 */
+	protected IAdapter $setting;
+
+	/**
+	 * @var ServiceInterface Service Interface object to interact with the demon
+	 */
+	protected ServiceInterface $serviceInterface;
+
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
