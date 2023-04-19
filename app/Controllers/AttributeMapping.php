@@ -1,14 +1,5 @@
 <?php namespace App\Controllers;
 
-use App\Libraries\CafeVariome\Database\AttributeAdapter;
-use App\Libraries\CafeVariome\Database\SourceAdapter;
-use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
-use App\Libraries\CafeVariome\Factory\AttributeMappingAdapterFactory;
-use App\Libraries\CafeVariome\Factory\AttributeMappingFactory;
-use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
-use App\Models\UIData;
-use CodeIgniter\Config\Services;
-
 /**
  * AttributeMapping.php
  * Created 21/10/2021
@@ -17,11 +8,26 @@ use CodeIgniter\Config\Services;
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Database\IAdapter;
+use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
+use App\Libraries\CafeVariome\Factory\AttributeMappingAdapterFactory;
+use App\Libraries\CafeVariome\Factory\AttributeMappingFactory;
+use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
+use App\Models\UIData;
+use CodeIgniter\Config\Services;
 
 class AttributeMapping extends CVUIController
 {
-	private AttributeAdapter $attributeAdapter;
-	private SourceAdapter $sourceAdapter;
+	/**
+	 * @var IAdapter
+	 */
+	private IAdapter $attributeAdapter;
+
+	/**
+	 * @var IAdapter
+	 */
+	private IAdapter $sourceAdapter;
+
 	private $validation;
 
 	/**
