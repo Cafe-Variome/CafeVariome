@@ -31,7 +31,15 @@ use App\Libraries\CafeVariome\Core\DataPipeLine\Input\VCFDataInput;
 
  class Task extends Controller
  {
-	 protected $dbAdapter;
+	 /**
+	  * @var IAdapter data adapter layer instance
+	  */
+	 protected IAdapter $dbAdapter;
+
+	 /**
+	  * @var IAdapter Setting adapter instance
+	  */
+	 protected IAdapter $setting;
 
 	 /**
 	  * Constructor
