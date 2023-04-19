@@ -67,62 +67,6 @@ class ServiceInterface
 		return $results;
 	}
 
-    public function GetUploadedFilesStatus()
-    {
-        $message = ['type' => 'uploadedfilesstatus'];
-
-        $results = "";
-        $this->socket->Create()->Connect()->Write($message);
-        while ($out = $this->socket->Read(2048)) {
-            $results .= $out;
-        }
-        $this->socket->Close();
-
-        return $results;
-    }
-
-    public function GetElasticsearchStatus()
-    {
-        $message = ['type' => 'elasticsearchstatus'];
-
-        $results = "";
-        $this->socket->Create()->Connect()->Write($message);
-        while ($out = $this->socket->Read(2048)) {
-            $results .= $out;
-        }
-        $this->socket->Close();
-
-        return $results;
-    }
-
-	public function GetNeo4JStatus()
-	{
-		$message = ['type' => 'neo4jstatus'];
-
-		$results = "";
-		$this->socket->Create()->Connect()->Write($message);
-		while ($out = $this->socket->Read(2048)) {
-			$results .= $out;
-		}
-		$this->socket->Close();
-
-		return $results;
-	}
-
-	public function GetUserInterfaceIndexStatus()
-	{
-		$message = ['type' => 'uiindexstatus'];
-
-		$results = "";
-		$this->socket->Create()->Connect()->Write($message);
-		while ($out = $this->socket->Read(2048)) {
-			$results .= $out;
-		}
-		$this->socket->Close();
-
-		return $results;
-	}
-
     public function RegisterTask(int $task_id, bool $batch = false, string $status = ''): bool
     {
 		$message = (new RegisterTaskMessageFactory())->GetInstance($task_id, $status, $batch);
