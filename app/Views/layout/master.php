@@ -76,9 +76,10 @@
 
     <script src="<?php echo base_url(VENDOR . "twbs/bootstrap/dist/js/bootstrap.bundle.js"); ?>"></script>
     <script src="<?php echo base_url(VENDOR . "select2/select2/dist/js/select2.js"); ?>"></script>
-    <script type="text/javascript">
-        $('[data-toggle="tooltip"]').tooltip();
-    </script>
+	<script type="text/javascript">
+		const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+		const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+	</script>
 
     <!-- extra Java Script-->
     <?php foreach ($javascript as $js) : ?>
