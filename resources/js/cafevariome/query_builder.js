@@ -502,7 +502,7 @@ $(function() {
                                         result_data[key] = records;
                                         trow += '<td>';
                                         if (val1['count'] > 0 || Object.keys(records).length > 0) {
-                                            trow += '<a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal" data-sourcename="' + key + '">' + val1['count'] + '</a>';
+                                            trow += '<a type="button" class="btn btn-primary active" data-bs-toggle="modal" data-bs-target="#resultModal" data-sourcename="' + key + '">' + val1['count'] + '</a>';
                                         }
                                         else{
                                             trow += '0';
@@ -510,7 +510,7 @@ $(function() {
                                         trow += '</td><td>';
                                         break;
                                 }
-                                trow += '<a type="button" class="btn btn-info active" data-toggle="modal" data-target="#sourceModal" data-sourcename="' + key + '"><i class="fa fa-database"></i></a>';
+                                trow += '<a type="button" class="btn btn-info active" data-bs-toggle="modal" data-bs-target="#sourceModal" data-sourcename="' + key + '"><i class="fa fa-database"></i></a>';
 
                                 trow += "</tr>";
                                     $('#query_result tbody').append(trow);

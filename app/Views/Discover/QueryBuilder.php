@@ -124,29 +124,29 @@
                 <div class="row">
                     <div class="col">
                         <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text"><i class="fa fa-search"></i></div>
-                            </div>
-                            <input class="form-control" id="search_filter_phen_left" type="text" placeholder="Start typing and a list of relevant items will populate... " style="text-align: center;" />
+							<span class="input-group-text fa fa-search pt-2"></span>
+							<input class="form-control" id="search_filter_phen_left" type="text" placeholder="Start typing and a list of relevant items will populate... " style="text-align: center;" />
                         </div>
-                        <select id='values_phen_left' class="form-control" size="10"></select>
-                        <button class="btnAdd btn btn-secondary btn-block">Add</button>
+						<div class="d-grid gap-2">
+							<select id='values_phen_left' class="form-control" size="10"></select>
+							<button class="btnAdd btn btn-success bg-success bg-gradient">Add HPO Term</button>
+						</div>
                     </div>
                     <div class="col">
                         <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                            <div class="input-group-text"><i class="fa fa-search"></i></div>
-                            </div>
+							<span class="input-group-text fa fa-search pt-2"></span>
                             <input class="form-control" id="search_filter_phen_right" type="text" placeholder="filter by keyword" style="text-align: center;">
                         </div>
-                        <select id="values_phen_right" class="form-control" size="10"></select>
-                        <button class="btnRemove btn btn-secondary btn-block">Remove</button>
+						<div class="d-grid gap-2">
+							<select id="values_phen_right" class="form-control" size="10"></select>
+							<button class="btnRemove btn btn-danger bg-danger bg-gradient">Remove HPO Term</button>
+						</div>
                     </div>
                 </div>
                 <hr/>
                 <div class="row mb-3">
-                    <div class="col-4">HPO Term Pairwise Similarity:</div>
-                    <div class="col-2 text-right">
+                    <div class="col-5">HPO Term Pairwise Similarity:</div>
+                    <div class="col-1 text-right">
                         Minimum
                     </div>
                     <div class="col-4">
@@ -159,8 +159,8 @@
                     </div>
                 </div>
                 <div class="row mb-3">
-                    <div class="col">Minimum Matched Terms:</div>
-                    <div class="col-2 text-right">
+                    <div class="col-5">Minimum Matched Terms:</div>
+                    <div class="col-1 text-right">
                         Any
                     </div>
                     <div class="col">
@@ -177,8 +177,8 @@
                         Include ORPHA:
                     </div>
                     <div class="col-5">
-                        <input type="checkbox" class="custom-control-input" id="includeORPHA">
-                        <label class="custom-control-label" for="includeORPHA"></label>
+                        <input type="checkbox" class="form-check-input" id="includeORPHA">
+                        <label class="form-check-label" for="includeORPHA"></label>
                     </div>
                 </div>
             </div>
@@ -203,8 +203,8 @@
                 </div>
                 <hr/>
                 <div class="row mb-3">
-                    <div class="col-4">HPO Term Pairwise Similarity:</div>
-                    <div class="col-2 text-right">
+                    <div class="col-5">HPO Term Pairwise Similarity:</div>
+                    <div class="col-1 text-right">
                         Minimum
                     </div>
                     <div class="col-4">
@@ -218,8 +218,8 @@
                 </div>
                 <hr/>
                 <div class="row mb-3">
-                    <div class="col-4">ORDO Match Scale</div>
-                    <div class="col-2 text-right">
+                    <div class="col-5">ORDO Match Scale</div>
+                    <div class="col-1 text-right">
                         Minimum
                     </div>
                     <div class="col-4">
@@ -237,8 +237,8 @@
                         Include HPO:
                     </div>
                     <div class="col-5">
-                        <input type="checkbox" class="custom-control-input" id="includeHPO">
-                        <label class="custom-control-label" for="includeHPO"></label>
+                        <input type="checkbox" class="form-check-input" id="includeHPO">
+                        <label class="form-check-label" for="includeHPO"></label>
                     </div>
                 </div>
             </div>
@@ -351,9 +351,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="exampleModalLabel">HPO Tree</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
         <div id="jstreeArea">
@@ -361,8 +359,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
+		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	  </div>
     </div>
   </div>
 </div>
@@ -373,9 +371,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="resultModalLabel">Results</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
 		  <div class="row">
@@ -397,8 +393,8 @@
         </table>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-      </div>
+		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	  </div>
     </div>
   </div>
 </div>
@@ -409,9 +405,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="sourceModalLabel">Source Information</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
 				<div class="row">
@@ -468,7 +462,7 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
 			</div>
 		</div>
 	</div>
