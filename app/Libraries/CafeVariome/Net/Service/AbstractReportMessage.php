@@ -21,7 +21,6 @@ abstract class AbstractReportMessage extends AbstractMessage
 
 	public function __construct(int $task_id, bool $finished = false, string $status = '')
 	{
-		parent::__construct();
 		$this->process_id = getmypid();
 		$this->SetType();
 		$this->task_id = $task_id;
