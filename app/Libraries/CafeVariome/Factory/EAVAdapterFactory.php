@@ -10,6 +10,7 @@
 
 
 use App\Libraries\CafeVariome\Database\EAVAdapter;
+use App\Libraries\CafeVariome\Database\IAdapter;
 
 class EAVAdapterFactory extends AdapterFactory
 {
@@ -17,7 +18,7 @@ class EAVAdapterFactory extends AdapterFactory
     /**
      * @inheritDoc
      */
-    public function GetInstance(): EAVAdapter
+    public function GetInstance(): IAdapter
     {
         return new EAVAdapter();
     }

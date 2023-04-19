@@ -12,11 +12,10 @@ use App\Libraries\CafeVariome\Database\ValueAdapter;
 
 class ValueAdapterFactory extends AdapterFactory
 {
-
     /**
      * @inheritDoc
      */
-    public function GetInstance(): ValueAdapter
+    public function GetInstance(): IAdapter
     {
         return new ValueAdapter();
     }

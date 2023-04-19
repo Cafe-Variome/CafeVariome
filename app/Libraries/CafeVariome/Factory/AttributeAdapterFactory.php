@@ -15,7 +15,7 @@ class AttributeAdapterFactory extends AdapterFactory
     /**
      * @inheritDoc
      */
-    public function GetInstance(): AttributeAdapter
+    public function GetInstance(): IAdapter
     {
         return new AttributeAdapter();
     }

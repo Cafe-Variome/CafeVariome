@@ -46,7 +46,7 @@ class PipelineFactory extends EntityFactory
 		int $grouping,
 		?string $group_columns,
 		?string $internal_delimiter
-	)
+	): IEntity
 	{
 		return new Pipeline([
 			'name' => $name,
