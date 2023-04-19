@@ -7,6 +7,9 @@
  * @author Mehdi Mehtarizadeh
  * @author Gregory Warren
  *
+ * Please note the code of this class and child classes will be invoked from the command line
+ * and therefore not executed within a web request.
+ *
  */
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\Database;
@@ -23,20 +26,81 @@ use DateTime;
 
 abstract class DataInput extends DataPipeLine
 {
+	/**
+	 * @var bool whether process should continue or not. Set by responses received from demon.
+	 */
 	protected bool $continue;
-	protected $db;
-    protected $fileMan;
-    protected $pipeline_id;
-    protected $fileName;
+
+	/**
+	 * @var Database database object
+	 * @see Database
+	 */
+	protected Database $db;
+
+	/**
+	 * @var IFileMan File handler instance
+	 */
+    protected IFileMan $fileMan;
+
+	/**
+	 * @var int Id of pipeline that determines how the file must be treated.
+	 */
+    protected int $pipeline_id;
+
+	/**
+	 * @var string file name as saved on the disk
+	 */
+    protected string $fileName;
+
+	/**
+	 * @var reader object that handles decoding and reading of data
+	 */
     protected $reader;
-	protected $serviceInterface;
+
+	/**
+	 * @var ServiceInterface service interface object used to communicate with the demon.
+	 */
+	protected ServiceInterface $serviceInterface;
+
+	/**
+	 * @var array attributes of file
+	 */
 	protected array $attributes;
+
+	/**
+	 * @var array subject ids of file
+	 */
 	protected array $subjects;
+
+	/**
+	 * @var array groups based on pipeline
+	 */
 	protected array $groups;
+
+	/**
+	 * @var array|string[]
+	 */
 	protected array $dateFormats;
-	private OntologyPrefixAdapter $ontologyPrefixAdapter;
+
+	/**
+	 * @var IAdapter data layer instance
+	 * used to fetch ontology prefixes to annotate ontology terms.
+	 */
+	private IAdapter $ontologyPrefixAdapter;
+
+	/**
+	 * @var int number of total records in file
+	 */
 	protected int $totalRecords;
+
+	/**
+	 * @var int number of records that are inserted in the database
+	 */
 	protected int $processedRecords;
+
+	/**
+	 * @var string errorMessage if any
+	 */
 	protected string $errorMessage;
 
 	public function __construct(Task $task, int $source_id)
@@ -60,9 +124,27 @@ abstract class DataInput extends DataPipeLine
 		$this->errorMessage = '';
 	}
 
+	/**
+	 * @param int $fileId
+	 * @return bool
+	 * This function needs to be implemented in relevant child classes.
+	 * In it, file existence and sanity must be checked.
+	 */
     abstract public function Absorb(int $fileId): bool;
+
+	/**
+	 * @param int $fileId
+	 * @return bool
+	 * This function needs to be implemented in relevant child classes.
+	 * In it, the file must be read and saved to the database.
+	 */
     abstract public function Save(int $fileId): bool;
 
+	/**
+	 * @return mixed
+	 * This function needs to be implemented in relevant child classes.
+	 * In it, the pipeline must be fetched from the database and relevant attributes set in this object.
+	 */
 	abstract protected function InitializePipeline();
 
 	public function Finalize(int $file_id, bool $update_subject_count = true)
@@ -111,6 +193,18 @@ abstract class DataInput extends DataPipeLine
 		return $this->errorMessage;
 	}
 
+	/**
+	 * @param int $group_id
+	 * @param int $file_id
+	 * @param int $subject_id
+	 * @param int $attribute_id
+	 * @param int $value_id
+	 * @return void
+	 *
+	 * This function inserts an EAV record into the database.
+	 * Please note the reason that the usual database layer has not been used is memory efficiency.
+	 *
+	 */
 	protected function createEAV(int $group_id, int $file_id, int $subject_id, int $attribute_id, int $value_id)
 	{
 		$this->db->insert("INSERT IGNORE INTO eavs (group_id, source_id, data_file_id, subject_id, attribute_id, value_id) VALUES ('$group_id', '$this->sourceId', '$file_id', '$subject_id', '$attribute_id', '$value_id');");
