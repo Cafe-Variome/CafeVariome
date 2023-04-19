@@ -13,7 +13,6 @@ class PollProgressMessage extends AbstractMessage
 
 	public function __construct()
 	{
-		parent::__construct();
 		$this->SetType();
 	}
 }
