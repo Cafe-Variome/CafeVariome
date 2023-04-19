@@ -32,7 +32,7 @@ interface IAuthenticator
 	 * @return int
 	 * Fetches authenticated user ID from sessions.
 	 */
-	public function GetUserId(): int;
+	public function GetUserId(): ?int;
 
 	/**
 	 * @return bool
@@ -57,13 +57,13 @@ interface IAuthenticator
 	 * @return string
 	 * Gets logout URL to redirect the user to.
 	 */
-	public function GetLogoutURL(): string;
+	public function GetLogoutURL(): ?string;
 
 	/**
 	 * @return string
 	 * Gets profile page URl to redirect the user to.
 	 */
-	public function GetProfileEndpoint(): string;
+	public function GetProfileEndpoint(): ?string;
 
 	/**
 	 * @return bool
