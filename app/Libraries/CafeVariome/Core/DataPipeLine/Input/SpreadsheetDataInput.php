@@ -14,10 +14,8 @@ use \Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
 class SpreadsheetDataInput extends DataInput
 {
-    protected $serviceInterface;
     protected array $configuration;
     private $column_count;
-    protected $pipeline_id;
 
     public function __construct(Task $task, int $source_id)
 	{
