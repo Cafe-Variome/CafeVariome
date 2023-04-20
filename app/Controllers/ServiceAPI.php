@@ -16,7 +16,7 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use App\Libraries\CafeVariome\Net\ServiceInterface;
 
-class ServiceApi extends ResourceController
+class ServiceAPI extends ResourceController
 {
 	/**
 	 * @var IAdapter Setting adapter instance

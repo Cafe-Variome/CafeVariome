@@ -1,7 +1,7 @@
 <?php namespace App\Controllers;
 
 /**
- * QueryApi.php
+ * QueryAPI.php
  *
  * Created : 27/01/2020
  *
@@ -24,7 +24,7 @@ use App\Libraries\CafeVariome\Core\APIResponseBundle;
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 
 
-class QueryApi extends ResourceController
+class QueryAPI extends ResourceController
 {
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {

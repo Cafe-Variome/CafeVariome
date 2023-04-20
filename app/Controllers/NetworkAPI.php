@@ -1,7 +1,7 @@
 <?php namespace App\Controllers;
 
 /**
- * NetworkApi.php
+ * NetworkAPI.php
  *
  * Created : 01/10/2019
  *
@@ -19,8 +19,8 @@ use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
 use App\Libraries\CafeVariome\Core\APIResponseBundle;
 
-class NetworkApi extends ResourceController{
-
+class NetworkAPI extends ResourceController
+{
     public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
     {
         parent::initController($request, $response, $logger);
