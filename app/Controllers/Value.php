@@ -9,8 +9,7 @@
  */
 
 use App\Libraries\CafeVariome\Core\DataPipeLine\DataPipeLine;
-use App\Libraries\CafeVariome\Database\AttributeAdapter;
-use App\Libraries\CafeVariome\Database\SourceAdapter;
+use App\Libraries\CafeVariome\Database\IAdapter;
 use App\Libraries\CafeVariome\Entities\ViewModels\ValueDetails;
 use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
@@ -19,20 +18,12 @@ use App\Libraries\CafeVariome\Factory\ValueFactory;
 use App\Models\UIData;
 use CodeIgniter\Config\Services;
 
-/**
- * Value.php
- * Created 15/09/2021
- *
- * This class offers CRUD operation for data values.
- * @author Mehdi Mehtarizadeh
- */
-
 class Value extends CVUIController
 {
 	private $validation;
 
-	private AttributeAdapter $attributeAdapter;
-	private SourceAdapter $sourceAdapter;
+	private IAdapter $attributeAdapter;
+	private IAdapter $sourceAdapter;
 
 	/**
 	 * Validation list template.
