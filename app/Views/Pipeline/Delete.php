@@ -5,18 +5,28 @@
 </h2>
 <hr>
 <?php echo form_open($controllerName."/Delete/" . $pipeline->getID()); ?>
+<div class="row mb-3">
+	<div class="col">
+		<div class="alert alert-danger">
+			<p class="text-lg-left bol">
+				<strong>
+					Do you wish to delete '<?= $pipeline->name; ?>'?
+				</strong>
+			</p>
+		</div>
+	</div>
+</div>
 
 <div class="row mb-3">
-<span class="text-danger">Warning: Are you sure you want to delete '<?= $pipeline->name; ?>'?</span>
-</div>
-<div class="row mb-3">
-	<div class="form-check form-check-inline">
-		<input class="form-check-input" type="radio" name="confirm" value="yes">
-		<label class="form-check-label" for="confirm">Yes</label>
-	</div>
-	<div class="form-check form-check-inline">
-		<input class="form-check-input" type="radio" name="confirm" value="no" checked>
-		<label class="form-check-label" for="confirm">No</label>
+	<div class="col">
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="confirm" id="confirm_yes" value="yes">
+			<label class="form-check-label" for="confirm_yes">Yes</label>
+		</div>
+		<div class="form-check form-check-inline">
+			<input class="form-check-input" type="radio" name="confirm" id="confirm_no" value="no" checked>
+			<label class="form-check-label" for="confirm_no">No</label>
+		</div>
 	</div>
 </div>
 
