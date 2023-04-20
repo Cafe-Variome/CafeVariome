@@ -1,13 +1,5 @@
 <?php namespace App\Controllers;
 
-use App\Libraries\CafeVariome\Entities\ViewModels\OntologyDropDown;
-use App\Libraries\CafeVariome\Entities\ViewModels\OntologyPrefixWithOntologyName;
-use App\Libraries\CafeVariome\Factory\OntologyAdapterFactory;
-use App\Libraries\CafeVariome\Factory\OntologyPrefixAdapterFactory;
-use App\Libraries\CafeVariome\Factory\OntologyPrefixFactory;
-use App\Models\UIData;
-use CodeIgniter\Config\Services;
-
 /**
  * OntologyPrefix.php
  * Created 29/09/2021
@@ -16,11 +8,20 @@ use CodeIgniter\Config\Services;
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Database\IAdapter;
+use App\Libraries\CafeVariome\Entities\ViewModels\OntologyDropDown;
+use App\Libraries\CafeVariome\Entities\ViewModels\OntologyPrefixWithOntologyName;
+use App\Libraries\CafeVariome\Factory\OntologyAdapterFactory;
+use App\Libraries\CafeVariome\Factory\OntologyPrefixAdapterFactory;
+use App\Libraries\CafeVariome\Factory\OntologyPrefixFactory;
+use App\Models\UIData;
+use CodeIgniter\Config\Services;
+
 class OntologyPrefix extends CVUIController
 {
 	private $validation;
 
-	private $ontologyAdapter;
+	private IAdapter $ontologyAdapter;
 
 	/**
 	 * Validation list template.
