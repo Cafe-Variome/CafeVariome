@@ -2,7 +2,7 @@
 
 /**
  * Name VCFDataInput.php
- *
+ * @deprecated
  * Created 26/04/2021
  * @author Mehdi Mehtarizadeh
  *
