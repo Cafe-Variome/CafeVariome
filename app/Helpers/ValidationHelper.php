@@ -303,7 +303,8 @@ class ValidationHelper
 		else
 		{
 			$ontology_id = $data[$fields];
-			return $ontologyRelationshipAdapter->ReadByNameAndOntologyId($str, $ontology_id);
+			$ontology_relationship = $ontologyRelationshipAdapter->ReadByNameAndOntologyId($str, $ontology_id);
+			return $ontology_relationship->isNull();
 		}
 	}
 
