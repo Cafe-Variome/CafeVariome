@@ -143,6 +143,7 @@ $routes->get('DiscoveryGroup/Details/(:num)', 'DiscoveryGroup::Details/$1');
 $routes->get('Home', 'Home::Index');
 $routes->get('home', 'Home::Index');
 $routes->get('Home/Index', 'Home::Index');
+$routes->get('Home/Portal', 'Home::Portal');
 $routes->get('home/index', 'Home::Index');
 $routes->get('home/index/(:num)', 'Home::Index/$1');
 $routes->get('Home/Index/(:num)', 'Home::Index/$1');
