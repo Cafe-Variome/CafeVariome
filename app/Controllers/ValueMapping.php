@@ -8,8 +8,7 @@
  * @author Mehdi Mehtarizadeh
  */
 
-use App\Libraries\CafeVariome\Database\AttributeAdapter;
-use App\Libraries\CafeVariome\Database\ValueAdapter;
+use App\Libraries\CafeVariome\Database\IAdapter;
 use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
 use App\Libraries\CafeVariome\Factory\ValueAdapterFactory;
 use App\Libraries\CafeVariome\Factory\ValueMappingAdapterFactory;
@@ -19,8 +18,8 @@ use CodeIgniter\Config\Services;
 
 class ValueMapping extends CVUIController
 {
-	private AttributeAdapter $attributeAdapter;
-	private ValueAdapter $valueAdapter;
+	private IAdapter $attributeAdapter;
+	private IAdapter $valueAdapter;
 	private $validation;
 
 	/**
