@@ -8,6 +8,7 @@
  * @author Mehdi Mehtarizadeh
  */
 
+use App\Libraries\CafeVariome\Database\IAdapter;
 use App\Libraries\CafeVariome\Entities\ViewModels\OntologyDropDown;
 use App\Libraries\CafeVariome\Entities\ViewModels\OntologyRelationshipWithOntologyName;
 use App\Libraries\CafeVariome\Factory\OntologyAdapterFactory;
@@ -19,7 +20,7 @@ use CodeIgniter\Config\Services;
 class OntologyRelationship extends CVUIController
 {
 
-	private $ontologyAdapter;
+	private IAdapter $ontologyAdapter;
 	private $validation;
 
 	/**
@@ -161,13 +162,6 @@ class OntologyRelationship extends CVUIController
 					'alpha_numeric_punct' => 'The only valid characters for {field} are alphabetical characters, numbers, and some punctuation characters.',
 					'unique_ontology_relationship' => '{field} already exists.',
 					'max_length' => 'Maximum length is 100 characters.'
-				]
-			],
-			'relationship_id' => [
-				'label'  => 'relationship_id',
-				'rules'  => 'integer',
-				'errors' => [
-					'integer' => 'The only valid input for {field} is integers.'
 				]
 			]
 		]);
