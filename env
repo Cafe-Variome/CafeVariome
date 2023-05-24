@@ -20,7 +20,7 @@ CI_ENVIRONMENT = development
 # APP
 #--------------------------------------------------------------------
 
-app.baseURL = ''
+app.baseURL = 'http://localhost:8082/cvci4/'
 #app.forceGlobalSecureRequests = true
 
 #app.sessionDriver = 'CodeIgniter\Session\Handlers\FileHandler'
@@ -49,11 +49,11 @@ app.baseURL = ''
 # DATABASE
 #--------------------------------------------------------------------
 
-database.default.hostname =
-database.default.database =
-database.default.username =
-database.default.password =
-database.default.DBDriver = MySQLi
+database.default.hostname = 'cafevariome_mysql'
+database.default.database = 'cafevariome'
+database.default.username = 'cafevariome'
+database.default.password = 'CafeVariome123!"£'
+database.default.DBDriver = 'MySQLi'
 
 # database.tests.hostname = localhost
 # database.tests.database = ci4
