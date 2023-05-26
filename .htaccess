@@ -38,7 +38,7 @@ IndexIgnore *
 	RewriteRule ^index/(.+?)/$ index.php?page=$1 [L,QSA]
 
 	# skip all files and directories from rules below
-    RewriteCond %{REQUEST_FILENAME} -d [OR]
+    	RewriteCond %{REQUEST_FILENAME} -d [OR]
 	RewriteCond %{REQUEST_FILENAME} -f [OR]
 	RewriteCond %{REQUEST_FILENAME} -l
 	RewriteRule ^ - [L]
@@ -49,15 +49,15 @@ IndexIgnore *
 	RewriteRule .*  %1/index.php?page=%2           [L]
 
 	# Checks to see if the user is attempting to access a valid file,
-    # such as an image or css document, if this isn't true it sends the
-    # request to the front controller, index.php
+    	# such as an image or css document, if this isn't true it sends the
+    	# request to the front controller, index.php
 	RewriteCond %{REQUEST_FILENAME} !-f
 	RewriteCond %{REQUEST_FILENAME} !-d
 	RewriteRule ^(.*)$ index.php/$1 [L]
 
 	# Ensure Authorization header is passed along
-    RewriteCond %{HTTP:Authorization} .
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    	RewriteCond %{HTTP:Authorization} .
+    	RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
 	# Deny Access to Hidden Files and Directories
 	RewriteCond %{SCRIPT_FILENAME} -d [OR]
@@ -79,6 +79,10 @@ IndexIgnore *
 	# Disallow access to vendor directory
 	RewriteRule ^vendor/(.*)?$ / [F,L]
 	RewriteRule ^composer\.(lock|json)$ / [F,L]
+
+	# Disabling TRACE Method to prevent access to sensitive header information
+	RewriteCond %{REQUEST_METHOD} ^TRACE
+	RewriteRule .* - [F]
 
 </IfModule>
 
