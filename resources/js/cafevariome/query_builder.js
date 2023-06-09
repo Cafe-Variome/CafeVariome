@@ -97,7 +97,7 @@ $( function() {
     $('#ordoSelect').select2({
         ajax: {
             url:  function (params) {
-                return orpha_autocomplete_url + params.term
+                return orpha_autocomplete_url + Sanitize(params.term)
             },
             dataType: 'json',
             processResults: function (data) {
@@ -118,6 +118,15 @@ $( function() {
     });
 });
 
+
+ //Input Sanitization for Auto Complete 
+  let Sanitize =(term)=>{
+    if(/[^a-z0-9áéíóúñü \.,_-]/.test(term)){
+        return '';
+    }else{
+        return term;
+    }
+  } 
 
 $(function() {
     // urls object
@@ -186,9 +195,10 @@ $(function() {
         $('select#values_phen_left').empty()
         var arrayToReduce = $(this).val().trim().split(' ').filter((term) => term.length != 1);
         str = (arrayToReduce.length > 0) ? arrayToReduce.reduce((v1, v2) => v1 + " " + v2) : '';
+        
 
         $.ajax({
-            url: hpo_autocomplete_url + str,
+            url: hpo_autocomplete_url + Sanitize(str),
             type: 'GET',
             dataType:'json',
             crossDomain: true,

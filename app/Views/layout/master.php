@@ -41,16 +41,6 @@
 
     <script src="<?php echo base_url(JS . "jquery-3.6.0.min.js"); ?>"></script>
 
-    <!-- Implementing Content Security Policy for all pages -->
-    <?php
-        $nonceDefaultSrc = base64_encode(openssl_random_pseudo_bytes(16));
-        $nonceScriptSrc = base64_encode(openssl_random_pseudo_bytes(16));
-        $nonceStyleSrc = base64_encode(openssl_random_pseudo_bytes(16));
-        $nonceFontSrc = base64_encode(openssl_random_pseudo_bytes(16));
-        $nonceFrameAncestors = base64_encode(openssl_random_pseudo_bytes(16));
-        $csp = "default-src 'self' 'nonce-$nonceDefaultSrc'; script-src 'self' 'nonce-$nonceScriptSrc'; style-src 'self' https://*.googleapis.com 'nonce-$nonceStyleSrc'; font-src 'self' https://*.gstatic.com 'nonce-$nonceFontSrc'; frame-ancestors 'self' 'nonce-$nonceFrameAncestors'; upgrade-insecure-requests; block-all-mixed-content;";
-        header("Content-Security-Policy: $csp");
-    ?>
 
 </head>
 
