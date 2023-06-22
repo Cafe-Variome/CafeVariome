@@ -91,7 +91,7 @@ class Sanitizer {
 	}
 
 	private static function sanitizeValue($value) {
-		$exclude_chars = array('<', '=', '>');
+		$exclude_chars = array('<', '=', '>', '"');
 		$sanitizedValue = self::customEntities($value, $exclude_chars);
 		return $sanitizedValue;
 	}
