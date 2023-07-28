@@ -404,7 +404,7 @@ INSERT INTO `settings` (`id`, `key`, `value`, `name`, `info`, `group`) VALUES
 (17, 'site_description', 'Cafe Variome - Description', 'Site Description', 'Description of the website that appears as metadata in the structure of public pages.', 'main'),
 (18, 'site_keywords', 'healthcare data discovery, bioinformatics', 'Keywords', 'Keywords explaining activity of the website that appear as metadata on public pages. They help search engines find this website.', 'main'),
 (19, 'site_title', 'Cafe Variome Central', 'Site Title', 'Title as it appears in the web browser and on top left side of all pages.', 'main'),
-(20, 'snomed_autocomplete_url', 'https://autocomplete.cafevariome.org/Snomed/query/', 'SNOMED Auto-complete Endpoint', 'Endpoint that provides auto-complete service for SNOMED terms lookup ', 'endpoint')
+(20, 'snomed_autocomplete_url', 'https://autocomplete.cafevariome.org/Snomed/query/', 'SNOMED Auto-complete Endpoint', 'Endpoint that provides auto-complete service for SNOMED terms lookup ', 'endpoint'),
 (21, 'reactome_autocomplete_url', 'https://autocomplete.cafevariome.org/Reactome/query/', 'Reactome Pathway Auto-complete Endpoint', 'Endpoint that provides auto-complete service for Reactome Pathway terms lookup ', 'endpoint');
 -- --------------------------------------------------------
 
