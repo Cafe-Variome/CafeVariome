@@ -33,12 +33,14 @@ class UserInterfaceAPI extends BaseController
 		$orphaAutocompleteURL = $this->setting->getORPHAAutoCompleteURL();
 		$snomedAutocompleteURL = $this->setting->getSNOMEDAutoCompleteURL();
 		$geneAutocompleteURL = $this->setting->getGeneAutoCompleteURL();
+		$reactomeAutocompleteURL = $this->setting->getReactomeAutoCompleteURL();
 
 		$script .= "var baseurl = '$baseURL/';";
 		$script .= "var hpo_autocomplete_url = '$hpoAutocompleteURL';";
 		$script .= "var orpha_autocomplete_url = '$orphaAutocompleteURL';";
 		$script .= "var snomed_autocomplete_url = '$snomedAutocompleteURL';";
 		$script .= "var gene_autocomplete_url = '$geneAutocompleteURL';";
+		$script .= "var reactome_autocomplete_url = '$reactomeAutocompleteURL';";
 
 		return $script;
 
