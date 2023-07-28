@@ -8,6 +8,14 @@ var attributesDisplayNames = {};
 var valuesDisplayNames = {};
 
 var queryXHR = null;
+$("#sall").change(function() {
+    if(this.checked) {
+        $('.ml-1 .custom-control-input').prop('checked', true);
+    }
+    else{
+        $('.ml-1 .custom-control-input').prop('checked', false);
+    }
+});
 
 $( function() {
     $( "#age-range" ).slider({
@@ -97,7 +105,7 @@ $( function() {
     $('#ordoSelect').select2({
         ajax: {
             url:  function (params) {
-                return orpha_autocomplete_url + Sanitize(params.term)
+                return orpha_autocomplete_url + params.term
             },
             dataType: 'json',
             processResults: function (data) {
@@ -116,17 +124,52 @@ $( function() {
         maximumSelectionLength: 1,
         minimumInputLength: 2
     });
+
+    $("#genes_box").select2( {
+        ajax: {
+            url:  function (params) {
+                return gene_autocomplete_url + params.term
+            },
+            dataType: 'json',
+            processResults: function (data) {
+                results = [];
+                $.each(data, function (key, value) {
+                    results.push({'id': value, 'text': value})
+                })
+                return {
+                    results: results
+                };
+            }
+        },
+		width: '100%',
+        placeholder: 'Choose genes',
+        allowClear: false,
+        minimumInputLength: 2 ,
+	});
+    
+    $("#reactome_box").select2( {
+        ajax: {
+            url:  function (params) {
+                return reactome_autocomplete_url + params.term
+            },
+            dataType: 'json',
+            processResults: function (data) {
+                results = [];
+                $.each(data, function (key, value) {
+                    results.push({'id': value, 'text': value})
+                })
+                return {
+                    results: results
+                };
+            }
+        },
+        width: '100%',
+        placeholder: 'Choose Pathway',
+        allowClear: false,
+        minimumInputLength: 2 ,
+    });
 });
 
-
- //Input Sanitization for Auto Complete 
-  let Sanitize =(term)=>{
-    if(/[^a-z0-9áéíóúñü \.,_-]/.test(term)){
-        return '';
-    }else{
-        return term;
-    }
-  } 
 
 $(function() {
     // urls object
@@ -195,10 +238,9 @@ $(function() {
         $('select#values_phen_left').empty()
         var arrayToReduce = $(this).val().trim().split(' ').filter((term) => term.length != 1);
         str = (arrayToReduce.length > 0) ? arrayToReduce.reduce((v1, v2) => v1 + " " + v2) : '';
-        
 
         $.ajax({
-            url: hpo_autocomplete_url + Sanitize(str),
+            url: hpo_autocomplete_url + str,
             type: 'GET',
             dataType:'json',
             crossDomain: true,
@@ -349,6 +391,9 @@ $(function() {
             var gen = []
             var mutation = []
             var ordo = []
+            var reactome = []
+            var gene = []
+            var af = []
 
             $('#pat_container .rule').each(function() {
                 var attr = $('select.keys_pat', this).val()
@@ -378,6 +423,86 @@ $(function() {
             //     logic_haplo.push("/query/components/eav/" + (eav.length-1))
             // });
             // if(logic_haplo.length > 1) {logic['-AND'].push({'-OR': logic_haplo})}
+            protein_effect = [];
+
+            if($('#ncoding').prop('checked')){
+                protein_effect.push('p:three_prime_UTR_variant');
+                protein_effect.push('p:five_prime_UTR_variant');
+                protein_effect.push('p:downstream_gene_variant');
+                protein_effect.push('p:upstream_gene_variant');
+                protein_effect.push('p:non_coding_transcript_variant');
+                protein_effect.push('p:intron_variant');
+                protein_effect.push('p:intergenic_variant');
+                protein_effect.push('p:non_coding_transcript_exon_variant');
+            }
+
+            if($('#mss').prop('checked')){
+                protein_effect.push('p:missense_variant');
+            }
+
+            if($('#nss').prop('checked')){
+                protein_effect.push('p:stop_gained');
+                protein_effect.push('p:synonymous_variant');
+            }
+
+            if($('#splice').prop('checked')){
+                protein_effect.push('p:splice_acceptor_variant');
+                protein_effect.push('p:splice_donor_variant');
+                protein_effect.push('p:synonymous_variant');
+                protein_effect.push('p:splice_region_variant');
+            }
+
+            if($('#frameshift').prop('checked')){
+                protein_effect.push('p:frameshift_variant');
+            }
+
+            if($('#lostart').prop('checked')){
+                protein_effect.push('p:start_lost');
+            }
+
+            if($('#lostop').prop('checked')){
+                
+            }
+
+            if($('#indel').prop('checked')){
+                protein_effect.push('p:inframe_deletion');
+                protein_effect.push('p:inframe_insertion');
+            }
+
+            logic_gene_reactome = [];
+            if($('#reactome_box').val().length > 0)
+            {
+                //logic_reactome = [];
+                for (i = 0; i < $('#reactome_box').val().length; i++){
+                    var reactome_dict = {'reactome_id': $('#reactome_box').val()[i].split(' ')[0], 'protein_effect': protein_effect}
+                    if($('#max_af').val() != ''){
+                        reactome_dict['af'] = $('#max_af').val() * 100;
+                    }
+                    reactome[i] = reactome_dict;
+                    //logic['-AND'].push('/query/components/reactome/' + i.toString())
+                    logic_gene_reactome.push('/query/components/reactome/' + i.toString());
+                }
+                //logic['-AND'].push({'-OR': logic_reactome})
+            }
+
+            if($('#genes_box').val().length > 0)
+                {
+                //logic_gene = [];
+                        for (i = 0; i < $('#genes_box').val().length; i++){
+                                var gene_dic = {'gene_id': $('#genes_box').val()[i].trim().toUpperCase(), 'protein_effect': protein_effect};
+                                if($('#max_af').val() != ''){
+                        gene_dic['af'] = $('#max_af').val() * 100;
+                    }
+                    gene[i] = gene_dic;
+                    //logic['-AND'].push('/query/components/gene/' + i.toString())
+                    logic_gene_reactome.push('/query/components/gene/' + i.toString());
+                        }
+                //logic['-AND'].push({'-OR': logic_gene})
+                }
+
+            if(logic_gene_reactome.length > 0){
+                logic['-AND'].push({'-OR':logic_gene_reactome});
+            }
 
             var phenLogic = 'SIM';
             logic_phen = [];
@@ -442,12 +567,20 @@ $(function() {
 
             if(logic_gen.length > 1 && genLogic === 'OR') {logic['-AND'].push({'-OR': logic_gen})}
 
+            /*if($('#max_af').val() != ''){
+            af[0] = {'af': $('#max_af').val()};
+            logic['-AND'].push("/query/components/allelefrequency/0");
+            }*/
+
             jsonAPI['requires']['response']['components']['attributes'] = attributes;
             jsonAPI['query']['components']['eav'] = eav;
             jsonAPI['query']['components']['subjectVariant'] = gen;
             jsonAPI['query']['components']['phenotype'] = phe;
             jsonAPI['query']['components']['sim'] = sim;
             jsonAPI['query']['components']['ordo'] = ordo;
+            jsonAPI['query']['components']['reactome'] = reactome;
+            jsonAPI['query']['components']['gene'] = gene;
+            // jsonAPI['query']['components']['allelefrequency'] = af;
 
             jsonAPI['logic'] = logic;
             var csrfTokenObj = getCSRFToken('keyvaluepair');
@@ -512,7 +645,7 @@ $(function() {
                                         result_data[key] = records;
                                         trow += '<td>';
                                         if (val1['count'] > 0 || Object.keys(records).length > 0) {
-                                            trow += '<a type="button" class="btn btn-primary active" data-bs-toggle="modal" data-bs-target="#resultModal" data-sourcename="' + key + '">' + val1['count'] + '</a>';
+                                            trow += '<a type="button" class="btn btn-primary active" data-toggle="modal" data-target="#resultModal" data-sourcename="' + key + '">' + val1['count'] + '</a>';
                                         }
                                         else{
                                             trow += '0';
@@ -520,7 +653,7 @@ $(function() {
                                         trow += '</td><td>';
                                         break;
                                 }
-                                trow += '<a type="button" class="btn btn-info active" data-bs-toggle="modal" data-bs-target="#sourceModal" data-sourcename="' + key + '"><i class="fa fa-database"></i></a>';
+                                trow += '<a type="button" class="btn btn-info active" data-toggle="modal" data-target="#sourceModal" data-sourcename="' + key + '"><i class="fa fa-database"></i></a>';
 
                                 trow += "</tr>";
                                     $('#query_result tbody').append(trow);
