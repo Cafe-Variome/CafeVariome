@@ -142,6 +142,11 @@ class SettingAdapter extends BaseAdapter
 		return $this->settings['gene_autocomplete_url']->value;
 	}
 
+	public function GetReactomeAutoCompleteURL(): ?string
+	{
+		return $this->settings['reactome_autocomplete_url']->value;
+	}
+
 	public function GetHeaderImage(): ?string
 	{
 		return $this->settings['logo']->value;
