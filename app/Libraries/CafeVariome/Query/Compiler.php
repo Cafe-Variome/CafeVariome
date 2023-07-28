@@ -443,6 +443,15 @@ class Compiler
 			case 'mutation':
 				$mutationQuery = new MutationQuery();
 				return $mutationQuery->Execute($clause, $source);
+			case 'reactome':
+				$reactomeQuery = new ReactomeQuery();
+				return $reactomeQuery->Execute($clause, $source);
+			case 'gene':
+				$geneQuery = new GeneQuery();
+				return $geneQuery->Execute($clause, $source);
+			case 'allelefrequency':
+				$alleleFrequencyQuery = new AlleleFrequencyQuery();
+				return $alleleFrequencyQuery->Execute($clause, $source);
 		}
 	}
 }
