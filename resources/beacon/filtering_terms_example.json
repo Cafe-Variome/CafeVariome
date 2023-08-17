@@ -1,0 +1,44 @@
+[
+            {
+                "ftType": "alphanumeric",
+                "id": "NCIT_C28421",
+                "label": "Sex. Permitted values: obo:NCIT_C16576, obo:NCIT_C20197",
+                "scope": "individuals"
+            },
+            {
+                "ftType": "ontologyTerm",
+                "id": "NCIT_C2991",
+                "label": "Diagnosis of the rare disease",
+                "scope": "individuals"
+            },
+            {
+                "ftType": "ontologyTerm",
+                "id": "SIO_010056",
+                "label": "Phenotype",
+                "scope": "individuals"
+            },
+            {
+                "ftType": "alphanumeric",
+                "id": "data_2295",
+                "label": "Causative genes. Permitted values: any HGNC gene symbol",
+                "scope": "individuals"
+            },
+            {
+                "ftType": "numeric",
+                "id": "NCIT_C83164",
+                "label": "Age this year",
+                "scope": "individuals"
+            },
+            {
+                "ftType": "numeric",
+                "id": "NCIT_C124353",
+                "label": "Symptom Onset",
+                "scope": "individuals"
+            },
+            {
+                "ftType": "numeric",
+                "id": ":NCIT_C156420",
+                "label": "Age at diagnosis",
+                "scope": "individuals"
+            }
+]
