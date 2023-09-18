@@ -36,7 +36,7 @@
 			<ul class="navbar-nav ms-auto mb-2 mb-md-0 float-right">
 			<?php if (! $loggedIn): ?>
 				<li class="nav-item">
-						<a class="nav-link-top" data-toggle="modal" data-target="#privacyPolicyModal">Privacy Policy</a>
+						<a class="nav-link-top" href="#" onclick="openPrivacyPolicyModal()">Privacy Policy</a>
 				</li>
 			<?php endif; ?>
 			<?php if (! $loggedIn): ?>
