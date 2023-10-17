@@ -4,6 +4,7 @@
  * Name: OpenIDAuthenticator.php
  * Created: 02/10/2020
  * @author Mehdi Mehtarizadeh
+ * @author Sadegh Abadijou
  *
  */
 
@@ -160,7 +161,7 @@ class OpenIDAuthenticator implements IAuthenticator
 
 		$this->options = $options;
 
-		$this->scopes = ['email'];
+		$this->scopes = ['openid profile'];
 	}
 
 	public function GetBaseURL(): string
@@ -234,7 +235,7 @@ class OpenIDAuthenticator implements IAuthenticator
 			'grant_type' => 'refresh_token',
 			'client_id'     => $this->options['client_id'],
 			'client_secret' => $this->options['client_secret'],
-			'redirect_uri'  => $this->options['redirect_uri'],
+			'redirect_uri' => $this->options['redirect_uri']
 		];
 
 		$params = array_merge($params, $input);
@@ -309,7 +310,7 @@ class OpenIDAuthenticator implements IAuthenticator
 		{
 			$this->scopes = $this->GetDefaultScopes();
 		}
-		$params['scopes'] = implode(' ', $this->scopes);
+		$params['scope'] = implode(' ', $this->scopes);
 
 		$params['redirect_uri'] = $this->GetRedirectURI();
 		$params['client_id'] = $this->options['client_id'];
