@@ -14,6 +14,10 @@ abstract class AbstractMessage implements IMessage
 {
 	protected string $installation_key;
 
+	public function __construct()
+	{
+		return $this;
+	}
 	public function ToJson(): string
 	{
 		return json_encode(get_object_vars($this));
