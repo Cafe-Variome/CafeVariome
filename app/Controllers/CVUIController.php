@@ -13,6 +13,7 @@ use App\Libraries\CafeVariome\Auth\LocalAuthenticator;
 use App\Libraries\CafeVariome\Auth\NullAuthenticator;
 use App\Libraries\CafeVariome\CafeVariome;
 use App\Libraries\CafeVariome\Database\IAdapter;
+use App\Libraries\CafeVariome\Entities\NullEntity;
 use App\Libraries\CafeVariome\Factory\AuthenticatorFactory;
 use App\Libraries\CafeVariome\Factory\SingleSignOnProviderAdapterFactory;
 use CodeIgniter\Controller;
@@ -221,7 +222,8 @@ class CVUIController extends Controller
 		$data["setting"] = &$setting;
 		$data['controllerName'] = $this->getClassName();
 
-		$loggedIn = $this->authenticator != null && $this->authenticator->loggedIn();
+		$loggedIn = $this->authenticator != null && $this->authenticator->loggedIn() &&
+			!($this->authenticator->GetUserById($this->authenticator->GetUserId()) instanceof NullEntity);
 		$data['loggedIn'] = $loggedIn;
 		if($loggedIn)
 		{
