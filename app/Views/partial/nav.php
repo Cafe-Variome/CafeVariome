@@ -1,5 +1,6 @@
-<nav class="navbar navbar-expand-md navbar-light fixed-top">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
 	<div class="container-fluid">
+
 		<?php if(strlen($headerImage) > 0): ?>
 			<img src="<?= base_url($headerImage);?>">
 		<?php else:?>
@@ -26,71 +27,82 @@
 				</div>
 			</div>
 		<?php endif; ?>
-		<a class="navbar-brand text-dark ms-3" href="<?php echo base_url("home"); ?>">
-			<?= $site_title ?>
-		</a>
-		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+
+		<a class="navbar-brand text-dark ms-3" href="<?php echo base_url("home"); ?>"><?= $site_title ?></a>
+
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
 			<span class="navbar-toggler-icon"></span>
 		</button>
-		<div class="collapse navbar-collapse" id="navbarCollapse">
-			<ul class="navbar-nav ms-auto mb-2 mb-md-0 float-right">
-			<?php if (! $loggedIn): ?>
-				<li class="nav-item">
-						<a class="nav-link-top" href="#" onclick="openPrivacyPolicyModal()">Privacy Policy</a>
-				</li>
-			<?php endif; ?>
-			<?php if (! $loggedIn): ?>
-				<li class="nav-item">
-					<a href="<?= base_url("auth/login") ?>" class="nav-link-top<?= (strtolower($uriSegments->controllerName) == 'auth') ? " active": "" ?>" id="loginUser">Login</a>
-				</li>
-			<?php else: ?>
-				<li class="nav-item">
-					<span class="nav-link-top">Hello <?= $userName ?>!</span>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link-top<?= (strtolower($uriSegments->controllerName) == 'discover') ? " active": "" ?>" href="<?= base_url("discover/index") ?>">
-						Discover
-					</a>
-				</li>
-				<?php if($isAdmin): ?>
-				<li class="nav-item">
-					<a class="nav-link-top<?= (strtolower($uriSegments->controllerName) == 'admin') ? " active": "" ?>" href="<?= base_url("admin/index") ?>">
-						Admin Dashboard
-					</a>
-				</li>
+
+		<div class="collapse navbar-collapse" id="navbarNav">
+			<ul class="navbar-nav ms-auto">
+
+				<!-- User not logged in -->
+				<?php if (! $loggedIn): ?>
+					<li class="nav-item">
+						<a class="nav-link-top btn btn" href="#" onclick="openPrivacyPolicyModal()">Privacy Policy</a>
+					</li>
+
+					<li class="nav-item">
+						<a class="nav-link-top btn btn <?= (strtolower($uriSegments->controllerName) == 'auth') ? " active": "" ?>" href="<?= base_url("auth/login") ?>" >Login</a>
+					</li>
+
+				<?php else: ?>
+
+					<!-- User logged in -->
+					<li class="nav-item">
+						<a class="nav-link-top btn btn<?= (strtolower($uriSegments->controllerName) == 'discover') ? " active": "" ?>" href="<?= base_url("discover/index") ?>">Discover</a>
+					</li>
+
+					<!-- Admin account -->
+					<?php if($isAdmin): ?>
+						<li class="nav-item">
+							<a class="nav-link-top btn btn<?= (strtolower($uriSegments->controllerName) == 'admin') ? " active": "" ?>" href="<?= base_url("admin/index") ?>">Admin Dashboard</a>
+						</li>
+					<?php endif; ?>
+					<!-- End -->
+					<li class="nav-item dropdown">
+						<a class="nav-link-top btn dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<i class="fas fa-user"></i> Hello <?= $userName ?>
+						</a>
+						<ul class="dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
+							<li><a class="dropdown-item" href="<?= $profileURL ?>"><i class="fas fa-user"></i>  Profile</a></li>
+							<li><a class="dropdown-item" href="<?= base_url("Auth/Logout") ?>"><i class="fas fa-sign-out-alt"></i>  Logout</a></li>
+						</ul>
+					</li>
 				<?php endif; ?>
-				<li class="nav-item">
-					<a target="_blank" class="nav-link-top" href="<?= $profileURL ?>">
-						Profile
-					</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link-top" href="<?= base_url("Auth/Logout") ?>">Logout</a>
-				</li>
-			<?php endif; ?>
-			</ul>
-		</div>
-		<div id="privacyPolicyModal" class="modal fade" style="justify-content: center;align-items:center;" tabindex="-1" role="dialog" aria-labelledby="privacyPolicyModalLabel" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-			<div class="modal-content" style="width: 1200px;">
-				<div class="modal-header">
-					<h4 class="modal-title" id="privacyPolicyModalTitle">Our privacy policy</h4>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body" >
-					<div class="row">
-						<div class="col">
-							<embed src="<?= base_url("PrivacyPolicy.pdf");?>" frameborder="0" width="800px" height="600px">
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-				</div>
-			</div>
-		</div>
 		</div>
 	</div>
 </nav>
+
+<!-- Privacy Policy Modal -->
+<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="pdfModalLabel">Our privacy policy</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<embed src="<?= base_url("PrivacyPolicy.pdf");?>" type="application/pdf" width="100%" height="600px">
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	function openPrivacyPolicyModal() {
+		$('#pdfModal').modal('show');
+	}
+	$("#privacyPolicyModalCloseButton").click(function() {
+		$("#pdfModal").modal("hide");
+	});
+
+	function openPrivacyPolicy() {
+		window.open("<?= base_url("Home/Index/3");?>", "_blank");
+	}
+</script>
+
