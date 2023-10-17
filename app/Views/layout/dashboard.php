@@ -298,13 +298,14 @@
 					<?= $this->renderSection('content') ?>
 					</div>
 				</main>
+
 				<footer class="py-4 bg-light mt-auto">
 					<div class="container-fluid px-4">
 						<div class="text-center justify-content-between small">
 							<div class="row">
 								<div class="col">
 									Powered by <a target="_blank" href="https://www.cafevariome.org/">Café Variome </a> (v. <?= $version ?>)
-									| <a href="" data-toggle="modal" data-target="#privacyPolicyModal">Privacy Policy</a>
+									| <a href="#" onclick="openPrivacyPolicyModal()">Privacy Policy</a>
 								</div>
 							</div>
 							<div class="row">
@@ -369,6 +370,34 @@
 				</div>
 			</div>
 		</div>
+		<div class="modal fade" id="pdfModal" tabindex="-1" aria-labelledby="pdfModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-xl">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="pdfModalLabel">Our privacy policy</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<embed src="<?= base_url("PrivacyPolicy.pdf");?>" type="application/pdf" width="100%" height="600px">
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script>
+			function openPrivacyPolicyModal() {
+				$('#pdfModal').modal('show');
+			}
+			$("#privacyPolicyModalCloseButton").click(function() {
+				$("#pdfModal").modal("hide");
+			});
+
+			function openPrivacyPolicy() {
+				window.open("<?= base_url("Home/Index/3");?>", "_blank");
+			}
+		</script>
 	</body>
 </html>
 
