@@ -270,7 +270,7 @@
                             <input class="form-control" id="search_filter_phen_left" type="text" placeholder="Start typing and a list of relevant items will populate... " style="text-align: center;" />
                         </div>
                         <select id='values_phen_left' class="form-control" size="10"></select>
-                        <button class="btnAdd btn btn-secondary btn-block">Add</button>
+						<button class="btnAdd btn btn-secondary d-block w-100">Add</button>
                     </div>
                     <div class="col">
                         <div class="input-group mb-2">
@@ -280,7 +280,7 @@
                             <input class="form-control" id="search_filter_phen_right" type="text" placeholder="filter by keyword" style="text-align: center;">
                         </div>
                         <select id="values_phen_right" class="form-control" size="10"></select>
-                        <button class="btnRemove btn btn-secondary btn-block">Remove</button>
+						<button class="btnRemove btn btn-secondary d-block w-100">Remove</button>
                     </div>
                 </div>
                 <hr/>
