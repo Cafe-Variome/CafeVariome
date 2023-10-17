@@ -135,6 +135,7 @@ class Auth extends CVUIController
 						if (!array_key_exists('email_verified', $owner) || $owner['email_verified'] === false)
 						{
 							$uidata->data['statusMessage'] = 'User email is not verified in the single sign-on provider.';
+							$this->authenticator->RemoveSession();
 						}
 						else
 						{
