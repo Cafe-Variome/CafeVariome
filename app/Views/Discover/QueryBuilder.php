@@ -264,9 +264,9 @@
                 <div class="row">
                     <div class="col">
                         <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                                <div class="input-group-text"><i class="fa fa-search"></i></div>
-                            </div>
+                            <span class="input-group-text">
+        						<i class="fas fa-search"></i>
+    						</span>
                             <input class="form-control" id="search_filter_phen_left" type="text" placeholder="Start typing and a list of relevant items will populate... " style="text-align: center;" />
                         </div>
                         <select id='values_phen_left' class="form-control" size="10"></select>
@@ -274,9 +274,9 @@
                     </div>
                     <div class="col">
                         <div class="input-group mb-2">
-                            <div class="input-group-prepend">
-                            <div class="input-group-text"><i class="fa fa-search"></i></div>
-                            </div>
+                            <span class="input-group-text">
+        						<i class="fas fa-search"></i>
+    						</span>
                             <input class="form-control" id="search_filter_phen_right" type="text" placeholder="filter by keyword" style="text-align: center;">
                         </div>
                         <select id="values_phen_right" class="form-control" size="10"></select>
@@ -513,9 +513,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="resultModalLabel">Results</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
 		  <div class="row">
@@ -549,9 +547,7 @@
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="sourceModalLabel">Source Information</h5>
-				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 			</div>
 			<div class="modal-body">
 				<div class="row">
