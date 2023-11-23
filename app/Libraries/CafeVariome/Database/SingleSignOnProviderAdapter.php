@@ -65,6 +65,19 @@ class SingleSignOnProviderAdapter extends BaseAdapter
 		return $this->toEntity($record);
 	}
 
+	public function ReadIDbyURL(string $url): int
+	{
+		$serverAdapter = (new ServerAdapterFactory())->GetInstance();
+		$serverTable = $serverAdapter->GetTable();
+		$serverKey = $serverAdapter->GetKey();
+		$this->builder->select(self::$table . '.id');
+		$this->builder->join($serverTable, $serverTable . '.' . $serverKey . '=' . self::$table . '.server_id');
+		$this->builder->where($serverTable . '.address', $url);
+		$results = $this->builder->get()->getResult();
+
+		return (int)$results;
+	}
+
 	/**
 	 * Converts general PHP objects to a SingleSignOnProvider object.
 	 * @param object|null $object
