@@ -397,8 +397,8 @@ $routes->post('Network/leave/(:num)', 'Network::Leave/$1');
 $routes->post('network/leave/(:num)', 'Network::Leave/$1');
 $routes->post('network/Leave/(:num)', 'Network::Leave/$1');
 
-$routes->post('NetworkAPI/requestToJoinNetwork', 'NetworkAPI::requestToJoinNetwork');
-$routes->post('NetworkApi/requestToJoinNetwork', 'NetworkAPI::requestToJoinNetwork');
+$routes->post('NetworkAPI/requestToJoinNetwork', 'NetworkApi::requestToJoinNetwork');
+$routes->post('NetworkApi/requestToJoinNetwork', 'NetworkApi::requestToJoinNetwork');
 
 $routes->get('NetworkRequest', 'NetworkRequest::Index');
 $routes->get('networkrequest', 'NetworkRequest::Index');
