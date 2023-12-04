@@ -483,4 +483,24 @@ class OpenIDAuthenticator implements IAuthenticator
 	{
 		return $this->userAdapter->ReadIdByEmail($email);
 	}
+
+	public function getServiceAccessToken()
+	{
+		$accessTokenURL = $this->options['token_endpoint'];
+		$openIDNetworkInterface = new OpenIDNetworkInterface($accessTokenURL, $this->proxyOptions);
+
+		$params = [
+			'grant_type' => 'client_credentials',
+			'client_id' => $this->options['client_id'],
+			'client_secret' => $this->options['client_secret'],
+		];
+
+		$encodedCredentials = base64_encode(sprintf('%s:%s', $params['client_id'], $params['client_secret']));
+		$params['credential'] = $encodedCredentials;
+		$response = $openIDNetworkInterface->GetToken($this->GenerateQueryString($params), $params['credential']);
+		$access_token = $response['access_token'] ?? "";
+
+		return $access_token;
+
+	}
 }
