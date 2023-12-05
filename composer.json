@@ -15,7 +15,7 @@
         "ext-sodium": "*",
         "ext-fileinfo": "*",
         "ext-gd": "*",
-        "codeigniter4/framework": "4.3.x",
+        "codeigniter4/framework": "4.4.x",
         "components/font-awesome": "6.4.x",
         "twbs/bootstrap": "5.3.x",
 	"elasticsearch/elasticsearch": "7.17.x",
