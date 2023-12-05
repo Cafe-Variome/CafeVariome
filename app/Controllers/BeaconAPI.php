@@ -8,6 +8,8 @@
  * @author Colin Veal
  * @author Mehdi Mehtarizadeh
  * @author Vatsalya Maddi
+ * @author Sadegh Abadijou
+ *
 */
 
 use App\Libraries\CafeVariome\CafeVariome;
@@ -210,6 +212,8 @@ class BeaconAPI extends ResourceController
 		}
 
 		$providerURL = str_replace(URLHelper::ExtractPort($providerURL), '', $providerURL); // Extract and remove port, if it exists
+
+		$this->providerID =  (new SingleSignOnProviderAdapterFactory())->GetInstance()->ReadIDbyURL($providerURL);
 		$singleSignOnProvider = (new SingleSignOnProviderAdapterFactory())->GetInstance()->ReadByURL($providerURL);
 
 		if (!$singleSignOnProvider->isNull())
@@ -221,7 +225,7 @@ class BeaconAPI extends ResourceController
 		$authenticator = (new AuthenticatorFactory())->GetInstance($singleSignOnProvider);
 		$user_id = $authenticator->GetUserIdByToken($token);
 
-		$queryCompiler = new Compiler();
+		$queryCompiler = new Compiler($this->providerID);
 
         $eavQueries = [];
         $diseaseCodes = [];
@@ -257,7 +261,7 @@ class BeaconAPI extends ResourceController
 			$query_json = json_encode($qArr, JSON_UNESCAPED_SLASHES);
 			$localRresults = $queryCompiler->CompileAndRunQuery($query_json, $network_key, $user_id);
 
-			$networkInterface = new NetworkInterface();
+			$networkInterface = new NetworkInterface('', $this->providerID);
 			$installationsResponse = $networkInterface->GetInstallationsByNetworkKey($network_key); // Get other installations within this network
 
 			$results = [$localRresults];
@@ -542,7 +546,7 @@ class BeaconAPI extends ResourceController
 
 		$localRresults = $queryCompiler->CompileAndRunQuery($query_json, $network_key, $user_id);
 
-		$networkInterface = new NetworkInterface();
+		$networkInterface = new NetworkInterface($this->providerID);
 		$response = $networkInterface->GetInstallationsByNetworkKey($network_key); // Get other installations within this network
 		$results = [$localRresults];
 

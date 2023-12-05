@@ -6,6 +6,7 @@
  *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
+ * @auther Sadegh Abadijou
  * @author Farid Yavari Dizjikan
  *
  */
@@ -38,8 +39,11 @@ class Network extends CVUIController
         parent::setIsAdmin(true);
         parent::initController($request, $response, $logger);
 
+		$this->session = \Config\Services::session();
 		$this->validation = Services::validation();
+
 		$this->dbAdapter = (new NetworkAdapterFactory())->GetInstance();
+		$this->providerID = $this->session->get(self::AUTHENTICATOR_SESSION);
     }
 
     public function Index()
@@ -58,7 +62,7 @@ class Network extends CVUIController
         $uidata->data['message'] = '';
         $networks = [];
 
-        $networkInterface = new NetworkInterface();
+        $networkInterface = new NetworkInterface('', $this->providerID);
         try
 		{
             $response = $networkInterface->GetNetworksByInstallationKey($this->setting->GetInstallationKey());
@@ -101,7 +105,7 @@ class Network extends CVUIController
 	{
         $uidata = new UIData();
         $uidata->data['title'] = "Create Network";
-        $networkInterface = new NetworkInterface();
+        $networkInterface = new NetworkInterface('', $this->providerID);
 
         // Validate form input
         $this->validation->setRules([
@@ -121,7 +125,7 @@ class Network extends CVUIController
 		{
             $name = strtolower($this->request->getVar('name')); // Convert the network name to lowercase
 
-            $networkInterface = new NetworkInterface();
+            $networkInterface = new NetworkInterface('', $this->providerID);
             $response = $networkInterface->CreateNetwork(['network_name' => $name, 'network_type' => 1, 'network_threshold' => 0, 'network_status' => 1]);
             if (!$response->status)
 			{
@@ -212,7 +216,7 @@ class Network extends CVUIController
 
         $uidata->IncludeJavaScript(JS.'cafevariome/network.js');
 
-        $networkInterface = new NetworkInterface();
+        $networkInterface = new NetworkInterface('', $this->providerID);
 
         if ($this->request->getPost() && $this->validation->withRequest($this->request)->run())
 		{
@@ -280,7 +284,7 @@ class Network extends CVUIController
 	 */
     private function Update_Threshold($network_key) {
 
-        $networkInterface = new NetworkInterface();
+        $networkInterface = new NetworkInterface('', $this->providerID);
         $response = $networkInterface->GetNetworkThreshold((int)$network_key);
 
         $uidata = new UIData();
@@ -339,7 +343,7 @@ class Network extends CVUIController
 
     public function Leave(int $network_key)
     {
-        $networkInterface = new NetworkInterface();
+        $networkInterface = new NetworkInterface('', $this->providerID);
         $networkResponse = $networkInterface->GetNetwork($network_key);
 
         $uidata = new UIData();

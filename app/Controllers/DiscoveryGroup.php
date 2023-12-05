@@ -6,6 +6,7 @@
  *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
+ * @author Sadegh Abadijou
  *
  */
 
@@ -46,6 +47,9 @@ class DiscoveryGroup extends CVUIController
 
 		$this->validation = Services::validation();
 		$this->dbAdapter = (new DiscoveryGroupAdapterFactory())->GetInstance();
+
+		$this->session = \Config\Services::session();
+		$this->providerID = $this->session->get(self::AUTHENTICATOR_SESSION);
 	}
 
 	public function Index()
@@ -75,7 +79,7 @@ class DiscoveryGroup extends CVUIController
 
 		$uidata->IncludeJavaScript(JS. 'cafevariome/discoverygroup.js');
 
-		$networkInterface = new NetworkInterface();
+		$networkInterface = new NetworkInterface('', $this->providerID);
 
         //validate form input
         $this->validation->setRules([
@@ -266,7 +270,7 @@ class DiscoveryGroup extends CVUIController
 		$uidata->data['discovery_group_id'] = $discoveryGroup->getID();
 		$uidata->IncludeJavaScript(JS. 'cafevariome/discoverygroup.js');
 
-		$networkInterface = new NetworkInterface();
+		$networkInterface = new NetworkInterface('', $this->providerID);
 
 		//validate form input
 		$this->validation->setRules([

@@ -6,6 +6,8 @@
  * Created: 20/12/2019
  *
  * @author Mehdi Mehtarizadeh
+ * @author Sadegh Abadijou
+ *
  */
 
 use App\Libraries\CafeVariome\Factory\NetworkRequestAdapterFactory;
@@ -25,6 +27,8 @@ class NetworkRequest extends CVUIController
         parent::setIsAdmin(true);
         parent::initController($request, $response, $logger);
 		$this->dbAdapter = (new NetworkRequestAdapterFactory())->GetInstance();
+		$this->session = \Config\Services::session();
+		$this->providerID = $this->session->get(self::AUTHENTICATOR_SESSION);
 	}
 
     public function Index()
@@ -46,8 +50,8 @@ class NetworkRequest extends CVUIController
         return view($this->viewDirectory . '/List', $data);
     }
 
-    public function Accept(int $id)
-    {
+	public function Accept(int $id)
+	{
 		$networkRequest = $this->dbAdapter->Read($id);
 
 		if ($networkRequest->isNull())
@@ -56,7 +60,7 @@ class NetworkRequest extends CVUIController
 			return redirect()->to(base_url($this->controllerName . '/List'));
 		}
 
-		$networkInterface = new NetworkInterface();
+		$networkInterface = new NetworkInterface('', $this->providerID);
 
 		$response = $networkInterface->AcceptRequest($networkRequest->token);
 
@@ -70,11 +74,11 @@ class NetworkRequest extends CVUIController
 			$this->setStatusMessage("There was a problem in accepting network request.", STATUS_ERROR);
 		}
 
-        return redirect()->to(base_url($this->controllerName.'/List'));
-    }
+		return redirect()->to(base_url($this->controllerName.'/List'));
+	}
 
-    public function Reject(int $id)
-    {
+	public function Reject(int $id)
+	{
 		$networkRequest = $this->dbAdapter->Read($id);
 
 		if ($networkRequest->isNull())
@@ -83,9 +87,9 @@ class NetworkRequest extends CVUIController
 			return redirect()->to(base_url($this->controllerName . '/List'));
 		}
 
-		$networkInterface = new NetworkInterface();
+		$networkInterface = new NetworkInterface('', $this->providerID);
 
-		$response = $networkInterface->DenyRequest($networkRequest[0]['token']);
+		$response = $networkInterface->DenyRequest($networkRequest->token);
 
 		if ($response->status)
 		{
@@ -97,6 +101,6 @@ class NetworkRequest extends CVUIController
 			$this->setStatusMessage("There was a problem in rejecting network request.", STATUS_ERROR);
 		}
 
-        return redirect()->to(base_url($this->controllerName.'/List'));
-    }
+		return redirect()->to(base_url($this->controllerName.'/List'));
+	}
 }

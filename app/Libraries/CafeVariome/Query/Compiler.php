@@ -23,9 +23,10 @@ class Compiler
 	private $query;
 	private array $uniqueSubjectIds;
 
-	public function __construct()
+	public function __construct(int $providerID)
 	{
 		$this->uniqueSubjectIds = [];
+		$this->providerID = $providerID;
 	}
 
 	public function CompileAndRunQuery(string $query, int $network_id, int $user_id): string
@@ -125,7 +126,7 @@ class Compiler
 					];
 					break;
 				case DISCOVERY_GROUP_POLICY_BOOLEAN:
-					$networkInterface = new NetworkInterface();
+					$networkInterface = new NetworkInterface('', $this->providerID);
 					$thresholdResponse = $networkInterface->GetNetworkThreshold($network_id);
 					if ($thresholdResponse->status)
 					{

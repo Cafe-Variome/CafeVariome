@@ -5,7 +5,7 @@
  * Created: 16/07/2019
  *
  * @author Mehdi Mehtarizadeh
- *
+ * @author Sadegh Abadijou
  *
  */
 
@@ -29,6 +29,9 @@ class Discover extends CVUIController
         parent::initController($request, $response, $logger);
 
 		$this->validation = Services::validation();
+
+		$this->session = \Config\Services::session();
+		$this->providerID = $this->session->get(self::AUTHENTICATOR_SESSION);
     }
 
     public function Index()
@@ -41,7 +44,7 @@ class Discover extends CVUIController
         $uidata = new UIData();
         $uidata->title = "Select Network";
 
-        $networkInterface = new NetworkInterface();
+        $networkInterface = new NetworkInterface('', $this->providerID);
 
         $user_id = $this->authenticator->GetUserId();
 
@@ -87,7 +90,7 @@ class Discover extends CVUIController
     public function QueryBuilder(int $network_id)
 	{
         $uidata = new UIData();
-        $networkInterface = new NetworkInterface();
+        $networkInterface = new NetworkInterface('', $this->providerID);
 
         if ($network_id)
 		{

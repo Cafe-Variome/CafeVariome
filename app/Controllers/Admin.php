@@ -7,6 +7,8 @@
  * @author Owen Lancaster
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
+ * @author Sadegh Abadijou
+ *
  */
 
 use App\Libraries\CafeVariome\Factory\NetworkRequestAdapterFactory;
@@ -42,6 +44,7 @@ class Admin extends CVUIController
 		$this->session = Services::session();
 		$this->db = \Config\Database::connect();
         $this->validation = Services::validation();
+		$this->providerID = $this->session->get(self::AUTHENTICATOR_SESSION);
     }
 
     public function Index()
@@ -53,7 +56,7 @@ class Admin extends CVUIController
         $uidata->IncludeJavaScript(JS.'dashboard/chartjs/Chart.min.js');
 		$uidata->IncludeJavaScript(JS . 'cafevariome/admin.js');
 
-        $networkInterface = new NetworkInterface();
+		$networkInterface = new NetworkInterface('', $this->providerID);
 		$networkRequestAdapter = (new NetworkRequestAdapterFactory())->GetInstance();
 
         $neo4j = new Neo4J();

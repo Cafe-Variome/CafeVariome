@@ -1,5 +1,13 @@
 <?php namespace App\Libraries\CafeVariome\Core\DataPipeLine\Index;
 
+/**
+ * UserInterfaceNetworkIndex.php
+ * Created 22/05/2022
+ *
+ * @author Mehdi Mehtarizadeh
+ * @auhtor Sadegh Abadijou
+ */
+
 use App\Libraries\CafeVariome\Core\IO\FileSystem\SysFileMan;
 use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
@@ -7,9 +15,10 @@ use App\Libraries\CafeVariome\Net\QueryNetworkInterface;
 
 class UserInterfaceNetworkIndex extends AbstractNetworkIndex
 {
-	public function __construct(int $network_key)
+	public function __construct(int $network_key, int $providerID)
 	{
 		parent::__construct($network_key);
+		$this->providerID = $providerID;
 	}
 
     public function IndexNetwork()
@@ -94,7 +103,7 @@ class UserInterfaceNetworkIndex extends AbstractNetworkIndex
 		$basePath = FCPATH . USER_INTERFACE_INDEX_DIR;
 		$discoveryGroupAdapter = (new DiscoveryGroupAdapterFactory())->GetInstance();
 		$fileMan = new SysFileMan($basePath);
-		$networkInterface = new NetworkInterface();
+		$networkInterface = new NetworkInterface('', $this->providerID);
 		$response = $networkInterface->GetInstallationsByNetworkKey($this->networkKey);
 
 		$installations = [];

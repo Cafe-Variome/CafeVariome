@@ -7,6 +7,7 @@
  *
  * @author Gregory Warren
  * @author Mehdi Mehtarizadeh
+ * @author Sadegh Abadijou
  *
  * This controller contains RESTful listeners for network operations.
  * Most methods are ported from netauth.php in the previous version.
@@ -44,6 +45,8 @@ class QueryAPI extends ResourceController
         $queryString = $this->request->getVar('query');
         $token = json_decode($this->request->getVar('token'), true);
 		$providerURL = $this->request->getVar('authentication_url');
+		$this->providerID =  (new SingleSignOnProviderAdapterFactory())->GetInstance()->ReadIDbyURL(str_replace(':' .
+			URLHelper::ExtractPort($providerURL), '', $providerURL));
 
 		$apiResponseBundle = new APIResponseBundle();
 
@@ -59,7 +62,7 @@ class QueryAPI extends ResourceController
 				{
 					$authenticator = (new AuthenticatorFactory())->GetInstance($singleSignOnProvider);
 					$user_id = $authenticator->GetUserIdByToken($token);
-					$cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler();
+					$cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler($this->providerID);
 					try
 					{
 						$resp = $cafeVariomeQuery->CompileAndRunQuery($queryString, $networkKey, $user_id);
@@ -137,7 +140,7 @@ class QueryAPI extends ResourceController
         $network_key = $this->request->getVar('network_key');
 
         $apiResponseBundle = new APIResponseBundle();
-		$userInterfaceNetworkIndex = new UserInterfaceNetworkIndex($network_key);
+		$userInterfaceNetworkIndex = new UserInterfaceNetworkIndex($network_key, $this->providerID);
 
         try {
             $resp = [];
