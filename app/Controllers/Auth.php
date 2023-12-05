@@ -117,6 +117,7 @@ class Auth extends CVUIController
 		if ($this->request->getGet('code') != null)
 		{
 			$token = $this->authenticator->GetAccessToken(['code' => $this->request->getGet('code')]);
+			$id_token = $this->authenticator->GetIdToken();
 			if (is_null($token))
 			{
 				$uidata->data['statusMessage'] = 'There was an error while trying to get an access token: ' . $this->authenticator->GetLastError();
@@ -125,6 +126,7 @@ class Auth extends CVUIController
 			{
 				//Save token in a session
 				$this->session->set(self::SSO_RANDOM_STATE_SESSION, $token);
+				$this->session->set(self::SSO_ID_TOKEN_SESSION, $id_token);
 				$owner = $this->authenticator->GetResourceOwner($token);
 
 				if (is_array($owner))
@@ -331,11 +333,9 @@ class Auth extends CVUIController
 		$logoutURL = '';
 		if ($this->authenticator != null)
 		{
-			$logoutURL = $this->authenticator->GetLogoutURL();
+			$logoutURL = $this->authenticator->GetLogoutURL().'&id_token_hint='.  $this->session->get(self::SSO_ID_TOKEN_SESSION);
 		}
-
 		$this->session->destroy();
-
 
 		return $logoutURL != '' ? redirect()->to($logoutURL) : redirect()->to(base_url());
 	}
