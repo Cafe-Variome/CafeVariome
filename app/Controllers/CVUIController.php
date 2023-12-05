@@ -179,7 +179,7 @@ class CVUIController extends Controller
 	 */
 	protected function wrapData(UIData $uidata): array
 	{
-		$config = new \Config\App();
+		$config = new \Config\Session();
 
 		$session = \Config\Services::session($config);
 
