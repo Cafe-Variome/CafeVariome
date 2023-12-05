@@ -80,6 +80,11 @@ class OpenIDAuthenticator implements IAuthenticator
 	protected Session $session;
 
 	/**
+	 * @var string
+	 * Store id token
+	 */
+	protected static string $id_token;
+	/**
 	 * Session name for authenticator ID
 	 */
 	protected const AUTHENTICATOR_SESSION = AUTHENTICATOR_SESSION_NAME;
@@ -177,8 +182,7 @@ class OpenIDAuthenticator implements IAuthenticator
 
 	public function GetLogoutURL(): string
 	{
-		$authParams = $this->GenerateAuthenticationParameters();
-		return $this->AttachQuery($this->options['end_session_endpoint'], $this->GenerateQueryString($authParams));
+		return $this->options['end_session_endpoint']. '?post_logout_redirect_uri=' . $this->options['redirect_uri'];
 	}
 
 	public function GetState(): ?string
@@ -219,12 +223,16 @@ class OpenIDAuthenticator implements IAuthenticator
 				{
 					$this->session->set(self::SSO_REFRESH_TOKEN_SESSION, $response['refresh_token']);
 				}
+				self::$id_token = $response['id_token'];
 				return $response['access_token'];
 			}
 		}
 		return null;
 	}
-
+	public function GetIdToken()
+	{
+		return self::$id_token;
+	}
 	public function GetRefreshToken(array $input): ?string
 	{
 		$accessTokenURL = $this->options['token_endpoint'];
@@ -254,6 +262,7 @@ class OpenIDAuthenticator implements IAuthenticator
 			}
 			else if (array_key_exists('access_token', $response))
 			{
+				self::$id_token = $response['id_token'];
 				return $response['access_token'];
 			}
 		}
