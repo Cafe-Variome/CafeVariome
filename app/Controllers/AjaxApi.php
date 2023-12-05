@@ -73,6 +73,7 @@ class AjaxApi extends Controller
 		$this->session = \Config\Services::session();
 		$this->serviceInterface = new ServiceInterface($this->setting->GetInstallationKey());
 		$this->authenticator = new NullAuthenticator();
+		$this->providerID = $this->session->get(self::AUTHENTICATOR_SESSION);
 
 		if ($this->session->has(self::AUTHENTICATOR_SESSION))
 		{
@@ -103,7 +104,7 @@ class AjaxApi extends Controller
 
     public function Query()
 	{
-        $networkInterface = new NetworkInterface();
+		$networkInterface = new NetworkInterface('', $this->providerID);
 
         //Check to see if user is logged in
         if (!$this->session->has(AUTHENTICATOR_SESSION_NAME))
@@ -131,9 +132,9 @@ class AjaxApi extends Controller
         try
 		{
             $results = [];
-            $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler();
-            $loaclResults = $cafeVariomeQuery->CompileAndRunQuery($queryString, $network_key, $user_id); // Execute locally
-            array_push($results, $loaclResults);
+            $cafeVariomeQuery = new \App\Libraries\CafeVariome\Query\Compiler($this->providerID);
+            $localResults = $cafeVariomeQuery->CompileAndRunQuery($queryString, $network_key, $user_id); // Execute locally
+            array_push($results, $localResults);
 
             $response = $networkInterface->GetInstallationsByNetworkKey((int)$network_key); // Get other installations within this network
             $installations = [];
@@ -171,11 +172,11 @@ class AjaxApi extends Controller
      * @return string in json format, phenotype and hpo data
      *
      */
-    public function GetPhenotypeAttributes(int $network_key)
+	public function GetPhenotypeAttributes(int $network_key)
 	{
-        if ($this->request->getMethod() == 'post')
-        {
-			$userInterfaceNetworkIndex = new UserInterfaceNetworkIndex($network_key);
+		if ($this->request->getMethod() == 'post')
+		{
+			$userInterfaceNetworkIndex = new UserInterfaceNetworkIndex($network_key, $this->providerID);
 			$userInterfaceNetworkIndex->IndexNetworkInstallations();
 
 			$basePath = FCPATH . USER_INTERFACE_INDEX_DIR;
@@ -183,9 +184,9 @@ class AjaxApi extends Controller
 
 			$localData = json_decode($fileMan->Read($network_key . '_local.json'), true);
 
-            return json_encode($localData);
-        }
-    }
+			return json_encode($localData);
+		}
+	}
 
 	/**
 	 * @return false|string|void
