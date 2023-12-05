@@ -6,6 +6,7 @@
  *
  * This class offers CRUD operation for SingleSignOnProvider.
  * @author Mehdi Mehtarizadeh
+ * @author Sadegh Abadijou
  */
 
 use App\Libraries\CafeVariome\Entities\IEntity;
@@ -50,10 +51,10 @@ class SingleSignOnProviderAdapter extends BaseAdapter
 		$serverAdapter = (new ServerAdapterFactory())->GetInstance();
 		$serverTable = $serverAdapter->GetTable();
 		$serverKey = $serverAdapter->GetKey();
-		$this->builder->select( $this->table . '.*');
-		$this->builder->join($serverTable, $serverTable . '.' . $serverKey . '=' . $this->table . '.server_id');
+		$this->builder->select( self::$table . '.*');
+		$this->builder->join($serverTable, $serverTable . '.' . $serverKey . '=' . self::$table . '.server_id');
 		$this->builder->where($serverTable . '.address', $url);
-		$this->builder->where($this->table . '.query', $query);
+		$this->builder->where(self::$table . '.query', $query);
 		$results = $this->builder->get()->getResult();
 
 		$record = null;
