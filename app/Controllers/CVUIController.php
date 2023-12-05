@@ -106,6 +106,10 @@ class CVUIController extends Controller
 	protected const POST_AUTHENTICATION_REDIRECT_URL_SESSION = POST_AUTHENTICATION_REDIRECT_URL_SESSION_NAME;
 
 	/**
+	 * Name of session object holding id token
+	 */
+	protected const SSO_ID_TOKEN_SESSION = SSO_ID_TOKEN_SESSION_NAME;
+	/**
 	 * Constructor.
 	 *
 	 */
