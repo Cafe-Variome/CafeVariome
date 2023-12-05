@@ -340,7 +340,7 @@
 					</div>
 					<div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
 					<div class="modal-footer">
-						<button class="btn btn-secondary bg-gradient-secondary" type="button" data-dismiss="modal">Cancel</button>
+						<button class="btn btn-secondary bg-gradient-secondary" type="button" data-bs-dismiss="modal">Cancel</button>
 						<a class="btn btn-warning bg-gradient-warning" href="<?= base_url('Auth/Logout') ?>">
 							<i class="fas fa-sign-out-alt fa-sm fa-fw"></i> Logout
 						</a>
