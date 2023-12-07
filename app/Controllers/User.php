@@ -300,21 +300,21 @@ class User extends CVUIController
 				'name'  => 'is_admin[]',
 				'id'    => 'is_admin',
 				'class' => 'form-check-input',
-				'value' => set_value('is_admin', $user->is_admin),
+				'value' => is_array($is_admin_val = set_value('is_admin', $user->is_admin)) ? $is_admin_val[0] : $user->is_admin,
 				'checked' => (bool)$user->is_admin
 			);
 			$uidata->data['remote'] = array(
 				'name'  => 'remote[]',
 				'id'    => 'remote',
 				'class' => 'form-check-input',
-				'value' => set_value('remote', $user->remote),
+				'value' => is_array($remote_val = set_value('remote', $user->remote)) ? $remote_val[0] : $user->remote,
 				'checked' => (bool)$user->remote
 			);
 			$uidata->data['active'] = array(
 				'name'  => 'active[]',
 				'id'    => 'active',
 				'class' => 'form-check-input',
-				'value' => set_value('active', $user->active),
+				'value' => is_array($active_val = set_value('active', $user->active)) ? $active_val[0] : $user->active,
 				'checked' => (bool)$user->active
 			);
 

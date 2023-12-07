@@ -140,7 +140,7 @@ class Credential extends CVUIController
 				'id' => 'hide_username',
 				'type' => 'checkbox',
 				'checked' => false,
-				'value' =>set_value('hide_username'),
+				'value' =>is_array($hide_username_vl = set_value('hide_username')) ? $hide_username_vl[0] : set_value('hide_username'),
 			);
 		}
 
@@ -266,7 +266,7 @@ class Credential extends CVUIController
 				'id' => 'hide_username',
 				'type' => 'checkbox',
 				'checked' => (bool)$credential->hide_username,
-				'value' =>set_value('hide_username', (string)$credential->hide_username),
+				'value' =>is_array($hide_username_val = set_value('hide_username', (string)$credential->hide_username)) ? $hide_username_val[0] : $credential->hide_username,
 			);
 		}
 

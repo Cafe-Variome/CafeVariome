@@ -310,7 +310,7 @@ class SingleSignOnProvider extends CVUIController
 				'type' => 'checkbox',
 				'class' => 'form-check-input',
 				'checked' => false,
-				'value' =>set_value('user_login'),
+				'value' =>is_array($user_login_vl = set_value('user_login')) ? $user_login_vl[0] : set_value('user_login'),
 			);
 
 			$uidata->data['query'] = array(
@@ -319,7 +319,7 @@ class SingleSignOnProvider extends CVUIController
 				'type' => 'checkbox',
 				'class' => 'form-check-input',
 				'checked' => false,
-				'value' =>set_value('query'),
+				'value' =>is_array($query_vl = set_value('query')) ? $query_vl[0] : set_value('query'),
 			);
 
 			$uidata->data['authentication_policy'] = array(
@@ -607,7 +607,7 @@ class SingleSignOnProvider extends CVUIController
 				'type' => 'checkbox',
 				'class' => 'form-check-input',
 				'checked' => $singleSignOnProvider->user_login,
-				'value' =>set_value('user_login'),
+				'value' =>is_array($user_login_val = set_value('user_login')) ? $user_login_val[0] : set_value('user_login'),
 			);
 
 			$uidata->data['query'] = array(
@@ -616,7 +616,7 @@ class SingleSignOnProvider extends CVUIController
 				'type' => 'checkbox',
 				'class' => 'form-check-input',
 				'checked' => $singleSignOnProvider->query,
-				'value' =>set_value('query'),
+				'value' =>is_array($query_val = set_value('query')) ? $query_val[0] : set_value('query'),
 			);
 
 			$uidata->data['authentication_policy'] = array(
