@@ -2,45 +2,47 @@
 //print("Install Cafe Variome...");
 namespace CafeVariomeSetup;
 
+use App\Libraries\CafeVariome\Security\Cryptography;
+
 class CVInstaller
 {
 	public static function InstallDB()
 	{
-	   // Valid PHP Version?
-	   $minPHPVersion = '8.0';
-	   if (phpversion() < $minPHPVersion) {
-		   die("Your PHP version must be {$minPHPVersion} or higher to run CodeIgniter. Current version: " . phpversion());
-	   }
-	   unset($minPHPVersion);
+		// Valid PHP Version?
+		$minPHPVersion = '8.0';
+		if (phpversion() < $minPHPVersion) {
+			die("Your PHP version must be {$minPHPVersion} or higher to run CodeIgniter. Current version: " . phpversion());
+		}
+		unset($minPHPVersion);
 
-	   // Path to the front controller (this file)
-	   define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
-	   define('ENVIRONMENT', 'development');
+		// Path to the front controller (this file)
+		define('FCPATH', __DIR__ . DIRECTORY_SEPARATOR);
+		define('ENVIRONMENT', 'development');
 
-	   // Location of the Paths config file.
-	   // This is the line that might need to be changed, depending on your folder structure.
-	   $pathsPath = '../app/Config/Paths.php';
-	   // ^^^ Change this if you move your application folder
+		// Location of the Paths config file.
+		// This is the line that might need to be changed, depending on your folder structure.
+		$pathsPath = '../app/Config/Paths.php';
+		// ^^^ Change this if you move your application folder
 
-	   /*
-	   *---------------------------------------------------------------
-	   * BOOTSTRAP THE APPLICATION
-	   *---------------------------------------------------------------
-	   * This process sets up the path constants, loads and registers
-	   * our autoloader, along with Composer's, loads our constants
-	   * and fires up an environment-specific bootstrapping.
-	   */
-	   // Ensure the current directory is pointing to the front controller's directory
-	   chdir(__DIR__);
+		/*
+		*---------------------------------------------------------------
+		* BOOTSTRAP THE APPLICATION
+		*---------------------------------------------------------------
+		* This process sets up the path constants, loads and registers
+		* our autoloader, along with Composer's, loads our constants
+		* and fires up an environment-specific bootstrapping.
+		*/
+		// Ensure the current directory is pointing to the front controller's directory
+		chdir(__DIR__);
 
-	   // Load our paths config file
-	   require $pathsPath;
-	   $paths = new \Config\Paths();
+		// Load our paths config file
+		require $pathsPath;
+		$paths = new \Config\Paths();
 
-	   // Location of the framework bootstrap file.
-	   require rtrim($paths->systemDirectory, '/ ') . '/bootstrap.php';
+		// Location of the framework bootstrap file.
+		require rtrim($paths->systemDirectory, '/ ') . '/bootstrap.php';
 
-	   echo "Creating database tables ... \n";
+		echo "Creating database tables ... \n";
 
 		$lines = file('../.env');
 
@@ -72,69 +74,83 @@ class CVInstaller
 
 		}
 
-	   // Name of the file
-	   $filename = 'MySql/cafevariome.sql';
-	   // MySQL host
-	   $mysql_host = $db['hostname'];
-	   // MySQL username
-	   $mysql_username = $db['username'];
-	   // MySQL password
-	   $mysql_password = $db['password'];
-	   // Database name
-	   $mysql_database = $db['database'];
+		// Name of the file
+		$filename = 'MySql/cafevariome.sql';
+		// MySQL host
+		$mysql_host = $db['hostname'];
+		// MySQL username
+		$mysql_username = $db['username'];
+		// MySQL password
+		$mysql_password = $db['password'];
+		// Database name
+		$mysql_database = $db['database'];
 
-	   // Connect to MySQL server
-	   $con = @new \mysqli($mysql_host, $mysql_username, $mysql_password, $mysql_database);
+		// Connect to MySQL server
+		$con = @new \mysqli($mysql_host, $mysql_username, $mysql_password, $mysql_database);
 
-	   // Check connection
-	   if ($con->connect_errno) {
-		   echo "Failed to connect to MySQL: " . $con->connect_errno;
-		   echo "<br/>Error: " . $con->connect_error;
-	   }
+		// Check connection
+		if ($con->connect_errno) {
+			echo "Failed to connect to MySQL: " . $con->connect_errno;
+			echo "<br/>Error: " . $con->connect_error;
+		}
 
-	   // Temporary variable, used to store current query
-	   $templine = '';
-	   // Read in entire file
-	   $lines = file($filename);
-	   // Loop through each line
-	   foreach ($lines as $line) {
-		   // Skip it if it's a comment
-		   if (substr($line, 0, 2) == '--' || $line == '')
-			   continue;
+		// Temporary variable, used to store current query
+		$templine = '';
+		// Read in entire file
+		$lines = file($filename);
+		// Loop through each line
+		foreach ($lines as $line) {
+			// Skip it if it's a comment
+			if (substr($line, 0, 2) == '--' || $line == '')
+				continue;
 
-		   // Add this line to the current segment
-		   $templine .= $line;
-		   // If it has a semicolon at the end, it's the end of the query
-		   if (substr(trim($line), -1, 1) == ';') {
-			   // Perform the query
-			   $con->query($templine);
-			   // Reset temp variable to empty
-			   $templine = '';
-		   }
-	   }
+			// Add this line to the current segment
+			$templine .= $line;
+			// If it has a semicolon at the end, it's the end of the query
+			if (substr(trim($line), -1, 1) == ';') {
+				// Perform the query
+				$con->query($templine);
+				// Reset temp variable to empty
+				$templine = '';
+			}
+		}
 
-	   echo "Tables imported successfully \n";
+		echo "Tables imported successfully \n";
 
-	   // print("Please enter your installation key:");
-	   $installation_key = readline("Please enter your installation key:");
-	   $installation_key = trim($installation_key);
+		// print("Please enter your installation key:");
+		$installation_key = readline("Please enter your installation key:");
+		$installation_key = trim($installation_key);
 
-	   // print("Please enter the URL to authentication server:");
-	   $auth_server = readline("Please enter the URL to authentication server:");
-	   $auth_server = trim($auth_server);
+		// print("Please enter the URL to authentication server:");
+		$auth_server = readline("Please enter the URL to authentication server:");
+		$auth_server = trim($auth_server);
+		// print("Please enter the URL to network server:");
+		$network_server = readline("Please enter the URL to network server:");
+		$network_server = trim($network_server);
 
-	   // print("Please enter the password for Admin user:");
-	   $admin_password = readline("Please enter the password for Admin user:");
-       $admin_password = trim(password_hash("$admin_password", PASSWORD_DEFAULT));
+		$client_id = readline("Please enter the client id:");
+		$client_id = trim($client_id);
 
-	   $con->query("Update settings set `value` = '$installation_key' where `key` = 'installation_key';");
-	   $con->query("Update settings set `value` = '$auth_server' where `key` = 'auth_server';");
-	   $con->query("Update users set `password` = '$admin_password' where `username`='admin@cafevariome.org';");
+		$client_secret = readline("Please enter the client secret:");
+		$client_secret = trim($client_secret);
+		$client_secret_hash = Cryptography::GenerateSecretKey();
+		$client_secret_password_hash = Cryptography::Encrypt($client_secret, $client_secret_hash);
+		// print("Please enter the password for Admin user:");
+		$admin_password = readline("Please enter the password for Admin user:");
+		$admin_password = trim(password_hash("$admin_password", PASSWORD_DEFAULT));
 
-	   print("Settings were updated successfully. \n");
+		$con->query("Update settings set `value` = '$installation_key' where `key` = 'installation_key';");
+		$con->query("Update settings set `value` = '$network_server' where `key` = 'auth_server';");
+		$con->query("Update users set `password` = '$admin_password' where `username`='admin@cafevariome.org';");
+		$con->query("Update servers set `address` = '$auth_server' where `id` = 1;");
+		$con->query("Update credentials set `username` = '$client_id' where `id` = 1;");
+		$con->query("Update credentials set `password` = '$client_secret_password_hash' where `id` = 1;");
+		$con->query("Update credentials set `hash` = '$client_secret_hash' where `id` = 1;");
 
-	   print("Setup completed. Remember that you must remove the Install directory completely. \n");
-	   $con->close();
+		print("Settings were updated successfully. \n");
+
+		print("Setup completed. Remember that you must remove the Install directory completely. \n");
+		$con->close();
 	}
 
 	public static function Deploy(string $base_url, string $installation_key, string $php_bin_path, string $apache_config_file, string $deployment_directory, array $database_info)
@@ -303,5 +319,3 @@ if (isset($argc)) {
 else {
 	echo "argc and argv disabled\n";
 }
-
-
