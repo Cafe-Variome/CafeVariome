@@ -74,4 +74,30 @@ class FileTest extends TestCase
 		);
 		$this->assertSame('', $mockNoExtensionFile->getExtension());
 	}
+
+	public function testFileProperties()
+	{
+		$name = 'test_file.txt';
+		$size = 1024;
+		$tempPath = '/tmp';
+		$type = 'text/plain';
+		$error = 0;
+
+		$file = new File($name, $size, $tempPath, $type, $error);
+
+		$this->assertEquals($name, $file->getName());
+		$this->assertEquals('txt', $file->getExtension());
+		$this->assertEquals($size, $file->getSize());
+		$this->assertEquals($tempPath, $file->getTempPath());
+		$this->assertEquals($type, $file->getType());
+
+		$useDiskName = true;
+		$diskNameLength = 32;
+		$fileWithDiskName = new File($name, $size, $tempPath, $type, $error, $useDiskName, $diskNameLength);
+
+		$this->assertNotEquals('', $fileWithDiskName->getDiskName());
+
+		$pattern = '/^[0-9a-fA-F]+$/';
+		$this->assertMatchesRegularExpression($pattern, pathinfo($fileWithDiskName->getDiskName(), PATHINFO_FILENAME));
+	}
 }
