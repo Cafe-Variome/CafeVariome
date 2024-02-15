@@ -122,37 +122,178 @@ class CVInstaller
 		$installation_key = trim($installation_key);
 
 		// print("Please enter the URL to authentication server:");
-		$auth_server = readline("Please enter the URL to authentication server:");
-		$auth_server = trim($auth_server);
-		// print("Please enter the URL to network server:");
-		$network_server = readline("Please enter the URL to network server:");
-		$network_server = trim($network_server);
+		$auth_host = readline("Please enter the URL to authentication server (OpenID Connect provider URL: https://example.com/) :");
+		$auth_host = trim($auth_host);
 
 		$client_id = readline("Please enter the client id:");
 		$client_id = trim($client_id);
-
+		$keycloak_realm = readline("Please enter the keycloak realm:");
+		$keycloak_realm = trim($keycloak_realm);
 		$client_secret = readline("Please enter the client secret:");
 		$client_secret = trim($client_secret);
 		$client_secret_hash = Cryptography::GenerateSecretKey();
 		$client_secret_password_hash = Cryptography::Encrypt($client_secret, $client_secret_hash);
-		// print("Please enter the password for Admin user:");
+
+		$auth_server = $auth_host."realms/$keycloak_realm/";
+
+		// print("Please enter the URL to network server:");
+		$network_server = readline("Please enter the URL to network server:");
+		$network_server = trim($network_server);
+
+		$admin_firstname = readline("Please enter your first name:");
+		$admin_firstname = trim($admin_firstname);
+
+		$admin_lastname = readline("Please enter last name:");
+		$admin_lastname = trim($admin_lastname);
+
+		$admin_username = readline("Please enter your email (It will be your username):");
+		$admin_username = trim($admin_username);
+
+		$admin_affiliation = readline("Please enter your affiliation:");
+		$admin_affiliation = trim($admin_affiliation);
+
+		// print("Please enter the password for Admin user:")
+		echo "Kindly take note of the following PASSWORD POLICIES:
+		1. Ensure the inclusion of at least one uppercase letter.
+		2. Ensure the inclusion of at least one lowercase letter.
+		3. Maintain a minimum length of 8 characters.
+		4. Incorporate at least one digit for added security. \n";
+
 		$admin_password = readline("Please enter the password for Admin user:");
-		$admin_password = trim(password_hash("$admin_password", PASSWORD_DEFAULT));
+		//$admin_password = trim(password_hash("$admin_password", PASSWORD_DEFAULT));
 
-		$con->query("Update settings set `value` = '$installation_key' where `key` = 'installation_key';");
-		$con->query("Update settings set `value` = '$network_server' where `key` = 'auth_server';");
-		$con->query("Update users set `password` = '$admin_password' where `username`='admin@cafevariome.org';");
-		$con->query("Update servers set `address` = '$auth_server' where `id` = 1;");
-		$con->query("Update credentials set `username` = '$client_id' where `id` = 1;");
-		$con->query("Update credentials set `password` = '$client_secret_password_hash' where `id` = 1;");
-		$con->query("Update credentials set `hash` = '$client_secret_hash' where `id` = 1;");
+		$is_created = self::createUserOnKeycloak($auth_host, $client_id, $client_secret, $keycloak_realm, $admin_username,
+			$admin_username, $admin_firstname, $admin_lastname, $admin_password);
 
-		print("Settings were updated successfully. \n");
+		if ($is_created)
+		{
 
-		print("Setup completed. Remember that you must remove the Install directory completely. \n");
+			$stmt = $con->prepare("UPDATE settings SET `value` = ? WHERE `key` = 'installation_key'");
+			$stmt->bind_param("s", $installation_key);
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE settings SET `value` = ? WHERE `key` = 'auth_server'");
+			$stmt->bind_param("s", $network_server);
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE users SET `password` = NULL WHERE `id` = 1");
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE users SET `first_name` = ? WHERE `id` = 1");
+			$stmt->bind_param("s", $admin_firstname);
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE users SET `last_name` = ? WHERE `id` = 1");
+			$stmt->bind_param("s", $admin_lastname);
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE users SET `username` = ? WHERE `id` = 1");
+			$stmt->bind_param("s", $admin_username);
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE users SET `email` = ? WHERE `id` = 1");
+			$stmt->bind_param("s", $admin_username);
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE users SET `company` = ? WHERE `id` = 1");
+			$stmt->bind_param("s", $admin_affiliation);
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE servers SET `address` = ? WHERE `id` = 1");
+			$stmt->bind_param("s", $auth_server);
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE credentials SET `username` = ? WHERE `id` = 1");
+			$stmt->bind_param("s", $client_id);
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE credentials SET `password` = ? WHERE `id` = 1");
+			$stmt->bind_param("s", $client_secret_password_hash);
+			$stmt->execute();
+
+			$stmt = $con->prepare("UPDATE credentials SET `hash` = ? WHERE `id` = 1");
+			$stmt->bind_param("s", $client_secret_hash);
+			$stmt->execute();
+
+
+			print("Settings were updated successfully. \n");
+			print("Setup completed. Remember that you must remove the Install directory completely. \n");
+		}
+		else
+		{
+			print("Installation was not successful.\n");
+		}
 		$con->close();
 	}
 
+	public static function createUserOnKeycloak($keycloakHost, $client_id, $client_secret, $realm,
+												$username, $email, $firstName, $lastName, $password)
+	{
+		$tokenUrl = "$keycloakHost/realms/$realm/protocol/openid-connect/token";
+		$data = [
+			'client_id' => $client_id,
+			'client_secret' => $client_secret,
+			'grant_type' => 'client_credentials',
+		];
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $tokenUrl);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Only for testing, disable in production
+
+		$response = curl_exec($ch);
+
+		if (!$response) {
+			die('Failed to obtain access token: ' . curl_error($ch));
+		}
+
+		$responseData = json_decode($response, true);
+		$accessToken = $responseData['access_token'];
+
+		$userUrl = "$keycloakHost/admin/realms/$realm/users";
+		$userData = [
+			'username' => $username,
+			'enabled' => true,
+			'email' => $email,
+			'firstName' => $firstName,
+			'lastName' => $lastName,
+			"emailVerified" => true,
+			'credentials' => [
+				[
+					'type' => 'password',
+					'value' => $password,
+					'temporary' => false,
+				],
+			],
+		];
+
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_URL, $userUrl);
+		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($userData));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, [
+			'Content-Type: application/json',
+			'Authorization: Bearer ' . $accessToken,
+		]);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Only for testing, disable in production
+
+		$response = curl_exec($ch);
+
+		if (curl_getinfo($ch, CURLINFO_HTTP_CODE) != 201)
+		{
+			die('Failed to create user as  ' . $response);
+		}
+		else
+		{
+			curl_close($ch);
+			return true;
+		}
+
+
+	}
 	public static function Deploy(string $base_url, string $installation_key, string $php_bin_path, string $apache_config_file, string $deployment_directory, array $database_info)
 	{
 		// Valid PHP Version?
