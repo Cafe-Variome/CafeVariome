@@ -29,7 +29,7 @@ $routes->setAutoRoute(false);
 
 // We get a performance increase by specifying the default
 // route since we don't have to scan directories.
-$routes->get('/', 'Home::Index');
+$routes->get('/', 'Discover::QueryBuilder');
 
 /**
  * Cafe Variome Manual Routes
@@ -1076,7 +1076,11 @@ $routes->post('ValueMapping/Delete/(:num)', 'ValueMapping::Delete/$1');
 $routes->post('ValueMapping/delete/(:num)', 'ValueMapping::Delete/$1');
 $routes->post('valuemapping/Delete/(:num)', 'ValueMapping::Delete/$1');
 $routes->post('valuemapping/delete/(:num)', 'ValueMapping::Delete/$1');
+// $routes->post('viewdata/viewDetail', 'Discover::');
+$routes->post('/h', 'Discover::fetchData');
+$routes->post('/lvm', 'Discover::getDatasetDetails');
 
+// /viewdata/getDatasetDetails
 /*
  * --------------------------------------------------------------------
  * Additional Routing

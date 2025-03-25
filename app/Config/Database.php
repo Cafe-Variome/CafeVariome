@@ -70,6 +70,28 @@ class Database extends Config
         'busyTimeout' => 1000,
     ];
 
+    public array $lehmr = [
+        'DSN'         => '',
+        'hostname'    => '127.0.0.1',
+        'username'    => '',
+        'password'    => '',
+        'database'    => ':memory:',
+        'DBDriver'    => 'SQLite3',
+        'DBPrefix'    => '',  // Needed to ensure we're working correctly with prefixes live. DO NOT REMOVE FOR CI DEVS
+        'pConnect'    => false,
+        'DBDebug'     => true,
+        'charset'     => 'utf8',
+        'DBCollat'    => 'utf8_general_ci',
+        'swapPre'     => '',
+        'encrypt'     => false,
+        'compress'    => false,
+        'strictOn'    => false,
+        'failover'    => [],
+        'port'        => 3306,
+        'foreignKeys' => true,
+        'busyTimeout' => 1000,
+    ];
+
     public function __construct()
     {
         parent::__construct();

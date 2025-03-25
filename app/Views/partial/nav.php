@@ -1,78 +1,31 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-	<div class="container-fluid">
-
-		<?php if(strlen($headerImage) > 0): ?>
-			<img src="<?= base_url($headerImage);?>">
-		<?php else:?>
-			<div class="cv-logo-square">
-				<div class="mug-coffee">
-					<div class="smoke-container">
-						<svg viewbox="0 0 60 30">
-							<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-								<g class="smokes" transform="translate(2.000000, 2.000000)" stroke="#BEBEBE" stroke-width="3">
-									<g class="smoke-1">
-										<path id="Shape1" d="M0.5,8.8817842e-16 C0.5,8.8817842e-16 3.5,5.875 3.5,11.75 C3.5,17.625 0.5,17.625 0.5,23.5 C0.5,29.375 3.5,29.375 3.5,35.25 C3.5,41.125 0.5,41.125 0.5,47"></path>
-									</g>
-									<g class="smoke-2">
-										<path id="Shape2" d="M0.5,8.8817842e-16 C0.5,8.8817842e-16 3.5,5.875 3.5,11.75 C3.5,17.625 0.5,17.625 0.5,23.5 C0.5,29.375 3.5,29.375 3.5,35.25 C3.5,41.125 0.5,41.125 0.5,47"></path>
-									</g>
-									<g class="smoke-3">
-										<path id="Shape3" d="M0.5,8.8817842e-16 C0.5,8.8817842e-16 3.5,5.875 3.5,11.75 C3.5,17.625 0.5,17.625 0.5,23.5 C0.5,29.375 3.5,29.375 3.5,35.25 C3.5,41.125 0.5,41.125 0.5,47"></path>
-									</g>
-								</g>
-							</g>
-						</svg>
-					</div>
-					<div class="mug"></div>
-				</div>
-			</div>
-		<?php endif; ?>
-
-		<a class="navbar-brand text-dark ms-3" href="<?php echo base_url("home"); ?>"><?= $site_title ?></a>
-
-		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-			<span class="navbar-toggler-icon"></span>
-		</button>
-
-		<div class="collapse navbar-collapse" id="navbarNav">
-			<ul class="navbar-nav ms-auto">
-
-				<!-- User not logged in -->
-				<?php if (! $loggedIn): ?>
-					<li class="nav-item">
-						<a class="nav-link-top btn btn" href="#" onclick="openPrivacyPolicyModal()">Privacy Policy</a>
-					</li>
-
-					<li class="nav-item">
-						<a class="nav-link-top btn btn <?= (strtolower($uriSegments->controllerName) == 'auth') ? " active": "" ?>" href="<?= base_url("auth/login") ?>" >Login</a>
-					</li>
-
-				<?php else: ?>
-
-					<!-- User logged in -->
-					<li class="nav-item">
-						<a class="nav-link-top btn btn<?= (strtolower($uriSegments->controllerName) == 'discover') ? " active": "" ?>" href="<?= base_url("discover/index") ?>">Discover</a>
-					</li>
-
-					<!-- Admin account -->
-					<?php if($isAdmin): ?>
-						<li class="nav-item">
-							<a class="nav-link-top btn btn<?= (strtolower($uriSegments->controllerName) == 'admin') ? " active": "" ?>" href="<?= base_url("admin/index") ?>">Admin Dashboard</a>
-						</li>
-					<?php endif; ?>
-					<!-- End -->
-					<li class="nav-item dropdown">
-						<a class="nav-link-top btn dropdown-toggle" href="#" id="navbarDarkDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-							<i class="fas fa-user"></i> Hello <?= $userName ?>
-						</a>
-						<ul class="dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
-							<li><a class="dropdown-item" href="<?= $profileURL ?>"><i class="fas fa-user"></i>  Profile</a></li>
-							<li><a class="dropdown-item" href="<?= base_url("Auth/Logout") ?>"><i class="fas fa-sign-out-alt"></i>  Logout</a></li>
-						</ul>
-					</li>
-				<?php endif; ?>
-		</div>
-	</div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+  <div class="container-fluid">
+    <div class="navbar-brand">
+        <a href="<?php echo base_url(); ?>">
+            <img src="<?= base_url("resources/images/logos/lehmrLogo.png")?>" class="logo" alt="LeHMR">
+        </a>
+    </div>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent" style="max-width: 510px;margin-left: auto; min-width: 300px;">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="width: -webkit-fill-available !important;">
+        <?php $request = service('request'); ?>
+        <li class="nav-item">
+            <a id ="home" class="nav-link" href="https://lehmr.le.ac.uk/"> Home</a>
+        </li>
+        <li class="nav-item">
+            <a id ="adddata" class="nav-link" href="https://lehmr.le.ac.uk/Getdata/index">Add Data</a>
+        </li>
+        <li class="nav-item dropdown">
+            <a id ="editdata" class="nav-link" href="https://lehmr.le.ac.uk/editdata">Edit Data</a>
+        </li>
+        <li class="nav-item active">
+            <a  id ="explore" class="nav-link" href="<?php echo base_url() ?>">Explore Datasets</a>
+        </li>
+      </ul>
+    </div>
+  </div>
 </nav>
 
 <!-- Privacy Policy Modal -->

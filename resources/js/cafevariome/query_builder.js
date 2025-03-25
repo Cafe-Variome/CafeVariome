@@ -1,851 +1,197 @@
-$('#reset_query').click(function() {
-    location.reload();
-});
-var result_data = {};
-var source_data = {};
-var attributesValues = {};
-var attributesDisplayNames = {};
-var valuesDisplayNames = {};
-
-var queryXHR = null;
-$("#sall").change(function() {
-    if(this.checked) {
-        $('.ml-1 .custom-control-input').prop('checked', true);
-    }
-    else{
-        $('.ml-1 .custom-control-input').prop('checked', false);
-    }
-});
-
-$( function() {
-    $( "#age-range" ).slider({
-        range: true,
-        min: 0,
-        max: 99,
-        values: [ 0, 99 ],
-        slide: function( event, ui ) {
-            $("#age-value").val(ui.values[0] + " - " + ui.values[1]);
-        }
-    });
-
-    $("#age-value").val($("#age-range").slider("values", 0) + " - " + $("#age-range").slider("values", 1));
-
-    $( "#age-diagnosis-range" ).slider({
-        range: true,
-        min: 0,
-        max: 99,
-        values: [ 0, 99 ],
-        slide: function( event, ui ) {
-            $("#age-diagnosis-value").val(ui.values[0] + " - " + ui.values[1]);
-        }
-    });
-
-    $("#age-diagnosis-value").val($("#age-diagnosis-range").slider("values", 0) + " - " + $("#age-diagnosis-range").slider("values", 1));
-
-    $( "#age-first-symptoms-range" ).slider({
-        range: true,
-        min: 0,
-        max: 99,
-        values: [ 0, 99 ],
-        slide: function( event, ui ) {
-            $("#age-first-symptoms-value").val(ui.values[0] + " - " + ui.values[1]);
-        }
-    });
-
-    $("#age-first-symptoms-value").val($("#age-first-symptoms-range").slider("values", 0) + " - " + $("#age-first-symptoms-range").slider("values", 1));
-
-    $( "#similarity-rel-range" ).slider({
-        range: "min",
-        min: 0.5,
-        max: 1,
-        value: 1,
-        step: 0.05
-    });
-
-    $( "#similarity-rel-range-ordo" ).slider({
-        range: "min",
-        min: 0.5,
-        max: 1,
-        value: 1,
-        step: 0.05
-    });
-
-    $( "#match-scale-ordo" ).slider({
-        range: "min",
-        min: 0,
-        max: 100,
-        value: 100,
-        step: 1
-    });
-
-    var handle = $( "#sr-handle" );
-
-    $( "#similarity-range" ).slider({
-        range: "min",
-        min: 0,
-        max: 0,
-        value: 1,
-        step: 1,
-        create: function() {
-            if ($(this).slider("value") != 0) {
-                handle.text($(this).slider("value"));
-            }
-        },
-        slide: function( event, ui ) {
-            handle.text( ui.value );
-        }
-    });
-
-    $( "#similarity-range" ).slider('disable');
-
-    $( "[type=radio]" ).checkboxradio({
-        icon: false
-    });
-
-    $('#ordoSelect').select2({
-        ajax: {
-            url:  function (params) {
-                return orpha_autocomplete_url + params.term
-            },
-            dataType: 'json',
-            processResults: function (data) {
-                results = [];
-                $.each(data, function (key, value) {
-                    results.push({'id': value, 'text': value})
-                })
-                return {
-                    results: results
-                };
-            }
-        },
-        placeholder: 'Choose Ordo term',
-        allowClear: false,
-        width: '100%',
-        maximumSelectionLength: 1,
-        minimumInputLength: 2
-    });
-
-    $("#genes_box").select2( {
-        ajax: {
-            url:  function (params) {
-                return gene_autocomplete_url + params.term
-            },
-            dataType: 'json',
-            processResults: function (data) {
-                results = [];
-                $.each(data, function (key, value) {
-                    results.push({'id': value, 'text': value})
-                })
-                return {
-                    results: results
-                };
-            }
-        },
-		width: '100%',
-        placeholder: 'Choose genes',
-        allowClear: false,
-        minimumInputLength: 2 ,
-	});
-    
-    $("#reactome_box").select2( {
-        ajax: {
-            url:  function (params) {
-                return reactome_autocomplete_url + params.term
-            },
-            dataType: 'json',
-            processResults: function (data) {
-                results = [];
-                $.each(data, function (key, value) {
-                    results.push({'id': value, 'text': value})
-                })
-                return {
-                    results: results
-                };
-            }
-        },
-        width: '100%',
-        placeholder: 'Choose Pathway',
-        allowClear: false,
-        minimumInputLength: 2 ,
-    });
-});
-
-
-$(function() {
-    // urls object
-    const urls = {'qb_config': baseurl + 'resources/js/config.json',
-                  'qb_json': baseurl + 'resources/js/querybuilder.json',
-                  'phen_json': baseurl + 'AjaxApi/GetPhenotypeAttributes/' + $('#network_key').val()
-                };
-    // error object
-    const error = {
-        'load_config': 'Error: Unable to load query builder config file.',
-        'load_json': 'Error: Unable to load query builder json file.',
-        'load_phen_json': 'Error: Unable to load phenotype.json',
-        'NaN': 'A numeric comparison operator was specified but the entered value is not numeric, unable to proceed with the query.',
-        'null' : 'NULL queries are only possible with "IS" or "IS NOT" operators, unable to proceed with the query.',
-        'str_cmp': 'You have specified a string comparison operator but supplied a numeric value. Query may not return proper results.'
-    }
-
-    String.prototype.isNumber = function(){ return !isNaN(parseFloat(this)) && isFinite(this) }
-    String.prototype.isEmpty = function(){ return !this.trim().length > 0 }
-    // Split the string by the delimiter specified, capitalized first character of each word & then joins each word by a space.
-    String.prototype.titleCase = function(delimiter) {
-        if(this === 'NULL') return this
-        str = this.toLowerCase().split(delimiter).map((word)=> word.charAt(0).toUpperCase() + word.slice(1))
-        return str.join(' ')
-    }
-
+$(function(){
+    // Reset Query Builder
     $('#reset_query').click(function() {
         location.reload();
     });
 
-    //load_qb_config()
-    load_phen_json();
-    var template = {}
-    var phen_data = {};
-    // Load phenotype json and then load JSON API template if successful
-    function load_phen_json() {
-        var query_builder_post = getCSRFToken();
+    $(document).on('click', '.view-btn', function () {
+        var datasetId = $(this).data('id');
+    
+        // Perform an AJAX request to fetch the dataset details
         $.ajax({
-            type: 'post',
-            url: urls['phen_json'],
-            data:query_builder_post,
-            dataType: 'json'
-        })
-        .done((jsonData)=> {
-            attributesValues = jsonData['attributes_values'];
-            attributesDisplayNames = jsonData['attributes_display_names'];
-            valuesDisplayNames = jsonData['values_display_names'];
-
-            for (const [attribute, values] of Object.entries(attributesValues)) {
-                $('select.keys_pat').append($('<option></option>').attr('value', attribute).text(attributesDisplayNames[attribute][0]))
-            }
-
-            template['patient'] = $('.rule')[0].outerHTML
-            template['genotype'] = $('.rule')[1].outerHTML
-
-            //$('select#values_phen_left').filterByText($('#search_filter_phen_left'));
-
-            initSelect2();
-        })
-        .fail(()=> alert(error['load_phen_json']))
-    }
-
-    $search_str = ''
-    $('#search_filter_phen_left').keyup(function() {
-        if($search_str == $(this).val()) return;
-        $('select#values_phen_left').empty()
-        var arrayToReduce = $(this).val().trim().split(' ').filter((term) => term.length != 1);
-        str = (arrayToReduce.length > 0) ? arrayToReduce.reduce((v1, v2) => v1 + " " + v2) : '';
-
-        $.ajax({
-            url: hpo_autocomplete_url + str,
-            type: 'GET',
-            dataType:'json',
-            crossDomain: true,
-            success: function  (data, textStatus, jqXHR) {
-                $('select#values_phen_left').empty()
-                data.forEach((term) => {
-                    $('select#values_phen_left').append($('<option></option>').attr('value', term).text(term))
-                })
-            }
-        }).done(function() {
-
-        });
-
-        $search_str = $(this).val()
-    })
-
-
-    // var hpo_json = {};
-    // $.ajax({
-    //     dataType: "json",
-    //     url: baseurl + "AjaxApi/HPOQuery",
-    //     data: null,
-    //     success: function(data){
-    //         hpo_json = data;
-    //         init_hpotree(hpo_json);
-    //     }
-    // });
-
-    // Load JSON API template and initialise query builder if successful
-    function load_json_api_template(qb_config, phen_attrib) {
-        $.ajax({ url: urls['qb_json'], dataType: 'json', })
-        .done()
-        .fail(()=> alert(error['load_json']))
-    }
-
-    function initSelect2() {
-        $('select.keys').select2({ allowClear: true, placeholder: 'Select an attribute', dropdownAutoWidth: 'true' });
-        $('select.conditions').select2({ allowClear: true, placeholder: 'Select operator', dropdownAutoWidth: 'true' });
-        $('select.keys_altaf').select2({placeholder: 'Select an attribute', dropdownAutoWidth: 'true' });
-        $('select.keys_pat').select2({placeholder: 'Select an attribute', dropdownAutoWidth: 'true' });
-        $('select.values_altall').select2({allowClear: true, placeholder: 'ALT', dropdownAutoWidth: 'true' });
-        $('select.values_refall').select2({allowClear: true, placeholder: 'REF', dropdownAutoWidth: 'true' });
-
-        $('select.values').select2({ allowClear: true, placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
-        $('select.values_pat').select2({ allowClear: true, placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
-        $('select.values_pos').select2({ allowClear: true, placeholder: 'Select/Input position', dropdownAutoWidth: 'true' });
-        $('select.values_altaf').select2({ allowClear: true, placeholder: 'Select/Input value'});
-    }
-
-    $(document).on('change', "select.keys_pat", function () {
-        $(this).closest('.rule').find('select.values_pat').select2('destroy')
-        $val = $(this).closest('.rule').find('select.values_pat');
-        $val.empty()
-        $val.append('<option></option>');
-
-        attributesValues[$(this).val()].forEach(function(val) {
-            $val.append($('<option>', {
-                value: val,
-                text: valuesDisplayNames[val][0]
-            }));    
-        })
-        $val.select2({ allowClear: true, placeholder: 'Select/Input value', dropdownAutoWidth: 'true' });
-    })
-
-    $('button.btnRemove').click(() => {
-        $("#similarity-range").slider('disable');
-        var max_val = $("#similarity-range").slider( "option", "max" );
-        var items_count = 0;
-        $('#values_phen_right :selected').each((key, el) => {
-            var txt = $(el).val();
-            $("#values_phen_right option[value='" + txt + "']").remove();
-            items_count++;
-        });
-        $('#values_phen_right').filterByText($('#search_filter_phen_right'));
-        $("#similarity-range").slider( "option", "max", max_val - items_count );
-
-        if (max_val - items_count > 0) {
-            $("#similarity-range").slider('enable');
-        }
-        else{
-            $("#similarity-range").slider( "option", "min", 0);
-            $("#similarity-range").slider( "option", "max", 0);
-            $("#similarity-range").slider( "option", "value", 1);
-        }
-        if ($("#similarity-range").slider('values', 0) != 0) {
-            $("#sr-handle").text($("#similarity-range").slider('values', 0));
-        }
-        else{
-            $("#sr-handle").text('');
-        }
-    });
-
-    $('button.btnAdd').click(() => {
-        $("#similarity-range").slider('disable');
-        var max_val = $("#similarity-range").slider( "option", "max" ); // 1 at start
-        var items_count = 0;
-        $('#values_phen_left :selected').each((key, el) => {
-            var txt = $(el).text();
-            if ($("#values_phen_right option[value='" + txt + "']").length == 0) {
-                $('#values_phen_right').append($("<option></option>").attr("value", txt).text(txt));    
-                items_count++;
-            }
-        });
-
-        $('#values_phen_right').filterByText($('#search_filter_phen_right'));
-
-        if ((max_val + items_count) == 1) {
-            $("#similarity-range").slider( "option", "min", 0);
-            $("#similarity-range").slider( "option", "value", 1);
-            $("#similarity-range").slider( "option", "max", items_count + max_val);
-        }
-        else if (max_val ==  $("#similarity-range").slider( "option", "value")) {
-            $("#similarity-range").slider( "option", "max", items_count + max_val);
-            $("#similarity-range").slider( "option", "min", 1);
-            $("#similarity-range").slider( "option", "value", items_count + max_val);
-            $("#similarity-range").slider('enable');
-        }
-        else{
-            $("#similarity-range").slider( "option", "min", 1);
-            $("#similarity-range").slider( "option", "max", items_count + max_val);
-            $("#similarity-range").slider('enable');
-        }
-        $( "#sr-handle" ).text($("#similarity-range").slider('values', 0));
-    });
-
-
-
-    function logic_eav(rule, eav, logic) {
-        if(typeof rule[1] !== 'undefined' && typeof rule[2] !== 'undefined' && rule[1] !== '' && rule[2] !== '') {
-            eav.push({'attribute' : rule[0], 'operator': rule[1], 'value': rule[2]})
-            logic['-AND'].push("/query/components/eav/" + (eav.length-1))
-        }
-    }
-
-    $('#build_query').click(() => {
-        $('#waiting').show();
-        $('#build_query').addClass('disabled');
-        $('#cancel_query').show();
-        $('#reset_query').hide();
-        $('#query_result tbody').html('')
-        $.ajax({ url: urls['qb_json'], dataType: 'json'})
-        .done((jsonAPI) => {
-
-            var attributes = [] // Attributes that need to be extracted from sources after query go here. Do not add subject_id as it is included implicitly.
-            var logic = {"-AND": []}
-            var eav = []
-            var phe = []
-            var gen = []
-            var mutation = []
-            var ordo = []
-            var reactome = []
-            var gene = []
-            var af = []
-
-            $('#pat_container .rule').each(function() {
-                var attr = $('select.keys_pat', this).val()
-                var opr = $('select.conditions', this).val()
-                var val = $('select.values_pat', this).val()
-                if(val != '') {
-                    logic_eav([attr, opr, val], eav, logic);
-                }
-            })
-
-            // Gender
-                // logic_gender = []
-                // eav.push({'attribute' : "Gender", 'operator': "is", 'value': "m"})
-                // logic_gender.push("/query/components/eav/" + (eav.length-1))
-                // eav.push({'attribute' : "Gender", 'operator': "is", 'value': "f"})
-                // logic_gender.push("/query/components/eav/" + (eav.length-1))
-                // logic['-AND'].push({'-OR': logic_gender})
-            
-
-            // logic_eav(['sex', 'is', $('#values_sex').val()], eav, logic);
-            // logic_eav(['age', $('select.oprAge').val(), $('select.values_age').val()], eav, logic);
-            // logic_eav(['tissue', 'is', $('#values_tissue').val()], eav, logic);
-
-            // logic_haplo = [];
-            // $("#values_haplo_right > option").each(function() {
-            //     eav.push({'attribute' : "haplogroup", 'operator': "is", 'value': this.value})
-            //     logic_haplo.push("/query/components/eav/" + (eav.length-1))
-            // });
-            // if(logic_haplo.length > 1) {logic['-AND'].push({'-OR': logic_haplo})}
-            protein_effect = [];
-
-            if($('#ncoding').prop('checked')){
-                protein_effect.push('p:three_prime_UTR_variant');
-                protein_effect.push('p:five_prime_UTR_variant');
-                protein_effect.push('p:downstream_gene_variant');
-                protein_effect.push('p:upstream_gene_variant');
-                protein_effect.push('p:non_coding_transcript_variant');
-                protein_effect.push('p:intron_variant');
-                protein_effect.push('p:intergenic_variant');
-                protein_effect.push('p:non_coding_transcript_exon_variant');
-            }
-
-            if($('#mss').prop('checked')){
-                protein_effect.push('p:missense_variant');
-            }
-
-            if($('#nss').prop('checked')){
-                protein_effect.push('p:stop_gained');
-                protein_effect.push('p:synonymous_variant');
-            }
-
-            if($('#splice').prop('checked')){
-                protein_effect.push('p:splice_acceptor_variant');
-                protein_effect.push('p:splice_donor_variant');
-                protein_effect.push('p:synonymous_variant');
-                protein_effect.push('p:splice_region_variant');
-            }
-
-            if($('#frameshift').prop('checked')){
-                protein_effect.push('p:frameshift_variant');
-            }
-
-            if($('#lostart').prop('checked')){
-                protein_effect.push('p:start_lost');
-            }
-
-            if($('#lostop').prop('checked')){
-                
-            }
-
-            if($('#indel').prop('checked')){
-                protein_effect.push('p:inframe_deletion');
-                protein_effect.push('p:inframe_insertion');
-            }
-
-            logic_gene_reactome = [];
-            if($('#reactome_box').val().length > 0)
-            {
-                //logic_reactome = [];
-                for (i = 0; i < $('#reactome_box').val().length; i++){
-                    var reactome_dict = {'reactome_id': $('#reactome_box').val()[i].split(' ')[0], 'protein_effect': protein_effect}
-                    if($('#max_af').val() != ''){
-                        reactome_dict['af'] = $('#max_af').val() * 100;
-                    }
-                    reactome[i] = reactome_dict;
-                    //logic['-AND'].push('/query/components/reactome/' + i.toString())
-                    logic_gene_reactome.push('/query/components/reactome/' + i.toString());
-                }
-                //logic['-AND'].push({'-OR': logic_reactome})
-            }
-
-            if($('#genes_box').val().length > 0)
-                {
-                //logic_gene = [];
-                        for (i = 0; i < $('#genes_box').val().length; i++){
-                                var gene_dic = {'gene_id': $('#genes_box').val()[i].trim().toUpperCase(), 'protein_effect': protein_effect};
-                                if($('#max_af').val() != ''){
-                        gene_dic['af'] = $('#max_af').val() * 100;
-                    }
-                    gene[i] = gene_dic;
-                    //logic['-AND'].push('/query/components/gene/' + i.toString())
-                    logic_gene_reactome.push('/query/components/gene/' + i.toString());
-                        }
-                //logic['-AND'].push({'-OR': logic_gene})
-                }
-
-            if(logic_gene_reactome.length > 0){
-                logic['-AND'].push({'-OR':logic_gene_reactome});
-            }
-
-            var phenLogic = 'SIM';
-            logic_phen = [];
-
-            sim = [];
-            if(phenLogic === 'SIM' && $("#values_phen_right option").length > 0) {
-                terms = [];
-                $("#values_phen_right option").each(function() { terms.push($(this).val().split(' ')[0].replace(/[()]/g, ''))})
-
-                    sim[0] = {
-                        'r': $( "#similarity-rel-range" ).slider('values', 0),
-                        's': $( "#similarity-range" ).slider('values', 0),
-                        'ORPHA': $('#includeORPHA').prop( "checked"),
-                        'ids': terms
-                    }
-                    logic['-AND'].push('/query/components/sim/0')
-            } else {
-                $("#values_phen_right option").each(function() { 
-                    var term = $(this).val().split(' ')[0].replace(/[()]/g, '')
-
-                    if(phenLogic === 'AND') {
-                        phe.push({'attribute' : "phenotypes_id", 'operator': "is", 'value': term})
-                        logic['-AND'].push("/query/components/phenotype/" + (phe.length-1))
+            url: base_url + '/lvm',
+            method: 'POST',
+            data: { id: datasetId },
+            success: function (response) {
+                if (response.success) {
+                    // Populate Dataset Information
+                    $('#datasetTitle').text(response.data.d_title || 'N/A');
+                    $('#datasetAbstract').text(response.data.d_abstract || 'N/A');
+                    $('#researchStudy').text(response.data.d_researchstudy || 'N/A');
+                    $('#dataTypes').text(response.data.d_datatypes || 'N/A');
+                    $('#ethnicities').text(response.data.d_ethnicities || 'N/A');
+                    $('#funders').text(response.data.d_funders || 'N/A');
+                    $('#geographies').text(response.data.d_geographies || 'N/A');
+                    $('#keywords').text(response.data.d_keywords || 'N/A');
+                    $('#ageRange').text(response.data.d_agerange || 'N/A');
+                    $('#studySize').text(response.data.d_studysize || 'N/A');
+                    $('#dataController').text(response.data.d_controler || 'N/A');
+                    $('#accessRights').text(response.data.d_arights || 'N/A');
+                    $('#legalJurisdiction').text(response.data.d_legaljurisdiction || 'N/A');
+                    $('#organisation').text(response.data.d_organisation || 'N/A');
+                    $('#contactPoint').text(response.data.d_conpoint || 'N/A');
+                    $('#hdrConsent').text(response.data.d_hdrconsent == 1 ? 'Yes' : 'No');
+    
+                    // Handle Publications Section
+                    if (response.data.publications && response.data.publications.length > 0) {
+                        $('#publicationsSection').empty();
+                        response.data.publications.forEach(function (publication, index) {
+                            var publicationCard = $('#publicationTemplate').clone().removeAttr('id').show();
+                            publicationCard.find('.publication-number').text(index + 1);
+                            publicationCard.find('.publication-title').text(publication.pub_title || 'N/A');
+                            publicationCard.find('.publication-venue').text(publication.pub_venue || 'N/A');
+                            publicationCard.find('.publication-author').text(publication.pub_author || 'N/A');
+                            publicationCard.find('.publication-year').text(publication.pub_date || 'N/A');
+                            publicationCard.find('.publication-doi').text(publication.pub_doi || 'N/A');
+                            $('#publicationsSection').append(publicationCard);
+                        });
+                        $('#publicationsCollapse').closest('.card').show();
                     } else {
-                        phe.push({'attribute' : "phenotypes_id", 'operator': "is", 'value': term})
-                        logic_phen.push("/query/components/phenotype/" + (phe.length-1))
+                        $('#publicationsCollapse').closest('.card').hide();
                     }
-                });
-                if(logic_phen.length > 1 && phenLogic === 'OR') {logic['-AND'].push({'-OR': logic_phen})}    
-            }
-            
-            
-            var genLogic = 'AND'; //$('#gen_logic a.active').html();
-            var logic_gen = [];
-            $('#gen_container .rule').each(function() {
-                v = {
-                        'chr' : $('#values_chr', this).val(),
-                        'start' : $('input.values_start', this).val(),
-                        'end' : $('input.values_end', this).val(),
-                        'referencebases' : $('select.values_refall', this).val(),
-                        'alternatebases' : $('select.values_altall', this).val()
-                    };
-                if(v['chr'] !== '' && v['referencebases'] !== '' && v['alternatebases'] !== '') {
-                    gen.push(v);
-                    if(genLogic === 'AND') {
-                        logic['-AND'].push("/query/components/subjectVariant/" + (gen.length-1))
+    
+                    // Handle Researchers Section
+                    if (response.data.researchers && response.data.researchers.length > 0) {
+                        $('#researchersSection').empty();
+                        response.data.researchers.forEach(function (researcher, index) {
+                            var researcherCard = $('#researcherTemplate').clone().removeAttr('id').show();
+                            researcherCard.find('.researcher-number').text(index + 1);
+                            researcherCard.find('.researcher-name').text((researcher.p_firstname + ' ' + researcher.p_surname) || 'N/A');
+                            researcherCard.find('.researcher-title').text(researcher.p_title || 'N/A');
+                            researcherCard.find('.researcher-email').text(researcher.p_email || 'N/A');
+                            researcherCard.find('.researcher-affiliations').text(researcher.p_affiliations || 'N/A');
+                            $('#researchersSection').append(researcherCard);
+                        });
+                        $('#researchersCollapse').closest('.card').show();
                     } else {
-                        logic_gen.push("/query/components/subjectVariant/" + (gen.length-1))    
+                        $('#researchersCollapse').closest('.card').hide();
                     }
+    
+                    // Handle Conditions Section
+                    if (response.data.conditions) {
+                        $('#allowedCountries').text(response.data.conditions.c_countries || 'N/A');
+                        $('#profitUse').text(response.data.conditions.c_profituse || 'N/A');
+                        $('#broadResearchUse').text(response.data.conditions.c_broadresearchuse || 'N/A');
+                        $('#specificResearchUse').text(response.data.conditions.c_specificresearchuse || 'N/A');
+                        $('#recontact').text(response.data.conditions.c_reconenct || 'N/A');
+                        $('#conditionsCollapse').closest('.card').show();
+                    } else {
+                        $('#conditionsCollapse').closest('.card').hide();
+                    }
+    
+    
+                    // Show the modal
+                    $('#viewDatasetModal').modal('show');
+                    $('#viewDatasetModal').on('shown.bs.modal', function () {
+                        // Expand all collapsible panels inside the modal
+                        $(this).find('.collapse').each(function () {
+                            var collapseElement = new bootstrap.Collapse(this, {
+                                toggle: true // Ensure the collapse expands
+                            });
+                            collapseElement.show();
+                        });
+                    
+                        console.log('All collapsible panels expanded.');
+                    });
+                } else {
+                    swal("Error", "Failed to load dataset details.", "error");
                 }
-            });
-
-            if($("#ordoSelect").val().length == 1){
-                ordo[0] = {
-                    'r': $("#similarity-rel-range-ordo").slider('values', 0),
-                    's': $("#match-scale-ordo").slider('values', 0),
-                    'id': [$("#ordoSelect").val()[0].split(' ')[0]],
-                    'HPO': $('#includeHPO').prop( "checked")
-                }
-                logic['-AND'].push("/query/components/ordo/" + (ordo.length-1))
+            },
+            error: function () {
+                swal("Error", "An error occurred. Please try again.", "error");
             }
+        });
+    });
+    
+    
+    
+    
+    
 
-            if(logic_gen.length > 1 && genLogic === 'OR') {logic['-AND'].push({'-OR': logic_gen})}
 
-            /*if($('#max_af').val() != ''){
-            af[0] = {'af': $('#max_af').val()};
-            logic['-AND'].push("/query/components/allelefrequency/0");
-            }*/
 
-            jsonAPI['requires']['response']['components']['attributes'] = attributes;
-            jsonAPI['query']['components']['eav'] = eav;
-            jsonAPI['query']['components']['subjectVariant'] = gen;
-            jsonAPI['query']['components']['phenotype'] = phe;
-            jsonAPI['query']['components']['sim'] = sim;
-            jsonAPI['query']['components']['ordo'] = ordo;
-            jsonAPI['query']['components']['reactome'] = reactome;
-            jsonAPI['query']['components']['gene'] = gene;
-            // jsonAPI['query']['components']['allelefrequency'] = af;
+    $(document).ready(function() {
 
-            jsonAPI['logic'] = logic;
-            var csrfTokenObj = getCSRFToken('keyvaluepair');
-            var queryData = {'jsonAPI': jsonAPI, 'network_key': $('#network_key').val()};
-            var csrfTokenName = Object.keys(csrfTokenObj)[0];
-            queryData[csrfTokenName] = csrfTokenObj[csrfTokenName];
-
-            queryXHR = $.ajax({url: baseurl + 'AjaxApi/Query',
-                type: 'POST',
-                data: queryData,
-                dataType: 'json',
-                beforeSend: function (jqXHR, settings) {
-                    $('#query_error').text('');
-                },
-                success: function (data) {
-                    $('#query_result').show();
-                    result_data = {};
-                    source_data = {};
-                    $.each(data, function(key, val) {
-                        if(key == 'error'){
-                            trow = "<tr><td>Error</td><td>" + val + "</td><td></td></tr>";
-                            $('#query_result tbody').append(trow);
-                        }
-                        else if (key == 'timeout') {
-                            $('#timeoutalert').show();
-                            window.scrollTo(0, 0); 
-                        }
-                        else if(val.length > 0) {
-                            resp = $.parseJSON(val)
-                            $.each(resp, function(key, val1) {
-                                //$('#resTbl tbody').empty();
-                                trow = "<tr id = " + key + "><td>" + key + "</a></td>";
-                                var payload = val1['payload'];
-                                source_data[key] = val1['source'];
-                                switch (val1['type'])
-                                {
-                                    case 'existence':
-                                        trow += '<td>';
-                                        trow +=  payload;
-                                        trow += '</td><td>';
-                                        break;
-                                    case 'boolean':
-                                        trow += '<td>';
-                                        if (isNaN(parseInt(payload)) && payload === true)
-                                        {
-                                            trow += 'Results below threshold exist.';
-                                        }
-                                        else
-                                        {
-                                            trow += payload;
-                                        }
-                                        trow += '</td><td>';
-
-                                        break;
-                                    case 'count':
-                                        trow += '<td>';
-                                        trow +=  payload;
-                                        trow += '</td><td>';
-                                        break;
-                                    case 'list':
-                                        var records = payload['subjects'];
-                                        result_data[key] = records;
-                                        trow += '<td>';
-                                        if (val1['count'] > 0 || Object.keys(records).length > 0) {
-                                            trow += '<a type="button" class="btn btn-primary active" data-bs-toggle="modal" data-bs-target="#resultModal" data-sourcename="' + key + '">' + val1['count'] + '</a>';
-                                        }
-                                        else{
-                                            trow += '0';
-                                        }
-                                        trow += '</td><td>';
-                                        break;
-                                }
-                                trow += '<a type="button" class="btn btn-info active" data-bs-toggle="modal" data-bs-target="#sourceModal" data-sourcename="' + key + '"><i class="fa fa-database"></i></a>';
-
-                                trow += "</tr>";
-                                    $('#query_result tbody').append(trow);
-                                //}
-                            })    
-                        }
-                    })
-                },
-                error: function(jqXHR, textStatus, errorThrown) {
-                    if(jqXHR.status == 403)
-                    {
-                        $('#query_error').text('Page has been expired. Please refresh the page.');
-                    }
-                    else
-                    {
-                        $('#query_result').hide();
-                        $('#query_error').text(textStatus + ': ' + errorThrown);
-                    }
-
-                },
-                complete: function(data) {
-                    $('#build_query').removeClass('disabled');
-                    $('#waiting').hide();
-                    $('#cancel_query').hide();
-                    $('#reset_query').show();
-                },
-            })
-
-            $('#cancel_query').click(()=> {
-                queryXHR.abort();
-                $('#cancel_query').hide();
-            });
-
-        }).fail(()=> alert(error['load_json']));
+        let dataType = [
+            "Genetics",
+            "Expression data", 
+            "Epigenetics",
+            "Biochemical data",
+            "Phenotype",
+            "Demographics",
+            "Genomics",
+            "Transcriptomics",
+            "Epigenomics",
+            "Microbiomics",
+            "Metabolomics",
+            "MRI", "CT" , "Ultrasound", "X-rays", "Mammography", "Bone density imaging", "Myelogram", "Arthrogram"
+          ]
+    
+       $("#d_datatitle").select2({
+            placeholder: "Write Title or Keyword and press Enter.",
+            allowClear: false,
+            theme: "bootstrap-5",
+            width: '100%'
+        });
+    
+        // d_datatype
+    
+        $("#d_datatype").select2({
+            placeholder: "Please Select Data Types.",
+            data: dataType,
+            allowClear: false,
+            theme: "bootstrap-5",
+            width: '100%'
+        });
+    
+        // d_datatheme
+        $("#d_datatheme").select2({
+            placeholder: "Please Select Data theme or department.",
+            // data: dataType,
+            allowClear: false,
+            theme: "bootstrap-5",
+            width: '100%'
+        });
+    
     })
 
-    // Bootstrap notify plugin
-    function notify(title, msg, type) { 
-        $.notify({
-            title: '<strong>' + title + ' </strong>', 
-            message: msg, 
-            icon: 'glyphicon glyphicon-' + (type === 'danger' ? 'remove' : 'info') + '-sign'
-        }, 
-        {type: type, delay: 5000}) 
-    }
-
-    $(document).on('click', ".btn-collapse", function () {
-        $parent = $(this).parent().parent().parent();
-        if ($(this).attr("data-collapseStatus") === "false") {
-            $(this).removeClass("btn-info").addClass("btn-success");
-            $(this).find('i').removeClass("icon-chevron-left").addClass("icon-chevron-down");
-            $(this).parent().parent().next().collapse('show').addClass('container_border');
-            $(this).attr("data-collapseStatus", "true");
-            $parent.prev().children('a').removeClass('disabled');
-        } else {
-            $collapse = true;
-            // $collapse = validate_Phenotype("collapseEvent")
-            if ($collapse) {
-                $(this).removeClass("btn-success").addClass("btn-info");
-                $(this).find('i').removeClass("icon-chevron-down").addClass("icon-chevron-left");
-                $($(this).parent().parent().next().collapse('hide')).removeClass("container_border");
-                $(this).attr("data-collapseStatus", "false");
-                $parent.prev().children('a').addClass('disabled');
-            }
-        }
-    });
-
-
-    $(document).on('click', ".btn-add", function () {
-        var $rule = $(template[$(this).attr('data-rule')]);
-        $rule.find('.btn-remove').show();
-        $(this).closest('.rule').find('.btn-add').hide();
-        $(this).closest('.rule').find('.btn-remove').show();
-        $('select.attribute').select2('destroy');
-        $('select.operator').select2('destroy');
-        $('select.value').select2('destroy');
-        if($(this).attr('data-rule') === 'patient') {
-            $('#pat_container').append($rule);
-        } else if($(this).attr('data-rule') === 'genotype') {
-            $('#gen_container').append($rule);
-        }
-        initSelect2();
-    });
-
-    $(document).on('click', ".btn-remove", function () {
-        var $rule = $(this).closest('.rule')
-
-        if($rule.is(':first-child')) {} 
-        else { 
-            if($rule.is(':last-child')) { 
-                $rule.prev().find('.btn-add').show() ;
-            } 
-        }
-        if($rule.siblings().length === 1) { 
-            $rule.siblings().find('.btn-remove').hide();
-        }
-        $rule.remove()
-    });
-
-    $('#resultModal').on('shown.bs.modal', function (e) {
-        $('#resTbl').hide();
-        $('#loader').show();
-
-        var src = $(e.relatedTarget).data('sourcename');
-        var source_results = result_data[src];
-        var ic = 1;
-        var resRow = '';
-        $.each(source_results, function (rkey, rval) {
-            resRow += '<tr><td>' + ic + '</td><td>' + rval + '</td></tr>'
-            ic++;
-        })
-
-        $('#resTbl tbody').append(resRow);
-
-        if ($('#resTbl').length) {
-            $('#resTbl').DataTable();
-        }
-
-        $('#loader').hide();
-        $('#resTbl').show();
-
-    });
-
-    $('#resultModal').on('hidden.bs.modal', function (e) {
-        $('#resTbl').DataTable().destroy();
-        $('#resTbl tbody').empty();
-    });
-
-    $('#sourceModal').on('show.bs.modal', function (e) {
-
-        var src = $(e.relatedTarget).data('sourcename');
-        var source_results = source_data[src];
-        $('#source_name').html('<p class="ml-1">' + source_results['name'] + '</p>');
-        $('#source_owner').html('<p class="ml-1">' + source_results['owner_name'] + '</p>');
-        $('#source_owner_email').html('<p class="ml-1">' + source_results['email'] + '</p>');
-        $('#source_uri').html('<p class="ml-1">' + source_results['uri'] + '</p>');
-        $('#source_description').html('<p class="ml-1">' + source_results['description'] + '</p>');
-        $('#source_long_description').html('<p class="ml-1">' + source_results['long_description'] + '</p>');
-    });
-
-    $('#sourceModal').on('hidden.bs.modal', function (e) {
-        $('#source_name').html('');
-        $('#source_owner').html('');
-        $('#source_owner_email').html('');
-        $('#source_uri').html('');
-        $('#source_description').html('');
-        $('#source_long_description').html('');
-    });
-
-        // https://stackoverflow.com/a/6647367/5510713
-    jQuery.fn.filterByText = function(textbox) {
-      return this.each(function() {
-        var select = this;
-        var options = [];
-        $(select).find('option').each(function() {
-          options.push({value: $(this).val(), text: $(this).text()});
+    // Query Mechanism
+    $(document).ready(function () {
+        var table = $('#datasetTable').DataTable({
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "url": base_url + '/h',
+                "type": "POST",
+                "data": function (d) {
+                    d.d_datatitle = $('#d_datatitle').val();  // Sends an array of selected values
+                    d.d_datatype = $('#d_datatype').val();
+                    d.d_datatheme = $('#d_datatheme').val();
+                    d.d_studysize = $('#d_studysize').val();
+                }
+            },
+            "columns": [
+                { "data": 0 },
+                { "data": 1 },
+                { "data": 2 },
+                { "data": 3 },
+                { "data": 4 }
+            ],
+            "paging": true,
+            "searching": true,
+            "ordering": true
         });
-        $(select).data('options', options);
-
-        $(textbox).bind('change keyup', function() {
-          var options = $(select).empty().data('options');
-          var search = $.trim($(this).val());
-          var regex = new RegExp(search, "gi");
-          $.each(options, (i) => {
-            var option = options[i];
-            if (option.text.match(regex) !== null) {
-              $(select).append($('<option>').text(option.text).val(option.value));
-            }
-          });
+    
+        $('#build_query').on('click', function () {
+            table.ajax.reload();
         });
-      });
-    };
-
-    $(document).on('click', ".btn-logic", function () {
-        if($(this).hasClass('btn-secondary')) {
-            $(this).addClass('active').addClass('btn-primary').removeClass('btn-secondary')
-            $(this).siblings().removeClass('active').addClass('btn-secondary').removeClass('btn-primary')
-        }
+    
+        $('#reset_query').on('click', function () {
+            $('#queryBuilder select').val(null).trigger('change');
+            $('#d_studysize').val('');
+            table.ajax.reload();
+        });
     });
+    
 
-});
-
-function getCSRFToken(format = 'string'){
-    csrf_token = $('#csrf_token').val();
-    csrf_token_name = $('#csrf_token').prop('name');
-
-    switch (format) {
-        case "string":
-            return csrf_token_name + '=' + csrf_token;
-        case "keyvaluepair":
-            var csrfObj = {};
-            csrfObj[csrf_token_name] = csrf_token;
-            return csrfObj;
-    }
-}
+})

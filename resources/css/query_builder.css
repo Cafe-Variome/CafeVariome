@@ -1,70 +1,367 @@
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-   }
-   .switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-  .slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  .slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    -webkit-transition: .4s;
-    transition: .4s;
-  }
-  
-  input:checked + .slider {
-    background-color:#47d147;
-  }
-  
-  input:focus + .slider {
-    box-shadow: 0 0 1px #47d147;
-  }
-  
-  input:checked + .slider:before {
-    -webkit-transform: translateX(26px);
-    -ms-transform: translateX(26px);
-    transform: translateX(26px);
+@charset "UTF-8";
+/*font Variables*/
+/*Color Variables*/
+@import url("https://fonts.googleapis.com/css?family=Roboto:300i,400,400i,500,700,900");
+.multi_step_form {
+  background: #f6f9fb;
+  display: block;
+  /* overflow: hidden; */
 }
 
- .select2-selection
-{    
-    height: auto !important;
+#msform label{
+    font-size: 20px;
+    font-style: normal;
+    font-weight: normal;
+    margin-bottom: 0px;
+    /* margin-right: 15px; */
+    float: inline-start !important;
+  }
+  #requestAccessForm label{
+    font-size: 20px;
+    font-style: normal;
+    font-weight: normal;
+    margin-bottom: 0px;
+    /* margin-right: 15px; */
+    float: inline-start !important;
+  }
+
+  .fs-title {
+    font-size: 20px;
+    text-transform: uppercase;
+    color: #2C3E50;
+    margin-bottom: 10px;
+  }
+  
+  .fs-subtitle {
+    font-weight: normal;
+    font-size: 20px;
+    color: #666;
+    margin-bottom: 20px;
+  }
+.multi_step_form .msform {
+
+ text-align: center;
+  padding-top: 5px;
+  min-height: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  background: #ffffff;
+  z-index: 1;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  margin-bottom: 0px;
+  position: relative;
+}
+.multi_step_form .msform .tittle {
+  text-align: center;
 }
 
-.select2-selection__rendered
-{ 
-    line-height: 35px !important;
-} 
+.multi_step_form .msform fieldset {
+  padding: 20px 105px 0;
+  background: white;
+  border-radius: 50px;
+  /* box-shadow: 0 0 15px 1px rgb(255 0 49 / 25%); */
+  box-shadow: 0 0 15px 1px rgba(139 182 29 / 50%);
+
+  /* box-shadow: 0 0 15px 1px rgb(0 180 96 / 25%); */
+  padding: 20px 30px;
+  box-sizing: border-box;
+  width: 90%;
+  margin: auto;
+}
+#requestAccessForm fieldset {
+  padding: 20px 105px 0;
+  background: white;
+  border-radius: 5px;
+  /* box-shadow: 0 0 15px 1px rgb(255 0 49 / 25%); */
+  box-shadow: 0 0 15px 1px rgba(139 182 29 / 50%);
+
+  /* box-shadow: 0 0 15px 1px rgb(0 180 96 / 25%); */
+  padding: 20px 30px;
+  box-sizing: border-box;
+  width: 100%;
+  margin: auto;
+}
+
+  .editFeildset{
+    padding: 20px 105px 0;
+    background: white;
+    border-radius: 10px;
+    /* box-shadow: 0 0 15px 1px rgb(255 0 49 / 25%); */
+    box-shadow: 0 0 15px 1px rgba(139 182 29 / 30%);
+
+    /* box-shadow: 0 0 15px 1px rgb(0 180 96 / 25%); */
+    padding: 20px 30px;
+    box-sizing: border-box;
+    width: 90%;
+    margin: auto;
+  }
+#done{
+    padding: 20px 105px 0;
+    background: white;
+    border-radius: 50px;
+    box-shadow: 4px 6px 12px rgba(0,0,0,0.4);
+    padding: 20px 30px;
+    box-sizing: border-box;
+    box-sizing: border-box;
+    width: 80%;
+    margin: auto;
+
+}
 /* 
-.col{
-    font-size: 18px;
-}
+    background: white;
+    border: 0 none;
+    border-radius: 3px;
+    box-shadow: 0 0 15px 1px rgb(0 0 0 / 40%);
+    padding: 20px 30px;
+    box-sizing: border-box;
+    width: 70%;
+    margin: 0px 13%;
 */
-#sr-handle, #srr-handle {
-    width: 1.6em;
-    height: 1.6em;
-    top: 50%;
-    margin-top: -.8em;
-    text-align: center;
-    line-height: 1.6em;
-  }
+.multi_step_form .msform fieldset:not(:first-of-type) {
+  display: none;
+}
+
+
+.multi_step_form .msform #progressbar {
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+.multi_step_form .msform #progressbar li {
+  list-style-type: none;
+  color: black;
+  font-size: 1rem;
+  width: calc(100%/6);
+  float: left;
+  position: relative;
+  font-weight: bold;
+
+}
+.multi_step_form .msform #progressbar li:nth-child(2):before {
+  content: "\F726";
+}
+.multi_step_form .msform #progressbar li:nth-child(3):before {
+  content: "\F4CF";
+}
+.multi_step_form .msform #progressbar li:nth-child(4):before {
+  content: "\F461";
+}
+.multi_step_form .msform #progressbar li:nth-child(5):before {
+  content: "\F640";
+}
+/* F5F9 */
+.multi_step_form .msform #progressbar li:nth-child(6):before {
+  content: "\F5F9";
+}
+
+.multi_step_form .msform #progressbar li:before {
+  font-family:'Bootstrap-icons';
+  content: "\F4D7";
+  /* font: normal normal normal 30px/50px Ionicons; */
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  display: block;
+  background: #eaf0f4;
+  border-radius: 50px;
+  margin: 0 auto 10px auto;
+}
+.multi_step_form .msform #progressbar li:after {
+    content: "";
+    width: 100%;
+    height: 10px;
+    background: #eaf0f4;
+    position: absolute;
+    left: -50%;
+    top: 21px;
+    z-index: -1;
+}
+.multi_step_form .msform #progressbar li:last-child:after {
+  width: 150%;
+}
+.multi_step_form .msform #progressbar li.active {
+  color: #8CB61D;
+}
+.multi_step_form .msform #progressbar li.active:before, .multi_step_form .msform #progressbar li.active:after {
+  background: #8CB61D;
+  color: #eaf0f4;
+}
+.multi_step_form .msform .action-button {
+  background: #8CB61D;
+  color: white;
+  border: 0 none;
+  border-radius: 5px;
+  cursor: pointer;
+  min-width: 130px;
+  /* font: 700 14px/40px "Roboto", sans-serif; */
+  border: 1px solid #8CB61D;
+  margin: 0 5px;
+  text-transform: uppercase;
+  display: inline-block;
+  width: fit-content;
+}
+.multi_step_form .msform .action-button:hover, .multi_step_form .msform .action-button:focus {
+  background: #405867;
+  border-color: #405867;
+}
+.multi_step_form .msform .previous_button {
+  background: transparent;
+  color: #99a2a8;
+  border-color: #99a2a8;
+}
+.multi_step_form .msform .previous_button:hover, .multi_step_form .msform .previous_button:focus {
+  background: #405867;
+  border-color: #405867;
+  color: #fff;
+}
+
+.disImage img{
+  width: 35%;
+  object-fit: contain;
+  margin-left: 1%;
+}
+.mimageC img {
+  width: 100%;
+  object-fit: contain;
+ 
+}
+.notaction-button {
+  background: #8CB61D;
+  color: white;
+  border: 0 none;
+  border-radius: 5px;
+  cursor: pointer;
+  min-width: 130px;
+  /* font: 700 14px/40px "Roboto", sans-serif; */
+  border: 1px solid #8CB61D;
+  margin: 0 5px;
+  text-transform: uppercase;
+  display: inline-block;
+  width: fit-content;
+}
+
+.msform label{
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  margin-bottom: 0px;
+  text-align: left !important;
+  /* margin-right: 15px; */
+}
+
+.msform .form-text{
+
+  text-align: left !important;
+  /* margin-right: 15px; */
+}
+.backvalue {
+  margin: 0%;
+  height: 0;
+  opacity: 0;
+  width: 0;
+  float: left;
+  /* Reposition so the validation message shows over the label */
+
+}
+.bootstrap-tagsinput .tag {
+  margin-right: 2px;
+  color: white !important;
+  background-color: #8CB61D;
+  padding: 0.2rem;
+}
+.bi-asterisk{
+  font-size: 10px !important;
+  position: relative;
+  left: 3px;
+  top: -6px;
+        
+}
+.edit{
+  font-size: 1.5rem;
+  color: #8CB61D !important;
+  background-color: transparent;
+  width: fit-content;
+  /* margin-top: -3.5%; */
+  height: fit-content;
+  float: right;
+}
+.edit:hover{
+
+  color: white !important;
+  background-color: #8CB61D;
+}
+
+.updateData{
+  font-size: 1.5rem;
+  color: #8CB61D !important;
+  background-color: transparent;
+  width: fit-content;
+  margin-top: -3.5% !important;
+  height: fit-content;
+  float: right;
+}
+.updateData:hover{
+
+  color: white !important;
+  background-color: #8CB61D;
+}
+.ReviewTable tbody :nth-child(1){
+  font-weight: bold;
+  width: 25%;
+}
+.swal2-confirm .swal2-styled{
+  color: white !important;
+  background-color: #8CB61D;
+}
+.remText{
+  float: inline-end !important;
+}
+em{
+  float: left !important;
+  font-size: small !important;
+}
+.form-control .form-control-feedback {
+  position: absolute !important;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  font-size: 1.5em;
+}
+.has-success {
+  color: green;
+}
+.has-erro .error {
+  color: red !important;
+}
+
+#dataUpdate label{
+  font-size: 20px;
+  font-style: normal;
+  font-weight: normal;
+  margin-bottom: 0px;
+}
+.fitcon{
+  padding: 0% !important;
+  height: fit-content !important;
+  width: fit-content !important;
+  /* margin-left: auto; */
+  margin-left: 5%;
+  margin-bottom: 1%;
+}
+
+.resulttable{
+
+  padding: 20px 105px 0;
+  background: white;
+  border-radius: 5px;
+  /* box-shadow: 0 0 15px 1px rgb(255 0 49 / 25%); */
+  box-shadow: 0 0 15px 1px rgba(139 182 29 / 50%);
+
+  /* box-shadow: 0 0 15px 1px rgb(0 180 96 / 25%); */
+  padding: 20px 30px;
+  box-sizing: border-box;
+  width:100%;
+  margin: auto;
+
+}

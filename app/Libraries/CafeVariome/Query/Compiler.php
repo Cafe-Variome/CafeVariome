@@ -17,16 +17,17 @@ use App\Libraries\CafeVariome\Factory\AttributeAdapterFactory;
 use App\Libraries\CafeVariome\Factory\DiscoveryGroupAdapterFactory;
 use App\Libraries\CafeVariome\Factory\SourceAdapterFactory;
 use App\Libraries\CafeVariome\Net\NetworkInterface;
+use CodeIgniter\Config\Services;
+
 
 class Compiler
 {
 	private $query;
 	private array $uniqueSubjectIds;
 
-	public function __construct(int $providerID)
+	public function __construct()
 	{
-		$this->uniqueSubjectIds = [];
-		$this->providerID = $providerID;
+		$this->encryption = Services::encrypter();
 	}
 
 	public function CompileAndRunQuery(string $query, int $network_id, int $user_id): string
@@ -455,4 +456,96 @@ class Compiler
 				return $alleleFrequencyQuery->Execute($clause, $source);
 		}
 	}
+
+	public function buildQueryLogic(array $filters, string $searchValue): string
+{
+    $queryLogic = [];
+
+    foreach ($filters as $filterName => $filter) {
+        $fields = $filter['fields'];
+        $values = $filter['values'];
+        $operator = $filter['operator'];
+
+        $conditions = [];
+        foreach ($fields as $field) {
+            $fieldConditions = [];
+            foreach ($values as $value) {
+                $value = trim(addslashes($value)); // Ensure no extra spaces
+                if ($operator === 'LIKE') {
+                    $fieldConditions[] = "$field LIKE '%$value%'";
+                } elseif ($operator === 'IN_LIST') {
+                    // Normalize semicolon-separated lists and check using FIND_IN_SET
+                    $fieldConditions[] = "FIND_IN_SET('$value', REPLACE(REPLACE($field, ' ;', ';'), '; ', ',')) > 0";
+                } elseif ($operator === '>=') {
+                    $fieldConditions[] = "$field >= '$value'";
+                } elseif ($operator === '=') {
+                    $fieldConditions[] = "$field = '$value'";
+                }
+            }
+            // Combine conditions for a single field using OR
+            $conditions[] = '(' . implode(' OR ', $fieldConditions) . ')';
+        }
+        // Combine field conditions using OR
+        $queryLogic[] = '(' . implode(' OR ', $conditions) . ')';
+    }
+
+    // Add global search logic
+    if (!empty($searchValue)) {
+        $searchConditions = [
+            "d_title LIKE '%" . addslashes($searchValue) . "%'",
+            "d_abstract LIKE '%" . addslashes($searchValue) . "%'",
+            "d_datatypes LIKE '%" . addslashes($searchValue) . "%'",
+            "d_conpoint LIKE '%" . addslashes($searchValue) . "%'"
+        ];
+        $queryLogic[] = '(' . implode(' OR ', $searchConditions) . ')';
+    }
+
+    // Combine all conditions using AND
+    $queryLogic = !empty($queryLogic) ? implode(' AND ', $queryLogic) : '1=1';
+
+    // Add default conditions for approval and archived status
+    $queryLogic .= " AND d_approved = 1 AND archived = 0";
+
+    return $queryLogic;
+}
+
+	
+
+	
+
+    public function execute(string $queryLogic, int $start, int $length, string $orderColumn, string $orderDir)
+    {
+        // Call the Model to fetch data
+        $model = new \App\Models\DatasetModel();
+        $datasets = $model->getFilteredData($queryLogic, $start, $length, $orderColumn, $orderDir);
+
+        // Count total records
+        $totalRecords = $model->countAllDatasets();
+
+        // Count filtered records
+        $totalFilteredRecords = $model->countFilteredData($queryLogic);
+
+        // Format the results for datatable
+        $data = [];
+        foreach ($datasets as $dataset) {
+            $data[] = [
+                $dataset['d_title'],
+                $dataset['d_abstract'],
+                $dataset['d_datatypes'],
+                $dataset['d_conpoint'],
+                '<a href="#" data-id="' .$this->encrypt($dataset['d_id']). '" class="btn btn-primary btn-sm view-btn"><i class="bi bi-eye"></i></a>'
+            ];
+        }
+
+        return [
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $totalFilteredRecords,
+            'data' => $data,
+        ];
+    }
+
+	private function encrypt($data)
+    {
+        return bin2hex($this->encryption->encrypt($data));
+    }
 }

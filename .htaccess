@@ -106,6 +106,8 @@ IndexIgnore *
     RewriteRule ^/(.*) https://%{SERVER_NAME}/$1 [NC,R,L]
 </IfModule>
 
+
+
 <IfModule !mod_rewrite.c>
 
     # If we don't have mod_rewrite installed, all 404's

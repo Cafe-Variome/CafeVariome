@@ -1,0 +1,46 @@
+/*
+ @author Umar Riaz 
+*/
+.logo{
+  width: 200px !important;
+}
+.navbar{
+  background-color: white !important;
+  /* box-shadow: 4px 6px 12px rgb(218 221 212 / 48%); */
+  box-shadow: 0 0 15px 1px rgba(139 182 29 / 30%);
+  /* box-shadow: 0 0 15px 1px rgb(255 0 49 / 25%); */
+  /* box-shadow: 0 0 15px 1px rgb(0 180 96 / 25%); */
+
+}
+.nav-item{
+  width: fit-content;
+  padding: 1%;
+  text-align: center;
+}
+.nav-item:hover {
+  color: black;
+  border-radius: 5px;
+  background: transparent;
+  box-shadow: inset 10px 10px 10px rgba(0, 0, 0, 0.169), 4px 6px 12px rgba(0, 0, 0, 0.1), 4px 6px 12px rgba(0, 0, 0, 0.05), inset -10px -10px 15px rgba(255, 255, 255, 0.9);
+
+}
+
+.nav-item.active a {
+  /* color: white !important; */
+  border-radius: 16px;
+  background: #27AE60;
+  /* box-shadow: 4px 6px 12px rgba(132, 133, 130, 0.48); */
+  box-shadow: 0 1px 2px 0 rgba(60,64,67,0.302), 0 1px 3px 1px rgba(60,64,67,0.149);
+  background-color: #c2e7ff;
+}
+.navbar-nav li.active a {
+  color: white !important;
+  border-radius: 5px;
+  background: #8CB61D;
+  box-shadow: 4px 6px 12px rgba(132, 133, 130, 0.48);
+}
+
+
+
+
+

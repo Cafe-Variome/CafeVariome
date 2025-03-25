@@ -69,37 +69,37 @@ class AjaxApi extends Controller
 	{
 		parent::initController($request, $response, $logger);
 
-        $this->setting =  CafeVariome::Settings();
-		$this->session = \Config\Services::session();
-		$this->serviceInterface = new ServiceInterface($this->setting->GetInstallationKey());
-		$this->authenticator = new NullAuthenticator();
-		$this->providerID = $this->session->get(self::AUTHENTICATOR_SESSION);
+        // $this->setting =  CafeVariome::Settings();
+		// $this->session = \Config\Services::session();
+		// $this->serviceInterface = new ServiceInterface($this->setting->GetInstallationKey());
+		// $this->authenticator = new NullAuthenticator();
+		// $this->providerID = $this->session->get(self::AUTHENTICATOR_SESSION);
 
-		if ($this->session->has(self::AUTHENTICATOR_SESSION))
-		{
-			if (intval($this->session->get(self::AUTHENTICATOR_SESSION)) > 0)
-			{
-				$authenticatorFactory = new AuthenticatorFactory();
-				$provider = (new SingleSignOnProviderAdapterFactory())->GetInstance()->Read($this->session->get(self::AUTHENTICATOR_SESSION));
-				if (!$provider->isNull())
-				{
-					$this->authenticator = $authenticatorFactory->GetInstance($provider);
-				}
-				else
-				{
-					$this->session->destroy();
-				}
-			}
-			else
-			{
-				if (self::LOCAL_AUTHENTICATION)
-				{
-					// Local authenticator being used
-					$this->authenticator = new LocalAuthenticator();
-				}
-			}
+		// if ($this->session->has(self::AUTHENTICATOR_SESSION))
+		// {
+		// 	if (intval($this->session->get(self::AUTHENTICATOR_SESSION)) > 0)
+		// 	{
+		// 		$authenticatorFactory = new AuthenticatorFactory();
+		// 		$provider = (new SingleSignOnProviderAdapterFactory())->GetInstance()->Read($this->session->get(self::AUTHENTICATOR_SESSION));
+		// 		if (!$provider->isNull())
+		// 		{
+		// 			$this->authenticator = $authenticatorFactory->GetInstance($provider);
+		// 		}
+		// 		else
+		// 		{
+		// 			$this->session->destroy();
+		// 		}
+		// 	}
+		// 	else
+		// 	{
+		// 		if (self::LOCAL_AUTHENTICATION)
+		// 		{
+		// 			// Local authenticator being used
+		// 			$this->authenticator = new LocalAuthenticator();
+		// 		}
+		// 	}
 
-		}
+		// }
     }
 
     public function Query()

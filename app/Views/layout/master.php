@@ -12,27 +12,10 @@
 <html class="h-100">
 
 <head>
-    <title><?php echo $site_title ?> | <?php echo $title ?></title>
+    <title>LeHMR Discovery</title>
 
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="keywords" content="<?php echo $meta_keywords ?>" />
-    <meta name="author" content="<?php echo $meta_author ?>" />
-    <meta name="description" content="<?php echo $meta_description ?>" />
-
-    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "twbs/bootstrap/dist/css/bootstrap.css"); ?>" />
-    <link rel="stylesheet" href="<?php echo base_url(CSS . "site.css"); ?>" />
-    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/fontawesome.css"); ?>" />
-    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/brands.css"); ?>" />
-    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/solid.css"); ?>" />
-    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "select2/select2/dist/css/select2.css"); ?>" />
-
-
-    <!-- extra CSS-->
-    <?php foreach ($css as $c) : ?>
-        <link rel="stylesheet" href="<?php echo base_url($c) ?>">
-    <?php endforeach; ?>
 
     <!-- favicon and touch icons -->
     <link rel="shortcut icon" href="<?php echo base_url(IMAGES . 'logos/favicon.ico'); ?>" />
@@ -40,6 +23,45 @@
     <script type="text/javascript" src="<?= base_url('UserInterfaceAPI/GetUIConstants') ?>"></script>
 
     <script src="<?php echo base_url(JS . "jquery-3.6.0.min.js"); ?>"></script>
+
+    <link rel="stylesheet" href="<?php echo base_url(CSS . "site.css"); ?>?v=<?php echo rand()?>" />
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(CSS . 'nav.css') ?>?v=<?php echo rand()?>"> 
+    <!-- query_builder.css -->
+    <link rel="stylesheet" type="text/css" href="<?php echo base_url(CSS . ' query_builder.css') ?>?v=<?php echo rand()?>"> 
+
+
+    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/fontawesome.css"); ?>" />
+    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/brands.css"); ?>" />
+    <link rel="stylesheet" href="<?php echo base_url(VENDOR . "components/font-awesome/css/solid.css"); ?>" />
+
+   
+    <!-- Bootstrap -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+    <!-- Select 2 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+
+    <!-- Swal Files -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+    <script>var base_url = '<?php echo base_url() ?>';</script>
+
+    <!-- DataTable -->
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+    <!-- extra CSS-->
+
+
+    <?php foreach ($css as $c) : ?>
+        <link rel="stylesheet" href="<?php echo base_url($c) ?>?v=<?php echo rand()?>">
+    <?php endforeach; ?>
+
+
 
 
 </head>

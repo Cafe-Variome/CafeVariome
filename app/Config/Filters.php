@@ -26,7 +26,8 @@ class Filters extends BaseConfig
         'secureheaders' => SecureHeaders::class,
 		'ajax'     => AJAXFilter::class,
 		'task'	   => TaskFilter::class,
-		'inputvalidation' => InputValidation::class
+		'inputvalidation' => InputValidation::class,
+
     ];
 
     /**
@@ -39,8 +40,11 @@ class Filters extends BaseConfig
 			'csrf' => [
 				'except' => [
 					'QueryApi/*',
-					'NetworkApi/*'
-					//'BeaconApi/*' //Uncomment to activate BeaconAPI
+					'NetworkApi/*',
+                    '/h',
+                    '/lvm'
+					//'BeaconApi/*' //Uncomment to activate BeaconAPI,
+
 				]
 			],
 		],
